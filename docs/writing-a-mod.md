@@ -318,7 +318,7 @@ the order that worked: [process.md](process.md), "Researching game code".
   published. `-Publish` makes a GitHub release `<id>-v<version>` (the DLL is the asset) and a pull request with
   `catalog\`. A version is published once: change the mod and **raise the version in `[BepInPlugin]`** to publish again.
 - Tags: `Tags` in `$catalogParts` is a comma-separated list for the catalog (`map`, `battle`, `tooltip`, `ui`, `fix`,
-  `qol`, `library`; the Mods window filters by them, the names of the known ones are the `oe.manager.tag.<id>` keys of
+  `qol`, `library`, `info`, `squads`, `buildings`; the Mods window filters by them, the names of the known ones are the `oe.manager.tag.<id>` keys of
   `mod-manager/lang`, so a new tag needs those keys in every language file).
 - Screenshots: put PNG or JPG pictures (up to 2 MB each) in the mod's `mod-<id>/screenshots/` folder. They are listed in
   the catalog sorted by file name and served from the repository's `main` branch. An optional

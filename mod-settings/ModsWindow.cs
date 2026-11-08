@@ -715,10 +715,10 @@ public partial class Plugin
         if (catalog)
             return;
 
-        // The controls, left of the information.
+        // The controls in one group, vertically centred, just left of the information on the right.
         var controls = NewRect("OE_Controls", row.transform);
         controls.anchorMin = controls.anchorMax = controls.pivot = new Vector2(1f, 0.5f);
-        controls.anchoredPosition = new Vector2(-370f, 0f);
+        controls.anchoredPosition = new Vector2(InfoLeft(row) - 24f, 0f);
         controls.sizeDelta = new Vector2(330f, 60f);
         HRow(controls.gameObject, 10f, TextAnchor.MiddleRight);
         // No update and no cross for a mod BepInEx loaded itself (ByHand).
@@ -736,6 +736,30 @@ public partial class Plugin
         var t = row.transform;
         Hide(t, "CloudOn", "CloudOff", "InfoIcons", "CampaignInfo");
         Hide(t.Find("HeaderGroup"), "RenameBtn");
+        // The game's save row laid out for a mod (fogone 08.11: it looked crooked): as high as it needs, the check box
+        // and the picture vertically centred at the left, the name above the middle (the tags under it, RowName), the
+        // three lines of information on the right around the middle.
+        Size(row, -1f, ModRowHeight);
+        var rowRect = row.transform.Cast<RectTransform>();
+        PinLeft(t.Find("Toggle"), rowRect, 0f);
+        PinLeft(t.Find("IconFrame"), rowRect, 0f);
+        PinLeft(t.Find("HeaderGroup"), rowRect, 15f);
+        PinRight(t.Find("LastSaveHeader"), rowRect, 27f);
+        PinRight(t.Find("LastSaveTime"), rowRect, 0f);
+        PinRight(t.Find("LastSaveGameTime"), rowRect, -27f);
+        // The name's group one line high, its name in the middle of it (the save row's 72-high name box hung down).
+        if (t.Find("HeaderGroup") is { } headerGroup)
+        {
+            headerGroup.Cast<RectTransform>().sizeDelta = new Vector2(560f, 34f);
+            if (headerGroup.GetComponent<HorizontalLayoutGroup>() is { } nameLine)
+            {
+                nameLine.childAlignment = TextAnchor.MiddleLeft;
+                nameLine.childControlHeight = true;
+                nameLine.childForceExpandHeight = false;
+            }
+            if (headerGroup.Find("SessionName")?.GetComponent<TMP_Text>() is { } nameText)
+                nameText.alignment = TextAlignmentOptions.MidlineLeft;
+        }
         if (t.Find("SelectedBack") is { } selectedBack)
             selectedBack.gameObject.SetActive(picked);
         if (t.Find("HoveredBack")?.GetComponent<CanvasGroup>() is { } hovered)
@@ -746,6 +770,44 @@ public partial class Plugin
             group.interactable = group.blocksRaycasts = true;
         }
         Clickable(row, () => Redraw(pick));
+    }
+
+    const float ModRowHeight = 96f;
+
+    // A part of the row kept where it is across, pinned to the row's left (or right) edge at a height from its middle
+    // (anchors and pivot middle; the row's own anchors were the save row's, for its 110).
+    static void PinLeft(Transform part, RectTransform row, float y)
+    {
+        if (part == null)
+            return;
+        var rect = part.Cast<RectTransform>();
+        var size = rect.rect.size;
+        var left = rect.localPosition.x + rect.rect.xMin - row.rect.xMin;
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
+        rect.sizeDelta = size;
+        rect.anchoredPosition = new Vector2(left, y);
+    }
+
+    static void PinRight(Transform part, RectTransform row, float y)
+    {
+        if (part == null)
+            return;
+        var rect = part.Cast<RectTransform>();
+        var size = rect.rect.size;
+        var right = row.rect.xMax - (rect.localPosition.x + rect.rect.xMax);
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1f, 0.5f);
+        rect.sizeDelta = size;
+        rect.anchoredPosition = new Vector2(-right, y);
+    }
+
+    // Where the information on the right begins (from the row's right edge, negative): its widest line's text.
+    static float InfoLeft(GameObject row)
+    {
+        var left = 0f;
+        foreach (var name in new[] { "LastSaveHeader", "LastSaveTime", "LastSaveGameTime" })
+            if (row.transform.Find(name)?.GetComponent<TMP_Text>() is { } text && !string.IsNullOrEmpty(text.text))
+                left = Math.Min(left, text.rectTransform.anchoredPosition.x - text.GetPreferredValues(text.text).x);
+        return left;
     }
 
     // The row's picture: a screenshot or the catalog's icon in the save's icon frame; with none, the name's first
@@ -794,8 +856,25 @@ public partial class Plugin
             return;
         if (group.Find("SessionName")?.GetComponent<TMP_Text>() is { } title)
             SetText(title, name);
-        // The game's two chips: the first two tags.
+        // The game's chips: the first four tags, on their own line under the name (the save row has them after its
+        // name; ours read better under it).
         var chips = group.GetComponentsInChildren<BhTag>(true).ToList();
+        var line = row.transform.Find("OE_Tags");
+        if (line == null)
+        {
+            var rect = NewRect("OE_Tags", row.transform);
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
+            rect.sizeDelta = new Vector2(560f, 24f);
+            rect.anchoredPosition = new Vector2(group.Cast<RectTransform>().anchoredPosition.x, -17f);
+            HRow(rect.gameObject, 6f, TextAnchor.MiddleLeft);
+            line = rect;
+        }
+        // The row has two chips; more are copies of the first, up to four tags.
+        while (chips.Count > 0 && chips.Count < 4)
+            chips.Add(UnityEngine.Object.Instantiate(chips[0].gameObject, line, false).GetComponent<BhTag>());
+        foreach (var chip in chips)
+            if (line != null)
+                chip.transform.SetParent(line, false);
         for (var i = 0; i < chips.Count; i++)
         {
             var key = tagKeys != null && i < tagKeys.Count ? tagKeys[i] : null;
