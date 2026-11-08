@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"интерфейс"},
 {"sid":"oe.manager.tag.fix","text":"исправления"},
 {"sid":"oe.manager.tag.qol","text":"удобство"},
-{"sid":"oe.manager.tag.library","text":"библиотека"}
+{"sid":"oe.manager.tag.library","text":"библиотека"},
 {"sid":"oe.manager.src.notHttps","text":"Не добавлен: разрешены только адреса https"},
 {"sid":"oe.manager.src.duplicate","text":"Не добавлен: такой источник уже есть"},
 {"sid":"oe.manager.src.badGitHub","text":"Не добавлен: имя на GitHub пишется как владелец или владелец/репозиторий"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"Источник убран: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"не читается"},
 {"sid":"oe.manager.src.note.cached","text":"из сохранённой копии"},
-{"sid":"oe.manager.src.note.read","text":"прочитан"}
+{"sid":"oe.manager.src.note.read","text":"прочитан"},
+{"sid":"oe.manager.src.note.notChecked","text":"ещё не проверялся"},
+{"sid":"oe.manager.src.note.noName","text":"у каталога нет названия"}
 ]
 }

@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"interface"},
 {"sid":"oe.manager.tag.fix","text":"fixes"},
 {"sid":"oe.manager.tag.qol","text":"quality of life"},
-{"sid":"oe.manager.tag.library","text":"library"}
+{"sid":"oe.manager.tag.library","text":"library"},
 {"sid":"oe.manager.src.notHttps","text":"Not added: only https addresses are allowed"},
 {"sid":"oe.manager.src.duplicate","text":"Not added: this source is already in the list"},
 {"sid":"oe.manager.src.badGitHub","text":"Not added: write a GitHub name as owner or owner/repo"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"Source removed: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"could not be read"},
 {"sid":"oe.manager.src.note.cached","text":"from the saved copy"},
-{"sid":"oe.manager.src.note.read","text":"read"}
+{"sid":"oe.manager.src.note.read","text":"read"},
+{"sid":"oe.manager.src.note.notChecked","text":"not checked yet"},
+{"sid":"oe.manager.src.note.noName","text":"the catalog has no name"}
 ]
 }
