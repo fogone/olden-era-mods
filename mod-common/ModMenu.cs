@@ -266,7 +266,8 @@ public sealed record ModScreenshot(string Path, string CaptionKey);
 // checked ("start", "daily", "weekly", "manual") and the actions (null when not allowed: the built-in source cannot be
 // removed).
 public sealed record CatalogSource(string TitleKey, string Url, int Mods, string NoteKey, bool BuiltIn, DateTime? LastChecked,
-    string CheckEvery, Action Check, Action<string> SetCheckEvery, Action Remove);
+    string CheckEvery, Action Check, Action<string> SetCheckEvery, Action Remove,
+    string IconPath = null);   // the catalog's icon on disk once downloaded (the root file's icon, checked and cached), or null
 
 public static class ModCatalog
 {

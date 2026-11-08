@@ -573,15 +573,14 @@ public partial class Plugin
         }
         var chosen = mods.Where(m => selected.Contains(m.Id)).ToList();
         var ids = chosen.Select(m => m.Id).ToList();
-        // TODO(ByHand): a mod BepInEx loaded itself (ModEntry.ByHand) is never updated nor removed: leave it out of
-        // updatable and removable below once the running library has ByHand (after the next restart).
+        // A mod BepInEx loaded itself (ByHand) is switched like the others but never updated nor removed here.
         BottomButton(W + "enable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == false && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, true));
         BottomButton(W + "disable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == true && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, false));
-        var updatable = chosen.Where(m => m.HasUpdate).Select(m => m.Id).ToList();
+        var updatable = chosen.Where(m => m.HasUpdate && !m.ByHand).Select(m => m.Id).ToList();
         BottomButton(W + "update", ModCatalog.Update != null && updatable.Count > 0, () => ModCatalog.Update?.Invoke(updatable));
         var updateAll = ModCatalog.UpdateAll != null && (ModCatalog.Mods.Any(m => m.HasUpdate) || ModCatalog.Manager?.HasUpdate == true);
         BottomButton(W + "updateAll", updateAll, () => ModCatalog.UpdateAll?.Invoke());
-        var removable = chosen.Where(m => !m.RequiredByOthers).Select(m => m.Id).ToList();
+        var removable = chosen.Where(m => !m.RequiredByOthers && !m.ByHand).Select(m => m.Id).ToList();
         if (deleteTemplate != null)
         {
             var remove = Copy(deleteTemplate, bottomGroup).GetComponent<BhGenericButton>();
@@ -640,7 +639,8 @@ public partial class Plugin
             RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "", mod.Available ?? mod.Installed ?? "",
                 mod.Installed != null ? Texts.Get(W + "installed") : mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
         else
-            RowInfo(row, Texts.Get(W + "versionLabel"), mod.Installed ?? "", mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
+            // The catalog it comes from on top (fogone 08.11), "by hand" when none; the version; the note.
+            RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"), mod.Installed ?? "", mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
         if (catalog)
             return;
 
@@ -650,12 +650,12 @@ public partial class Plugin
         controls.anchoredPosition = new Vector2(-370f, 0f);
         controls.sizeDelta = new Vector2(330f, 60f);
         HRow(controls.gameObject, 10f, TextAnchor.MiddleRight);
-        // TODO(ByHand): no update and no cross for a mod BepInEx loaded itself (mod.ByHand) once the library has it.
-        if (mod.HasUpdate && ModCatalog.Update != null && textButtonTemplate != null)
+        // No update and no cross for a mod BepInEx loaded itself (ByHand).
+        if (mod.HasUpdate && !mod.ByHand && ModCatalog.Update != null && textButtonTemplate != null)
             TextButton(controls, string.Format(Texts.Get(W + "updateTo"), mod.Available), 170f, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
         if (!isManager && mod.Enabled is { } on && !mod.RequiredByOthers && ModCatalog.SetEnabled != null && switchSource != null)
             NewSwitch(controls, on, value => Guard("switch " + mod.Id, () => ModCatalog.SetEnabled?.Invoke(new[] { mod.Id }, value)));
-        if (!isManager && !mod.RequiredByOthers && ModCatalog.Remove != null && crossSource != null)
+        if (!isManager && !mod.RequiredByOthers && !mod.ByHand && ModCatalog.Remove != null && crossSource != null)
             NewCross(controls, () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
     }
 
@@ -870,11 +870,11 @@ public partial class Plugin
             InfoText(string.Format(Texts.Get(W + "requires"), string.Join(", ", requires.Select(Texts.Get))));
 
         // The buttons by tab: the big one Update / Install, the bin Remove.
-        // TODO(ByHand): no Update and no Remove for a mod BepInEx loaded itself (mod.ByHand) once the library has it.
+        // No Update and no Remove for a mod BepInEx loaded itself (ByHand).
         if (tab == WindowTab.Installed)
         {
-            PanelButton(primaryButton, W + "update", mod.HasUpdate && ModCatalog.Update != null, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
-            PanelButton(deleteButton, null, mod != ModCatalog.Manager && mod.Installed != null && !mod.RequiredByOthers && ModCatalog.Remove != null,
+            PanelButton(primaryButton, W + "update", mod.HasUpdate && !mod.ByHand && ModCatalog.Update != null, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
+            PanelButton(deleteButton, null, mod != ModCatalog.Manager && mod.Installed != null && !mod.RequiredByOthers && !mod.ByHand && ModCatalog.Remove != null,
                 () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
         }
         else
