@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"Continua"},
 {"sid":"oe.settings.w.url.caption","text":"L'indirizzo di un catalogo"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"Un catalogo su GitHub: proprietario o proprietario/repository"},
-{"sid":"oe.settings.w.github.placeholder","text":"proprietario/repository"},
+{"sid":"oe.settings.w.github.caption","text":"Un catalogo su GitHub"},
+{"sid":"oe.settings.w.github.placeholder","text":"proprietario o proprietario/repository"},
 {"sid":"oe.settings.w.add","text":"Aggiungi"},
-{"sid":"oe.settings.w.cancel","text":"Annulla"}
+{"sid":"oe.settings.w.cancel","text":"Annulla"},
+{"sid":"oe.settings.w.selectAll","text":"Seleziona tutto · selezionati: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"Versione"},
+{"sid":"oe.settings.w.catalogLabel","text":"Catalogo"},
+{"sid":"oe.settings.w.modsLabel","text":"Mod"},
+{"sid":"oe.settings.w.checkedLabel","text":"Ultimo controllo"}
 ]
 }

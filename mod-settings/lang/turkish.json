@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"Devam"},
 {"sid":"oe.settings.w.url.caption","text":"Bir kataloğun adresi"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"GitHub'daki bir katalog: sahip veya sahip/depo"},
-{"sid":"oe.settings.w.github.placeholder","text":"sahip/depo"},
+{"sid":"oe.settings.w.github.caption","text":"GitHub'daki bir katalog"},
+{"sid":"oe.settings.w.github.placeholder","text":"sahip veya sahip/depo"},
 {"sid":"oe.settings.w.add","text":"Ekle"},
-{"sid":"oe.settings.w.cancel","text":"İptal"}
+{"sid":"oe.settings.w.cancel","text":"İptal"},
+{"sid":"oe.settings.w.selectAll","text":"Tümünü seç · seçili: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"Sürüm"},
+{"sid":"oe.settings.w.catalogLabel","text":"Katalog"},
+{"sid":"oe.settings.w.modsLabel","text":"Modlar"},
+{"sid":"oe.settings.w.checkedLabel","text":"Son kontrol"}
 ]
 }

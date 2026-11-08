@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"계속"},
 {"sid":"oe.settings.w.url.caption","text":"카탈로그 주소"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"GitHub의 카탈로그: 소유자 또는 소유자/저장소"},
-{"sid":"oe.settings.w.github.placeholder","text":"소유자/저장소"},
+{"sid":"oe.settings.w.github.caption","text":"GitHub의 카탈로그"},
+{"sid":"oe.settings.w.github.placeholder","text":"소유자 또는 소유자/저장소"},
 {"sid":"oe.settings.w.add","text":"추가"},
-{"sid":"oe.settings.w.cancel","text":"취소"}
+{"sid":"oe.settings.w.cancel","text":"취소"},
+{"sid":"oe.settings.w.selectAll","text":"모두 선택 · 선택됨: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"버전"},
+{"sid":"oe.settings.w.catalogLabel","text":"카탈로그"},
+{"sid":"oe.settings.w.modsLabel","text":"모드"},
+{"sid":"oe.settings.w.checkedLabel","text":"마지막 확인"}
 ]
 }

@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"Продолжить"},
 {"sid":"oe.settings.w.url.caption","text":"Адрес каталога"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"Каталог на GitHub: владелец или владелец/репозиторий"},
-{"sid":"oe.settings.w.github.placeholder","text":"владелец/репозиторий"},
+{"sid":"oe.settings.w.github.caption","text":"Каталог на GitHub"},
+{"sid":"oe.settings.w.github.placeholder","text":"владелец или владелец/репозиторий"},
 {"sid":"oe.settings.w.add","text":"Добавить"},
-{"sid":"oe.settings.w.cancel","text":"Отмена"}
+{"sid":"oe.settings.w.cancel","text":"Отмена"},
+{"sid":"oe.settings.w.selectAll","text":"Выделить всё · выбрано: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"Версия"},
+{"sid":"oe.settings.w.catalogLabel","text":"Каталог"},
+{"sid":"oe.settings.w.modsLabel","text":"Модов"},
+{"sid":"oe.settings.w.checkedLabel","text":"Последняя проверка"}
 ]
 }

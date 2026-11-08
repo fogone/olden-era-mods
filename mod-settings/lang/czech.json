@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"Pokračovat"},
 {"sid":"oe.settings.w.url.caption","text":"Adresa katalogu"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"Katalog na GitHubu: vlastník nebo vlastník/repozitář"},
-{"sid":"oe.settings.w.github.placeholder","text":"vlastník/repozitář"},
+{"sid":"oe.settings.w.github.caption","text":"Katalog na GitHubu"},
+{"sid":"oe.settings.w.github.placeholder","text":"vlastník nebo vlastník/repozitář"},
 {"sid":"oe.settings.w.add","text":"Přidat"},
-{"sid":"oe.settings.w.cancel","text":"Zrušit"}
+{"sid":"oe.settings.w.cancel","text":"Zrušit"},
+{"sid":"oe.settings.w.selectAll","text":"Vybrat vše · vybráno: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"Verze"},
+{"sid":"oe.settings.w.catalogLabel","text":"Katalog"},
+{"sid":"oe.settings.w.modsLabel","text":"Módy"},
+{"sid":"oe.settings.w.checkedLabel","text":"Naposledy zkontrolováno"}
 ]
 }

@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"继续"},
 {"sid":"oe.settings.w.url.caption","text":"目录的地址"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"GitHub 上的目录:所有者 或 所有者/仓库"},
-{"sid":"oe.settings.w.github.placeholder","text":"所有者/仓库"},
+{"sid":"oe.settings.w.github.caption","text":"GitHub 上的目录"},
+{"sid":"oe.settings.w.github.placeholder","text":"所有者 或 所有者/仓库"},
 {"sid":"oe.settings.w.add","text":"添加"},
-{"sid":"oe.settings.w.cancel","text":"取消"}
+{"sid":"oe.settings.w.cancel","text":"取消"},
+{"sid":"oe.settings.w.selectAll","text":"全选 · 已选: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"版本"},
+{"sid":"oe.settings.w.catalogLabel","text":"目录"},
+{"sid":"oe.settings.w.modsLabel","text":"模组"},
+{"sid":"oe.settings.w.checkedLabel","text":"上次检查"}
 ]
 }

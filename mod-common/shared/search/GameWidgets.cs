@@ -105,6 +105,25 @@ internal static partial class Game
     static readonly Lookup<Type> tabClickArgument = Lookup<Type>.Among("hub tab click argument",
         () => tabClick.Value is { } p ? new[] { p.PropertyType.GetGenericArguments()[0] } : null, t => t.Name).Generate("GameTabItem");
 
+    // ---------- the Load screen's tabs and tag chips (Hex.UI.SaveLoad.ScLoad) ----------
+
+    // A tab's data for BhSimpleTabs.Init(List<dcs>, int) (dcs): its label (+0x10) and what choosing it does (+0x18; Select
+    // calls it).
+    static readonly Lookup<Type> simpleTabData = Lookup<Type>.Among("simple tab data",
+        () => typeof(Hex.UI.Elements.BhSimpleTabs).Methods().Named("Init").Where(m => m.GetParameters().Length == 2)
+            .Select(m => m.GetParameters()[0].ParameterType).Where(t => t.IsGenericType).Select(t => t.GetGenericArguments()[0]).Distinct(),
+        t => t.Name, onlyOne: true).Generate("GameSimpleTabData");
+
+    static readonly Lookup<PropertyInfo> simpleTabLabel = NthField("simple tab label", () => simpleTabData.Value, typeof(string), 0, 1).Generate("Label", writable: true);
+    static readonly Lookup<PropertyInfo> simpleTabClick = NthField("simple tab click", () => simpleTabData.Value, typeof(Il2CppSystem.Action), 0, 1).Generate("Click", writable: true);
+
+    // A tag chip of the save list (BhTag): its text, the chip sized to it (yeo), and its colour (yeq).
+    static readonly Lookup<MethodInfo> tagText = Lookup<MethodInfo>.Among("tag chip text",
+        () => typeof(BhTag).Methods().Instance().Returns(typeof(void)).Takes(typeof(string)).DistinctCode(), Members.Name, onlyOne: true).Generate("ShowText");
+
+    static readonly Lookup<MethodInfo> tagColor = Lookup<MethodInfo>.Among("tag chip colour",
+        () => typeof(BhTag).Methods().Instance().Returns(typeof(void)).Takes(typeof(UnityEngine.Color)).DistinctCode(), Members.Name, onlyOne: true).Generate("ShowColor");
+
     // ---------- buttons and check marks ----------
 
     // A button available or greyed out (BhGenericButton.uhb): the active and grey looks, and its flag (+0xA8).

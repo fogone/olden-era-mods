@@ -2,13 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Hex.GameHub.UICommon;
-using Hex.QuickStart;
 using Hex.Settings.UI;
 using Hex.UI;
+using Hex.UI.Elements;
 using Hex.UI.GeneralKit;
-using Hex.UI.MapPreview;
-using Hex.UI.SaveLoad;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine;
@@ -17,55 +15,58 @@ using UnityEngine.UI;
 
 namespace OldenEra.Modding.Settings;
 
-// The mods' own window (issue #13, #14 "mockup v4", #6): a "Mods" button in the main menu under Additional (a copy of
-// the game's Options button) opens a window made of the game's widgets on a canvas of ours: the message box's frame,
-// heading, state line and button row (ScMessageBox), the game hub's tabs (BhTab), the input box's text field
-// (ScInputBox), the settings' dropdowns and switches (BhLocalizedDropdown, BhSettingsCheckbox), the save list filter's
-// check marks (BhToggle), the quick start's map cards and tag chips (BhMapCard, BhDescriptionTag), the settings' small
-// buttons and the game's cross. Adding a source asks with the game's own message box and input box.
-// Three tabs: Installed (managing: filter, rows with a check mark, switch, update and remove, actions on the selected),
-// Catalog (browsing: search, tag and source filters, cards), Sources (the list, add, check); a mod's or a source's
-// details on the right. The data and the actions are the mod manager's (ModCatalog, mod-common/ModMenu.cs).
+// The mods' own window (issue #13, #14, #6): a "Mods" button in the main menu under Additional (a copy of the game's
+// Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad, fogone 08.11: the game's existing
+// screen style) on a canvas of its own, its scripts taken off and its parts filled with ours:
+//   its title and close cross; its tabs (BhSimpleTabs: Installed / Catalog / Sources, a third tab copied); its filter row
+//   (a text field from the game's input box, its sorting dropdown as the tag and source filters); its list with the
+//   scrollbar, rows made from its save slot rows (check box, picture, name, tag chips, information on the right); its
+//   bottom left group (select all, the actions on the selected; Add by URL / from GitHub on Sources); its information
+//   panel on the right as a mod's or a source's details (picture, texts, chips, buttons); the cloud quota line as the
+//   state line. Adding a source asks with the game's own message box and input box.
+// The data and the actions are the mod manager's (ModCatalog, mod-common/ModMenu.cs).
 public partial class Plugin
 {
     const string ModsButtonName = "OE_ModsButton", WindowName = "OE_ModsWindow", CloseKey = "oe.settings.close", W = "oe.settings.w.";
-    // Under the game's 30000 of the dropdown lists (Unity's own), over the menus.
+    // Under the 30000 of Unity's dropdown lists, over the menus.
     const int WindowOrder = 29000;
-    const float WindowWidth = 3000f, BodyWidth = 2860f, BodyHeight = 1330f, ListWidth = 1860f, DetailsX = 1900f, DetailsWidth = 960f;
-    const float PageTop = 90f, PageHeight = BodyHeight - PageTop, RowHeight = 84f, RowSpacing = 6f, CellGap = 20f;
-    const float ButtonHeight = 66f, BottomButtonWidth = 440f, CrossScale = 2.2f, CheckScale = 3.5f, DropdownScale = 0.7f;
-    const float CardWidth = 440f, CardHeight = 560f, CardScale = 1.5f;
     static readonly string[] CheckEveryValues = { "start", "daily", "weekly", "manual" };
+
+    // The Load screen's scripts that run it (taken off the copy: it shows our data, not saves).
+    static readonly HashSet<string> ScreenScripts = new()
+    {
+        "ScLoad", "BhLoadingRoot", "BhSaveLoadBase", "BhVirtualizedList", "BhSaveInfoPanel", "BhDescriptionBlocks", "BhCloudQuotaValue",
+        "BhSessionInfoElement", "BhMapPreview", "BhHeroSlotsContainer", "BhFilter", "UiAnimatorSOPrime", "BhMapPreviewInfoView",
+    };
 
     enum WindowTab { Installed, Catalog, Sources }
 
     BhNavigationButton modsButton;
     GameObject window, staging;
-    Transform windowHeader, windowStatus, windowButtons;
     int windowRevision = -1, nextButtonSearch;
-    bool windowDirty;
+    bool windowDirty, filling;
 
-    // The game's widgets copied (found when the window is built).
-    BhGenericButton rowButtonTemplate, crossTemplate;
-    BhSettingsCheckbox switchSource;
-    BhTab tabTemplate;
-    TMP_InputField inputTemplate;
-    BhToggle checkTemplate;
-    BhDescriptionTag tagTemplate;
-    BhMapCard cardTemplate;
-    TMP_Text textStyle;
-
-    // The window's parts.
-    readonly Dictionary<WindowTab, BhTab> tabs = new();
-    readonly Dictionary<WindowTab, GameObject> pages = new();
-    Transform installedList, installedHeader, installedActions, catalogGrid, sourcesList, sourcesActions, details, detailsButtons, bigShot;
+    // The parts of the copied screen.
+    TMP_Text titleText, statusText, nothingText, selectAllText, panelTitle, versionLabel, versionValue, originLabel, originValue;
+    BhSimpleTabs simpleTabs;
+    readonly List<BhSimpleTab> tabList = new();
+    Transform filterRow, listContent, bottomGroup, panel, emptyPanel, infoContent, bigShot;
+    BhToggle selectAll;
+    RawImage panelPicture;
+    BhGenericButton primaryButton, deleteButton, secondaryButton;
     TMP_InputField filterInput, searchInput;
-    BhLocalizedDropdown tagDropdown, sourceDropdown;
+    BhDropdown tagDropdown, sourceDropdown;
     string tagOptions, sourceOptions;
+
+    // Copy sources: rows, texts, chips, buttons (all from the copy), and the settings' switch, the input box's field.
+    GameObject rowSource, lineTemplate, wrapTemplate, chipTemplate, textButtonTemplate, crossSource, dropdownSource, deleteTemplate;
+    BhSettingsCheckbox switchSource;
+    TMP_InputField inputTemplate;
 
     // What the player chose.
     WindowTab tab = WindowTab.Installed;
     string filterText = "", searchText = "", tagFilter, sourceFilter, installedPick, catalogPick, sourcePick, bigShotPath;
+    int shotIndex;
     readonly HashSet<string> selected = new();
     readonly HashSet<string> screenshotsAsked = new();
     readonly Dictionary<string, Texture2D> textures = new();
@@ -118,6 +119,7 @@ public partial class Plugin
         }
         else if (windowDirty || windowRevision != ModMenu.Revision)
             Guard("fill", FillWindow);
+        GreyLater();
     }
 
     void AddModsButton()
@@ -173,171 +175,285 @@ public partial class Plugin
 
     // ---------- building ----------
 
-    // The window: a canvas of ours over the menu, the game's message box (its blocker and its container) copied onto
-    // it, a body of our layout in place of its text.
+    // The Load screen's running scripts off a copy (they would show saves).
+    static void StripScreenScripts(GameObject go)
+    {
+        foreach (var script in go.GetComponentsInChildren<MonoBehaviour>(true).ToList())
+            if (script != null && ScreenScripts.Contains(script.GetIl2CppType().Name))
+                UnityEngine.Object.DestroyImmediate(script);
+    }
+
+    // The window: a copy of the game's Load screen (its own canvas and scaler), its scripts off, its parts ours.
     bool BuildWindow()
     {
-        var box = Scene.Find<ScMessageBox>();
-        var master = box != null ? box.transform.Find("ContainerMaster") : null;
-        if (master == null)
+        var load = Scene.Find<Hex.UI.SaveLoad.ScLoad>();
+        if (load == null)
         {
-            Log.LogWarning("mods window: the game's message box is not there");
+            Log.LogWarning("mods window: the game's Load screen (ScLoad) is not loaded");
             return false;
         }
         if (GameObject.Find(WindowName) is { } old)
-            UnityEngine.Object.Destroy(old);
-        window = new GameObject(WindowName, Il2CppInterop.Runtime.Il2CppType.Of<RectTransform>());
+            UnityEngine.Object.DestroyImmediate(old);
+        // Made under an inactive holder first: the copy's scripts do not wake up before they are taken off.
+        var holder = new GameObject("OE_ModsHolder");
+        holder.SetActive(false);
+        window = UnityEngine.Object.Instantiate(load.gameObject, holder.transform, false);
+        window.name = WindowName;
+        StripScreenScripts(window);
+        window.transform.SetParent(null, false);
+        UnityEngine.Object.Destroy(holder);
         UnityEngine.Object.DontDestroyOnLoad(window);
-        var canvas = window.AddComponent<Canvas>();
+        window.SetActive(true);
+        var canvas = window.GetComponent<Canvas>();
+        canvas.enabled = true;
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = WindowOrder;
-        var scaler = window.AddComponent<CanvasScaler>();
-        if (box.GetComponent<CanvasScaler>() is { } gameScaler)
+        if (window.GetComponent<CanvasGroup>() is { } rootGroup)
         {
-            scaler.uiScaleMode = gameScaler.uiScaleMode;
-            scaler.referenceResolution = gameScaler.referenceResolution;
-            scaler.screenMatchMode = gameScaler.screenMatchMode;
-            scaler.matchWidthOrHeight = gameScaler.matchWidthOrHeight;
+            rootGroup.alpha = 1f;
+            rootGroup.interactable = rootGroup.blocksRaycasts = true;
         }
-        window.AddComponent<GraphicRaycaster>();
-        // Copies are made here first, inactive (their scripts do not wake up before they are stripped and placed).
         staging = new GameObject("OE_Staging", Il2CppInterop.Runtime.Il2CppType.Of<RectTransform>());
         staging.transform.SetParent(window.transform, false);
         staging.SetActive(false);
-        if (box.transform.Find("RaycastBlocker") is { } blocker)
-            UnityEngine.Object.Instantiate(blocker.gameObject, window.transform, false).SetActive(true);
-        var container = UnityEngine.Object.Instantiate(master.gameObject, window.transform, false).transform;
-        container.gameObject.SetActive(true);
-        // The box's own fade (its container's group); the buttons' groups are theirs (their grey and glow layers).
-        foreach (var group in container.GetComponentsInChildren<CanvasGroup>(true).Where(g => g.GetComponentInParent<BhGenericButton>(true) == null))
-        {
-            group.alpha = 1f;
-            group.interactable = group.blocksRaycasts = true;
-        }
-        var inner = container.Find("Container");
-        // The box's background is see-through (a message over the game): ours is a window over the menu, opaque.
-        foreach (var image in inner.Find("popupFrame").GetComponentsInChildren<Image>(true))
-            image.color = new Color(image.color.r, image.color.g, image.color.b, 1f);
-        windowHeader = inner.Find("GameObject/Header");
-        windowStatus = inner.Find("Notification");
-        windowButtons = inner.Find("Buttons");
-        textStyle = windowStatus.GetComponent<TMP_Text>();
-        if (inner.Find("ContainerLabelSCALE") is { } label)
-            label.gameObject.SetActive(false);
-        // Wider than the box: its parent lays it out at its own width (the frame follows it).
-        inner.Cast<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, WindowWidth);
-        foreach (var own in windowButtons.GetComponentsInChildren<BhGenericButton>(true).ToList())
-            UnityEngine.Object.DestroyImmediate(own.gameObject);
-        // The box's row does not size its buttons: its layout sizes them now, by their LayoutElement.
-        if (windowButtons.GetComponent<HorizontalLayoutGroup>() is { } buttonsRow)
-        {
-            buttonsRow.childControlWidth = buttonsRow.childControlHeight = true;
-            buttonsRow.childForceExpandWidth = buttonsRow.childForceExpandHeight = false;
-            buttonsRow.childAlignment = TextAnchor.MiddleCenter;
-            buttonsRow.spacing = 40f;
-        }
-        if (windowButtons.GetComponent<LayoutElement>() is { } buttonsSize)
-            buttonsSize.preferredWidth = buttonsSize.minWidth = 1600f;
-        var buttonsRect = windowButtons.Cast<RectTransform>();
-        buttonsRect.sizeDelta = new Vector2(1600f, buttonsRect.sizeDelta.y);
 
-        FindTemplates();
-        if (rowButtonTemplate == null)
+        var root = window.transform;
+        var sar = root.Find("ShowAnimationRoot");
+        titleText = root.Find("MainHeader")?.GetComponent<TMP_Text>();
+        Hide(root, "ButtonBack", "BackToSaving", "ExampleImage");
+        if (root.Find("ButtonClose")?.GetComponent<BhGenericButton>() is { } close)
+            Bind(close, null, () => window.SetActive(false), false);
+        // The state line: a copy of the title, smaller, just under it (the same parent and anchors); the cloud quota and
+        // the autosaves' header and switch off.
+        Hide(sar, "CloudQuota", "AutosaveShow", "AutosavesHeader");
+        if (titleText != null)
         {
-            Log.LogWarning("mods window: no button to copy (the settings screen's Reset)");
-            UnityEngine.Object.Destroy(window);
+            var line = UnityEngine.Object.Instantiate(titleText.gameObject, root, false);
+            line.name = "OE_Status";
+            var rect = line.transform.Cast<RectTransform>();
+            rect.anchoredPosition = titleText.rectTransform.anchoredPosition + new Vector2(0f, -33f);
+            rect.sizeDelta = new Vector2(1400f, 50f);
+            // The title's font style would set its size back.
+            foreach (var style in line.GetComponents<MonoBehaviour>().Where(c => c.GetIl2CppType().Name == "BhFont").ToList())
+                UnityEngine.Object.DestroyImmediate(style);
+            statusText = line.GetComponent<TMP_Text>();
+            statusText.enableAutoSizing = false;
+            statusText.fontSize = 20f;
+            statusText.color = new Color(0.65f, 0.65f, 0.65f, 1f);
+            statusText.enableWordWrapping = false;
+            statusText.overflowMode = TextOverflowModes.Overflow;
+            statusText.alignment = TextAlignmentOptions.Center;
+        }
+        nothingText = sar.Find("NoSavesHeader")?.GetComponent<TMP_Text>();
+
+        // The list: its rows' layout ours (the game's virtualized list placed them itself), its scrollbar kept.
+        var list = sar.Find("VirtualizedList");
+        listContent = list.Find("Viewport/Content");
+        var firstRow = listContent.childCount > 0 ? listContent.GetChild(0).gameObject : null;
+        if (firstRow == null)
+        {
+            // No save shown: its row prefab among the loaded objects.
+            var prefab = Resources.FindObjectsOfTypeAll<Transform>().FirstOrDefault(t => t != null && t.name == "SessionElement");
+            if (prefab != null)
+            {
+                firstRow = UnityEngine.Object.Instantiate(prefab.gameObject, staging.transform, false);
+                StripScreenScripts(firstRow);
+            }
+        }
+        if (firstRow == null)
+        {
+            Log.LogWarning("mods window: no save row to copy");
+            UnityEngine.Object.DestroyImmediate(window);
             window = null;
             return false;
         }
+        firstRow.transform.SetParent(staging.transform, false);
+        rowSource = firstRow;
+        Clear(listContent);
+        var column = listContent.gameObject.AddComponent<VerticalLayoutGroup>();
+        column.spacing = 6f;
+        column.padding.left = column.padding.right = 10;
+        column.padding.top = column.padding.bottom = 6;
+        column.childAlignment = TextAnchor.UpperLeft;
+        column.childControlWidth = column.childControlHeight = true;
+        column.childForceExpandWidth = true;
+        column.childForceExpandHeight = false;
+        listContent.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        var contentRect = listContent.Cast<RectTransform>();
+        contentRect.anchorMin = new Vector2(0f, 1f);
+        contentRect.anchorMax = new Vector2(1f, 1f);
+        contentRect.pivot = new Vector2(0.5f, 1f);
+        contentRect.anchoredPosition = Vector2.zero;
+        contentRect.sizeDelta = new Vector2(0f, contentRect.sizeDelta.y);
+        if (list.Find("InvisibleContainer") is { } invisible)
+            Clear(invisible);
+        // A tag chip of the row: the chips' source.
+        chipTemplate = firstRow.GetComponentInChildren<BhTag>(true)?.gameObject;
 
-        // The body: under the state line, our own layout (absolute places, each part laying out its own content).
-        var body = NewRect("OE_ModsBody", inner);
-        body.SetSiblingIndex(windowStatus.GetSiblingIndex() + 1);
-        Size(body.gameObject, BodyWidth, BodyHeight);
-        body.sizeDelta = new Vector2(BodyWidth, BodyHeight);
-
-        var tabBar = NewRect("Tabs", body);
-        Place(tabBar, 0f, 0f, ListWidth, 72f);
-        HRow(tabBar.gameObject, 24f, TextAnchor.MiddleLeft);
-        tabs.Clear();
-        tabButtons.Clear();
-        foreach (var which in new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources })
-            NewTab(tabBar, which);
-
-        pages.Clear();
-        foreach (var which in new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources })
+        // The information panel: its texts and buttons.
+        panel = sar.Find("SaveInfoPanel/RightPanelPopup");
+        emptyPanel = sar.Find("SaveInfoPanel/EmptryPanel");
+        var header = panel.Find("Container/Header");
+        panelTitle = header.Find("header-window (1)")?.GetComponent<TMP_Text>();
+        Hide(header, "Rename", "Legend");
+        crossSource = header.Find("CROSS BUTTON (1)")?.gameObject;
+        var back = panel.Find("Container/Main/Back");
+        Hide(back, "MinimapScreenShot", "MissionIcon");
+        panelPicture = back.Find("TemplatePreview")?.GetComponent<RawImage>();
+        var info = panel.Find("InfoScrollView");
+        infoContent = info.Find("Viewport/Content");
+        lineTemplate = infoContent.Find("DifficultyLine")?.gameObject;
+        wrapTemplate = infoContent.Find("Description")?.gameObject;
+        foreach (var part in new[] { lineTemplate, wrapTemplate })
+            part?.transform.SetParent(staging.transform, false);
+        Clear(infoContent);
+        if (info.Find("Scrollbar Vertical") is { } infoBar)
+            infoBar.gameObject.SetActive(true);
+        versionLabel = panel.Find("TimeSaving")?.GetComponent<TMP_Text>();
+        versionValue = panel.Find("TimeSavingValue")?.GetComponent<TMP_Text>();
+        originLabel = panel.Find("GameTimeSaving")?.GetComponent<TMP_Text>();
+        originValue = panel.Find("GameTimeSavingValue")?.GetComponent<TMP_Text>();
+        Hide(panel, "CloudButton", "SaveButton");
+        primaryButton = panel.Find("LoadButton")?.GetComponent<BhGenericButton>();
+        secondaryButton = panel.Find("SetupInLobby")?.GetComponent<BhGenericButton>();
+        deleteButton = panel.Find("DeleteButton")?.GetComponent<BhGenericButton>();
+        textButtonTemplate = secondaryButton != null ? UnityEngine.Object.Instantiate(secondaryButton.gameObject, staging.transform, false) : null;
+        deleteTemplate = deleteButton != null ? UnityEngine.Object.Instantiate(deleteButton.gameObject, staging.transform, false) : null;
+        if (emptyPanel != null && lineTemplate != null)
         {
-            var page = NewRect("Page_" + which, body);
-            Place(page, 0f, PageTop, ListWidth, PageHeight);
-            pages[which] = page.gameObject;
+            var hint = UnityEngine.Object.Instantiate(lineTemplate, emptyPanel, false);
+            hint.name = "OE_Hint";
+            var rect = hint.transform.Cast<RectTransform>();
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(440f, 80f);
+            var text = hint.GetComponent<TMP_Text>();
+            text.alignment = TextAlignmentOptions.Center;
+            text.enableWordWrapping = true;
+            hint.SetActive(true);
         }
 
-        // Installed: the filter, the header (select all, how many selected), the rows, the actions on the selected.
-        var installed = pages[WindowTab.Installed].transform;
-        filterInput = NewInput(installed, W + "filter", 0f, 0f, 760f, value => Redraw(() => filterText = value ?? ""));
-        installedHeader = NewRect("Header", installed);
-        Place(installedHeader.Cast<RectTransform>(), 0f, 76f, ListWidth, 64f);
-        installedList = NewScroll(installed, 0f, 150f, ListWidth, PageHeight - 150f - ButtonHeight - 30f, false);
-        installedActions = NewRect("Actions", installed);
-        Place(installedActions.Cast<RectTransform>(), 0f, PageHeight - ButtonHeight - 10f, ListWidth, ButtonHeight + 10f);
-        HRow(installedActions.gameObject, CellGap, TextAnchor.MiddleLeft);
-
-        // Catalog: the cards, the filters over them (last: their dropdown lists draw over the cards).
-        var catalog = pages[WindowTab.Catalog].transform;
-        catalogGrid = NewScroll(catalog, 0f, 86f, ListWidth, PageHeight - 86f, true);
-        searchInput = NewInput(catalog, W + "search", 0f, 0f, 760f, value => Redraw(() => searchText = value ?? ""));
-        tagDropdown = NewDropdown(catalog, 790f, 0f, i => Redraw(() => tagFilter = i <= 0 ? null : TagKeys().ElementAtOrDefault(i - 1)));
-        sourceDropdown = NewDropdown(catalog, 1330f, 0f, i => Redraw(() => sourceFilter = i <= 0 ? null : SourceKeys().ElementAtOrDefault(i - 1)));
-
-        // Sources: the list, Add by URL and Add from GitHub under it.
-        var sources = pages[WindowTab.Sources].transform;
-        sourcesList = NewScroll(sources, 0f, 0f, ListWidth, PageHeight - ButtonHeight - 30f, false);
-        sourcesActions = NewRect("Actions", sources);
-        Place(sourcesActions.Cast<RectTransform>(), 0f, PageHeight - ButtonHeight - 10f, ListWidth, ButtonHeight + 10f);
-        HRow(sourcesActions.gameObject, CellGap, TextAnchor.MiddleLeft);
-
-        // The details on the right: a scrolling column, its buttons under it.
-        details = NewScroll(body, DetailsX, 0f, DetailsWidth, BodyHeight - ButtonHeight - 30f, false);
-        if (details.GetComponent<VerticalLayoutGroup>() is { } column)
+        // The bottom left group: select all and its text; the cloud and the delete wrap off (our buttons in their place).
+        bottomGroup = sar.Find("LeftBottomGroup");
+        selectAll = bottomGroup.Find("Toggle")?.GetComponent<BhToggle>();
+        selectAllText = bottomGroup.Find("main")?.GetComponent<TMP_Text>();
+        if (selectAllText != null)
         {
-            column.spacing = 18f;
-            column.childAlignment = TextAnchor.UpperLeft;
+            selectAllText.enableWordWrapping = false;
+            Size(selectAllText.gameObject, 250f, -1f);
         }
-        detailsButtons = NewRect("DetailsButtons", body);
-        Place(detailsButtons.Cast<RectTransform>(), DetailsX, BodyHeight - ButtonHeight - 10f, DetailsWidth, ButtonHeight + 10f);
-        HRow(detailsButtons.gameObject, CellGap, TextAnchor.MiddleLeft);
+        Hide(bottomGroup, "CloudWrap", "DeleteWrap");
+        Widen(bottomGroup.Cast<RectTransform>(), 1040f);
+        if (bottomGroup.GetComponent<HorizontalLayoutGroup>() is { } bottomRow)
+        {
+            bottomRow.spacing = 14f;
+            bottomRow.childAlignment = TextAnchor.MiddleLeft;
+        }
+        if (selectAll != null)
+            selectAll.toggle.onValueChanged.AddListener((UnityAction<bool>)(value => Guard("select all", () =>
+            {
+                if (filling)
+                    return;
+                Redraw(() =>
+                {
+                    foreach (var mod in InstalledShown())
+                        if (value)
+                            selected.Add(mod.Id);
+                        else
+                            selected.Remove(mod.Id);
+                });
+            })));
 
-        // A screenshot big, over the body (a click closes it).
-        bigShot = NewRect("BigShot", body);
-        Place(bigShot.Cast<RectTransform>(), 0f, 0f, BodyWidth, BodyHeight);
+        // The filter row: the sorting dropdown as the tag filter, a copy of it as the source filter, the text fields.
+        filterRow = sar.Find("FilterSortGroup");
+        Hide(filterRow, "Filter", "GameTypeHeader", "GameTypeDropdown");
+        var sorting = filterRow.Find("SortingDropdown")?.GetComponent<BhDropdown>();
+        if (sorting != null)
+        {
+            dropdownSource = UnityEngine.Object.Instantiate(sorting.gameObject, staging.transform, false);
+            tagDropdown = sorting;
+            BindDropdown(tagDropdown, i => Redraw(() => tagFilter = i <= 0 ? null : TagKeys().ElementAtOrDefault(i - 1)));
+            sourceDropdown = UnityEngine.Object.Instantiate(dropdownSource, filterRow, false).GetComponent<BhDropdown>();
+            sourceDropdown.name = "OE_SourceDropdown";
+            sourceDropdown.gameObject.SetActive(true);
+            BindDropdown(sourceDropdown, i => Redraw(() => sourceFilter = i <= 0 ? null : SourceKeys().ElementAtOrDefault(i - 1)));
+        }
+        inputTemplate = Scene.Find<ScInputBox>()?.inputField;
+        filterInput = NewInput(filterRow, W + "filter", value => Redraw(() => filterText = value ?? ""));
+        searchInput = NewInput(filterRow, W + "search", value => Redraw(() => searchText = value ?? ""));
+        filterInput?.transform.SetAsFirstSibling();
+        searchInput?.transform.SetAsFirstSibling();
+        Widen(filterRow.Cast<RectTransform>(), 1040f);
+        if (filterRow.GetComponent<HorizontalLayoutGroup>() is { } filterLayout)
+        {
+            filterLayout.spacing = 14f;
+            filterLayout.childAlignment = TextAnchor.MiddleLeft;
+        }
+
+        // The tabs: the game's two and a third, set up by the game's own Init (their click selects through Select).
+        simpleTabs = sar.Find("Tabs")?.GetComponent<BhSimpleTabs>();
+        if (simpleTabs != null && simpleTabs.tabs.Count > 0)
+        {
+            var first = simpleTabs.tabs[0];
+            var third = UnityEngine.Object.Instantiate(first.gameObject, first.transform.parent, false).GetComponent<BhSimpleTab>();
+            third.name = "OE_Tab3";
+            simpleTabs.tabs.Add(third);
+            tabList.Clear();
+            for (var i = 0; i < simpleTabs.tabs.Count; i++)
+                tabList.Add(simpleTabs.tabs[i]);
+            var width = simpleTabs.transform.Cast<RectTransform>().rect.width / 3f;
+            foreach (var t in tabList)
+            {
+                Size(t.gameObject, width, -1f);
+                t.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, t.transform.Cast<RectTransform>().sizeDelta.y);
+            }
+            LayoutRebuilder.ForceRebuildLayoutImmediate(simpleTabs.transform.Cast<RectTransform>());
+            var data = new Il2CppSystem.Collections.Generic.List<GameSimpleTabData>();
+            foreach (var which in new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources })
+            {
+                var item = new GameSimpleTabData();
+                item.Label = TabLabel(which);
+                var chosen = which;
+                item.Click = (Il2CppSystem.Action)(Action)(() => Guard("tab", () =>
+                {
+                    if (!filling && tab != chosen)
+                        Redraw(() => SwitchTab(chosen));
+                }));
+                data.Add(item);
+            }
+            filling = true;
+            try { simpleTabs.Init(data, (int)tab); }
+            finally { filling = false; }
+            // The game's tab answers the press (OnPointerDown); a click (keyboard, tools) selects it the same way, once.
+            for (var i = 0; i < tabList.Count; i++)
+            {
+                var index = i;
+                Clickable(tabList[i].gameObject, () =>
+                {
+                    if ((int)tab != index)
+                        simpleTabs.Select(index, true);
+                });
+            }
+        }
+
+        // A screenshot big, over everything (a click closes it).
+        bigShot = NewRect("OE_BigShot", root);
+        Stretch(bigShot.Cast<RectTransform>());
         bigShot.gameObject.SetActive(false);
 
-        Logs.Info($"Mods window: built from the game's message box; tabs {(tabTemplate != null ? tabTemplate.name : "none")}, input {(inputTemplate != null)}, " +
-                  $"check {(checkTemplate != null)}, tag {(tagTemplate != null)}, card {(cardTemplate != null)}, dropdown {(dropdownTemplate != null)}, switch {(switchSource != null)}");
+        switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
+        Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, dropdown {(tagDropdown != null)}, " +
+                  $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
         return true;
     }
 
-    // The game's widgets to copy, from the scenes the main menu has loaded (or their prefabs).
-    void FindTemplates()
+    static void Hide(Transform parent, params string[] names)
     {
-        // The rows' and the bottom's buttons: the settings screen's own small ones (its Reset); the cross: the game's.
-        rowButtonTemplate = Scene.Find<ScSettings>()?.transform.Find("ResetButton")?.GetComponent<BhGenericButton>();
-        crossTemplate = Resources.FindObjectsOfTypeAll<BhGenericButton>().FirstOrDefault(b => b != null && b.name == "CROSS BUTTON" && b.gameObject.scene.IsValid());
-        // The switches: the settings tab's own (a copy of the game's switch, off).
-        switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
-        // The tabs: the game hub's (the profile's Statistics / Match history, the leaderboard's).
-        var allTabs = Resources.FindObjectsOfTypeAll<BhTab>().Where(t => t != null && t.label != null && t.selectedFon != null && t.notSelectedFon != null).ToList();
-        tabTemplate = allTabs.FirstOrDefault(t => t.gameObject.scene.IsValid() && t.transform.parent != null && t.transform.parent.parent?.name == "window")
-                      ?? allTabs.FirstOrDefault(t => t.gameObject.scene.IsValid()) ?? allTabs.FirstOrDefault();
-        // The text field: the input box's (the messageboxes scene, always loaded).
-        inputTemplate = Scene.Find<ScInputBox>()?.inputField;
-        // The check marks: the save list filter's.
-        var checks = Resources.FindObjectsOfTypeAll<BhToggle>().Where(t => t != null && t.toggle != null).ToList();
-        checkTemplate = checks.FirstOrDefault(t => t.GetComponentInParent<BhFilterElement>(true) != null) ?? checks.FirstOrDefault();
-        // The tag chips: the quick start's map details' (and the save info's).
-        tagTemplate = Resources.FindObjectsOfTypeAll<BhDescriptionTag>().FirstOrDefault(t => t != null && t.label != null);
-        // The cards: the quick start's map cards.
-        cardTemplate = Resources.FindObjectsOfTypeAll<BhMapCard>().FirstOrDefault(c => c != null && c.minimapImage != null && c.title != null);
+        if (parent == null)
+            return;
+        foreach (var name in names)
+            if (parent.Find(name) is { } part)
+                part.gameObject.SetActive(false);
     }
 
     // ---------- filling ----------
@@ -348,64 +464,69 @@ public partial class Plugin
         windowDirty = true;
     }
 
+    static string TabLabel(WindowTab which) => string.Format(Texts.Get(W + "tab." + which.ToString().ToLowerInvariant()), which switch
+    {
+        WindowTab.Installed => Installed().Count,
+        WindowTab.Catalog => Catalog().Count,
+        _ => ModCatalog.Sources.Count,
+    });
+
     void FillWindow()
     {
         windowRevision = ModMenu.Revision;
         windowDirty = false;
-        SetText(windowHeader, Texts.Get(ModCatalog.TitleKey ?? TabKey));
-        var status = ModCatalog.StatusKey != null ? Texts.Get(ModCatalog.StatusKey) : "";
-        if (ModCatalog.Busy)
-            status = status.Length > 0 ? $"{status} · {Texts.Get(W + "busy")}" : Texts.Get(W + "busy");
-        SetText(windowStatus, status);
-
-        var installedIds = Installed().Select(m => m.Id).ToHashSet();
-        selected.RemoveWhere(id => !installedIds.Contains(id));
-        if (installedPick != null && !installedIds.Contains(installedPick) && installedPick != ModCatalog.Manager?.Id)
-            installedPick = null;
-        if (catalogPick != null && Catalog().All(m => m.Id != catalogPick))
-            catalogPick = null;
-        if (sourcePick != null && ModCatalog.Sources.All(s => s.Url != sourcePick))
-            sourcePick = null;
-
-        foreach (var which in new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources })
+        filling = true;
+        try
         {
-            var label = string.Format(Texts.Get(W + "tab." + which.ToString().ToLowerInvariant()), which switch
+            if (titleText != null)
+                SetText(titleText, Texts.Get(ModCatalog.TitleKey ?? TabKey));
+            var status = ModCatalog.StatusKey != null ? Texts.Get(ModCatalog.StatusKey) : "";
+            if (ModCatalog.Busy)
+                status = status.Length > 0 ? $"{status} · {Texts.Get(W + "busy")}" : Texts.Get(W + "busy");
+            if (statusText != null)
             {
-                WindowTab.Installed => Installed().Count,
-                WindowTab.Catalog => Catalog().Count,
-                _ => ModCatalog.Sources.Count,
-            });
-            if (tabs.TryGetValue(which, out var hubTab))
-            {
-                SetText(hubTab.label, label);
-                hubTab.SetAvailable(true);
-                hubTab.ShowSelected(which == tab);
+                SetText(statusText, status);
             }
-            else if (tabButtons.TryGetValue(which, out var button))
-            {
-                SetText(button.label, label);
-                button.SetAvailable(which != tab);
-            }
-        }
-        foreach (var (which, page) in pages)
-            page.SetActive(which == tab);
 
-        switch (tab)
-        {
-            case WindowTab.Installed:
-                FillInstalled();
-                break;
-            case WindowTab.Catalog:
-                FillCatalog();
-                break;
-            default:
-                FillSources();
-                break;
+            var installedIds = Installed().Select(m => m.Id).ToHashSet();
+            selected.RemoveWhere(id => !installedIds.Contains(id));
+            if (installedPick != null && !installedIds.Contains(installedPick) && installedPick != ModCatalog.Manager?.Id)
+                installedPick = null;
+            if (catalogPick != null && Catalog().All(m => m.Id != catalogPick))
+                catalogPick = null;
+            if (sourcePick != null && ModCatalog.Sources.All(s => s.Url != sourcePick))
+                sourcePick = null;
+
+            // The tabs' labels (with the counts): the game's tab keeps them in its labels.
+            var tabs = new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources };
+            for (var i = 0; i < tabList.Count && i < tabs.Length; i++)
+                foreach (var label in tabList[i].labels)
+                    SetText(label, TabLabel(tabs[i]));
+
+            filterInput?.gameObject.SetActive(tab == WindowTab.Installed);
+            searchInput?.gameObject.SetActive(tab == WindowTab.Catalog);
+            tagDropdown?.gameObject.SetActive(tab == WindowTab.Catalog);
+            sourceDropdown?.gameObject.SetActive(tab == WindowTab.Catalog);
+
+            Clear(listContent);
+            ClearBottom();
+            switch (tab)
+            {
+                case WindowTab.Installed:
+                    FillInstalled();
+                    break;
+                case WindowTab.Catalog:
+                    FillCatalog();
+                    break;
+                default:
+                    FillSources();
+                    break;
+            }
+            FillDetails();
+            FillBigShot();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(window.GetComponent<RectTransform>());
         }
-        FillDetails();
-        FillBottom();
-        FillBigShot();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(window.GetComponent<RectTransform>());
+        finally { filling = false; }
     }
 
     // The mods installed (the manager is apart, on top) and the catalog's (from a source), as the window lists them.
@@ -415,92 +536,190 @@ public partial class Plugin
     static List<ModEntry> Catalog() => ModCatalog.Mods.Where(m => m.SourceNameKey != null)
         .OrderBy(m => m.Installed != null).ThenBy(m => Texts.Get(m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
 
+    List<ModEntry> InstalledShown() => Installed().Where(m => Matches(m, filterText)).ToList();
+
     // The text typed matches a mod: its name, description or author.
     static bool Matches(ModEntry mod, string text) =>
         string.IsNullOrWhiteSpace(text) || new[] { Texts.Get(mod.NameKey), mod.DescriptionKey != null ? Texts.Get(mod.DescriptionKey) : "", mod.Author ?? "" }
             .Any(s => s.IndexOf(text.Trim(), StringComparison.CurrentCultureIgnoreCase) >= 0);
 
+    void ShowNothing(bool nothing, string key)
+    {
+        if (nothingText == null)
+            return;
+        nothingText.gameObject.SetActive(nothing);
+        if (nothing)
+            SetText(nothingText, Texts.Get(key));
+    }
+
     // ---------- Installed ----------
 
     void FillInstalled()
     {
-        var mods = Installed().Where(m => Matches(m, filterText)).ToList();
-
-        // The header: select all (the mods listed), how many are selected.
-        Clear(installedHeader);
-        HRow(installedHeader.gameObject, CellGap, TextAnchor.MiddleLeft);
-        var header = installedHeader;
-        var all = mods.Count > 0 && mods.All(m => selected.Contains(m.Id));
-        NewCheck(header, all, value => Redraw(() =>
-        {
-            foreach (var mod in mods)
-                if (value)
-                    selected.Add(mod.Id);
-                else
-                    selected.Remove(mod.Id);
-        }));
-        TextCell(header, string.Format(Texts.Get(W + "selected"), selected.Count), -1f, Dim(), textStyle.fontSize * 0.85f);
-
-        Clear(installedList);
+        var mods = InstalledShown();
         if (ModCatalog.Manager is { } manager)
-            InstalledRow(manager, true);
+            ModRow(manager, isManager: true);
         foreach (var mod in mods)
-            InstalledRow(mod, false);
-        if (mods.Count == 0)
-            TextCell(Line(NewRect("Empty", installedList).gameObject, RowHeight), Texts.Get(W + (ModCatalog.Mods.Any(m => m.Installed != null) ? "nothing" : "noneInstalled")), -1f, Dim());
+            ModRow(mod, isManager: false);
+        ShowNothing(mods.Count == 0, ModCatalog.Mods.Any(m => m.Installed != null) ? W + "nothing" : W + "noneInstalled");
 
-        // The actions on the selected.
-        Clear(installedActions);
+        // The bottom left: select all (the mods listed), how many are selected, the actions on them.
+        selectAll?.gameObject.SetActive(true);
+        selectAll?.ShowValue(mods.Count > 0 && mods.All(m => selected.Contains(m.Id)));
+        if (selectAllText != null)
+        {
+            selectAllText.gameObject.SetActive(true);
+            SetText(selectAllText, string.Format(Texts.Get(W + "selectAll"), selected.Count));
+        }
         var chosen = mods.Where(m => selected.Contains(m.Id)).ToList();
         var ids = chosen.Select(m => m.Id).ToList();
-        ActionButton(installedActions, W + "enable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == false && !m.RequiredByOthers),
-            () => ModCatalog.SetEnabled?.Invoke(ids, true));
-        ActionButton(installedActions, W + "disable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == true && !m.RequiredByOthers),
-            () => ModCatalog.SetEnabled?.Invoke(ids, false));
+        // TODO(ByHand): a mod BepInEx loaded itself (ModEntry.ByHand) is never updated nor removed: leave it out of
+        // updatable and removable below once the running library has ByHand (after the next restart).
+        BottomButton(W + "enable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == false && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, true));
+        BottomButton(W + "disable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == true && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, false));
         var updatable = chosen.Where(m => m.HasUpdate).Select(m => m.Id).ToList();
-        ActionButton(installedActions, W + "update", ModCatalog.Update != null && updatable.Count > 0, () => ModCatalog.Update?.Invoke(updatable), green: true);
+        BottomButton(W + "update", ModCatalog.Update != null && updatable.Count > 0, () => ModCatalog.Update?.Invoke(updatable));
+        var updateAll = ModCatalog.UpdateAll != null && (ModCatalog.Mods.Any(m => m.HasUpdate) || ModCatalog.Manager?.HasUpdate == true);
+        BottomButton(W + "updateAll", updateAll, () => ModCatalog.UpdateAll?.Invoke());
         var removable = chosen.Where(m => !m.RequiredByOthers).Select(m => m.Id).ToList();
-        ActionButton(installedActions, W + "remove", ModCatalog.Remove != null && removable.Count > 0, () =>
+        if (deleteTemplate != null)
         {
-            ModCatalog.Remove?.Invoke(removable);
-            selected.ExceptWith(removable);
-        });
+            var remove = Copy(deleteTemplate, bottomGroup).GetComponent<BhGenericButton>();
+            remove.name = "OE_RemoveSelected";
+            remove.gameObject.SetActive(true);
+            Bind(remove, null, () =>
+            {
+                ModCatalog.Remove?.Invoke(removable);
+                selected.ExceptWith(removable);
+            }, true);
+            if (ModCatalog.Remove == null || removable.Count == 0)
+                GreyOut(remove, true);
+        }
     }
 
-    // A row: check mark, name, version, note, switch, update (the new version), remove. The manager: its update only.
-    void InstalledRow(ModEntry mod, bool isManager)
+    // A row made from the game's save slot row: check box, picture, name, tag chips; on the right the version, the
+    // note; the switch, the update (to the new version) and the remove cross. The manager: its update only.
+    void ModRow(ModEntry mod, bool isManager, bool catalog = false)
     {
-        var go = NewRect("OE_Row_" + mod.Id, installedList).gameObject;
-        var line = Line(go, RowHeight);
-        Pickable(go, installedPick == mod.Id, () => installedPick = mod.Id);
-        if (isManager)
-            Space(line, CheckWidth);
-        else
-            NewCheck(line, selected.Contains(mod.Id), value => Redraw(() =>
+        var row = Copy(rowSource, listContent);
+        row.name = "OE_Row_" + mod.Id;
+        row.SetActive(true);
+        var picked = (catalog ? catalogPick : installedPick) == mod.Id;
+        RowBase(row, picked, () =>
+        {
+            if (catalog)
+                catalogPick = mod.Id;
+            else
+                installedPick = mod.Id;
+            shotIndex = 0;
+        });
+        var check = row.transform.Find("Toggle")?.GetComponent<BhToggle>();
+        if (check != null)
+        {
+            check.gameObject.SetActive(!catalog && !isManager);
+            if (!catalog && !isManager)
             {
-                if (value)
-                    selected.Add(mod.Id);
-                else
-                    selected.Remove(mod.Id);
-            }));
-        TextCell(line, Texts.Get(mod.NameKey), -1f, textStyle.color);
-        TextCell(line, mod.Installed ?? "", 200f, textStyle.color);
-        TextCell(line, mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "", 380f, Dim());
+                check.ShowValue(selected.Contains(mod.Id));
+                check.toggle.onValueChanged.AddListener((UnityAction<bool>)(value => Guard("check", () =>
+                {
+                    if (filling)
+                        return;
+                    Redraw(() =>
+                    {
+                        if (value)
+                            selected.Add(mod.Id);
+                        else
+                            selected.Remove(mod.Id);
+                    });
+                })));
+            }
+        }
+        RowPicture(row, mod.Screenshots?.FirstOrDefault(s => s?.Path != null)?.Path);
+        RowName(row, Texts.Get(mod.NameKey), mod.TagKeys);
+        if (catalog)
+            RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "", mod.Available ?? mod.Installed ?? "",
+                mod.Installed != null ? Texts.Get(W + "installed") : mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
+        else
+            RowInfo(row, Texts.Get(W + "versionLabel"), mod.Installed ?? "", mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
+        if (catalog)
+            return;
 
+        // The controls, left of the information.
+        var controls = NewRect("OE_Controls", row.transform);
+        controls.anchorMin = controls.anchorMax = controls.pivot = new Vector2(1f, 0.5f);
+        controls.anchoredPosition = new Vector2(-370f, 0f);
+        controls.sizeDelta = new Vector2(330f, 60f);
+        HRow(controls.gameObject, 10f, TextAnchor.MiddleRight);
+        // TODO(ByHand): no update and no cross for a mod BepInEx loaded itself (mod.ByHand) once the library has it.
+        if (mod.HasUpdate && ModCatalog.Update != null && textButtonTemplate != null)
+            TextButton(controls, string.Format(Texts.Get(W + "updateTo"), mod.Available), 170f, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
         if (!isManager && mod.Enabled is { } on && !mod.RequiredByOthers && ModCatalog.SetEnabled != null && switchSource != null)
-            NewSwitch(line, on, value => Guard("switch " + mod.Id, () => ModCatalog.SetEnabled?.Invoke(new[] { mod.Id }, value)));
-        else
-            Space(line, SwitchWidth);
+            NewSwitch(controls, on, value => Guard("switch " + mod.Id, () => ModCatalog.SetEnabled?.Invoke(new[] { mod.Id }, value)));
+        if (!isManager && !mod.RequiredByOthers && ModCatalog.Remove != null && crossSource != null)
+            NewCross(controls, () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
+    }
 
-        if (mod.HasUpdate && ModCatalog.Update != null)
-            NewButton(line, string.Format(Texts.Get(W + "updateTo"), mod.Available), 300f, () => ModCatalog.Update?.Invoke(new[] { mod.Id }), green: true);
-        else
-            Space(line, 300f);
+    // The row's own parts: its selected look, the cloud and the map's icons off, a click picks it.
+    void RowBase(GameObject row, bool picked, Action pick)
+    {
+        var t = row.transform;
+        Hide(t, "CloudOn", "CloudOff", "InfoIcons", "CampaignInfo");
+        Hide(t.Find("HeaderGroup"), "RenameBtn");
+        if (t.Find("SelectedBack") is { } selectedBack)
+            selectedBack.gameObject.SetActive(picked);
+        if (t.Find("HoveredBack")?.GetComponent<CanvasGroup>() is { } hovered)
+            hovered.alpha = 0f;
+        if (row.GetComponent<CanvasGroup>() is { } group)
+        {
+            group.alpha = 1f;
+            group.interactable = group.blocksRaycasts = true;
+        }
+        Clickable(row, () => Redraw(pick));
+    }
 
-        if (!isManager && !mod.RequiredByOthers && ModCatalog.Remove != null && crossTemplate != null)
-            NewCross(line, () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
-        else
-            Space(line, CrossWidth);
+    void RowPicture(GameObject row, string path)
+    {
+        var icon = row.transform.Find("IconFrame/Icon");
+        if (icon == null)
+            return;
+        // The save's icon is not ours: the first screenshot over it, or the frame empty.
+        if (icon.GetComponent<Image>() is { } image)
+            image.enabled = false;
+        if (path == null)
+            return;
+        var picture = NewRect("OE_Shot", icon).gameObject.AddComponent<RawImage>();
+        Stretch(picture.rectTransform);
+        picture.raycastTarget = false;
+        ShowPicture(picture, path, crop: true);
+    }
+
+    void RowName(GameObject row, string name, IReadOnlyList<string> tagKeys)
+    {
+        var group = row.transform.Find("HeaderGroup");
+        if (group == null)
+            return;
+        if (group.Find("SessionName")?.GetComponent<TMP_Text>() is { } title)
+            SetText(title, name);
+        // The game's two chips: the first two tags.
+        var chips = group.GetComponentsInChildren<BhTag>(true).ToList();
+        for (var i = 0; i < chips.Count; i++)
+        {
+            var key = tagKeys != null && i < tagKeys.Count ? tagKeys[i] : null;
+            chips[i].gameObject.SetActive(key != null);
+            if (key != null)
+                chips[i].ShowText(Texts.Get(key));
+        }
+    }
+
+    static void RowInfo(GameObject row, string header, string value, string note)
+    {
+        var t = row.transform;
+        if (t.Find("LastSaveHeader")?.GetComponent<TMP_Text>() is { } h)
+            SetText(h, $"<color=#A5A5A5>{header}</color>");
+        if (t.Find("LastSaveTime")?.GetComponent<TMP_Text>() is { } v)
+            SetText(v, value);
+        if (t.Find("LastSaveGameTime")?.GetComponent<TMP_Text>() is { } n)
+            SetText(n, note);
     }
 
     // ---------- Catalog ----------
@@ -520,283 +739,276 @@ public partial class Plugin
             tagFilter = null;
         if (sourceFilter != null && !sourceKeys.Contains(sourceFilter))
             sourceFilter = null;
-        tagOptions = InitDropdown(tagDropdown, "oe.settings.w.tagopt.", W + "tags.all", tagKeys, tagFilter, tagOptions);
-        sourceOptions = InitDropdown(sourceDropdown, "oe.settings.w.sourceopt.", W + "sources.all", sourceKeys, sourceFilter, sourceOptions);
+        tagOptions = SetOptions(tagDropdown, W + "tags.all", tagKeys, tagFilter, tagOptions);
+        sourceOptions = SetOptions(sourceDropdown, W + "sources.all", sourceKeys, sourceFilter, sourceOptions);
 
-        Clear(catalogGrid);
         var mods = Catalog().Where(m => Matches(m, searchText) && (tagFilter == null || (m.TagKeys?.Contains(tagFilter) ?? false)) &&
                                         (sourceFilter == null || m.SourceNameKey == sourceFilter)).ToList();
         foreach (var mod in mods)
-            Card(mod);
-        if (mods.Count == 0)
-            TextCell(Line(NewRect("Empty", catalogGrid).gameObject, RowHeight), Texts.Get(W + "nothing"), -1f, Dim());
-    }
-
-    // The dropdown's options: "All ..." and the keys (looked up by number: aliases <prefix>0..N); set again only when
-    // they changed (Init closes a list the player has open). Returns what they are now.
-    string InitDropdown(BhLocalizedDropdown dropdown, string prefix, string allKey, List<string> keys, string chosen, string was)
-    {
-        if (dropdown == null)
-            return was;
-        var now = $"{Texts.Language}|{string.Join("|", keys)}|{chosen}";
-        if (now == was)
-            return was;
-        Texts.Alias(prefix + 0, allKey);
-        for (var i = 0; i < keys.Count; i++)
-            Texts.Alias(prefix + (i + 1), keys[i]);
-        var values = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>(keys.Count + 1);
-        for (var i = 0; i <= keys.Count; i++)
-            values[i] = i;
-        var index = chosen != null ? keys.IndexOf(chosen) + 1 : 0;
-        dropdown.Init(dropdownChanged[dropdown.Pointer], new Il2CppSystem.Array(values.Pointer), index, false, prefix, EDropdownType.Text);
-        return now;
-    }
-
-    // A card: the first screenshot as its picture, the name, the source (or "installed"), the tags.
-    void Card(ModEntry mod)
-    {
-        var cell = NewRect("OE_Card_" + mod.Id, catalogGrid);
-        var column = cell.gameObject.AddComponent<VerticalLayoutGroup>();
-        column.spacing = 8f;
-        column.childAlignment = TextAnchor.UpperCenter;
-        column.childControlWidth = column.childControlHeight = true;
-        column.childForceExpandWidth = true;
-        column.childForceExpandHeight = false;
-        Pickable(cell.gameObject, catalogPick == mod.Id, () => catalogPick = mod.Id);
-
-        var pictureHolder = NewRect("Picture", cell);
-        Size(pictureHolder.gameObject, CardWidth, 267f * CardScale);
-        var shot = mod.Screenshots?.FirstOrDefault(s => s?.Path != null)?.Path;
-        if (cardTemplate != null)
-        {
-            var card = Copy(cardTemplate.gameObject, pictureHolder);
-            var minimap = card.GetComponentsInChildren<RawImage>(true).FirstOrDefault(r => r.name == cardTemplate.minimapImage.name && r.GetComponentInParent<Mask>(true) == null);
-            var title = card.GetComponentsInChildren<TMP_Text>(true).FirstOrDefault(t => t.name == cardTemplate.title.name);
-            // The map's info icons and favourite mark are not ours.
-            foreach (var part in new[] { cardTemplate.mapInfoView != null ? cardTemplate.mapInfoView.name : null, "IconsSeparators", cardTemplate.fav != null ? cardTemplate.fav.name : null })
-                if (part != null)
-                    foreach (var t in card.GetComponentsInChildren<Transform>(true).Where(t => t.name == part).ToList())
-                        t.gameObject.SetActive(false);
-            Strip<BhMapCard>(card);
-            Strip<BhMapPreviewInfoView>(card);
-            foreach (var group in card.GetComponents<CanvasGroup>())
-            {
-                group.alpha = 1f;
-                group.interactable = group.blocksRaycasts = true;
-            }
-            var rect = card.transform.Cast<RectTransform>();
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
-            rect.localScale = new Vector3(CardScale, CardScale, 1f);
-            card.SetActive(true);
-            if (title != null)
-            {
-                SetText(title, Texts.Get(mod.NameKey));
-                title.enableWordWrapping = false;
-                title.overflowMode = TextOverflowModes.Ellipsis;
-            }
-            if (minimap != null)
-                ShowPicture(minimap, shot, crop: true);
-        }
-        else
-        {
-            // No card in the loaded scenes: the picture and the name in the window's own font.
-            var picture = NewRect("Shot", pictureHolder).gameObject.AddComponent<RawImage>();
-            Stretch(picture.rectTransform);
-            ShowPicture(picture, shot, crop: true);
-            TextCell(Line(NewRect("Name", cell).gameObject, 60f, CardWidth), Texts.Get(mod.NameKey), -1f, textStyle.color);
-        }
-        var origin = mod.Installed != null ? Texts.Get(W + "installed") : mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "";
-        var originLine = Line(NewRect("Origin", cell).gameObject, 48f, CardWidth);
-        originLine.GetComponent<HorizontalLayoutGroup>().childAlignment = TextAnchor.MiddleCenter;
-        var originCell = TextCell(originLine, origin, -1f, Dim(), textStyle.fontSize * 0.8f);
-        originCell.alignment = TextAlignmentOptions.Midline;
-        var chips = NewRect("Tags", cell);
-        Size(chips.gameObject, CardWidth, 50f);
-        chips.gameObject.AddComponent<RectMask2D>();
-        var chipsRow = HRow(chips.gameObject, 8f, TextAnchor.MiddleCenter, controlWidth: false);
-        chipsRow.childControlHeight = false;
-        foreach (var key in (mod.TagKeys ?? Array.Empty<string>()).Take(3))
-            Chip(chips, key);
+            ModRow(mod, isManager: false, catalog: true);
+        ShowNothing(mods.Count == 0, W + "nothing");
     }
 
     // ---------- Sources ----------
 
     void FillSources()
     {
-        Clear(sourcesList);
         foreach (var source in ModCatalog.Sources)
         {
-            var go = NewRect("OE_Source", sourcesList).gameObject;
-            var line = Line(go, RowHeight);
+            var row = Copy(rowSource, listContent);
+            row.name = "OE_Source";
+            row.SetActive(true);
             var url = source.Url;
-            Pickable(go, sourcePick == url, () => sourcePick = url);
-            TextCell(line, Texts.Get(source.TitleKey), -1f, textStyle.color);
-            TextCell(line, string.Format(Texts.Get(W + "mods"), source.Mods), 220f, textStyle.color);
-            TextCell(line, source.NoteKey != null ? Texts.Get(source.NoteKey) : "", 520f, Dim());
-            TextCell(line, Checked(source), 460f, Dim());
+            RowBase(row, sourcePick == url, () => sourcePick = url);
+            row.transform.Find("Toggle")?.gameObject.SetActive(false);
+            RowPicture(row, null);
+            RowName(row, Texts.Get(source.TitleKey), source.BuiltIn ? new[] { W + "builtIn" } : null);
+            RowInfo(row, string.Format(Texts.Get(W + "mods"), source.Mods), Checked(source), source.NoteKey != null ? Texts.Get(source.NoteKey) : "");
         }
-        Clear(sourcesActions);
-        ActionButton(sourcesActions, W + "addUrl", ModCatalog.AddSource != null, () => AskForSource(W + "url.caption", W + "url.placeholder", ModCatalog.AddSource), width: 520f);
-        ActionButton(sourcesActions, W + "addGitHub", ModCatalog.AddGitHubSource != null, () => AskForSource(W + "github.caption", W + "github.placeholder", ModCatalog.AddGitHubSource), width: 520f);
+        ShowNothing(ModCatalog.Sources.Count == 0, W + "nothing");
+        BottomButton(W + "addUrl", ModCatalog.AddSource != null, () => AskForSource(W + "url.caption", W + "url.placeholder", ModCatalog.AddSource), 260f);
+        BottomButton(W + "addGitHub", ModCatalog.AddGitHubSource != null, () => AskForSource(W + "github.caption", W + "github.placeholder", ModCatalog.AddGitHubSource), 260f);
+        BottomButton(W + "checkAll", ModCatalog.CheckAll != null, () => ModCatalog.CheckAll?.Invoke(), 220f);
     }
 
     static string Checked(CatalogSource source) => source.LastChecked is { } when
         ? string.Format(Texts.Get(W + "checked"), when.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture))
         : Texts.Get(W + "checkedNever");
 
+    // ---------- the bottom left group ----------
+
+    void ClearBottom()
+    {
+        if (bottomGroup == null)
+            return;
+        for (var i = bottomGroup.childCount - 1; i >= 0; i--)
+            if (bottomGroup.GetChild(i).name.StartsWith("OE_", StringComparison.Ordinal))
+                UnityEngine.Object.DestroyImmediate(bottomGroup.GetChild(i).gameObject);
+        selectAll?.gameObject.SetActive(false);
+        selectAllText?.gameObject.SetActive(false);
+    }
+
+    void BottomButton(string key, bool available, Action click, float width = 150f)
+    {
+        if (textButtonTemplate == null || bottomGroup == null)
+            return;
+        var button = TextButton(bottomGroup, Texts.Get(key), width, click);
+        button.name = "OE_" + key.Substring(W.Length);
+        if (!available)
+            GreyOut(button, true);
+    }
+
     // ---------- details ----------
 
     void FillDetails()
     {
-        Clear(details);
-        Clear(detailsButtons);
+        Clear(infoContent);
         if (tab == WindowTab.Sources)
         {
-            if (ModCatalog.Sources.FirstOrDefault(s => s.Url == sourcePick) is { } source)
+            var source = ModCatalog.Sources.FirstOrDefault(s => s.Url == sourcePick);
+            ShowPanel(source != null, W + "pickSource");
+            if (source != null)
                 SourceDetails(source);
-            else
-                DetailText(Texts.Get(W + "pickSource"), Dim(), textStyle.fontSize);
             return;
         }
         var id = tab == WindowTab.Installed ? installedPick : catalogPick;
         var mod = id == null ? null : ModCatalog.Manager?.Id == id ? ModCatalog.Manager : ModCatalog.Mods.FirstOrDefault(m => m.Id == id);
+        ShowPanel(mod != null, W + "pickMod");
         if (mod == null)
-        {
-            DetailText(Texts.Get(W + "pickMod"), Dim(), textStyle.fontSize);
             return;
-        }
         if (screenshotsAsked.Add(mod.Id) && ModCatalog.LoadScreenshots is { } load)
             Guard("load screenshots " + mod.Id, () => load(mod.Id));
 
-        DetailText(Texts.Get(mod.NameKey), textStyle.color, textStyle.fontSize * 1.5f);
-        var origin = new List<string>
+        if (panelTitle != null)
+            SetText(panelTitle, Texts.Get(mod.NameKey));
+        // The picture: the screenshot chosen (a click shows it big); none: the panel's own ornaments.
+        var shots = (mod.Screenshots ?? Array.Empty<ModScreenshot>()).Where(s => s?.Path != null).ToList();
+        if (shotIndex >= shots.Count)
+            shotIndex = 0;
+        if (panelPicture != null)
         {
-            mod.SourceNameKey != null ? string.Format(Texts.Get(W + "catalogOf"), Texts.Get(mod.SourceNameKey)) : Texts.Get(W + "byHand"),
-        };
-        if (!string.IsNullOrEmpty(mod.Author))
-            origin.Add(string.Format(Texts.Get(W + "author"), mod.Author));
-        DetailText(string.Join(" · ", origin), Dim(), textStyle.fontSize * 0.85f);
-        DetailText(mod.Installed != null && mod.HasUpdate && mod.Available != null ? string.Format(Texts.Get(W + "versions"), mod.Installed, mod.Available)
-            : mod.Installed != null ? string.Format(Texts.Get(W + "version"), mod.Installed)
-            : mod.Available != null ? string.Format(Texts.Get(W + "available"), mod.Available) : "", textStyle.color, textStyle.fontSize * 0.85f);
-        if (mod.NoteKey != null)
-            DetailText(Texts.Get(mod.NoteKey), Dim(), textStyle.fontSize * 0.85f);
+            panelPicture.gameObject.SetActive(shots.Count > 0);
+            if (shots.Count > 0)
+            {
+                ShowPicture(panelPicture, shots[shotIndex].Path, crop: false);
+                var path = shots[shotIndex].Path;
+                Clickable(panelPicture.gameObject, () => Redraw(() => bigShotPath = path));
+            }
+        }
+        SetPair(versionLabel, versionValue, Texts.Get(W + "versionLabel"),
+            mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available ?? "");
+        SetPair(originLabel, originValue, Texts.Get(W + "catalogLabel"), mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"));
 
-        // The screenshots: thumbnails, a click shows one big.
-        if (mod.Screenshots is { Count: > 0 } shots)
+        if (!string.IsNullOrEmpty(mod.Author))
+            InfoLine(string.Format(Texts.Get(W + "author"), mod.Author));
+        InfoLine(mod.Installed != null && mod.HasUpdate && mod.Available != null ? string.Format(Texts.Get(W + "versions"), mod.Installed, mod.Available)
+            : mod.Installed != null ? string.Format(Texts.Get(W + "version"), mod.Installed)
+            : mod.Available != null ? string.Format(Texts.Get(W + "available"), mod.Available) : "");
+        if (mod.NoteKey != null)
+            InfoLine($"<color=#A5A5A5>{Texts.Get(mod.NoteKey)}</color>");
+        // The thumbnails: a click shows that one in the picture.
+        if (shots.Count > 1)
         {
-            var strip = NewRect("Screenshots", details);
-            Size(strip.gameObject, DetailsWidth, 135f);
-            HRow(strip.gameObject, 12f, TextAnchor.MiddleLeft);
-            strip.gameObject.AddComponent<RectMask2D>();
-            foreach (var shot in shots.Take(4))
+            var strip = NewRect("OE_Shots", infoContent);
+            Size(strip.gameObject, 440f, 70f);
+            HRow(strip.gameObject, 8f, TextAnchor.MiddleLeft);
+            for (var i = 0; i < shots.Count && i < 5; i++)
             {
                 var thumb = NewRect("Shot", strip);
-                Size(thumb.gameObject, 228f, 128f);
+                Size(thumb.gameObject, 112f, 63f);
                 var picture = thumb.gameObject.AddComponent<RawImage>();
-                ShowPicture(picture, shot?.Path, crop: true);
-                if (shot?.Path is { } path)
-                    Clickable(thumb.gameObject, () => Redraw(() => bigShotPath = path));
+                ShowPicture(picture, shots[i].Path, crop: true);
+                var index = i;
+                Clickable(thumb.gameObject, () => Redraw(() => shotIndex = index));
             }
         }
-
-        // The tags, in rows as wide as the panel.
         if (mod.TagKeys is { Count: > 0 } tagKeys)
-        {
-            Transform row = null;
-            var width = 0f;
-            foreach (var key in tagKeys)
-            {
-                if (row == null || width > DetailsWidth - 220f)
-                {
-                    row = NewRect("Tags", details);
-                    Size(row.gameObject, DetailsWidth, 50f);
-                    var layout = HRow(row.gameObject, 8f, TextAnchor.MiddleLeft, controlWidth: false);
-                    layout.childControlHeight = false;
-                    width = 0f;
-                }
-                width += Chip(row, key) + 8f;
-            }
-        }
+            Chips(tagKeys);
         if (mod.DescriptionKey != null)
-            DetailText(Texts.Get(mod.DescriptionKey), textStyle.color, textStyle.fontSize * 0.85f, wrap: true);
+            InfoText(Texts.Get(mod.DescriptionKey));
         if (mod.RequiresKeys is { Count: > 0 } requires)
-            DetailText(string.Format(Texts.Get(W + "requires"), string.Join(", ", requires.Select(Texts.Get))), Dim(), textStyle.fontSize * 0.85f, wrap: true);
+            InfoText(string.Format(Texts.Get(W + "requires"), string.Join(", ", requires.Select(Texts.Get))));
 
-        // The buttons by tab.
+        // The buttons by tab: the big one Update / Install, the bin Remove.
+        // TODO(ByHand): no Update and no Remove for a mod BepInEx loaded itself (mod.ByHand) once the library has it.
         if (tab == WindowTab.Installed)
         {
-            ActionButton(detailsButtons, W + "update", mod.HasUpdate && ModCatalog.Update != null, () => ModCatalog.Update?.Invoke(new[] { mod.Id }), green: true, hideWhenOff: true);
-            ActionButton(detailsButtons, W + "remove", mod != ModCatalog.Manager && mod.Installed != null && !mod.RequiredByOthers && ModCatalog.Remove != null,
-                () => ModCatalog.Remove?.Invoke(new[] { mod.Id }), hideWhenOff: true);
+            PanelButton(primaryButton, W + "update", mod.HasUpdate && ModCatalog.Update != null, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
+            PanelButton(deleteButton, null, mod != ModCatalog.Manager && mod.Installed != null && !mod.RequiredByOthers && ModCatalog.Remove != null,
+                () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
         }
         else
-            ActionButton(detailsButtons, W + "install", mod.Installed == null && mod.Available != null && ModCatalog.Install != null,
-                () => ModCatalog.Install?.Invoke(mod.Id), green: true, hideWhenOff: true);
+        {
+            PanelButton(primaryButton, W + "install", mod.Installed == null && mod.Available != null && ModCatalog.Install != null, () => ModCatalog.Install?.Invoke(mod.Id));
+            PanelButton(deleteButton, null, false, null);
+        }
+        PanelButton(secondaryButton, null, false, null);
     }
 
     void SourceDetails(CatalogSource source)
     {
-        DetailText(Texts.Get(source.TitleKey), textStyle.color, textStyle.fontSize * 1.5f);
-        DetailText(source.Url ?? "", Dim(), textStyle.fontSize * 0.75f, wrap: true);
+        if (panelTitle != null)
+            SetText(panelTitle, Texts.Get(source.TitleKey));
+        panelPicture?.gameObject.SetActive(false);
+        SetPair(versionLabel, versionValue, Texts.Get(W + "modsLabel"), source.Mods.ToString());
+        SetPair(originLabel, originValue, Texts.Get(W + "checkedLabel"), source.LastChecked is { } when
+            ? when.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) : Texts.Get(W + "checkedNever"));
+        InfoText($"<color=#A5A5A5>{source.Url}</color>");
         if (source.BuiltIn)
-            DetailText(Texts.Get(W + "builtIn"), Dim(), textStyle.fontSize * 0.85f);
-        DetailText(string.Format(Texts.Get(W + "mods"), source.Mods), textStyle.color, textStyle.fontSize * 0.85f);
-        DetailText(Checked(source), textStyle.color, textStyle.fontSize * 0.85f);
+            InfoLine(Texts.Get(W + "builtIn"));
         if (source.NoteKey != null)
-            DetailText(Texts.Get(source.NoteKey), Dim(), textStyle.fontSize * 0.85f, wrap: true);
-        if (source.SetCheckEvery is { } setEvery)
+            InfoText(Texts.Get(source.NoteKey));
+        if (source.SetCheckEvery is { } setEvery && dropdownSource != null)
         {
-            DetailText(Texts.Get(W + "every"), textStyle.color, textStyle.fontSize * 0.85f);
-            var holder = NewRect("CheckEvery", details);
-            Size(holder.gameObject, DetailsWidth, 72f);
-            var dropdown = NewDropdown(holder, 0f, 0f, i =>
+            InfoLine(Texts.Get(W + "every"));
+            var holder = NewRect("OE_Every", infoContent);
+            Size(holder.gameObject, 440f, 40f);
+            // Laid out from the left by the holder (the dropdown's own anchors are its row's).
+            var everyRow = HRow(holder.gameObject, 0f, TextAnchor.MiddleLeft);
+            everyRow.childControlWidth = everyRow.childControlHeight = false;
+            var dropdown = Copy(dropdownSource, holder).GetComponent<BhDropdown>();
+            dropdown.gameObject.SetActive(true);
+            BindDropdown(dropdown, i =>
             {
                 if (i >= 0 && i < CheckEveryValues.Length)
                     Guard("check every", () => setEvery(CheckEveryValues[i]));
             });
-            if (dropdown != null)
-            {
-                const string prefix = "oe.settings.w.every.";
-                var values = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>(CheckEveryValues.Length);
-                for (var i = 0; i < CheckEveryValues.Length; i++)
-                    values[i] = i;
-                dropdown.Init(dropdownChanged[dropdown.Pointer], new Il2CppSystem.Array(values.Pointer), Math.Max(0, Array.IndexOf(CheckEveryValues, source.CheckEvery)),
-                    false, prefix, EDropdownType.Text);
-            }
+            var texts = Enumerable.Range(0, CheckEveryValues.Length).Select(i => Texts.Get($"{W}every.{i}")).ToArray();
+            dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), Math.Max(0, Array.IndexOf(CheckEveryValues, source.CheckEvery)), EDropdownType.Text);
         }
-        ActionButton(detailsButtons, W + "check", source.Check != null, () => source.Check?.Invoke(), hideWhenOff: true);
-        ActionButton(detailsButtons, W + "remove", source.Remove != null && !source.BuiltIn, () => source.Remove?.Invoke(), hideWhenOff: true);
+        PanelButton(primaryButton, W + "check", source.Check != null, () => source.Check?.Invoke());
+        PanelButton(deleteButton, null, source.Remove != null && !source.BuiltIn, () => source.Remove?.Invoke());
+        PanelButton(secondaryButton, null, false, null);
     }
 
-    TMP_Text DetailText(string text, Color color, float size, bool wrap = false)
+    // The panel, or the empty one with a hint.
+    void ShowPanel(bool show, string hintKey)
     {
-        var go = NewRect("Text", details).gameObject;
-        var tmp = Text(go, text, color, size);
-        tmp.enableWordWrapping = wrap;
-        tmp.overflowMode = wrap ? TextOverflowModes.Overflow : TextOverflowModes.Ellipsis;
-        var element = Size(go, DetailsWidth, -1f);
-        // Wrapped text grows with its lines (its preferred height); one line keeps the font's height.
-        if (!wrap)
-            element.preferredHeight = element.minHeight = size * 1.6f;
-        else
-            go.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        return tmp;
+        panel?.gameObject.SetActive(show);
+        if (emptyPanel == null)
+            return;
+        emptyPanel.gameObject.SetActive(!show);
+        if (emptyPanel.Find("OE_Hint")?.GetComponent<TMP_Text>() is { } hint)
+            SetText(hint, Texts.Get(hintKey));
     }
 
-    // ---------- the bottom, the big screenshot ----------
-
-    void FillBottom()
+    static void SetPair(TMP_Text label, TMP_Text value, string labelText, string valueText)
     {
-        Clear(windowButtons);
-        if (tab == WindowTab.Installed)
-            ActionButton(windowButtons, W + "updateAll", ModCatalog.UpdateAll != null && (ModCatalog.Mods.Any(m => m.HasUpdate) || ModCatalog.Manager?.HasUpdate == true),
-                () => ModCatalog.UpdateAll?.Invoke(), width: BottomButtonWidth, green: true);
-        if (tab == WindowTab.Sources)
-            ActionButton(windowButtons, W + "checkAll", ModCatalog.CheckAll != null, () => ModCatalog.CheckAll?.Invoke(), width: BottomButtonWidth);
-        NewButton(windowButtons, Texts.Get(CloseKey), BottomButtonWidth, () => window.SetActive(false), waits: false);
+        if (label != null)
+            SetText(label, labelText);
+        if (value != null)
+            SetText(value, valueText);
     }
+
+    // A line of the panel's information, in its own style.
+    void InfoLine(string text)
+    {
+        if (lineTemplate == null || string.IsNullOrEmpty(text))
+            return;
+        var line = Copy(lineTemplate, infoContent);
+        line.name = "OE_Line";
+        line.SetActive(true);
+        var tmp = line.GetComponent<TMP_Text>();
+        tmp.enableWordWrapping = false;
+        tmp.overflowMode = TextOverflowModes.Ellipsis;
+        SetText(tmp, text);
+    }
+
+    // A text that wraps (the description), as the panel's own description.
+    void InfoText(string text)
+    {
+        var template = wrapTemplate ?? lineTemplate;
+        if (template == null || string.IsNullOrEmpty(text))
+            return;
+        var block = Copy(template, infoContent);
+        block.name = "OE_Text";
+        block.SetActive(true);
+        var tmp = block.GetComponent<TMP_Text>();
+        tmp.enableWordWrapping = true;
+        tmp.overflowMode = TextOverflowModes.Overflow;
+        SetText(tmp, text);
+        if (block.GetComponent<LayoutElement>() is { } element)
+            element.preferredHeight = element.minHeight = -1f;
+        if (block.GetComponent<ContentSizeFitter>() == null)
+            block.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+    }
+
+    // The tags as the game's chips, in rows as wide as the panel.
+    void Chips(IReadOnlyList<string> keys)
+    {
+        if (chipTemplate == null)
+            return;
+        Transform row = null;
+        var width = 0f;
+        foreach (var key in keys)
+        {
+            if (row == null || width > 360f)
+            {
+                row = NewRect("OE_Chips", infoContent);
+                Size(row.gameObject, 440f, 26f);
+                HRow(row.gameObject, 6f, TextAnchor.MiddleLeft);
+                width = 0f;
+            }
+            var chip = Copy(chipTemplate, row).GetComponent<BhTag>();
+            chip.gameObject.SetActive(true);
+            chip.ShowText(Texts.Get(key));
+            width += (chip.layoutElement != null ? chip.layoutElement.preferredWidth : 80f) + 6f;
+        }
+    }
+
+    // A button of the panel: our label (null: keep its picture) and action, hidden while not available.
+    void PanelButton(BhGenericButton button, string key, bool available, Action click)
+    {
+        if (button == null)
+            return;
+        button.gameObject.SetActive(available);
+        if (available)
+            Bind(button, key != null ? Texts.Get(key) : null, click, true);
+        if (available && ModCatalog.Busy)
+            GreyOut(button, true);
+    }
+
+    // ---------- the big screenshot ----------
 
     void FillBigShot()
     {
@@ -816,8 +1028,9 @@ public partial class Plugin
         var rect = picture.rectTransform;
         rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
         rect.anchoredPosition = Vector2.zero;
+        var area = window.GetComponent<RectTransform>().rect;
         var aspect = texture != null && texture.height > 0 ? (float)texture.width / texture.height : 16f / 9f;
-        var width = Math.Min(BodyWidth - 40f, (BodyHeight - 40f) * aspect);
+        var width = Math.Min(area.width - 80f, (area.height - 80f) * aspect);
         rect.sizeDelta = new Vector2(width, width / aspect);
     }
 
@@ -911,44 +1124,27 @@ public partial class Plugin
 
     // ---------- widgets ----------
 
-    const float CheckWidth = 64f, SwitchWidth = 150f, CrossWidth = 80f;
-
-    // The tabs when there is no hub tab in the loaded scenes: the settings' small buttons (the current one greyed out).
-    readonly Dictionary<WindowTab, BhGenericButton> tabButtons = new();
-
-    void NewTab(Transform parent, WindowTab which)
-    {
-        if (tabTemplate == null)
-        {
-            tabButtons[which] = NewButton(parent, which.ToString(), 560f, () => Redraw(() => SwitchTab(which)), waits: false);
-            Logs.Once("Mods window: no hub tab to copy, buttons instead");
-            return;
-        }
-        var copy = Copy(tabTemplate.gameObject, parent);
-        copy.name = "Tab_" + which;
-        Size(copy, 560f, 66f);
-        copy.SetActive(true);
-        var tab = copy.GetComponent<BhTab>();
-        tab.Click = (Action<GameTabItem>)(_ => Guard("tab", () => Redraw(() => SwitchTab(which))));
-        tabs[which] = tab;
-    }
-
     void SwitchTab(WindowTab which)
     {
         tab = which;
         bigShotPath = null;
+        shotIndex = 0;
     }
 
-    // A text field: a copy of the game's input box's, its placeholder ours, each change reported.
-    TMP_InputField NewInput(Transform parent, string placeholderKey, float x, float y, float width, Action<string> changed)
+    // A text field: a copy of the game's input box's, in the filter row's size (its font halved: that box is drawn on
+    // a canvas twice as big), its placeholder ours, each change reported.
+    TMP_InputField NewInput(Transform parent, string placeholderKey, Action<string> changed)
     {
         if (inputTemplate == null)
             return null;
         var copy = Copy(inputTemplate.gameObject, parent);
-        copy.name = "Input";
-        Place(copy.transform.Cast<RectTransform>(), x, y, width, 64f);
+        copy.name = "OE_Input";
+        Size(copy, 380f, 31f);
+        copy.transform.Cast<RectTransform>().sizeDelta = new Vector2(380f, 31f);
         copy.SetActive(true);
         var input = copy.GetComponent<TMP_InputField>();
+        foreach (var text in copy.GetComponentsInChildren<TMP_Text>(true))
+            text.fontSize = 18f;
         input.text = "";
         input.characterLimit = 0;
         if (input.placeholder != null && input.placeholder.GetComponent<TMP_Text>() is { } placeholder)
@@ -957,77 +1153,43 @@ public partial class Plugin
         return input;
     }
 
-    // What each of our dropdowns does with the option chosen, by the dropdown (the click is set again on each Init).
-    readonly Dictionary<IntPtr, Action<int>> dropdownChanged = new();
-
-    // A dropdown: a copy of the settings' dropdown row with only its dropdown shown (the switch's way below).
-    BhLocalizedDropdown NewDropdown(Transform parent, float x, float y, Action<int> changed)
-    {
-        if (dropdownTemplate == null)
-            return null;
-        var holder = NewRect("Dropdown", parent);
-        Place(holder, x, y, 841f * DropdownScale + 20f, 70f);
-        // Its list opens over what follows it.
-        var canvas = holder.gameObject.AddComponent<Canvas>();
-        canvas.overrideSorting = true;
-        canvas.sortingOrder = WindowOrder + 10;
-        holder.gameObject.AddComponent<GraphicRaycaster>();
-        var copy = Copy(dropdownTemplate.gameObject, holder);
-        copy.name = "Row";
-        var rect = copy.transform.Cast<RectTransform>();
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
-        rect.anchoredPosition = Vector2.zero;
-        if (copy.GetComponent<Image>() is { } rowImage)
-            rowImage.color = new Color(0f, 0f, 0f, 0f);
-        for (var i = 0; i < copy.transform.childCount; i++)
+    // What a dropdown does with the option chosen (not while the window fills it).
+    void BindDropdown(BhDropdown dropdown, Action<int> changed) =>
+        dropdown.onValueChanged.AddListener((UnityAction<int>)(i => Guard("dropdown", () =>
         {
-            var part = copy.transform.GetChild(i);
-            if (part.name == "Dropdown")
-            {
-                var own = part.Cast<RectTransform>();
-                own.anchorMin = own.anchorMax = new Vector2(0f, 0.5f);
-                own.pivot = new Vector2(0f, 0.5f);
-                own.anchoredPosition = Vector2.zero;
-                own.localScale = new Vector3(DropdownScale, DropdownScale, 1f);
-            }
-            else
-                part.gameObject.SetActive(false);
-        }
-        copy.SetActive(true);
-        var dropdown = copy.GetComponent<BhLocalizedDropdown>();
-        dropdownChanged[dropdown.Pointer] = i => Guard("dropdown", () => changed(i));
-        return dropdown;
-    }
+            if (!filling)
+                changed(i);
+        })));
 
-    // A check mark: a copy of the save list filter's, scaled up.
-    void NewCheck(Transform line, bool value, Action<bool> changed)
+    // The dropdown's options: "All ..." and the names; set again only when they changed (Init closes a list the player
+    // has open). Returns what they are now.
+    static string SetOptions(BhDropdown dropdown, string allKey, List<string> keys, string chosen, string was)
     {
-        var holder = Space(line, CheckWidth);
-        if (checkTemplate == null)
-            return;
-        var copy = Copy(checkTemplate.gameObject, holder);
-        copy.name = "Check";
-        var rect = copy.transform.Cast<RectTransform>();
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = Vector2.zero;
-        rect.localScale = new Vector3(CheckScale, CheckScale, 1f);
-        copy.SetActive(true);
-        var check = copy.GetComponent<BhToggle>();
-        check.ShowValue(value);
-        check.toggle.onValueChanged.AddListener((UnityAction<bool>)(v => Guard("check", () => changed(v))));
+        if (dropdown == null)
+            return was;
+        var now = $"{Texts.Language}|{string.Join("|", keys)}|{chosen}";
+        if (now == was)
+            return was;
+        var texts = new[] { Texts.Get(allKey) }.Concat(keys.Select(Texts.Get)).ToArray();
+        var index = chosen != null ? keys.IndexOf(chosen) + 1 : 0;
+        dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), index, EDropdownType.Text);
+        return now;
     }
 
-    // The switch: a copy of the settings tab's switch, only its knob shown, centred.
+    // The switch: a copy of the settings tab's switch, only its knob shown, centred (half size: the settings' canvas is
+    // twice as big).
     void NewSwitch(Transform line, bool on, Action<bool> set)
     {
-        var holder = Space(line, SwitchWidth);
+        var holder = NewRect("OE_Switch", line);
+        Size(holder.gameObject, 70f, 50f);
         var copy = UnityEngine.Object.Instantiate(switchSource.gameObject, holder, false);
         copy.name = "Switch";
         copy.SetActive(true);
         var copyRect = copy.transform.Cast<RectTransform>();
         copyRect.anchorMin = copyRect.anchorMax = copyRect.pivot = new Vector2(0.5f, 0.5f);
-        copyRect.sizeDelta = new Vector2(SwitchWidth, RowHeight);
+        copyRect.sizeDelta = new Vector2(140f, 100f);
         copyRect.anchoredPosition = Vector2.zero;
+        copyRect.localScale = new Vector3(0.5f, 0.5f, 1f);
         if (copy.GetComponent<Image>() is { } rowImage)
             rowImage.color = new Color(0f, 0f, 0f, 0f);
         for (var i = 0; i < copy.transform.childCount; i++)
@@ -1045,63 +1207,33 @@ public partial class Plugin
         copy.GetComponent<BhSettingsCheckbox>().Init((Action<bool>)set, on);
     }
 
+    // The remove cross: the information panel's own.
     void NewCross(Transform line, Action click)
     {
-        var holder = Space(line, CrossWidth);
-        var cross = UnityEngine.Object.Instantiate(crossTemplate.gameObject, holder, false).GetComponent<BhGenericButton>();
-        cross.name = "Remove";
-        var crossRect = cross.transform.Cast<RectTransform>();
-        crossRect.anchorMin = crossRect.anchorMax = crossRect.pivot = new Vector2(0.5f, 0.5f);
-        crossRect.anchoredPosition = Vector2.zero;
-        crossRect.localScale = new Vector3(CrossScale, CrossScale, 1f);
+        var cross = Copy(crossSource, line).GetComponent<BhGenericButton>();
+        cross.name = "OE_Remove";
+        Size(cross.gameObject, 37f, 37f);
+        cross.gameObject.SetActive(true);
         Bind(cross, null, click, true);
     }
 
-    // A tag chip: a copy of the quick start's, its text the game's translation of our key (BhDescriptionTag.Show sizes
-    // it to the text). Returns its width.
-    float Chip(Transform parent, string key)
+    // A text button: a copy of the panel's "Set up in the lobby" button.
+    BhGenericButton TextButton(Transform parent, string label, float width, Action click)
     {
-        if (tagTemplate == null)
-        {
-            var label = Text(NewRect("Tag", parent).gameObject, Texts.Get(key), Dim(), textStyle.fontSize * 0.7f);
-            label.enableWordWrapping = false;
-            var width = label.preferredWidth;
-            label.rectTransform.sizeDelta = new Vector2(width, 44f);
-            return width;
-        }
-        var copy = Copy(tagTemplate.gameObject, parent);
-        copy.name = "Tag";
-        copy.SetActive(true);
-        var chip = copy.GetComponent<BhDescriptionTag>();
-        chip.Show(key);
-        copy.SetActive(true);
-        return copy.transform.Cast<RectTransform>().rect.width;
-    }
-
-    // A button with our label: shown greyed out while not available (or hidden), waiting while the manager is busy.
-    void ActionButton(Transform parent, string key, bool available, Action click, bool green = false, float width = 320f, bool hideWhenOff = false)
-    {
-        if (!available && hideWhenOff)
-            return;
-        var button = NewButton(parent, Texts.Get(key), width, click, green);
-        if (!available)
-            button.SetAvailable(false);
-    }
-
-    BhGenericButton NewButton(Transform parent, string label, float width, Action click, bool green = false, bool waits = true)
-    {
-        var button = UnityEngine.Object.Instantiate(rowButtonTemplate.gameObject, parent, false).GetComponent<BhGenericButton>();
-        button.name = "Button";
-        Size(button.gameObject, width, ButtonHeight);
+        var button = Copy(textButtonTemplate, parent).GetComponent<BhGenericButton>();
+        button.name = "OE_Button";
+        Size(button.gameObject, width, 40f);
+        button.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, 40f);
         button.gameObject.SetActive(true);
-        Bind(button, label, click, waits);
-        // Install and Update stand out (green in the mockup; the game has no green button loaded in the menu: the
-        // blue one's own pictures tinted).
-        if (green && button.itemActive != null)
-            foreach (var image in button.itemActive.GetComponentsInChildren<Image>(true))
-                image.color = new Color(image.color.r * 0.45f, image.color.g, image.color.b * 0.35f, image.color.a);
-        if (waits && ModCatalog.Busy)
-            button.SetAvailable(false);
+        Bind(button, label, click, true);
+        if (button.label != null)
+        {
+            button.label.enableAutoSizing = true;
+            button.label.fontSizeMin = 10f;
+            button.label.fontSizeMax = Math.Max(button.label.fontSize, 12f);
+        }
+        if (ModCatalog.Busy)
+            GreyOut(button, true);
         return button;
     }
 
@@ -1118,6 +1250,33 @@ public partial class Plugin
             Guard(label ?? button.name, click);
             windowDirty = true;
         }));
+    }
+
+    // A new button's Start (on its first shown frame) makes it available again: greyed out then, and on the frame after.
+    readonly List<(BhGenericButton button, int until)> greyed = new();
+
+    void GreyOut(BhGenericButton button, bool grey)
+    {
+        button.SetAvailable(!grey);
+        // Its label dimmed too (the grey picture keeps a bright label).
+        if (button.label != null)
+            button.label.alpha = grey ? 0.45f : 1f;
+        if (grey)
+            greyed.Add((button, Time.frameCount + 2));
+    }
+
+    void GreyLater()
+    {
+        for (var i = greyed.Count - 1; i >= 0; i--)
+        {
+            var (button, until) = greyed[i];
+            if (button == null || Time.frameCount > until)
+            {
+                greyed.RemoveAt(i);
+                continue;
+            }
+            button.SetAvailable(false);
+        }
     }
 
     // ---------- pictures ----------
@@ -1178,12 +1337,14 @@ public partial class Plugin
         return go.transform.Cast<RectTransform>();
     }
 
-    // At (x, y) from the parent's top left, of this size.
-    static void Place(RectTransform rect, float x, float y, float width, float height)
+    // Wider, its left edge where it was (the group lays its children out from the left).
+    static void Widen(RectTransform rect, float width)
     {
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 1f);
-        rect.anchoredPosition = new Vector2(x, -y);
-        rect.sizeDelta = new Vector2(width, height);
+        var grow = width - rect.rect.width;
+        if (grow <= 0f)
+            return;
+        rect.sizeDelta = new Vector2(rect.sizeDelta.x + grow, rect.sizeDelta.y);
+        rect.anchoredPosition += new Vector2(grow * rect.pivot.x, 0f);
     }
 
     static void Stretch(RectTransform rect)
@@ -1193,19 +1354,13 @@ public partial class Plugin
         rect.offsetMin = rect.offsetMax = Vector2.zero;
     }
 
-    // A copy of a game widget, made inactive (its scripts wake up when it is shown), then put under the parent.
+    // A copy of a widget, made inactive (its scripts wake up when it is shown), then put under the parent.
     GameObject Copy(GameObject template, Transform parent)
     {
         var copy = UnityEngine.Object.Instantiate(template, staging.transform, false);
         copy.SetActive(false);
         copy.transform.SetParent(parent, false);
         return copy;
-    }
-
-    static void Strip<T>(GameObject go) where T : Component
-    {
-        foreach (var component in go.GetComponentsInChildren<T>(true).ToList())
-            UnityEngine.Object.DestroyImmediate(component);
     }
 
     static void Clear(Transform parent)
@@ -1216,72 +1371,15 @@ public partial class Plugin
             UnityEngine.Object.DestroyImmediate(parent.GetChild(i).gameObject);
     }
 
-    // A scrolling list (the mouse wheel) at a place: a column of rows, or a grid of cards. Returns its content.
-    Transform NewScroll(Transform parent, float x, float y, float width, float height, bool grid)
-    {
-        var scroll = NewRect("Scroll", parent);
-        Place(scroll, x, y, width, height);
-        scroll.gameObject.AddComponent<RectMask2D>();
-        // A transparent image: the wheel over the gaps between rows scrolls too.
-        scroll.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-        var content = NewRect("Content", scroll);
-        content.anchorMin = new Vector2(0f, 1f);
-        content.anchorMax = new Vector2(1f, 1f);
-        content.pivot = new Vector2(0.5f, 1f);
-        content.sizeDelta = Vector2.zero;
-        if (grid)
-        {
-            var cells = content.gameObject.AddComponent<GridLayoutGroup>();
-            cells.cellSize = new Vector2(CardWidth, CardHeight);
-            cells.spacing = new Vector2(CellGap, CellGap * 1.5f);
-            cells.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            cells.constraintCount = Math.Max(1, (int)((width + CellGap) / (CardWidth + CellGap)));
-        }
-        else
-        {
-            var column = content.gameObject.AddComponent<VerticalLayoutGroup>();
-            column.spacing = RowSpacing;
-            column.childAlignment = TextAnchor.UpperCenter;
-            column.childControlWidth = column.childControlHeight = true;
-            column.childForceExpandWidth = true;
-            column.childForceExpandHeight = false;
-        }
-        content.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        var scrollRect = scroll.gameObject.AddComponent<ScrollRect>();
-        scrollRect.content = content;
-        scrollRect.viewport = scroll;
-        scrollRect.horizontal = false;
-        scrollRect.vertical = true;
-        scrollRect.movementType = ScrollRect.MovementType.Clamped;
-        scrollRect.scrollSensitivity = RowHeight;
-        return content;
-    }
-
-    static HorizontalLayoutGroup HRow(GameObject go, float spacing, TextAnchor alignment, bool controlWidth = true)
+    static HorizontalLayoutGroup HRow(GameObject go, float spacing, TextAnchor alignment)
     {
         var line = go.GetComponent<HorizontalLayoutGroup>() ?? go.AddComponent<HorizontalLayoutGroup>();
         line.spacing = spacing;
         line.childAlignment = alignment;
-        line.childControlWidth = controlWidth;
+        line.childControlWidth = true;
         line.childControlHeight = true;
         line.childForceExpandWidth = line.childForceExpandHeight = false;
         return line;
-    }
-
-    // A horizontal line of cells, as wide as the list.
-    static Transform Line(GameObject go, float height, float width = ListWidth)
-    {
-        HRow(go, CellGap, TextAnchor.MiddleLeft);
-        Size(go, width, height);
-        return go.transform;
-    }
-
-    // A row or card that shows the details on a click; the one picked is lit.
-    void Pickable(GameObject go, bool picked, Action pick)
-    {
-        var image = go.GetComponent<Image>() ?? go.AddComponent<Image>();
-        image.color = picked ? textStyle.color * new Color(1f, 1f, 1f, 0.12f) : new Color(0f, 0f, 0f, 0f);
-        Clickable(go, () => Redraw(pick));
     }
 
     void Clickable(GameObject go, Action click)
@@ -1304,46 +1402,6 @@ public partial class Plugin
         return size;
     }
 
-    // An empty cell of a width (a holder for a switch, a check mark or a cross, or a gap).
-    static Transform Space(Transform line, float width)
-    {
-        var go = NewRect("Space", line).gameObject;
-        Size(go, width, -1f);
-        return go.transform;
-    }
-
-    Color Dim() => textStyle.color * new Color(1f, 1f, 1f, 0.6f);
-
-    // A text in the box's own font.
-    TextMeshProUGUI Text(GameObject go, string text, Color color, float size)
-    {
-        var tmp = go.AddComponent<TextMeshProUGUI>();
-        tmp.font = textStyle.font;
-        tmp.fontSharedMaterial = textStyle.fontSharedMaterial;
-        tmp.fontSize = size > 0f ? size : textStyle.fontSize;
-        tmp.color = color;
-        tmp.alignment = TextAlignmentOptions.MidlineLeft;
-        tmp.raycastTarget = false;
-        tmp.text = text ?? "";
-        return tmp;
-    }
-
-    // A text cell, left-aligned, on one line; width < 0: takes what the others leave.
-    TextMeshProUGUI TextCell(Transform line, string text, float width, Color color, float fontSize = 0f)
-    {
-        var go = NewRect("Cell", line).gameObject;
-        var tmp = Text(go, text, color, fontSize);
-        tmp.enableWordWrapping = false;
-        tmp.overflowMode = TextOverflowModes.Ellipsis;
-        var size = Size(go, width, -1f);
-        if (width < 0f)
-        {
-            size.minWidth = 0f;
-            size.flexibleWidth = 1f;
-        }
-        return tmp;
-    }
-
     void Guard(string what, Action action)
     {
         try { action(); }
@@ -1363,21 +1421,19 @@ public partial class Plugin
         textures.Clear();
         window = staging = null;
         modsButton = null;
-        windowHeader = windowStatus = windowButtons = null;
-        installedList = installedHeader = installedActions = catalogGrid = sourcesList = sourcesActions = details = detailsButtons = bigShot = null;
-        rowButtonTemplate = crossTemplate = null;
-        switchSource = null;
-        tabTemplate = null;
-        inputTemplate = filterInput = searchInput = null;
-        checkTemplate = null;
-        tagTemplate = null;
-        cardTemplate = null;
+        titleText = statusText = nothingText = selectAllText = panelTitle = versionLabel = versionValue = originLabel = originValue = null;
+        simpleTabs = null;
+        tabList.Clear();
+        filterRow = listContent = bottomGroup = panel = emptyPanel = infoContent = bigShot = null;
+        selectAll = null;
+        panelPicture = null;
+        primaryButton = deleteButton = secondaryButton = null;
+        filterInput = searchInput = inputTemplate = null;
         tagDropdown = sourceDropdown = null;
-        textStyle = null;
-        tabs.Clear();
-        tabButtons.Clear();
-        pages.Clear();
-        dropdownChanged.Clear();
+        tagOptions = sourceOptions = null;
+        rowSource = lineTemplate = wrapTemplate = chipTemplate = textButtonTemplate = crossSource = dropdownSource = deleteTemplate = null;
+        switchSource = null;
+        greyed.Clear();
         suspended = false;
         pendingBox = null;
     }
