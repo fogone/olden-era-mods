@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"інтерфейс"},
 {"sid":"oe.manager.tag.fix","text":"виправлення"},
 {"sid":"oe.manager.tag.qol","text":"зручність"},
-{"sid":"oe.manager.tag.library","text":"бібліотека"}
+{"sid":"oe.manager.tag.library","text":"бібліотека"},
 {"sid":"oe.manager.src.notHttps","text":"Не додано: дозволені лише адреси https"},
 {"sid":"oe.manager.src.duplicate","text":"Не додано: таке джерело вже є"},
 {"sid":"oe.manager.src.badGitHub","text":"Не додано: ім'я на GitHub пишеться як власник або власник/репозиторій"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"Джерело прибрано: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"не читається"},
 {"sid":"oe.manager.src.note.cached","text":"із збереженої копії"},
-{"sid":"oe.manager.src.note.read","text":"прочитано"}
+{"sid":"oe.manager.src.note.read","text":"прочитано"},
+{"sid":"oe.manager.src.note.notChecked","text":"ще не перевірялося"},
+{"sid":"oe.manager.src.note.noName","text":"у каталогу немає назви"}
 ]
 }

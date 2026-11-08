@@ -48,7 +48,7 @@ public static class ManagerService
         // The config line is only read for the migration into sources.json (once, when that file is not there yet).
         var legacy = config.Bind("Catalog", "Sources", "",
             "Old place of the player's sources, moved to oldenera-mods/sources.json in the BepInEx folder (the Mods window adds and removes them now).");
-        store = SourceStore.Load(ManagerState.Folder, legacy.Value, line => log.LogWarning(line));
+        store = SourceStore.Load(ManagerState.Folder, legacy.Value, line => log.LogWarning(line), BuiltInSource);
         // A token for a private GitHub repository (debugging before the repository is public): the player's own, in a
         // local file next to the state (oldenera-mods\github-token.txt), never in the catalog, git or a build.
         var tokenFile = System.IO.Path.Combine(ManagerState.Folder, "github-token.txt");
@@ -68,6 +68,19 @@ public static class ManagerService
     // What the last add or remove of a source said, for the status line: a localization key and its arguments
     // (null: nothing to say; cleared by the next thing asked).
     public static (string Key, object[] Args)? SourceNote { get; private set; }
+
+    // A source's settings (the built-in one's too): its remembered name, check frequency, last check.
+    public static SourceEntry SourceSettings(string url) => store.Settings(url);
+    public static void SetCheckEvery(string url, string every)
+    {
+        if (store.SetCheckEvery(url, every))
+            ModMenu.Changed();
+    }
+
+    // Counts up when a screenshot came into the cache: the rows are made again (their paths).
+    public static int ScreensRevision { get; private set; }
+    public static string ScreenshotPath(ScreenshotFile shot) => client.ScreenshotPath(shot);
+    static readonly HashSet<string> screenshotsLoading = new(StringComparer.OrdinalIgnoreCase);
 
     // Every frame on the main thread: what the background work left to do here (loading mods, the results).
     public static void Pump()
@@ -99,21 +112,36 @@ public static class ManagerService
         });
     }
 
-    // Reads the sources and works out the updates; the manager's own update among them.
-    public static void Refresh() => Run("catalog", ReadCatalog);
+    // At the game's start: the sources that are due are read from the network (CheckSchedule: every start, daily,
+    // weekly; never the manual ones), the others come from the saved copies. Works out the updates; the manager's own
+    // update among them.
+    public static void Refresh() => Run("catalog", () => ReadCatalog(url => store.IsDue(url, DateTime.Now)));
 
-    static async Task ReadCatalog()
+    // "Check all": every source read from the network now.
+    public static void CheckAll() => Run("check all", () => ReadCatalog(_ => true));
+
+    // "Check" of one source: it is read now, the others come from the saved copies.
+    public static void Check(string url) => Run("check source", () => ReadCatalog(u => string.Equals(u, url, StringComparison.OrdinalIgnoreCase)));
+
+    // `online`: which sources are read from the network (the rest: the saved copies). A source read from the network
+    // successfully gets its last check time.
+    static async Task ReadCatalog(Func<string, bool> online)
     {
         var sources = Sources.ToList();
         var installed = ModLoader.State.Mods.ToList();
-        var reading = await client.ReadAll(sources, installed);
+        var reading = await client.ReadAll(sources, installed, online);
         var catalog = reading.Mods;
         mainThread.Enqueue(() =>
         {
             Catalog = catalog;
             SourceResults = reading.Sources;
+            var now = DateTime.Now;
             foreach (var result in reading.Sources)
+            {
                 store.SetName(result.Url, result.Name);
+                if (result.State == SourceState.Read)
+                    store.SetChecked(result.Url, now);
+            }
             var updates = CatalogClient.Updates(catalog, ModLoader.State, gameVersion);
             // The manager is not in the state: compared with its own version.
             if (catalog.FirstOrDefault(m => m.Id == ManagerId) is { } self && CatalogClient.ReleaseFor(self, gameVersion) is { } release &&
@@ -160,8 +188,10 @@ public static class ManagerService
                 return;
             }
             store.Add(url, result.Name);
-            // The catalog read again with the new source in it (the mods it lists show in the window).
-            await ReadCatalog();
+            store.SetChecked(url, DateTime.Now);
+            // The catalog read again with the new source in it (the mods it lists show in the window); the others
+            // as they are due.
+            await ReadCatalog(u => string.Equals(u, url, StringComparison.OrdinalIgnoreCase) || store.IsDue(u, DateTime.Now));
             mainThread.Enqueue(() => Note("oe.manager.src.added", string.IsNullOrWhiteSpace(result.Name) ? url : result.Name, result.Mods));
         });
     }
@@ -190,7 +220,7 @@ public static class ManagerService
             return;
         Run("remove source", async () =>
         {
-            await ReadCatalog();
+            await ReadCatalog(_ => false);
             mainThread.Enqueue(() => Note("oe.manager.src.removed", string.IsNullOrWhiteSpace(name) ? url : name));
         });
     }
@@ -229,33 +259,68 @@ public static class ManagerService
             log.LogInfo($"installed {string.Join(", ", downloaded.Select(d => d.Id + " " + d.Version))}");
         });
     });
-    // Removes an installed mod (ModLoader.Remove); on the main thread, nothing to download.
-    public static void Remove(string id)
+
+    // Removes installed mods (ModLoader.Remove), dependents first; one that a mod staying installed requires is left
+    // out. On the main thread, nothing to download.
+    public static void Remove(IReadOnlyList<string> ids)
     {
-        if (Busy)
+        if (Busy || ids == null)
             return;
-        var outcome = ModLoader.Remove(id);
-        Updates = Updates.Where(u => u.Id != id).ToList();
-        LastFailed = outcome == ModLoader.Outcome.Failed;
-        LastMessage = $"remove {id}: {outcome}";
+        var order = Batch.Removable(ids, ModLoader.State.Mods);
+        var failed = 0;
+        foreach (var id in order)
+        {
+            var outcome = ModLoader.Remove(id);
+            if (outcome == ModLoader.Outcome.Failed)
+                failed++;
+            log.LogInfo($"remove {id}: {outcome}");
+        }
+        Updates = Updates.Where(u => !order.Contains(u.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+        LastFailed = failed > 0 || order.Count < ids.Count;
+        LastMessage = $"removed {order.Count} of {ids.Count} mods";
         log.LogInfo(LastMessage);
         ModMenu.Changed();
     }
 
-    // Switches an installed mod off or on (ModLoader.SetEnabled: at once when it can unload, else at the next start).
-    public static void SetEnabled(string id, bool enabled)
+    // Switches installed mods off or on (ModLoader.SetEnabled: at once when it can unload, else at the next start), what
+    // a mod needs first when switching on, dependents first when switching off.
+    public static void SetEnabled(IReadOnlyList<string> ids, bool enabled)
     {
-        if (Busy)
+        if (Busy || ids == null)
             return;
-        var outcome = ModLoader.SetEnabled(id, enabled);
-        LastFailed = outcome == ModLoader.Outcome.Failed;
-        LastMessage = $"{(enabled ? "on" : "off")} {id}: {outcome}";
-        log.LogInfo(LastMessage);
+        var failed = 0;
+        var order = Batch.SwitchOrder(ids, ModLoader.State.Mods, enabled);
+        foreach (var id in order)
+        {
+            var outcome = ModLoader.SetEnabled(id, enabled);
+            if (outcome == ModLoader.Outcome.Failed)
+                failed++;
+            log.LogInfo($"{(enabled ? "on" : "off")} {id}: {outcome}");
+        }
+        LastFailed = failed > 0;
+        LastMessage = $"{(enabled ? "on" : "off")}: {order.Count} mods";
         ModMenu.Changed();
     }
 
-    // Updates one mod (or the manager, at the next start).
-    public static void Update(string id) => Run($"update {id}", () => UpdateOne(id));
+    // Updates mods one after another in one run (or the manager, at the next start); one that fails does not stop the
+    // others, the run then says it failed. An id with no update is skipped.
+    public static void Update(IReadOnlyList<string> ids) => Run("update", async () =>
+    {
+        var failures = new List<string>();
+        foreach (var id in ids.Distinct(StringComparer.OrdinalIgnoreCase).ToList())
+        {
+            if (Updates.All(u => !string.Equals(u.Id, id, StringComparison.OrdinalIgnoreCase)))
+                continue;
+            try { await UpdateOne(id); }
+            catch (Exception e)
+            {
+                log.LogError($"update {id}: {e.Message}");
+                failures.Add($"{id}: {e.Message}");
+            }
+        }
+        if (failures.Count > 0)
+            throw new InvalidOperationException(string.Join("; ", failures));
+    });
 
     // The player's "Go back" after the manager's update: the previous version at the next start (Updater).
     public static void RollBackManager()
@@ -265,11 +330,29 @@ public static class ManagerService
         ModMenu.Changed();
     }
 
-    public static void UpdateAll() => Run("update all", async () =>
+    public static void UpdateAll() => Update(Updates.Select(u => u.Id).ToList());
+
+    // The mod's screenshots into the cache in the background (the window asks when it shows the details; it does not
+    // wait for the manager's other work). When some came, the rows are made again: their Path is set.
+    public static void LoadScreenshots(string id)
     {
-        foreach (var update in Updates.ToList())
-            await UpdateOne(update.Id);
-    });
+        var meta = Catalog?.FirstOrDefault(m => string.Equals(m.Id, id, StringComparison.OrdinalIgnoreCase));
+        if (meta == null || meta.Screenshots.Count == 0 || meta.Screenshots.All(s => client.ScreenshotPath(s) != null))
+            return;
+        lock (screenshotsLoading)
+            if (!screenshotsLoading.Add(id))
+                return;
+        Task.Run(async () =>
+        {
+            try
+            {
+                if (await client.LoadScreenshots(meta) > 0)
+                    mainThread.Enqueue(() => ScreensRevision++);
+            }
+            catch (Exception e) { log.LogWarning($"{id} screenshots: {e.Message}"); }
+            finally { lock (screenshotsLoading) screenshotsLoading.Remove(id); }
+        });
+    }
 
     static async Task UpdateOne(string id)
     {

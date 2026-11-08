@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"interfaz"},
 {"sid":"oe.manager.tag.fix","text":"correcciones"},
 {"sid":"oe.manager.tag.qol","text":"comodidad"},
-{"sid":"oe.manager.tag.library","text":"biblioteca"}
+{"sid":"oe.manager.tag.library","text":"biblioteca"},
 {"sid":"oe.manager.src.notHttps","text":"No añadida: solo se permiten direcciones https"},
 {"sid":"oe.manager.src.duplicate","text":"No añadida: esta fuente ya está en la lista"},
 {"sid":"oe.manager.src.badGitHub","text":"No añadida: escribe un nombre de GitHub como owner u owner/repo"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"Fuente quitada: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"no se puede leer"},
 {"sid":"oe.manager.src.note.cached","text":"de la copia guardada"},
-{"sid":"oe.manager.src.note.read","text":"leída"}
+{"sid":"oe.manager.src.note.read","text":"leída"},
+{"sid":"oe.manager.src.note.notChecked","text":"aún no comprobada"},
+{"sid":"oe.manager.src.note.noName","text":"el catálogo no tiene nombre"}
 ]
 }

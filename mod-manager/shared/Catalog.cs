@@ -19,12 +19,14 @@ namespace OldenEra.Modding.Manager;
 //   <mod>.json:     { "schema": 1, "id": "...", "name": { "english": "...", "russian": "..." }, "author": "...",
 //                     "source": "<repository>", "description": { ... },
 //                     "tags": [ "map", "tooltip" ],
+//                     "screenshots": [ { "url": "https://...png", "sha256": "...", "caption": { "english": "..." } } ],
 //                     "releases": [ { "version": "0.48.0", "games": [ "0.82.07" ], "bepinex": "6.0.0-be.788",
 //                                     "requires": [ { "id": "nobirds.oldenera.core", "version": "0.7.0" } ],
 //                                     "files": [ { "name": "X.dll", "url": "https://...", "sha256": "..." } ] } ] }
 public sealed class CatalogRoot
 {
     [JsonPropertyName("schema")] public int Schema { get; set; } = 1;
+    // The catalog's name, shown everywhere (required: a root file without it is shown by its URL, with a note).
     [JsonPropertyName("name")] public string Name { get; set; }
     [JsonPropertyName("mods")] public List<CatalogEntry> Mods { get; set; } = new();
 }
@@ -47,6 +49,8 @@ public sealed class ModMeta
     // Tag ids (map, battle, tooltip, ...): the manager names the known ones per language (Tags.TagName), an unknown one
     // is shown by its id. Meta files without it read fine (an empty list).
     [JsonPropertyName("tags")] public List<string> Tags { get; set; } = new();
+    // PNG or JPG pictures for the mod's details: checked by sha256 and cached (CatalogClient.LoadScreenshot).
+    [JsonPropertyName("screenshots")] public List<ScreenshotFile> Screenshots { get; set; } = new();
     [JsonPropertyName("releases")] public List<ModRelease> Releases { get; set; } = new();
 
     // The URL it was read from (not in the file).
@@ -56,6 +60,17 @@ public sealed class ModMeta
 
     public string NameIn(string language) =>
         Name.TryGetValue(language, out var name) || Name.TryGetValue("english", out name) ? name : Id;
+}
+
+public sealed class ScreenshotFile
+{
+    [JsonPropertyName("url")] public string Url { get; set; }
+    [JsonPropertyName("sha256")] public string Sha256 { get; set; }
+    // By the game's language name (english, russian, ...); english when the language is missing; may be empty.
+    [JsonPropertyName("caption")] public Dictionary<string, string> Caption { get; set; } = new();
+
+    public string CaptionIn(string language) =>
+        Caption != null && (Caption.TryGetValue(language, out var text) || Caption.TryGetValue("english", out text)) && !string.IsNullOrWhiteSpace(text) ? text : null;
 }
 
 public sealed class ModRelease
@@ -82,11 +97,17 @@ public sealed class ReleaseFile
     [JsonPropertyName("sha256")] public string Sha256 { get; set; }
 }
 
-public enum SourceState { Read, Failed, Cached }
+// Read: from the network now. Cached: a saved copy (no network, or the source is not due for a check). Failed: nothing
+// came and there is no copy. NotChecked: not due for a check and never read, so there is no copy either.
+public enum SourceState { Read, Failed, Cached, NotChecked }
 
-// How one source's root file read: its name, how many mods it lists, its state (Failed: nothing came and there is no
-// cached copy; Cached: a cached copy was used) and why when it failed.
-public sealed record SourceResult(string Url, string Name, int Mods, SourceState State, string Error);
+// How one source's root file read: its name (null when the file has none), how many mods it lists, its state and why
+// when it failed.
+public sealed record SourceResult(string Url, string Name, int Mods, SourceState State, string Error)
+{
+    // Read, but the root file has no name (it is required): shown by its URL.
+    public bool NoName => (State == SourceState.Read || State == SourceState.Cached) && string.IsNullOrWhiteSpace(Name);
+}
 
 // What a reading of the sources gave: every meta of every source (All, in the sources' order), the one chosen per id
 // (Mods) and how each source read.
@@ -139,9 +160,15 @@ public sealed class CatalogClient
 
     // A meta file read from its URL, kept in the cache; the cached one when it cannot be read (no network) and
     // `useCache` (a source being added is not taken from the cache). Cached: whether the cached copy was used.
-    async Task<(T value, bool cached)> GetJson<T>(string url, bool useCache = true) where T : class
+    async Task<(T value, bool cached)> GetJson<T>(string url, bool useCache = true, bool cacheOnly = false) where T : class
     {
         var cached = Path.Combine(cacheFolder, Hex(SHA256.HashData(Encoding.UTF8.GetBytes(url))) + ".json");
+        if (cacheOnly)
+        {
+            if (!File.Exists(cached))
+                throw new FileNotFoundException($"{url}: not read yet and not due for a check");
+            return (JsonSerializer.Deserialize<T>(File.ReadAllBytes(cached), options), true);
+        }
         try
         {
             var bytes = await Get(url);
@@ -162,12 +189,14 @@ public sealed class CatalogClient
     public async Task<List<ModMeta>> Read(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null) =>
         (await ReadAll(sources, installed)).Mods;
 
-    public async Task<CatalogReading> ReadAll(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null)
+    // `online`: whether a source is read from the network now (default: all); the others come from the saved copies
+    // (a source that is not due for a check, ManagerService).
+    public async Task<CatalogReading> ReadAll(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null, Func<string, bool> online = null)
     {
         var reading = new CatalogReading();
         foreach (var source in sources)
         {
-            var (result, metas) = await ReadSource(source, true);
+            var (result, metas) = await ReadSource(source, true, online != null && !online(source));
             reading.Sources.Add(result);
             reading.All.AddRange(metas);
         }
@@ -177,12 +206,18 @@ public sealed class CatalogClient
 
     // One source's root file and the mods' meta files it lists. `useCache`: the cached copies stand in for what cannot
     // be read; off for a source being added, which must read for real.
-    public async Task<(SourceResult result, List<ModMeta> metas)> ReadSource(string source, bool useCache)
+    // `cacheOnly`: no network, the saved copies only (NotChecked when there is none).
+    public async Task<(SourceResult result, List<ModMeta> metas)> ReadSource(string source, bool useCache, bool cacheOnly = false)
     {
         var metas = new List<ModMeta>();
         CatalogRoot root;
         bool cached;
-        try { (root, cached) = await GetJson<CatalogRoot>(source, useCache); }
+        try { (root, cached) = await GetJson<CatalogRoot>(source, useCache, cacheOnly); }
+        catch (FileNotFoundException e) when (cacheOnly)
+        {
+            log($"source {source}: {e.Message}");
+            return (new SourceResult(source, null, 0, SourceState.NotChecked, null), metas);
+        }
         catch (Exception e)
         {
             log($"source {source}: {e.Message}");
@@ -195,7 +230,7 @@ public sealed class CatalogClient
                 continue;
             try
             {
-                var (meta, metaCached) = await GetJson<ModMeta>(entry.Meta, useCache);
+                var (meta, metaCached) = await GetJson<ModMeta>(entry.Meta, useCache, cacheOnly);
                 cached |= metaCached;
                 if (!string.Equals(meta.Id, entry.Id, StringComparison.OrdinalIgnoreCase))
                 {
@@ -209,6 +244,82 @@ public sealed class CatalogClient
             catch (Exception e) { log($"{entry.Id} ({entry.Meta}): {e.Message}"); }
         }
         return (new SourceResult(source, root.Name, listed.Count, cached ? SourceState.Cached : SourceState.Read, null), metas);
+    }
+
+    // ---------- screenshots (issue #14) ----------
+
+    public const long MaxScreenshotSize = 2L * 1024 * 1024;
+
+    string ScreensFolder => Path.Combine(cacheFolder, "screens");
+
+    static bool IsSha256(string text) => text != null && text.Length == 64 && text.All(Uri.IsHexDigit);
+
+    // The cached file of a screenshot (<sha256>.png or .jpg in .cache\screens), or null while it is not downloaded.
+    public string ScreenshotPath(ScreenshotFile shot)
+    {
+        if (!IsSha256(shot?.Sha256))
+            return null;
+        var name = shot.Sha256.ToLowerInvariant();
+        foreach (var extension in new[] { ".png", ".jpg" })
+        {
+            var path = Path.Combine(ScreensFolder, name + extension);
+            if (File.Exists(path))
+                return path;
+        }
+        return null;
+    }
+
+    // "png" or "jpg" by the file's first bytes, or null: only pictures are kept, whatever the URL says.
+    public static string PictureType(byte[] bytes)
+    {
+        if (bytes.Length > 8 && bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47 && bytes[4] == 0x0D && bytes[5] == 0x0A && bytes[6] == 0x1A && bytes[7] == 0x0A)
+            return "png";
+        if (bytes.Length > 3 && bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
+            return "jpg";
+        return null;
+    }
+
+    // One screenshot into the cache and its path (already there: no download). Refused with an exception, nothing kept:
+    // not https, no sha256, more than 2 MB, not the file the sha256 names, not a PNG or a JPG.
+    public async Task<string> LoadScreenshot(ScreenshotFile shot)
+    {
+        if (ScreenshotPath(shot) is { } there)
+            return there;
+        if (!IsSha256(shot?.Sha256))
+            throw new InvalidOperationException($"{shot?.Url}: no valid sha256; refused");
+        if (!Uri.TryCreate(shot.Url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException($"{shot.Url}: a screenshot must come over https");
+        var bytes = await fetch(shot.Url) ?? throw new IOException($"{shot.Url}: nothing came");
+        if (bytes.LongLength > MaxScreenshotSize)
+            throw new IOException($"{shot.Url}: {bytes.LongLength} bytes, more than the {MaxScreenshotSize} allowed for a screenshot");
+        var hash = Hex(SHA256.HashData(bytes));
+        if (!string.Equals(hash, shot.Sha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"{shot.Url}: not the file the catalog names (sha256 {hash}, expected {shot.Sha256}); refused");
+        var type = PictureType(bytes) ?? throw new InvalidOperationException($"{shot.Url}: neither a PNG nor a JPG; refused");
+        Directory.CreateDirectory(ScreensFolder);
+        var path = Path.Combine(ScreensFolder, hash + "." + type);
+        var temporary = path + ".tmp";
+        File.WriteAllBytes(temporary, bytes);
+        File.Move(temporary, path, true);
+        return path;
+    }
+
+    // A mod's screenshots into the cache; a refused or failed one is logged and left out. How many came now.
+    public async Task<int> LoadScreenshots(ModMeta meta)
+    {
+        var loaded = 0;
+        foreach (var shot in meta.Screenshots ?? new List<ScreenshotFile>())
+        {
+            if (ScreenshotPath(shot) != null)
+                continue;
+            try
+            {
+                await LoadScreenshot(shot);
+                loaded++;
+            }
+            catch (Exception e) { log($"{meta.Id} screenshot: {e.Message}"); }
+        }
+        return loaded;
     }
 
     // One meta per id, in the order the ids first appear: the installed mod's own source's (its Source is the meta

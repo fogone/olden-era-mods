@@ -235,57 +235,80 @@ public sealed class Choice<T> where T : struct, Enum
     public T Value(T whenOff) => menu.IsEnabled ? Entry.Value : whenOff;
 }
 
-// The catalog's rows in the Mods window (issue #10, #13: a "Mods" button in the main menu): the mod manager fills them
-// (a mod to install, update, switch off or remove, the manager's own update), mod-settings draws them. Each row: its
-// name (the row object's), its text (a localization key, composed per language by the manager) and its buttons (each
-// its label's key and what it does). The window's own buttons (Check, Update all) are Actions.
-public sealed record CatalogButton(string Key, Action Click);
+// The Mods window's data (issue #10, #13, #14, #6): the mod manager fills it, mod-settings draws it. Every visible text is
+// a localization key (the manager composes per-language texts with Texts.Compose); actions are delegates, null while
+// not available (no manager, busy, not allowed). The window redraws on ModMenu.Revision.
 
-// A row of the mods table: its name (a localization key composed per language), its version, a note on its state
-// (a key, or null), its switch (null: none; the value and what flipping it does), one action button (Install / Update)
-// and Remove (null: none).
-public sealed record CatalogRow(string Name, string TitleKey, string Version, string NoteKey, bool? Enabled, Action<bool> SetEnabled,
-    CatalogButton Action, Action Remove);
+// A mod as the window shows it, on the Installed tab (Installed != null) and the Catalog tab (every mod of the
+// sources, installed or not).
+public sealed record ModEntry(
+    string Id,
+    string NameKey,                         // the mod's name in the game's language
+    string DescriptionKey,                  // its description, or null
+    string Author,                          // plain (a name)
+    string SourceNameKey,                   // the name of the catalog it comes from, or null (installed by hand)
+    IReadOnlyList<string> TagKeys,          // the tags' names
+    string Installed,                       // the installed version, or null
+    string Available,                       // the newest release for this game version, or null
+    bool HasUpdate,                         // Available is newer than Installed
+    bool? Enabled,                          // installed: on or off; null: no switch (not installed, or others need it)
+    bool RequiredByOthers,                  // installed mods need it: no switch, no remove
+    IReadOnlyList<string> RequiresKeys,     // the names of the mods it needs
+    IReadOnlyList<ModScreenshot> Screenshots,
+    string NoteKey);                        // a note on its state (restart needed, removed, no release...), or null
 
-// A source of the catalog (issue #6): its name (a localization key composed by the manager: the root meta file's name,
-// the URL when it has none), its URL, how many mods it gave, a note on its state (a key: read, failed, from the cache;
-// null: none), and Remove (null for the built-in source, which stays).
-public sealed record CatalogSource(string TitleKey, string Url, int Mods, string NoteKey, bool BuiltIn, Action Remove);
+// A screenshot of a mod: its file on disk once downloaded (checked by sha256, cached), else null; its caption key or null.
+public sealed record ModScreenshot(string Path, string CaptionKey);
+
+// A source of the catalog: its name (the root file's name; the URL when it has none), its URL, how many mods it gave,
+// a note on its state (read, failed, from the cache), when it was last checked (local time, or null), how often it is
+// checked ("start", "daily", "weekly", "manual") and the actions (null when not allowed: the built-in source cannot be
+// removed).
+public sealed record CatalogSource(string TitleKey, string Url, int Mods, string NoteKey, bool BuiltIn, DateTime? LastChecked,
+    string CheckEvery, Action Check, Action<string> SetCheckEvery, Action Remove);
 
 public static class ModCatalog
 {
-    public static IReadOnlyList<CatalogRow> Rows { get; private set; } = Array.Empty<CatalogRow>();
     // The window's heading (a localization key); null: no window (no manager).
     public static string TitleKey { get; private set; }
-    // The catalog's state under the heading (a localization key composed by the manager).
+    // The outcome of the last thing done, or the catalog's state (a localization key composed by the manager).
     public static string StatusKey { get; set; }
-    // The window's buttons at the bottom, besides Close (each null when not available now).
-    public static CatalogButton Check { get; set; }
-    public static CatalogButton UpdateAll { get; set; }
     // The mod manager's version (it sets it on load): the mods' version shown next to the game's in the main menu.
     public static string ManagerVersion { get; set; }
+    // The manager itself on the Installed tab: its name, version and a note (its own update staged, failed...), its
+    // update when there is one (null otherwise).
+    public static ModEntry Manager { get; private set; }
 
-    // The catalog's sources (issue #6), for the window's Sources view: the built-in one first. Set by the manager with
-    // the rows (SetSources), drawn by mod-settings.
+    // Every mod: installed ones (Installed != null) and the catalog's.
+    public static IReadOnlyList<ModEntry> Mods { get; private set; } = Array.Empty<ModEntry>();
     public static IReadOnlyList<CatalogSource> Sources { get; private set; } = Array.Empty<CatalogSource>();
-    // Adding a source, each null while not available (no manager, or busy): the text the player typed in the game's
-    // input box. AddSource takes a root meta file's URL, AddGitHubSource "owner" or "owner/repo". The manager reads the
-    // source first and says how it went in StatusKey (and the source's row); the window only asks and passes the text.
+    // Something runs in the background (reading, downloading): the window shows it and its buttons wait.
+    public static bool Busy { get; set; }
+
+    // What the window can do with a mod (by id; null while not available). Update and SetEnabled take several ids
+    // (the Installed tab's selection); the manager runs them one after another.
+    public static Action<string> Install { get; set; }
+    public static Action<IReadOnlyList<string>> Update { get; set; }
+    public static Action<IReadOnlyList<string>> Remove { get; set; }
+    public static Action<IReadOnlyList<string>, bool> SetEnabled { get; set; }
+    public static Action UpdateAll { get; set; }
+    // A mod's screenshots downloaded (when the window shows its details): its entry's Screenshots get their Path.
+    public static Action<string> LoadScreenshots { get; set; }
+
+    // Sources: check them all now, add one (the text the player typed in the game's input box: a root file's URL, or
+    // "owner" / "owner/repo" for GitHub). The manager reads a source before adding it and says how it went in StatusKey.
+    public static Action CheckAll { get; set; }
     public static Action<string> AddSource { get; set; }
     public static Action<string> AddGitHubSource { get; set; }
 
-    public static void Set(string titleKey, IReadOnlyList<CatalogRow> rows)
+    public static void Set(string titleKey, ModEntry manager, IReadOnlyList<ModEntry> mods, IReadOnlyList<CatalogSource> sources)
     {
         TitleKey = titleKey;
-        Rows = rows ?? Array.Empty<CatalogRow>();
-        ModMenu.Changed();
-    }
-
-    public static void SetSources(IReadOnlyList<CatalogSource> sources)
-    {
+        Manager = manager;
+        Mods = mods ?? Array.Empty<ModEntry>();
         Sources = sources ?? Array.Empty<CatalogSource>();
         ModMenu.Changed();
     }
 
-    public static void Clear() => Set(null, null);
+    public static void Clear() => Set(null, null, null, null);
 }

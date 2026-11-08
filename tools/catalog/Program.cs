@@ -8,6 +8,9 @@ using OldenEra.Modding.Manager;
 //   catalog add --catalog <dir> --root-url <URL the catalog folder is served at> --id <id> --version <v> --game <game version>
 //               --bepinex <v> [--requires id[@version],...] [--lang <the mod's lang folder>] [--author a] [--source url]
 //               [--tags a,b,c]   (replaces the mod's tags: trimmed, lowercased, distinct, empty ones dropped)
+//               [--name <catalog name>]   (the root file's name, shown everywhere; required while the root file has none)
+//               [--screenshot <path>=<url>[|<english caption>] ...]   (replaces the mod's screenshots; PNG or JPG, up to
+//                                                                      2 MB each; the sha256 is computed)
 //               --file <path>=<download URL> [--file ...]
 // The same version again with the same files: the game version is added to it (a build that works on another game
 // version too); with other files: refused (a version is never published twice with other content).
@@ -34,12 +37,53 @@ var id = Need("id");
 var version = Need("version");
 var game = Need("game");
 
+// The root file's name is required (it is shown everywhere): given now, or already in the file.
+var rootPath = Path.Combine(catalogDir, "catalog.json");
+var root = File.Exists(rootPath) ? JsonSerializer.Deserialize<CatalogRoot>(File.ReadAllText(rootPath), json) : new CatalogRoot();
+if (One("name") is { } rootName && !string.IsNullOrWhiteSpace(rootName))
+    root.Name = rootName.Trim();
+if (string.IsNullOrWhiteSpace(root.Name))
+    return Fail("the catalog's root file has no name: give one with --name <catalog name> (it is shown everywhere)");
+
 var metaPath = Path.Combine(catalogDir, "mods", id + ".json");
 var meta = File.Exists(metaPath) ? JsonSerializer.Deserialize<ModMeta>(File.ReadAllText(metaPath), json) : new ModMeta { Id = id };
 meta.Author = One("author") ?? meta.Author;
 meta.Source = One("source") ?? meta.Source;
 if (One("tags") is { } tagsArg)
     meta.Tags = tagsArg.Split(',').Select(t => t.Trim().ToLowerInvariant()).Where(t => t.Length > 0).Distinct().ToList();
+
+// Screenshots: <path>=<url> with an optional |<english caption>; given: they replace the mod's list.
+if (options.TryGetValue("screenshot", out var shotArgs))
+{
+    var shots = new List<ScreenshotFile>();
+    foreach (var arg in shotArgs)
+    {
+        var at = arg.IndexOf('=');
+        if (at <= 0)
+            return Fail($"--screenshot {arg}: <path>=<url>[|<caption>]");
+        var path = arg[..at];
+        var rest = arg[(at + 1)..];
+        var bar = rest.LastIndexOf('|');
+        var url = bar >= 0 ? rest[..bar] : rest;
+        var caption = bar >= 0 ? rest[(bar + 1)..].Trim() : "";
+        if (!File.Exists(path))
+            return Fail($"--screenshot {path}: no such file");
+        var bytes = File.ReadAllBytes(path);
+        if (bytes.LongLength > CatalogClient.MaxScreenshotSize)
+            return Fail($"--screenshot {path}: {bytes.LongLength} bytes, more than the {CatalogClient.MaxScreenshotSize} allowed");
+        if (CatalogClient.PictureType(bytes) == null)
+            return Fail($"--screenshot {path}: neither a PNG nor a JPG");
+        if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            return Fail($"--screenshot {path}: the URL must be https");
+        shots.Add(new ScreenshotFile
+        {
+            Url = url,
+            Sha256 = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),
+            Caption = caption.Length > 0 ? new Dictionary<string, string> { ["english"] = caption } : new(),
+        });
+    }
+    meta.Screenshots = shots;
+}
 
 // The mod's name in every language it has (its lang/<language>.json: oe.<short id>.title).
 if (One("lang") is { } langDir && Directory.Exists(langDir))
@@ -98,8 +142,6 @@ else
 Directory.CreateDirectory(Path.GetDirectoryName(metaPath)!);
 File.WriteAllText(metaPath, JsonSerializer.Serialize(meta, json) + "\n");
 
-var rootPath = Path.Combine(catalogDir, "catalog.json");
-var root = File.Exists(rootPath) ? JsonSerializer.Deserialize<CatalogRoot>(File.ReadAllText(rootPath), json) : new CatalogRoot { Name = "Olden Era mods" };
 if (!root.Mods.Any(m => m.Id == id))
 {
     root.Mods.Add(new CatalogEntry { Id = id, Meta = $"{rootUrl}/mods/{id}.json" });

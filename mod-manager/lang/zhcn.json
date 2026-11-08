@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"界面"},
 {"sid":"oe.manager.tag.fix","text":"修复"},
 {"sid":"oe.manager.tag.qol","text":"便利"},
-{"sid":"oe.manager.tag.library","text":"库"}
+{"sid":"oe.manager.tag.library","text":"库"},
 {"sid":"oe.manager.src.notHttps","text":"未添加：只允许 https 地址"},
 {"sid":"oe.manager.src.duplicate","text":"未添加：此来源已在列表中"},
 {"sid":"oe.manager.src.badGitHub","text":"未添加：GitHub 名称请写成 owner 或 owner/repo"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"已移除来源：{0}"},
 {"sid":"oe.manager.src.note.failed","text":"无法读取"},
 {"sid":"oe.manager.src.note.cached","text":"来自已保存的副本"},
-{"sid":"oe.manager.src.note.read","text":"已读取"}
+{"sid":"oe.manager.src.note.read","text":"已读取"},
+{"sid":"oe.manager.src.note.notChecked","text":"尚未检查"},
+{"sid":"oe.manager.src.note.noName","text":"该目录没有名称"}
 ]
 }

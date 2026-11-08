@@ -24,7 +24,7 @@
 {"sid":"oe.manager.tag.ui","text":"felület"},
 {"sid":"oe.manager.tag.fix","text":"javítások"},
 {"sid":"oe.manager.tag.qol","text":"kényelem"},
-{"sid":"oe.manager.tag.library","text":"könyvtár"}
+{"sid":"oe.manager.tag.library","text":"könyvtár"},
 {"sid":"oe.manager.src.notHttps","text":"Nincs hozzáadva: csak https címek engedélyezettek"},
 {"sid":"oe.manager.src.duplicate","text":"Nincs hozzáadva: ez a forrás már a listán van"},
 {"sid":"oe.manager.src.badGitHub","text":"Nincs hozzáadva: a GitHub-nevet így írd: owner vagy owner/repo"},
@@ -33,6 +33,8 @@
 {"sid":"oe.manager.src.removed","text":"Forrás eltávolítva: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"nem olvasható"},
 {"sid":"oe.manager.src.note.cached","text":"a mentett másolatból"},
-{"sid":"oe.manager.src.note.read","text":"beolvasva"}
+{"sid":"oe.manager.src.note.read","text":"beolvasva"},
+{"sid":"oe.manager.src.note.notChecked","text":"még nincs ellenőrizve"},
+{"sid":"oe.manager.src.note.noName","text":"a katalógusnak nincs neve"}
 ]
 }

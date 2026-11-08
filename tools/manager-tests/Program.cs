@@ -385,6 +385,185 @@ Case("versions compare by numbers", root =>
     var c = VersionComparer.Instance;
     Check(c.Compare("0.48.10", "0.48.9") > 0 && c.Compare("0.49", "0.48.10") > 0 && c.Compare("1.0", "1.0.0") == 0, "the order");
 });
+// ---------- check frequency, names, screenshots, batches (issues #6, #14) ----------
+
+Case("check schedule: start always, daily by the day, weekly by seven days, manual never", root =>
+{
+    var now = new DateTime(2026, 11, 8, 10, 0, 0);
+    Check(CheckSchedule.IsDue("start", now, now) && CheckSchedule.IsDue(null, null, now) && CheckSchedule.IsDue("nonsense", now, now), "start (or unknown) is always due");
+    Check(!CheckSchedule.IsDue("manual", null, now) && !CheckSchedule.IsDue("manual", now.AddDays(-100), now), "manual is never due");
+    Check(CheckSchedule.IsDue("daily", null, now), "daily, never checked");
+    Check(!CheckSchedule.IsDue("daily", new DateTime(2026, 11, 8, 0, 5, 0), now), "daily, checked today");
+    Check(CheckSchedule.IsDue("daily", new DateTime(2026, 11, 7, 23, 59, 0), now), "daily, checked yesterday");
+    Check(CheckSchedule.IsDue("daily", now.AddHours(3), now), "daily, last check in the future");
+    Check(CheckSchedule.IsDue("weekly", null, now), "weekly, never checked");
+    Check(!CheckSchedule.IsDue("weekly", now.AddDays(-6), now), "weekly, six days ago");
+    Check(CheckSchedule.IsDue("weekly", now.AddDays(-7), now), "weekly, seven days ago");
+    Check(CheckSchedule.IsDue("WEEKLY", now.AddDays(-30), now), "weekly in capitals");
+    Check(CheckSchedule.Normalize(" Daily ") == "daily" && CheckSchedule.Normalize("x") == "start", "normalize");
+});
+
+Case("sources.json: checkEvery and lastChecked round-trip, the built-in source's too; an old file reads as start / never", root =>
+{
+    var folder = Path.Combine(root, "oldenera-mods");
+    Directory.CreateDirectory(folder);
+    const string Built = "https://built.test/catalog.json";
+    var store = SourceStore.Load(folder, "", null, Built);
+    Check(store.CheckEveryOf(Built) == "start" && store.LastCheckedOf(Built) == null, "built-in defaults");
+    store.Add("https://a.test/c.json", "A");
+    Check(store.CheckEveryOf("https://a.test/c.json") == "start", "default start");
+    Check(store.SetCheckEvery("https://a.test/c.json", "Weekly") && store.SetCheckEvery(Built, "manual"), "not set");
+    Check(!store.SetCheckEvery("https://a.test/c.json", "hourly") && !store.SetCheckEvery("https://unknown.test/c.json", "daily"), "a bad value or source was accepted");
+    var when = new DateTime(2026, 11, 8, 9, 30, 0);
+    store.SetChecked("https://a.test/c.json", when);
+    store.SetChecked(Built, when.AddHours(1));
+    store.SetName(Built, "Built-in");
+    var again = SourceStore.Load(folder, "", null, Built);
+    Check(again.CheckEveryOf("https://a.test/c.json") == "weekly" && again.LastCheckedOf("https://a.test/c.json") == when, "own source lost its settings");
+    Check(again.CheckEveryOf(Built) == "manual" && again.LastCheckedOf(Built) == when.AddHours(1) && again.Settings(Built).Name == "Built-in", "built-in settings lost");
+    Check(again.Entries.Count == 1 && again.Entries[0].CheckEvery == "weekly", "the built-in source is in the list");
+    Check(!again.IsDue(Built, when.AddDays(30)) && again.IsDue("https://a.test/c.json", when.AddDays(7)) && !again.IsDue("https://a.test/c.json", when.AddDays(6)), "IsDue");
+    // An old file: no checkEvery, no lastChecked, no builtIn.
+    File.WriteAllText(Path.Combine(folder, "sources.json"), """{ "schema": 1, "sources": [ { "url": "https://old.test/c.json", "name": "Old", "added": "2026-11-01" } ] }""");
+    var old = SourceStore.Load(folder, "", null, Built);
+    Check(old.Entries.Count == 1 && old.CheckEveryOf("https://old.test/c.json") == "start" && old.LastCheckedOf("https://old.test/c.json") == null, "old file");
+    Check(old.IsDue("https://old.test/c.json", DateTime.Now) && old.IsDue(Built, DateTime.Now), "an old file's sources are due at every start");
+    old.SetCheckEvery("https://old.test/c.json", "daily");
+    Check(!File.ReadAllText(Path.Combine(folder, "sources.json")).Contains("\"lastChecked\""), "a null last check was written");
+});
+
+Case("sources: due ones read from the network, the others from the saved copies; a never-read one is NotChecked", root =>
+{
+    var (client, net, asked) = Net(root);
+    Publish(net);
+    PublishOther(net);
+    var both = new[] { Source, OtherSource };
+    Check(client.ReadAll(both).Result.Sources.All(s => s.State == SourceState.Read), "the first reading");
+    asked.Clear();
+    var reading = client.ReadAll(both, null, url => url == OtherSource).Result;
+    Check(reading.Sources[0].State == SourceState.Cached && reading.Sources[0].Mods == 1 && reading.Sources[0].Name == "test", "the source not due is not from the saved copy");
+    Check(reading.Sources[1].State == SourceState.Read, "the due source was not read");
+    Check(!asked.Any(a => a == Source || a == MetaUrl), "the network was asked for a source not due: " + string.Join(",", asked));
+    Check(reading.Mods.Count == 2, "mods of the cached source missing");
+    var never = client.ReadAll(new[] { "https://never.test/catalog.json" }, null, _ => false).Result;
+    Check(never.Sources[0].State == SourceState.NotChecked && never.Sources[0].Error == null && never.Mods.Count == 0 && !asked.Contains("https://never.test/catalog.json"), "a never-read source not due");
+    var forced = client.ReadAll(new[] { "https://never.test/catalog.json" }, null, _ => true).Result;
+    Check(forced.Sources[0].State == SourceState.Failed, "a due source that does not read");
+});
+
+Case("sources: a root file without a name is flagged, one with a name is not", root =>
+{
+    var (client, net, _) = Net(root);
+    net[Source] = Bytes("""{ "schema": 1, "mods": [] }""");
+    net[OtherSource] = Bytes("""{ "schema": 1, "name": "  ", "mods": [] }""");
+    net["https://named.test/c.json"] = Bytes("""{ "schema": 1, "name": "Named", "mods": [] }""");
+    var reading = client.ReadAll(new[] { Source, OtherSource, "https://named.test/c.json", "https://missing.test/c.json" }).Result;
+    Check(reading.Sources[0].NoName && reading.Sources[1].NoName, "a missing or blank name was not flagged");
+    Check(!reading.Sources[2].NoName && !reading.Sources[3].NoName, "a named or failed source was flagged");
+    Check(reading.Sources[0].State == SourceState.Read, "a nameless source is still read");
+});
+
+// A small PNG (the signature and some bytes) and a JPG.
+byte[] Png(int length = 64) { var b = new byte[length]; new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }.CopyTo(b, 0); b[^1] = 7; return b; }
+byte[] Jpg() => new byte[] { 0xFF, 0xD8, 0xFF, 0xE0, 1, 2, 3, 4 };
+
+Case("meta: screenshots round-trip with captions by language; a file without them reads as an empty list", root =>
+{
+    var opts = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    var meta = System.Text.Json.JsonSerializer.Deserialize<ModMeta>("""{ "id": "a", "screenshots": [ { "url": "https://x.test/a.png", "sha256": "ab", "caption": { "english": "One", "russian": "Раз" } }, { "url": "https://x.test/b.jpg", "sha256": "cd" } ] }""", opts);
+    Check(meta.Screenshots.Count == 2 && meta.Screenshots[0].CaptionIn("russian") == "Раз" && meta.Screenshots[0].CaptionIn("german") == "One", "captions");
+    Check(meta.Screenshots[1].CaptionIn("english") == null, "a missing caption is not null");
+    var again = System.Text.Json.JsonSerializer.Deserialize<ModMeta>(System.Text.Json.JsonSerializer.Serialize(meta), opts);
+    Check(again.Screenshots.Count == 2 && again.Screenshots[1].Url == "https://x.test/b.jpg", "lost on a round trip");
+    Check(System.Text.Json.JsonSerializer.Deserialize<ModMeta>("""{ "id": "a" }""", opts).Screenshots.Count == 0, "no screenshots is not an empty list");
+});
+
+Case("screenshots: downloaded, checked by sha256 and signature, cached; a bad one is refused and leaves nothing", root =>
+{
+    var (client, net, asked) = Net(root);
+    var png = Png();
+    var jpg = Jpg();
+    net["https://x.test/a.png"] = png;
+    net["https://x.test/b.jpg"] = jpg;
+    var good = new ScreenshotFile { Url = "https://x.test/a.png", Sha256 = Sha(png) };
+    Check(client.ScreenshotPath(good) == null, "cached before downloading");
+    var path = client.LoadScreenshot(good).Result;
+    Check(path.EndsWith(Sha(png) + ".png") && path.Contains(Path.Combine(".cache", "screens")) && File.ReadAllBytes(path).SequenceEqual(png), "the cached file");
+    Check(client.ScreenshotPath(good) == path, "ScreenshotPath does not find it");
+    var jpgPath = client.LoadScreenshot(new ScreenshotFile { Url = "https://x.test/b.jpg", Sha256 = Sha(jpg).ToUpperInvariant() }).Result;
+    Check(jpgPath.EndsWith(".jpg"), "a jpg kept as a jpg");
+    // Cache hit: no network.
+    asked.Clear();
+    Check(client.LoadScreenshot(good).Result == path && asked.Count == 0, "the cached screenshot was downloaded again");
+
+    void Refused(ScreenshotFile shot, string what)
+    {
+        var refused = false;
+        try { client.LoadScreenshot(shot).Wait(); }
+        catch (AggregateException) { refused = true; }
+        Check(refused, what + " was not refused");
+        Check(client.ScreenshotPath(shot) == null, what + " left a file");
+    }
+    net["https://x.test/other.png"] = Png(80);
+    Refused(new ScreenshotFile { Url = "https://x.test/other.png", Sha256 = Sha(Png(33)) }, "a sha256 mismatch");
+    var big = Png(2 * 1024 * 1024 + 1);
+    net["https://x.test/big.png"] = big;
+    Refused(new ScreenshotFile { Url = "https://x.test/big.png", Sha256 = Sha(big) }, "a file over 2 MB");
+    var exactly = Png(2 * 1024 * 1024);
+    net["https://x.test/max.png"] = exactly;
+    Check(client.LoadScreenshot(new ScreenshotFile { Url = "https://x.test/max.png", Sha256 = Sha(exactly) }).Result.EndsWith(".png"), "a file of exactly 2 MB was refused");
+    var text = Bytes("not a picture");
+    net["https://x.test/t.png"] = text;
+    Refused(new ScreenshotFile { Url = "https://x.test/t.png", Sha256 = Sha(text) }, "a file that is not a picture");
+    net["http://x.test/h.png"] = Png(41);
+    Refused(new ScreenshotFile { Url = "http://x.test/h.png", Sha256 = Sha(Png(41)) }, "an http address");
+    Refused(new ScreenshotFile { Url = "https://x.test/a.png", Sha256 = "../../evil" }, "a sha256 that is a path");
+    Refused(new ScreenshotFile { Url = "https://x.test/a.png" }, "no sha256");
+    Refused(new ScreenshotFile { Url = "https://x.test/missing.png", Sha256 = Sha(Png(9)) }, "a missing file");
+    // A whole mod: the good ones come, the bad one is left out, the count says how many came now.
+    var meta = new ModMeta { Id = "m", Screenshots = { new ScreenshotFile { Url = "https://x.test/other.png", Sha256 = Sha(png) }, good, new ScreenshotFile { Url = "https://x.test/b.jpg", Sha256 = Sha(jpg) } } };
+    Check(client.LoadScreenshots(meta).Result == 0, "nothing new was expected (the good ones are cached, the bad refused)");
+    var (client2, net2, _) = Net(Path.Combine(root, "second"));
+    net2["https://x.test/a.png"] = png;
+    net2["https://x.test/b.jpg"] = jpg;
+    net2["https://x.test/other.png"] = Png(80);
+    Check(client2.LoadScreenshots(meta).Result == 2 && client2.ScreenshotPath(meta.Screenshots[1]) != null && client2.ScreenshotPath(meta.Screenshots[2]) != null, "LoadScreenshots");
+});
+
+Case("batches: dependents first when removing or switching off, what a mod needs first when switching on; a needed mod stays", root =>
+{
+    InstalledMod M(string id, params string[] requires) => new() { Id = id, Version = "1", Requires = requires.ToList() };
+    var mods = new[] { M("core"), M("a", "core"), M("b", "core", "a"), M("lone") };
+    Check(Batch.DependentsFirst(new[] { "core", "a", "b" }, mods).SequenceEqual(new[] { "b", "a", "core" }), "dependents first: " + string.Join(",", Batch.DependentsFirst(new[] { "core", "a", "b" }, mods)));
+    Check(Batch.SwitchOrder(new[] { "b", "core", "a" }, mods, true).SequenceEqual(new[] { "core", "a", "b" }), "on: what a mod needs first");
+    Check(Batch.SwitchOrder(new[] { "core", "a" }, mods, false).SequenceEqual(new[] { "a", "core" }), "off: dependents first");
+    Check(Batch.Removable(new[] { "core", "a", "b" }, mods).SequenceEqual(new[] { "b", "a", "core" }), "everything selected goes, dependents first");
+    Check(Batch.Removable(new[] { "core", "a" }, mods).Count == 0, "core and a are both needed by b, which stays");
+    Check(Batch.Removable(new[] { "b", "lone", "core" }, mods).SequenceEqual(new[] { "b", "lone" }), "core stays while a needs it");
+    Check(Batch.Removable(new[] { "nobody", "lone", "lone" }, mods).SequenceEqual(new[] { "lone" }), "unknown and repeated ids");
+    Check(Batch.DependentsFirst(new[] { "x", "y" }, new[] { M("x", "y"), M("y", "x") }).Count == 2, "a cycle lost mods");
+});
+
+Case("the mod manager's lang files all parse and have the same keys as english", root =>
+{
+    var dir = AppContext.BaseDirectory;
+    while (dir != null && !Directory.Exists(Path.Combine(dir, "mod-manager", "lang")))
+        dir = Path.GetDirectoryName(dir);
+    Check(dir != null, "the repository's mod-manager\\lang not found");
+    var docs = new System.Text.Json.JsonDocumentOptions { AllowTrailingCommas = true };
+    HashSet<string> Keys(string file) => System.Text.Json.JsonDocument.Parse(File.ReadAllText(file), docs).RootElement.GetProperty("tokens").EnumerateArray()
+        .Select(t => t.GetProperty("sid").GetString()).ToHashSet();
+    var files = Directory.GetFiles(Path.Combine(dir, "mod-manager", "lang"), "*.json");
+    Check(files.Length == 16, $"{files.Length} language files, 16 expected");
+    var english = Keys(Path.Combine(dir, "mod-manager", "lang", "english.json"));
+    foreach (var file in files)
+    {
+        var keys = Keys(file);
+        Check(keys.SetEquals(english), $"{Path.GetFileName(file)}: keys differ from english ({string.Join(",", keys.Except(english).Concat(english.Except(keys)))})");
+        Check(!File.ReadAllText(file).Contains('≈'), $"{Path.GetFileName(file)} has the sign the game's font lacks");
+    }
+});
+
 // ---------- online, only with OE_GITHUB_TOKEN: the real catalog in the private repository, the whole way ----------
 
 if (Environment.GetEnvironmentVariable("OE_GITHUB_TOKEN") is { Length: > 0 } githubToken)
