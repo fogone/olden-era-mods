@@ -20,6 +20,25 @@ their own way; they ask the game.
 
 ## Installing
 
+In PowerShell (Windows 10/11, no administrator rights needed), paste:
+
+```powershell
+irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1 | iex
+```
+
+Options: `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -DryRun`
+(also `-Uninstall`, `-RemoveBepInEx` with it, `-Game <folder>`). `-DryRun` only looks and says what it would do.
+
+The script finds the game (Game Pass or Steam; it asks if it cannot), refuses while the game runs, checks the game's
+version and BepInEx's, installs BepInEx `6.0.0-be.788` if it is missing or another (SHA-256 checked), then the mod
+manager from the release for your game's version (every file checked against the catalog's SHA-256). If the mods are
+not built for your game's version yet, it says so and installs nothing. The mods themselves you pick in the game, in
+the Mods window. Everything stays inside the game's folder. You can download
+[`install/install.ps1`](install/install.ps1) and read it first.
+
+### Installing by hand
+
+
 **1. BepInEx.** Download **BepInEx 6, IL2CPP, x64, build `6.0.0-be.788`**
 (the file `BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.788+….zip` from [builds.bepinex.dev](https://builds.bepinex.dev/projects/bepinex_be))
 and unpack it into the game's folder, the one with `HeroesOldenEra.exe`:
