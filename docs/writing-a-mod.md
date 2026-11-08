@@ -109,6 +109,9 @@ falls back to English, then Russian.
 ```
 
 - `oe.<id>.title`: the mod's name in the Mods tab. Required.
+- `oe.<id>.description`: one or two sentences on what the mod does. It is the mod's description in the Mods window and in
+  the catalog (`publish-mods.ps1` passes the lang folder to `tools/catalog --lang`, which copies `title` and `description`
+  of every language into the mod's meta file). Give it in every language file; `<id>` here is the last part of the plugin GUID.
 - `oe.<id>.<Key>`: the label of the switch made with `Menu.Toggle("<Key>", ...)`; `oe.<id>.<Key>.desc` its hover text.
 - For `Menu.Choose`: `oe.<id>.<Key>` the label and `oe.<id>.<Key>.<EnumValueName>` each option.
 - The game's font has no `≈`.
@@ -314,6 +317,14 @@ the order that worked: [process.md](process.md), "Researching game code".
 - `.\publish-mods.ps1 -Mods <id>` builds the mod and writes its catalog files into `release\catalog-preview`; nothing is
   published. `-Publish` makes a GitHub release `<id>-v<version>` (the DLL is the asset) and a pull request with
   `catalog\`. A version is published once: change the mod and **raise the version in `[BepInPlugin]`** to publish again.
+- Tags: `Tags` in `$catalogParts` is a comma-separated list for the catalog (`map`, `battle`, `tooltip`, `ui`, `fix`,
+  `qol`, `library`; the Mods window filters by them, the names of the known ones are the `oe.manager.tag.<id>` keys of
+  `mod-manager/lang`, so a new tag needs those keys in every language file).
+- Screenshots: put PNG or JPG pictures (up to 2 MB each) in the mod's `mod-<id>/screenshots/` folder. They are listed in
+  the catalog sorted by file name and served from the repository's `main` branch. An optional
+  `screenshots/captions.txt` gives English captions, one line `<file name>=<caption>` (a `|` in a caption is replaced).
+  A mod without that folder keeps the screenshots its meta file already has.
+- The catalog's icon (`catalog/icon.png`) is added to the root file by the script; a mod needs no icon of its own.
 - The catalog, its files and the mod manager: [catalog.md](catalog.md). Releases of the whole set and the rules for
   versions: [building.md](building.md).
 - The repository is public. `main` changes only through a pull request that passes `tools/check-public.ps1` (no

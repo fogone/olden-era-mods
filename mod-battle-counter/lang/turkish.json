@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Savaş sayacı"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Çift Vuruş'un ikinci vuruşu"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Çift Vuruşlu bir yaratık vurur, karşı saldırıyı yer ve tekrar vurur. Vuruşa eklenir: tahminin sayıları iki vuruşu birden gösterir. Bir sütun: karşı saldırıdan sonra satırın simgesi ile ikinci vuruşun hasarı ve kayıpları, sağlık satırında (açıksa) ise vurduğu savunanın sağlığı. Her vuruş, öncekilerden sonra birliklerde kalan sağlığa göre hesaplanır; yaralı üstteki yaratık da dahildir."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"kapalı"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"vuruşa eklenir"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"bir sütun"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Tahminde karşı saldırı hasarı ve kayıpları"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Hasar tahmininde oyunun sayılarından sonra: kılıçlar ve savunanın karşı saldırısı, verdiği hasar ve öldürdüğü yaratıklar. Yalnızca oyunun kendisi karşı saldırı olacağına karar verdiğinde."},
 {"sid":"oe.battlecounter.HealthShown","text":"Tahminde kümelerin sağlığı"},

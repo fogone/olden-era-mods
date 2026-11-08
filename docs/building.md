@@ -92,8 +92,29 @@ with the manager's own models (`mod-manager/shared/Catalog.cs`), each file with 
 - `.\publish-mods.ps1 -Publish` creates the releases (`gh`) and puts `catalog\` on a branch of its own with a pull
   request, merged once the check passed (see "Changes to the repository" below).
 
+What goes into a mod's catalog entry (`tools/catalog add`, see [catalog.md](catalog.md)):
+- **Name and description** in every language: from the mod's `lang/<language>.json`, keys `oe.<id>.title` and
+  `oe.<id>.description`.
+- **Tags**: the `Tags` of the mod in `$catalogParts` of `publish-mods.ps1` (`map`, `battle`, `tooltip`, `ui`, `fix`,
+  `qol`, `library`).
+- **Author and source**: `fogone` and the repository's address.
+- **Icon**: the catalog's own, `catalog/icon.png` (drawn by `catalog/make-icon.ps1`), written into the root file.
+- **Screenshots**: the PNG and JPG files of `mod-<id>/screenshots/` (up to 2 MB each), served from `main`, with English
+  captions from `screenshots/captions.txt` (`<file name>=<caption>` a line). No folder: the meta file keeps its screenshots.
+- **Requirements**: `Requires` (`nobirds.oldenera.core` for the mods that listen to the core's events).
+
+The manager's package is special: the manager, the library, the Mods tab and the patcher go in one release (the DLLs and
+`olden-era-mod-manager-<version>-for-game-<game version>.zip` for the first install, unpacked into the game's folder).
+
+How `-Publish` goes: for each mod, `gh release create` if its tag does not exist yet; then all `catalog\` changes go to
+a new branch `catalog/<mods>-<time>` cut from `origin/main`, a pull request is opened, `gh pr checks --watch` waits for
+the check, and when it passed the pull request is merged by rebase (the commit keeps its author) and the branch is
+deleted; when it did not, the pull request stays open and the script warns. The player's manager reads the catalog from
+`main`, so a release is seen once its pull request is merged. Your own branch is switched back to and updated.
+
 A version is published once. Run again on another game version with the same DLL, the release only gets that game
 version added (it works there too); with another DLL it stops: raise the mod's version in its `[BepInPlugin]`.
+
 ## How it is built
 
 - **`mod-common/`**: the common library `OldenEraCommon.dll`, one for every version of the game: `ModBase` (a mod's frame:

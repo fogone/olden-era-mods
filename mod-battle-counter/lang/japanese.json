@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"戦闘カウンター"},
+{"sid":"oe.battlecounter.SecondStrike","text":"二連撃の2回目"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"二連撃を持つ生物は攻撃し、反撃を受け、もう一度攻撃します。攻撃に加算：予測の数値は2回分の攻撃を表します。列：反撃の後に、行のアイコンと2回目の攻撃のダメージと損失を表示し、体力の行（オンの場合）には攻撃を受ける防御側の体力を表示します。各攻撃は、直前の攻撃の後に部隊に残る体力（負傷した先頭の生物を含む）で計算されます。"},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"オフ"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"攻撃に加算"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"列"},
 {"sid":"oe.battlecounter.ShowCounter","text":"予測に反撃ダメージと損害を表示"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"ダメージ予測のゲーム標準の数値の後に、剣と防御側の反撃、そのダメージと倒されるクリーチャーを表示します。ゲーム自身が反撃があると判断したときのみ。"},
 {"sid":"oe.battlecounter.HealthShown","text":"予測にスタックのHPを表示"},

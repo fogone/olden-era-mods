@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Compteur de combat"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Deuxième frappe de la Frappe double"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Une créature à Frappe double frappe, subit la contre-attaque, puis frappe de nouveau. Ajoutée à la frappe : les chiffres de la prévision couvrent les deux frappes. Une colonne : après la contre-attaque, l'icône de la ligne ainsi que les dégâts et les pertes de la deuxième frappe, et dans la ligne de santé (si elle est activée) la santé du défenseur touché. Chaque coup est calculé pour la santé qui reste aux troupes après les précédents, créature du dessus blessée comprise."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"désactivé"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"ajoutée à la frappe"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"une colonne"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Dégâts de contre-attaque et pertes dans les prévisions"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Après les chiffres du jeu dans les prévisions de dégâts : des épées et la contre-attaque du défenseur, ses dégâts et les créatures qu'il tue. Seulement quand le jeu décide lui-même qu'il y aura une contre-attaque."},
 {"sid":"oe.battlecounter.HealthShown","text":"Les points de vie des piles dans les prévisions"},
