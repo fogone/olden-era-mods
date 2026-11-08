@@ -77,6 +77,8 @@ The hidden numbers the game does not show (exact counts, Diplomacy points, the a
 
 To build the mods yourself or to work on them: **[docs/building.md](docs/building.md)** (building, releases, publishing a mod into the catalog with `publish-mods.ps1`). Tasks and ideas are in the
 repository's [Issues](../../issues).
+Changes come as pull requests; each is checked for anything personal, secrets and game files before it can be merged
+(`tools/check-public.ps1`).
 
 ## License
 
