@@ -747,19 +747,29 @@ public partial class Plugin
         PinRight(t.Find("LastSaveHeader"), rowRect, 27f);
         PinRight(t.Find("LastSaveTime"), rowRect, 0f);
         PinRight(t.Find("LastSaveGameTime"), rowRect, -27f);
-        // The name's group one line high, its name in the middle of it (the save row's 72-high name box hung down).
-        if (t.Find("HeaderGroup") is { } headerGroup)
-        {
-            headerGroup.Cast<RectTransform>().sizeDelta = new Vector2(560f, 34f);
-            if (headerGroup.GetComponent<HorizontalLayoutGroup>() is { } nameLine)
+        // The row's backs (default, hovered, selected) are the save row's fixed 122 for its 110 (6 over each edge, their
+        // pictures' own margins making the gaps between rows): as much over ours, centred, or the rows run together.
+        foreach (var backName in new[] { "DefaultBack", "HoveredBack", "SelectedBack" })
+            if (t.Find(backName) is { } back)
             {
-                nameLine.childAlignment = TextAnchor.MiddleLeft;
-                nameLine.childControlHeight = true;
-                nameLine.childForceExpandHeight = false;
+                var rect = back.Cast<RectTransform>();
+                var width = rect.rect.width;
+                rect.anchorMin = new Vector2(rect.anchorMin.x, 0.5f);
+                rect.anchorMax = new Vector2(rect.anchorMax.x, 0.5f);
+                rect.pivot = new Vector2(rect.pivot.x, 0.5f);
+                rect.sizeDelta = new Vector2(rect.anchorMin.x == rect.anchorMax.x ? width : rect.sizeDelta.x, ModRowHeight + 12f);
+                rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, 0f);
+                // The selected back's frame: 5 over the save row's 110.
+                if (back.Find("Frame") is { } frame)
+                {
+                    var frameRect = frame.Cast<RectTransform>();
+                    if (frameRect.anchorMin.y == frameRect.anchorMax.y)
+                        frameRect.sizeDelta = new Vector2(frameRect.sizeDelta.x, ModRowHeight + 5f);
+                }
             }
-            if (headerGroup.Find("SessionName")?.GetComponent<TMP_Text>() is { } nameText)
-                nameText.alignment = TextAlignmentOptions.MidlineLeft;
-        }
+        // The row's check box drawn as the bottom group's (the save row's is a faint outline until hovered).
+        if (t.Find("Toggle/Background")?.GetComponent<Image>() is { } box && selectAll?.transform.Find("Background")?.GetComponent<Image>() is { } shown)
+            box.color = shown.color;
         if (t.Find("SelectedBack") is { } selectedBack)
             selectedBack.gameObject.SetActive(picked);
         if (t.Find("HoveredBack")?.GetComponent<CanvasGroup>() is { } hovered)

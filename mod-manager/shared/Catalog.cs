@@ -428,20 +428,44 @@ public sealed class CatalogClient
     static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
 }
 
-// "0.48.0" < "0.48.10" < "0.49": by numbers, part by part; a part that is not a number by its text.
+// Versions by semver precedence (semver.org, 11): the release part by numbers, part by part ("0.48.10" > "0.48.9",
+// "1.0" == "1.0.0"); a pre-release is lower than its release ("0.4.1-rc.1" < "0.4.1"), its identifiers compared one by
+// one, numbers as numbers and below words ("rc.2" < "rc.10", "alpha" < "rc"); build metadata after "+" is ignored.
 public sealed class VersionComparer : IComparer<string>
 {
     public static readonly VersionComparer Instance = new();
 
     public int Compare(string a, string b)
     {
-        var x = (a ?? "").Split('.', '-', '+');
-        var y = (b ?? "").Split('.', '-', '+');
+        var (releaseA, preA) = Split(a);
+        var (releaseB, preB) = Split(b);
+        var c = CompareParts(releaseA.Split('.'), releaseB.Split('.'), "0");
+        if (c != 0)
+            return c;
+        if (preA == null || preB == null)
+            return preA == null ? (preB == null ? 0 : 1) : -1;
+        return CompareParts(preA.Split('.'), preB.Split('.'), null);
+    }
+
+    static (string release, string pre) Split(string version)
+    {
+        var v = (version ?? "").Split('+')[0];
+        var dash = v.IndexOf('-');
+        return dash < 0 ? (v, null) : (v[..dash], v[(dash + 1)..]);
+    }
+
+    // `missing`: what a shorter list counts as ("0" for release numbers); null: the shorter list is lower (pre-release).
+    static int CompareParts(string[] x, string[] y, string missing)
+    {
         for (var i = 0; i < Math.Max(x.Length, y.Length); i++)
         {
-            var p = i < x.Length ? x[i] : "0";
-            var q = i < y.Length ? y[i] : "0";
-            var c = long.TryParse(p, out var m) && long.TryParse(q, out var n) ? m.CompareTo(n) : string.CompareOrdinal(p, q);
+            if (missing == null && (i >= x.Length || i >= y.Length))
+                return i >= x.Length ? -1 : 1;
+            var p = i < x.Length ? x[i] : missing;
+            var q = i < y.Length ? y[i] : missing;
+            var pNumber = long.TryParse(p, out var m);
+            var qNumber = long.TryParse(q, out var n);
+            var c = pNumber && qNumber ? m.CompareTo(n) : pNumber != qNumber ? (pNumber ? -1 : 1) : string.CompareOrdinal(p, q);
             if (c != 0)
                 return c;
         }

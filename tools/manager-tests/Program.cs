@@ -384,6 +384,9 @@ Case("versions compare by numbers", root =>
 {
     var c = VersionComparer.Instance;
     Check(c.Compare("0.48.10", "0.48.9") > 0 && c.Compare("0.49", "0.48.10") > 0 && c.Compare("1.0", "1.0.0") == 0, "the order");
+    Check(c.Compare("0.4.1-rc.1", "0.4.1") < 0 && c.Compare("0.4.1", "0.4.1-rc.9") > 0 && c.Compare("0.4.1-rc.1", "0.4.0") > 0, "a pre-release is below its release, above the one before");
+    Check(c.Compare("0.4.1-rc.10", "0.4.1-rc.2") > 0 && c.Compare("1.0-alpha", "1.0-rc") < 0 && c.Compare("1.0-rc", "1.0-rc.1") < 0 && c.Compare("1.0-1", "1.0-a") < 0, "pre-release identifiers: numbers as numbers, below words, a shorter list lower");
+    Check(c.Compare("1.0+abc", "1.0") == 0, "build metadata ignored");
 });
 // ---------- check frequency, names, screenshots, batches (issues #6, #14) ----------
 
