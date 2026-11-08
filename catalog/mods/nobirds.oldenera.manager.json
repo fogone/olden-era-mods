@@ -1,11 +1,87 @@
 {
   "schema": 1,
   "id": "nobirds.oldenera.manager",
-  "name": {},
-  "description": {},
+  "name": {
+    "brportugese": "Gerenciador de mods",
+    "czech": "Správce módů",
+    "english": "Mod manager",
+    "french": "Gestionnaire de mods",
+    "german": "Mod-Manager",
+    "hungarian": "Modkezelő",
+    "italian": "Gestore mod",
+    "japanese": "MODマネージャー",
+    "korean": "모드 관리자",
+    "polish": "Menedżer modów",
+    "russian": "Мод-менеджер",
+    "spanish": "Gestor de mods",
+    "turkish": "Mod yöneticisi",
+    "ukrainian": "Мод-менеджер",
+    "zhcn": "模组管理器",
+    "zhtw": "模組管理員"
+  },
+  "description": {
+    "brportugese": "O gerenciador de mods e a janela «Mods» do menu principal: navegue por catálogos, instale, atualize, desative e remova mods com um clique. Nada é instalado ou atualizado sem o seu clique.",
+    "czech": "Správce modů a okno „Módy“ v hlavní nabídce: procházejte katalogy, instalujte, aktualizujte, vypínejte a odstraňujte módy jedním kliknutím. Nic se neinstaluje ani neaktualizuje bez vašeho kliknutí.",
+    "english": "The mod manager and the Mods window in the main menu: browse mod catalogs, install, update, switch off and remove mods with a click. Nothing is installed or updated without your click.",
+    "french": "Le gestionnaire de mods et la fenêtre « Mods » du menu principal : parcourez les catalogues, installez, mettez à jour, désactivez et supprimez des mods en un clic. Rien n'est installé ni mis à jour sans votre clic.",
+    "german": "Der Mod-Manager und das Fenster „Mods“ im Hauptmenü: Mod-Kataloge durchsuchen, Mods mit einem Klick installieren, aktualisieren, ausschalten und entfernen. Ohne Ihren Klick wird nichts installiert oder aktualisiert.",
+    "hungarian": "A modkezelő és a főmenü „Modok” ablaka: katalógusok böngészése, modok telepítése, frissítése, kikapcsolása és eltávolítása egy kattintással. Az Ön kattintása nélkül semmi sem települ és nem frissül.",
+    "italian": "Il gestore di mod e la finestra «Mod» del menu principale: sfoglia i cataloghi, installa, aggiorna, disattiva e rimuovi le mod con un clic. Niente viene installato o aggiornato senza il tuo clic.",
+    "japanese": "MODマネージャーとメインメニューの「MOD」ウィンドウ：カタログを見て、MODをワンクリックでインストール、更新、無効化、削除できます。あなたのクリックなしには何もインストールも更新もされません。",
+    "korean": "모드 관리자와 메인 메뉴의 '모드' 창: 카탈로그를 둘러보고 모드를 한 번의 클릭으로 설치, 업데이트, 끄기, 제거할 수 있습니다. 당신의 클릭 없이는 아무것도 설치되거나 업데이트되지 않습니다.",
+    "polish": "Menedżer modów i okno „Mody” w menu głównym: przeglądaj katalogi, instaluj, aktualizuj, wyłączaj i usuwaj mody jednym kliknięciem. Nic nie jest instalowane ani aktualizowane bez Twojego kliknięcia.",
+    "russian": "Менеджер модов и окно «Моды» в главном меню: каталоги модов, установка, обновление, выключение и удаление модов в один щелчок. Без вашего щелчка ничего не ставится и не обновляется.",
+    "spanish": "El gestor de mods y la ventana «Mods» del menú principal: explora catálogos, instala, actualiza, desactiva y elimina mods con un clic. Nada se instala ni se actualiza sin tu clic.",
+    "turkish": "Mod yöneticisi ve ana menüdeki „Modlar” penceresi: katalogları gezin, modları tek tıkla kurun, güncelleyin, kapatın ve kaldırın. Sizin tıklamanız olmadan hiçbir şey kurulmaz veya güncellenmez.",
+    "ukrainian": "Менеджер модів і вікно «Моди» в головному меню: каталоги модів, установлення, оновлення, вимкнення та видалення модів одним клацанням. Без вашого клацання нічого не встановлюється й не оновлюється.",
+    "zhcn": "模组管理器和主菜单中的“模组”窗口：浏览模组目录，一键安装、更新、关闭和移除模组。没有你的点击，不会安装或更新任何东西。",
+    "zhtw": "模組管理員與主選單中的「模組」視窗：瀏覽模組目錄，一鍵安裝、更新、關閉與移除模組。沒有你的點擊，不會安裝或更新任何東西。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "library"
+  ],
+  "screenshots": [
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-manager/screenshots/settings-tab.jpg",
+      "sha256": "01b5d84fbbb622e8437d6972c48f1b0c24267749ba201606caac8b952914c9c0",
+      "caption": {
+        "english": "The Mods tab in the game settings"
+      }
+    }
+  ],
   "releases": [
+    {
+      "version": "0.4.0",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraModManager.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.4.0/OldenEraModManager.dll",
+          "sha256": "96207c388c042a187002cef536266f7dc05179da50c32faa87a18d597337c18e"
+        },
+        {
+          "name": "OldenEraCommon.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.4.0/OldenEraCommon.dll",
+          "sha256": "0c4adf9e024b4eaf17c64e3e7c29ce942da971372fdb2985559907786f8d2d0f"
+        },
+        {
+          "name": "OldenEraModManager.Patcher.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.4.0/OldenEraModManager.Patcher.dll",
+          "sha256": "31e4b750617421e1717ba168c43dfa503e12aa7ccb2c19e56cb5455d32df026d"
+        },
+        {
+          "name": "OldenEraSettings.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.4.0/OldenEraSettings.dll",
+          "sha256": "e47b3e47519ed12699aeabaa1c2ad1c89d5fcb4d8ac2c04ecb73458ab0b4272e"
+        }
+      ]
+    },
     {
       "version": "0.3.4",
       "games": [

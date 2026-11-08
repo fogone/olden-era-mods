@@ -3,12 +3,62 @@
   "id": "nobirds.oldenera.skipintro",
   "name": {
     "english": "Skip intro",
-    "russian": "Без заставок"
+    "russian": "Без заставок",
+    "brportugese": "Pular intro",
+    "czech": "Přeskočit intro",
+    "french": "Passer l'intro",
+    "german": "Intro überspringen",
+    "hungarian": "Intró átugrása",
+    "italian": "Salta intro",
+    "japanese": "イントロをスキップ",
+    "korean": "인트로 건너뛰기",
+    "polish": "Pomiń intro",
+    "spanish": "Omitir intro",
+    "turkish": "Girişi atla",
+    "ukrainian": "Без заставок",
+    "zhcn": "跳过开场",
+    "zhtw": "跳過開場"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Pula os logotipos dos estúdios e o trailer ao iniciar o jogo e vai direto ao menu principal.",
+    "czech": "Při spuštění hry přeskočí loga studií a upoutávku a rovnou otevře hlavní nabídku.",
+    "english": "Skips the studios' logos and the trailer when the game starts and goes straight to the main menu.",
+    "french": "Saute les logos des studios et la bande-annonce au démarrage du jeu et passe directement au menu principal.",
+    "german": "Überspringt beim Spielstart die Studio-Logos und den Trailer und geht direkt ins Hauptmenü.",
+    "hungarian": "A játék indításakor átugorja a stúdiók logóit és az előzetest, és rögtön a főmenübe lép.",
+    "italian": "Salta i loghi degli studi e il trailer all'avvio del gioco e passa direttamente al menu principale.",
+    "japanese": "ゲーム起動時にスタジオのロゴとトレーラーを飛ばし、そのままメインメニューへ進みます。",
+    "korean": "게임을 시작할 때 스튜디오 로고와 트레일러를 건너뛰고 곧바로 메인 메뉴로 갑니다.",
+    "polish": "Pomija logo studiów i zwiastun przy starcie gry i od razu przechodzi do menu głównego.",
+    "russian": "Пропускает логотипы студий и трейлер при запуске игры и сразу открывает главное меню.",
+    "spanish": "Omite los logotipos de los estudios y el tráiler al iniciar el juego y pasa directamente al menú principal.",
+    "turkish": "Oyun başlarken stüdyo logolarını ve fragmanı atlar, doğrudan ana menüye geçer.",
+    "ukrainian": "Пропускає логотипи студій і трейлер під час запуску гри та одразу відкриває головне меню.",
+    "zhcn": "游戏启动时跳过工作室标志和预告片，直接进入主菜单。",
+    "zhtw": "遊戲啟動時跳過工作室標誌與預告片，直接進入主選單。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "qol"
+  ],
+  "screenshots": [],
   "releases": [
+    {
+      "version": "0.1.1",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraSkipIntro.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.1.1/OldenEraSkipIntro.dll",
+          "sha256": "70a93f87f13a687fbb92377d634a91d3e55f5ecf04f70b46917ac35e0f0f88b2"
+        }
+      ]
+    },
     {
       "version": "0.1.0",
       "games": [

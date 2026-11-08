@@ -19,10 +19,60 @@
     "zhcn": "部队提示框",
     "zhtw": "部隊提示框"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Passe o cursor sobre um esquadrão no mapa: a dica diz se ele se juntaria ao seu herói ou ofereceria fuga, com o ícone de Diplomacia ou de fuga no lugar das caveiras de dificuldade. As respostas são do próprio jogo.",
+    "czech": "Najeďte na oddíl na mapě: nápověda řekne, zda by se připojil k vašemu hrdinovi, nebo nabídl útěk, s ikonou Diplomacie či útěku místo lebek obtížnosti. Odpovědi dává sama hra.",
+    "english": "Hover a squad on the map: its tooltip says whether it would join your hero or offer to flee, with the Diplomacy or escape icon instead of the difficulty skulls. The answers are the game's own.",
+    "french": "Survolez un groupe sur la carte : l'infobulle indique s'il rejoindrait votre héros ou proposerait de fuir, avec l'icône de Diplomatie ou de fuite à la place des crânes de difficulté. Les réponses viennent du jeu lui-même.",
+    "german": "Fahren Sie auf der Karte über eine Truppe: Der Tooltip sagt, ob sie sich Ihrem Helden anschließen oder die Flucht anbieten würde, mit dem Diplomatie- oder Fluchtsymbol statt der Schwierigkeits-Totenköpfe. Die Antworten stammen vom Spiel selbst.",
+    "hungarian": "Vigye az egeret egy csapat fölé a térképen: a súgó megmondja, csatlakozna-e a hőséhez vagy menekülést ajánlana, a nehézségi koponyák helyett a Diplomácia vagy a menekülés ikonjával. A válaszokat maga a játék adja.",
+    "italian": "Passa il cursore su una squadra sulla mappa: il suggerimento dice se si unirebbe al tuo eroe o offrirebbe di fuggire, con l'icona della Diplomazia o della fuga al posto dei teschi di difficoltà. Le risposte sono quelle del gioco stesso.",
+    "japanese": "マップ上の部隊にカーソルを合わせると、ツールチップがその部隊が英雄に加わるか逃走を申し出るかを示し、難易度のドクロの代わりに外交または逃走のアイコンを表示します。答えはゲーム自身のものです。",
+    "korean": "지도에서 부대 위에 커서를 올리면 툴팁이 그 부대가 영웅에게 합류할지 도망을 제안할지 알려 주며, 난이도 해골 대신 외교 또는 도주 아이콘을 보여 줍니다. 답은 게임 자체의 것입니다.",
+    "polish": "Najedź na oddział na mapie: podpowiedź powie, czy dołączyłby do twojego bohatera, czy zaproponował ucieczkę, z ikoną Dyplomacji lub ucieczki zamiast czaszek trudności. Odpowiedzi pochodzą z samej gry.",
+    "russian": "Наведите курсор на отряд на карте: в подсказке сказано, присоединится ли он к вашему герою или предложит сбежать, со значком Дипломатии или побега вместо черепов сложности. Ответы даёт сама игра.",
+    "spanish": "Pasa el cursor sobre una tropa en el mapa: la información emergente dice si se uniría a tu héroe o ofrecería huir, con el icono de Diplomacia o de huida en lugar de las calaveras de dificultad. Las respuestas son las del propio juego.",
+    "turkish": "Haritada bir birliğin üzerine gelin: ipucu, kahramanınıza katılıp katılmayacağını ya da kaçmayı teklif edip etmeyeceğini söyler; zorluk kafatası yerine Diplomasi veya kaçış simgesiyle. Cevaplar oyunun kendisinindir.",
+    "ukrainian": "Наведіть курсор на загін на мапі: у підказці сказано, чи приєднається він до вашого героя, чи запропонує втекти, зі значком Дипломатії або втечі замість черепів складності. Відповіді дає сама гра.",
+    "zhcn": "在地图上悬停于一支部队：提示会说明它是否会加入你的英雄或提出逃跑，并用外交或逃跑图标代替难度骷髅。答案来自游戏本身。",
+    "zhtw": "在地圖上將游標移到一支部隊上：提示會說明它是否會加入你的英雄或提出逃跑，並以外交或逃跑圖示取代難度骷髏。答案來自遊戲本身。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "map",
+    "tooltip"
+  ],
+  "screenshots": [
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-squad-tooltip/screenshots/want-to-flee.jpg",
+      "sha256": "35ee0aa32672006bf8348123940f60f463cf42f46f2769ec18bcd372253d623f",
+      "caption": {
+        "english": "A squad that would offer to flee: the escape icon and a Want to flee line in its tooltip"
+      }
+    }
+  ],
   "releases": [
+    {
+      "version": "1.31.1",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraSquadTooltip.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.31.1/OldenEraSquadTooltip.dll",
+          "sha256": "fbdbd3425720a0c045ab4b4b0000197e0f2d8fa1ecf94ede6c8b25e53924eddf"
+        }
+      ]
+    },
     {
       "version": "1.31.0",
       "games": [

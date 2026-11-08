@@ -19,10 +19,52 @@
     "zhcn": "地图提示框",
     "zhtw": "地圖提示框"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Impede que a dica de um objeto do mapa cubra o objeto: ela vai para um lugar livre acima, à direita, à esquerda ou abaixo, também fora dos painéis da interface. Desativado por padrão.",
+    "czech": "Brání tomu, aby nápověda objektu na mapě zakrývala sám objekt: přesune se na volné místo nad, vpravo, vlevo nebo pod objekt, i mimo panely rozhraní. Ve výchozím stavu vypnuto.",
+    "english": "Keeps a map object's tooltip from covering the object: it moves to a free place above, right, left or below, off the interface panels too. Off by default.",
+    "french": "Empêche l'infobulle d'un objet de la carte de couvrir l'objet : elle passe à un endroit libre, au-dessus, à droite, à gauche ou en dessous, hors des panneaux de l'interface. Désactivé par défaut.",
+    "german": "Verhindert, dass der Tooltip eines Kartenobjekts das Objekt verdeckt: Er weicht auf einen freien Platz oben, rechts, links oder unten aus, auch abseits der Oberflächenleisten. Standardmäßig aus.",
+    "hungarian": "Megakadályozza, hogy egy térképi tárgy súgója eltakarja magát a tárgyat: szabad helyre kerül fölé, jobbra, balra vagy alá, a felületi panelektől is távol. Alapértelmezetten ki van kapcsolva.",
+    "italian": "Impedisce al suggerimento di un oggetto della mappa di coprire l'oggetto: si sposta in un punto libero sopra, a destra, a sinistra o sotto, anche fuori dai pannelli dell'interfaccia. Disattivato per impostazione predefinita.",
+    "japanese": "マップ上のオブジェクトのツールチップがオブジェクト自体を隠さないようにします：インターフェースのパネルも避けて、上・右・左・下の空いた場所へ移動します。初期設定ではオフ。",
+    "korean": "지도 오브젝트의 툴팁이 오브젝트 자체를 가리지 않게 합니다: 인터페이스 패널도 피해 위, 오른쪽, 왼쪽, 아래의 빈자리로 옮겨 갑니다. 기본값은 꺼짐.",
+    "polish": "Chroni obiekt na mapie przed zasłonięciem przez własną podpowiedź: przesuwa ją na wolne miejsce nad, na prawo, na lewo lub pod obiektem, także poza panelami interfejsu. Domyślnie wyłączone.",
+    "russian": "Не даёт подсказке объекта на карте закрывать сам объект: она уходит на свободное место сверху, справа, слева или снизу, не заходя и на панели интерфейса. По умолчанию выключено.",
+    "spanish": "Evita que la información emergente de un objeto del mapa lo tape: se mueve a un lugar libre arriba, a la derecha, a la izquierda o abajo, también fuera de los paneles de la interfaz. Desactivado por defecto.",
+    "turkish": "Bir harita nesnesinin ipucunun nesnenin kendisini örtmesini engeller: arayüz panellerinden de uzakta, üstte, sağda, solda veya altta boş bir yere kayar. Varsayılan olarak kapalıdır.",
+    "ukrainian": "Не дає підказці об'єкта на мапі закривати сам об'єкт: вона йде на вільне місце зверху, праворуч, ліворуч або знизу, не заходячи й на панелі інтерфейсу. Типово вимкнено.",
+    "zhcn": "避免地图对象的提示遮住对象本身：它会移到上方、右侧、左侧或下方的空位，同样避开界面面板。默认关闭。",
+    "zhtw": "避免地圖物件的提示遮住物件本身：它會移到上方、右側、左側或下方的空位，同樣避開介面面板。預設為關閉。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "ui",
+    "tooltip"
+  ],
+  "screenshots": [],
   "releases": [
+    {
+      "version": "0.9.3",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraMapTooltip.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/map-tooltip-v0.9.3/OldenEraMapTooltip.dll",
+          "sha256": "b260b365097fd884688a2409ddc62d78e2f4b9bb2d749ab8f3c0dccb5e95b4dc"
+        }
+      ]
+    },
     {
       "version": "0.9.2",
       "games": [

@@ -3,12 +3,67 @@
   "id": "nobirds.oldenera.fixes",
   "name": {
     "english": "Game fixes",
-    "russian": "Исправления игры"
+    "russian": "Исправления игры",
+    "brportugese": "Correções do jogo",
+    "czech": "Opravy hry",
+    "french": "Correctifs du jeu",
+    "german": "Spielkorrekturen",
+    "hungarian": "Játékjavítások",
+    "italian": "Correzioni del gioco",
+    "japanese": "ゲームの修正",
+    "korean": "게임 수정",
+    "polish": "Poprawki gry",
+    "spanish": "Correcciones del juego",
+    "turkish": "Oyun düzeltmeleri",
+    "ukrainian": "Виправлення гри",
+    "zhcn": "游戏修复",
+    "zhtw": "遊戲修正"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Correções de erros do próprio jogo, cada uma com seu interruptor. Por enquanto: o crescimento semanal das moradias volta depois de carregar um jogo salvo.",
+    "czech": "Opravy chyb samotné hry, každá s vlastním přepínačem. Zatím: týdenní přírůstek z obydlí se vrací po načtení uložené hry.",
+    "english": "Fixes for bugs of the game itself, each with its own switch. For now: the weekly growth from unit dwellings comes back after loading a save.",
+    "french": "Correctifs de bogues du jeu lui-même, chacun avec son interrupteur. Pour l'instant : la croissance hebdomadaire des habitations revient après le chargement d'une sauvegarde.",
+    "german": "Korrekturen für Fehler des Spiels selbst, jede mit eigenem Schalter. Vorerst: Das wöchentliche Wachstum aus Behausungen kehrt nach dem Laden eines Spielstands zurück.",
+    "hungarian": "A játék saját hibáinak javításai, mindegyik külön kapcsolóval. Egyelőre: a lakhelyek heti szaporulata visszatér mentés betöltése után.",
+    "italian": "Correzioni di bug del gioco stesso, ciascuna con il proprio interruttore. Per ora: la crescita settimanale delle dimore torna dopo il caricamento di un salvataggio.",
+    "japanese": "ゲーム自体の不具合の修正で、それぞれ個別のスイッチがあります。現在は：セーブの読み込み後に、生息地からの週ごとの増加が元に戻ります。",
+    "korean": "게임 자체 버그의 수정이며, 각각 별도의 스위치가 있습니다. 현재는: 저장 파일을 불러온 뒤 거주지의 주간 증가량이 되돌아옵니다.",
+    "polish": "Poprawki błędów samej gry, każda z własnym przełącznikiem. Na razie: cotygodniowy przyrost z siedlisk wraca po wczytaniu zapisu.",
+    "russian": "Исправления ошибок самой игры, у каждого своя галочка. Пока одно: еженедельный прирост от жилищ возвращается после загрузки сохранения.",
+    "spanish": "Correcciones de errores del propio juego, cada una con su interruptor. Por ahora: el crecimiento semanal de las moradas vuelve tras cargar una partida guardada.",
+    "turkish": "Oyunun kendi hatalarına düzeltmeler, her biri ayrı bir anahtarla. Şimdilik: konutlardan gelen haftalık artış, kayıt yüklendikten sonra geri gelir.",
+    "ukrainian": "Виправлення помилок самої гри, у кожного своя галочка. Поки одне: щотижневий приріст від осель повертається після завантаження збереження.",
+    "zhcn": "修复游戏本身的错误，每项都有独立开关。目前有：读取存档后，生物巢穴的每周增长会恢复。",
+    "zhtw": "修正遊戲本身的錯誤，每項都有獨立開關。目前有：讀取存檔後，生物巢穴的每週增長會恢復。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "fix"
+  ],
+  "screenshots": [],
   "releases": [
+    {
+      "version": "0.1.1",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraFixes.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/fixes-v0.1.1/OldenEraFixes.dll",
+          "sha256": "1aa0c197d6ebf21c73e115fafcaa668c002eef8413b50a7e84440553c225f2d4"
+        }
+      ]
+    },
     {
       "version": "0.1.0",
       "games": [

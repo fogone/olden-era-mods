@@ -19,10 +19,66 @@
     "zhcn": "战斗反击",
     "zhtw": "戰鬥反擊"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Em batalha, ao passar o cursor sobre um ataque, mostra toda a troca em ordem: contra-ataque antes do golpe, o golpe, contra-ataque depois e o segundo golpe do Golpe duplo. Os números são as previsões do próprio jogo.",
+    "czech": "V boji ukáže najetí na útok celou výměnu ran popořadě: protiútok před úderem, úder, protiútok po něm a druhý zásah Dvojitého úderu. Čísla jsou předpovědi samotné hry.",
+    "english": "In battle, hovering an attack shows the whole exchange in order: counterattack before the strike, the strike, counterattack after it and Double Strike's second hit. The numbers are the game's own forecasts.",
+    "french": "En combat, survoler une attaque montre tout l'échange dans l'ordre : contre-attaque avant le coup, le coup, contre-attaque après et second coup de la Double frappe. Les chiffres sont les prévisions du jeu.",
+    "german": "Im Kampf zeigt der Mauszeiger über einem Angriff den ganzen Schlagabtausch der Reihe nach: Gegenangriff vor dem Schlag, der Schlag, Gegenangriff danach und der zweite Treffer des Doppelschlags. Die Zahlen sind die Prognosen des Spiels.",
+    "hungarian": "Csatában egy támadás fölé víve az egeret sorrendben látszik az egész ütésváltás: ellentámadás az ütés előtt, az ütés, ellentámadás utána és a Dupla ütés második találata. A számok magának a játéknak az előrejelzései.",
+    "italian": "In battaglia, passando il cursore su un attacco si vede l'intero scambio in ordine: contrattacco prima del colpo, il colpo, contrattacco dopo e il secondo colpo del Doppio colpo. I numeri sono le previsioni del gioco.",
+    "japanese": "戦闘中、攻撃にカーソルを合わせると、やり取り全体を順番に表示します：攻撃前の反撃、攻撃、攻撃後の反撃、ダブルストライクの2撃目。数値はゲーム自身の予測です。",
+    "korean": "전투 중 공격 위에 커서를 올리면 주고받는 전체 과정을 순서대로 보여 줍니다: 타격 전 반격, 타격, 그 뒤의 반격, 더블 스트라이크의 두 번째 타격. 수치는 게임 자체의 예측입니다.",
+    "polish": "W walce najechanie na atak pokazuje całą wymianę ciosów po kolei: kontratak przed uderzeniem, uderzenie, kontratak po nim i drugie uderzenie Podwójnego ciosu. Liczby to prognozy samej gry.",
+    "russian": "В бою при наведении на атаку показывает весь обмен ударами по порядку: ответка до удара, сам удар, ответка после него и второй удар двойного удара. Числа — прогнозы самой игры.",
+    "spanish": "En combate, al pasar el cursor sobre un ataque se muestra todo el intercambio en orden: contraataque antes del golpe, el golpe, contraataque después y el segundo golpe del Doble golpe. Las cifras son las previsiones del propio juego.",
+    "turkish": "Savaşta bir saldırının üzerine gelmek tüm vuruş alışverişini sırayla gösterir: vuruştan önce karşı saldırı, vuruş, ondan sonra karşı saldırı ve Çifte Vuruş'un ikinci darbesi. Sayılar oyunun kendi tahminleridir.",
+    "ukrainian": "У бою при наведенні на атаку показує весь обмін ударами по порядку: відповідь до удару, сам удар, відповідь після нього і другий удар подвійного удару. Числа — прогнози самої гри.",
+    "zhcn": "战斗中悬停于一次攻击上，会按顺序显示整个交锋：攻击前的反击、攻击、攻击后的反击以及双重打击的第二击。数字是游戏本身的预测。",
+    "zhtw": "戰鬥中將游標移到一次攻擊上，會依序顯示整個交鋒：攻擊前的反擊、攻擊、攻擊後的反擊，以及雙重打擊的第二擊。數字是遊戲本身的預測。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "battle"
+  ],
+  "screenshots": [
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-battle-counter/screenshots/double-strike.jpg",
+      "sha256": "3abbfecdb5d3e9844be5e8fb69b905680173abf2214ffc44b2317c680068ca58",
+      "caption": {
+        "english": "The forecast of an attack with Double Strike: both strikes in order"
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-battle-counter/screenshots/strike-and-counter.jpg",
+      "sha256": "aacf1e6e8a5aacc4be8ad4bb1fd9e0666215c4677acbc24b1a987872609f008c",
+      "caption": {
+        "english": "The forecast of a strike and the counterattack that follows it"
+      }
+    }
+  ],
   "releases": [
+    {
+      "version": "0.48.2",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraBattleCounter.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/battle-counter-v0.48.2/OldenEraBattleCounter.dll",
+          "sha256": "3c52e53ce39611d85444cf2a47a8af080ed3b51334d650b4de154ab1347ef2c4"
+        }
+      ]
+    },
     {
       "version": "0.48.1",
       "games": [
