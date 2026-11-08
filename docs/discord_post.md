@@ -32,7 +32,7 @@ The catalog has these mods (all optional, all free, MIT):
 
 **No multiplayer advantage.** The mods never work in online games or replays, whatever the settings; they work in single player and, by default, hotseat (everyone at the computer sees the same). Settings → Mods → "When the mods work" can limit them to single player or switch them off. Hidden numbers (exact counts, Diplomacy points) are off by default.
 
-**Tested on:** game version 0.82.07 (Game Pass), BepInEx 6.0.0-be.788 (IL2CPP).
+**Tested on:** game version 0.82.07 (Game Pass), BepInEx 6.0.0-be.788 (IL2CPP). Yes, that is not the latest: the 0.82.08 hotfix has not reached Game Pass yet (sadly). Builds for the new version will come to the catalog as soon as it does.
 
 **Install**
 1. Unpack **BepInEx 6, IL2CPP x64, build 6.0.0-be.788** into the game folder (the one with `HeroesOldenEra.exe`): <https://builds.bepinex.dev/projects/bepinex_be>
