@@ -48,7 +48,10 @@ The catalog has these mods (all optional, all free, MIT):
 - Tested on Game Pass only; Steam should be the same game version but is not tested.
 - Game fixes and Skip intro are in English and Russian only (the game's other languages show them in English); the rest is in all 16 of the game's languages.
 
-Source, guide and issues: <https://github.com/fogone/olden-era-mods>
+**Coming soon:** mod sources of your own: add another catalog in the Mods window, so anyone can host and share mods through the manager.
+
+**Contributions welcome:** pull requests, bug reports and ideas on GitHub. The catalog's format is open, MIT.
+, guide and issues: <https://github.com/fogone/olden-era-mods>
 ```
 
 Attachments: 2–4 screenshots (see below).
