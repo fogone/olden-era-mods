@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Contatore di battaglia"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Secondo colpo del Doppio colpo"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Una creatura con Doppio colpo colpisce, subisce il contrattacco e colpisce di nuovo. Aggiunto al colpo: i numeri della previsione valgono per entrambi i colpi. Una colonna: dopo il contrattacco, l'icona della riga e il danno e le perdite del secondo colpo e, nella riga della salute (se attiva), la salute del difensore colpito. Ogni colpo è calcolato sulla salute che resta agli squadroni dopo i precedenti, con la creatura in cima ferita."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"disattivato"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"aggiunto al colpo"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"una colonna"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Danno del contrattacco e perdite nella previsione"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Dopo i numeri del gioco nella previsione del danno: spade e il contrattacco del difensore, il suo danno e le creature che uccide. Solo quando è il gioco stesso a decidere che ci sarà un contrattacco."},
 {"sid":"oe.battlecounter.HealthShown","text":"La salute delle pile nella previsione"},

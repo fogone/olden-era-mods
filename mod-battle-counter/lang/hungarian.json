@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Csataszámláló"},
+{"sid":"oe.battlecounter.SecondStrike","text":"A Kettős csapás második ütése"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"A Kettős csapással rendelkező lény üt, megkapja az ellentámadást, majd újra üt. Az ütéshez adva: az előrejelzés számai mindkét ütésre vonatkoznak. Oszlop: az ellentámadás után a sor ikonja, a második ütés sebzése és vesztesége, az életerősorban (ha be van kapcsolva) pedig a megütött védő életereje. Minden ütést az előzők után megmaradt életerőre számol, a megsebesült felső lénnyel együtt."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"ki"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"az ütéshez adva"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"oszlop"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Visszatámadás sebzése és veszteségei az előrejelzésben"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"A játék számai után a sebzés előrejelzésében: kardok és a védő visszatámadása, annak sebzése és az általa megölt lények. Csak akkor, ha maga a játék dönt úgy, hogy lesz visszatámadás."},
 {"sid":"oe.battlecounter.HealthShown","text":"Az egységek életereje az előrejelzésben"},

@@ -71,10 +71,10 @@ Nothing is installed or updated without the player's click; installing a mod fir
 | `schema` | int | no | `1`. Not checked yet. |
 | `id` | string | yes | The mod id; equals the entry's `id` in the root file, or the mod is left out. |
 | `name` | object | yes | Display name by the game's language name: `english`, `russian`, `brportugese`, `czech`, `french`, `german`, `hungarian`, `italian`, `japanese`, `korean`, `polish`, `spanish`, `turkish`, `ukrainian`, `zhcn`, `zhtw`. The Mods window shows the game's language, English when it is missing, the id when there is no English either. Always give `english`. |
-| `description` | object | no | Same shape as `name`. May be `{}`. |
+| `description` | object | no | Same shape as `name`: what the mod does, shown in its details and searched by the Mods window's search box. May be `{}`. |
 | `author` | string | no | Shown to the player. |
 | `source` | string | no | Link to the repository or page. |
-| `tags` | string[] | no | Tag ids, for example `["map","battle","ui","fix","qol","library"]`. The manager shows known tags by name and unknown ones by id. Meta files without `tags` still read. |
+| `tags` | string[] | no | Tag ids; the manager knows these by name: `map`, `battle`, `tooltip`, `ui`, `fix`, `qol`, `library`. The manager shows known tags by name (in the game's language) and unknown ones by id; the Mods window filters by them. Meta files without `tags` still read. |
 | `screenshots` | array | no | Pictures for the mod's details (see "Screenshots"). Meta files without it still read. |
 | `screenshots[].url` | string | yes | https URL of a PNG or JPG. |
 | `screenshots[].sha256` | string | yes | Hex sha256 (64 digits) of the file; a screenshot without a valid one is refused. |
@@ -116,6 +116,7 @@ Nothing is installed or updated without the player's click; installing a mod fir
 - **Offline and not due.** Root and meta files are cached in `BepInEx\oldenera-mods\.cache`; when a source cannot be
   fetched, the cached copy is used. A source that fails with no cache is skipped. A source that is not due for a check
   (see "Sources") is read from the cache only; with no cache it is "not checked".
+- **Icon.** The catalog's icon: https, at most 512 KB (524288 bytes), sha256 given and matching, a PNG or a JPG by its first bytes; cached in `.cacheicons`, downloaded in the background when the source is read. A refused one is logged and the source shows without it.
 - **Screenshots.** Only https (a local file is not accepted here). At most 2 MB (2097152 bytes). The sha256 must be
   given and must match. The file must be a PNG or a JPG by its first bytes, whatever the URL or extension says. Kept in
   `BepInEx\oldenera-mods\.cache\screens\<sha256>.png|jpg` (written through a temporary file). Downloaded in the
@@ -151,7 +152,7 @@ Mods that need our core (`nobirds.oldenera.core`) list it in `requires`.
    `https://raw.githubusercontent.com/<owner>/<repo>/HEAD/catalog/catalog.json`.
    The `meta` URLs inside can point to the same repository the same way.
 
-The player adds it in the game's Mods window (the window is being built, issue #14; the manager's side is done):
+The player adds it in the game's Mods window, tab **Sources** (the game warns that nobody reviews other sources):
 
 - **Add by URL** takes the root file's URL. Only https; a URL already in the list is refused. The root file is read
   from the network first (never from the cache); a source that cannot be read is not added. The mods it lists then
@@ -179,8 +180,17 @@ Sources are stored in `BepInEx\oldenera-mods\sources.json`:
   "sources": [ { "url": "https://.../catalog.json", "name": "My mods", "added": "2026-11-08", "checkEvery": "weekly", "lastChecked": "2026-11-08T10:00:00" } ] }
 ```
 
-`name` is the root file's name as last read. The built-in source is not in `sources` (its URL is fixed in the manager);
-only its check settings are kept. When the file does not exist yet, the old config line `[Catalog] Sources` in
+| Field | Meaning |
+|---|---|
+| `schema` | `1`. |
+| `sources[].url` | The root file's https URL; the key of the source (compared ignoring case). |
+| `sources[].name` | The root file's `name` as last read; empty until it was read once. |
+| `sources[].added` | The date the player added it (`yyyy-MM-dd`). |
+| `sources[].checkEvery` | `start`, `daily`, `weekly` or `manual`; missing reads as `start`. |
+| `sources[].lastChecked` | Local time of the last successful read from the network; missing: never. |
+| `builtIn` | The built-in source: only its `checkEvery` and `lastChecked` (and the name last read), no `url` (it is fixed in the manager, so it is not in `sources` and cannot be removed). |
+
+A file without `checkEvery` / `lastChecked` reads fine.  When the file does not exist yet, the old config line `[Catalog] Sources` in
 `BepInEx\config\nobirds.oldenera.manager.cfg` (URLs separated by spaces) is moved into it once; after that the config
 line is ignored. A file that cannot be read is copied to `sources.json.bad` and the list starts empty. Nothing is
 installed or updated by a source check: the player asks for each.
@@ -197,16 +207,22 @@ dotnet run --project tools/catalog -- add --catalog catalog --root-url https://r
   --file Hello.dll=https://github.com/me/mods/releases/download/hello-v1.0.0/Hello.dll
 ```
 
-Options: `--catalog <dir>` (holds `catalog.json` and `mods\`), `--root-url`, `--id`, `--version`, `--game`, `--file
-<path>=<URL>` (repeatable; the name is the path's file name) are required (`--file` at least once); `--bepinex`,
-`--requires id[@version],...`, `--author`, `--source` are optional; `--name <catalog name>` sets the root file's name
-and is required while the root file has none (the tool refuses otherwise); `--icon <path>=<url>` sets the root file's icon (sha256 computed; refused: no such file, over 512 KB, not a PNG or JPG, URL not https); `--screenshot <path>=<url>[|<english
-caption>]` (repeatable) computes the sha256 of the local picture and writes the list, replacing the mod's screenshots
-(refused: no such file, over 2 MB, not a PNG or JPG, URL not https; the caption is written as `english`; split at the
-last `|`); `--lang <folder>` takes the mod's names from every
-`<language>.json` in it (token `oe.<last part of the id>.title`); `--tags a,b,c` sets the tags (replacing them). The
-tool does not write `description` yet; edit the file by hand. Same version with the same files adds the game version to `games`; the same version with other
-files is refused. Releases are written newest first, root entries sorted by id.
+Options:
+- Required: `--catalog <dir>` (holds `catalog.json` and `mods\`), `--root-url`, `--id`, `--version`, `--game`, and
+  `--file <path>=<URL>` (repeatable, at least once; the name is the path's file name).
+- Release: `--bepinex`, `--requires id[@version],...`.
+- Mod meta: `--author`, `--source`, `--tags a,b,c` (replaces the tags: trimmed, lowercased, duplicates and empty ones
+  dropped), `--lang <folder>` (takes the mod's `name` and `description` in every language from each `<language>.json`
+  in it: tokens `oe.<last part of the id>.title` (or `.name`) and `oe.<last part of the id>.description`; so a mod's
+  catalog description is the `oe.<id>.description` key of its lang files), `--screenshot <path>=<url>[|<english
+  caption>]` (repeatable; computes the sha256 of the local picture and replaces the mod's screenshots; refused: no
+  such file, over 2 MB, not a PNG or JPG, URL not https; the caption is written as `english`, split at the last `|`).
+- Root file: `--name <catalog name>` (required while the root file has none; the tool refuses otherwise), `--icon
+  <path>=<url>` (the catalog's icon; sha256 computed; refused: no such file, over 512 KB, not a PNG or JPG, URL not
+  https).
+
+Same version with the same files adds the game version to `games`; the same version with other files is refused.
+Releases are written newest first, root entries sorted by id.
 
 This repository's own `publish-mods.ps1` wraps it: a GitHub release per mod (tag `<mod>-v<version>`, the DLL as the
 asset), meta files under `catalog/`, committed through a pull request (`docs/building.md`, "Publishing into the catalog").

@@ -128,11 +128,29 @@ Fixes of the game's own bugs. A fix does what the game itself does where it work
 
 ## The mods window
 
-**Mods** in the main menu (under Additional) opens the mod manager's window: a table of the catalog's mods, its
-version, its state, and per mod a switch, **Install** or **Update**, and a cross to remove it; at the bottom
-**Check** (read the catalog again), **Update all** (when there are two updates or more) and **Close**.
-- Install, update, switch off and remove work at once when the mod can unload (all ours can); a mod the others need
-  (the core) has no switch nor cross, it says "other mods need it".
+**Mods** in the main menu (under Additional) opens the mod manager's window, built like the game's own Load screen:
+a list on the left, the picked mod's or source's details on the right (description, author, version, requirements,
+screenshots), buttons at the bottom. Three tabs, each with its count:
+- **Installed**: the mods on this computer with their state. Tick one or several rows (**Select all** too) and use the
+  buttons at the bottom: **Enable**, **Disable**, **Update**, **Update all**, and the bin to remove the ticked mods.
+  A mod others need (the core) cannot be switched off or removed while they are on.
+- **Catalog**: every mod of every source; **Install** for the ones you do not have, **Update to …** for the ones with a
+  newer version. Installing a mod first installs the mods it requires.
+- **Sources**: the places the catalog is read from. The built-in one (ours) cannot be removed. **Add by URL** takes the
+  address of a `catalog.json`; **Add from GitHub** takes `owner` or `owner/repository`. The game warns first: nobody
+  reviews the mods of other sources, their DLLs run with the game and can do anything this computer lets the game do.
+  Per source you set how often it is checked: at the game's start, daily, weekly or manually; **Check** reads one
+  source now, **Check all** every one. Checking only looks, it installs nothing.
+
+Finding things: the search box looks through names, descriptions and authors; **Tags** and **Sources** are filters of
+the same kind as the Load screen's, where you tick several (a mod fits when it has any of the ticked ones; nothing
+ticked: all); the list sorts by name, not installed first, or installed first.
+
+- Install, update, switch off and remove work at once when the mod can unload (all ours can); otherwise the row says
+  "changes at the next start".
+- A mod put in `BepInEx\plugins` by hand shows as "Installed by hand": it can be switched on and off like the others,
+  but not updated nor removed here (remove its files yourself).
+- A mod is updated only from the source it was installed from.
 - The manager's own update comes at the next start; if the new version does not start, the old one comes back by
   itself.
 - Nothing is installed or updated without a click.

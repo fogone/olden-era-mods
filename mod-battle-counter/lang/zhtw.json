@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"戰鬥反擊"},
+{"sid":"oe.battlecounter.SecondStrike","text":"雙擊的第二擊"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"擁有雙擊的生物先攻擊，承受反擊，再攻擊一次。併入攻擊：預測數字同時表示兩次攻擊。單獨一欄：在反擊之後顯示列圖示以及第二擊的傷害和損失，在生命值列（若已開啟）顯示被擊中防守方的生命值。每次攻擊都按前幾次攻擊後部隊剩餘的生命值計算，包括受傷的最上方生物。"},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"關閉"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"併入攻擊"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"單獨一欄"},
 {"sid":"oe.battlecounter.ShowCounter","text":"預測中顯示反擊傷害與損失"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"在傷害預測中遊戲內建的數字之後：顯示劍圖示和防禦方的反擊、其傷害以及擊殺的生物數量。僅在遊戲本身判定會發生反擊時顯示。"},
 {"sid":"oe.battlecounter.HealthShown","text":"預測中顯示部隊生命值"},

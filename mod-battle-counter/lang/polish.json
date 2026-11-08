@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Licznik walki"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Drugie uderzenie Podwójnego uderzenia"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Stwór z Podwójnym uderzeniem atakuje, dostaje kontratak i atakuje ponownie. Dodane do uderzenia: liczby prognozy obejmują oba uderzenia. Kolumna: po kontrataku ikona wiersza oraz obrażenia i straty drugiego uderzenia, a w wierszu zdrowia (jeśli włączony) zdrowie broniącego się, w którego trafia. Każde uderzenie liczone jest dla zdrowia, jakie oddziałom zostaje po poprzednich, razem z rannym górnym stworem."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"wyłączone"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"dodane do uderzenia"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"kolumna"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Obrażenia i straty z kontrataku w prognozie"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Po liczbach gry w prognozie obrażeń: miecze i kontratak obrońcy, jego obrażenia i zabite stworzenia. Tylko gdy sama gra uzna, że będzie kontratak."},
 {"sid":"oe.battlecounter.HealthShown","text":"Zdrowie oddziałów w prognozie"},

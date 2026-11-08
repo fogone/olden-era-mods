@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Лічильник бою"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Другий удар подвійного удару"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Істота з подвійним ударом б'є, отримує відповідь і б'є ще раз. Додати до удару: числа прогнозу — за обидва удари. Колонкою: після відповіді значок рядка, шкода й втрати другого удару, а в рядку здоров'я (якщо він увімкнений) — здоров'я захисника, по якому він б'є. Кожен удар рахується для того здоров'я загонів, що залишиться після попередніх, з пораненою верхньою істотою."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"вимкнено"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"додати до удару"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"колонкою"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Шкода від контратаки та втрати в прогнозі"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Після чисел гри в прогнозі шкоди: мечі й контратака захисника, її шкода та істоти, яких вона вбиває. Лише коли сама гра вирішує, що контратака буде."},
 {"sid":"oe.battlecounter.HealthShown","text":"Здоров'я загонів у прогнозі"},

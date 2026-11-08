@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Kampfzähler"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Zweiter Schlag des Doppelschlags"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Eine Kreatur mit Doppelschlag schlägt zu, erhält den Gegenangriff und schlägt noch einmal zu. Zum Schlag addiert: Die Zahlen der Prognose gelten für beide Schläge. Eine Spalte: nach dem Gegenangriff das Zeilensymbol sowie Schaden und Verluste des zweiten Schlags, in der Gesundheitszeile (wenn aktiv) die Gesundheit des getroffenen Verteidigers. Jeder Treffer wird für die Gesundheit berechnet, die die Trupps nach den vorherigen noch haben, samt verwundeter oberster Kreatur."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"aus"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"zum Schlag addiert"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"eine Spalte"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Gegenangriffsschaden und Verluste in der Vorschau"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Nach den Zahlen des Spiels in der Schadensvorschau: Schwerter und der Gegenangriff des Verteidigers, sein Schaden und die Kreaturen, die er tötet. Nur wenn das Spiel selbst entscheidet, dass es einen Gegenangriff gibt."},
 {"sid":"oe.battlecounter.HealthShown","text":"Trefferpunkte der Stapel in der Vorschau"},

@@ -1,6 +1,11 @@
 {
 "tokens": [
 {"sid":"oe.battlecounter.title","text":"Contador de batalha"},
+{"sid":"oe.battlecounter.SecondStrike","text":"Segundo golpe do Golpe Duplo"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"Uma criatura com Golpe Duplo ataca, sofre o contra-ataque e ataca de novo. Somado ao golpe: os números da previsão valem pelos dois golpes. Coluna: depois do contra-ataque, o ícone da linha e o dano e as perdas do segundo golpe e, na linha de vida (se ligada), a vida do defensor atingido. Cada golpe é calculado com a vida que os grupos têm depois dos anteriores, com a criatura de cima ferida."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"desligado"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"somado ao golpe"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"uma coluna"},
 {"sid":"oe.battlecounter.ShowCounter","text":"Dano e baixas do contra-ataque na previsão"},
 {"sid":"oe.battlecounter.ShowCounter.desc","text":"Depois dos números do jogo na previsão de dano: espadas e o contra-ataque do defensor, seu dano e as criaturas que ele mata. Somente quando o próprio jogo decide que haverá contra-ataque."},
 {"sid":"oe.battlecounter.HealthShown","text":"Vida dos grupos na previsão"},
