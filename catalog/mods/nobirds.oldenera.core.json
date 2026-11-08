@@ -24,6 +24,21 @@
   "source": "https://github.com/fogone/olden-era-mods",
   "releases": [
     {
+      "version": "0.7.3",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraCore.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.3/OldenEraCore.dll",
+          "sha256": "f713175a2a94ba4de8391d4bdd6c8c3a6281fffd42c9ef487e89084cb2b592b7"
+        }
+      ]
+    },
+    {
       "version": "0.7.2",
       "games": [
         "0.82.07"
