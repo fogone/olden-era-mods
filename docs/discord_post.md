@@ -30,7 +30,7 @@ The catalog has these mods (all optional, all free, MIT):
 
 **What it changes:** the tooltips, badges and forecast only show what the game itself already decides (whether a squad joins, whether a defender strikes back, whether a building was visited): the mods ask the game, they do not calculate anything their own way. They do not change rules, AI or balance. Game fixes and Skip intro are the only ones that change something, each behind a switch.
 
-**Single player only.** By default every mod is off in online games, hotseat and replays (Settings → Mods → "When the mods work"). Please do not use them to get an advantage over other players. Hidden numbers (exact counts, Diplomacy points) are off by default.
+**No multiplayer advantage.** The mods never work in online games or replays, whatever the settings; they work in single player and, by default, hotseat (everyone at the computer sees the same). Settings → Mods → "When the mods work" can limit them to single player or switch them off. Hidden numbers (exact counts, Diplomacy points) are off by default.
 
 **Tested on:** game version 0.82.07 (Game Pass), BepInEx 6.0.0-be.788 (IL2CPP).
 

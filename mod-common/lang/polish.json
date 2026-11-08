@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Mody są wyłączone: zbudowane dla wersji gry {0}, a gra jest w wersji {1}. Trzeba je przebudować dla tej wersji. Wyłączone: {2}."},
 {"sid":"oe.common.mode.title","text":"Wszystkie mody"},
 {"sid":"oe.common.mode","text":"Kiedy mody działają"},
-{"sid":"oe.common.mode.desc","text":"Zawsze, tylko w grze jednoosobowej albo nigdy. Nie jednoosobowa: sieciowa, hotseat, powtórka. Dopóki nie działają, mody niczego nie zmieniają ani nie pokazują, jakby ich nie było; własne przełączniki każdego moda zostają bez zmian."},
-{"sid":"oe.common.mode.Always","text":"zawsze"},
+{"sid":"oe.common.mode.desc","text":"Tylko w grze jednoosobowej; w grze jednoosobowej i hotseat (wszyscy gracze przy tym komputerze widzą to samo); albo nigdy. Nigdy w grze sieciowej ani w powtórce: mody nie mogą dawać przewagi nad innymi graczami. Dopóki nie działają, mody niczego nie zmieniają ani nie pokazują, jakby ich nie było; własne przełączniki każdego moda zostają bez zmian."},
 {"sid":"oe.common.mode.SinglePlayer","text":"w grze jednoosobowej"},
+{"sid":"oe.common.mode.Hotseat","text":"w grze jednoosobowej i hotseat"},
 {"sid":"oe.common.mode.Off","text":"nigdy"}
 ]
 }

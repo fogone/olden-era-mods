@@ -13,9 +13,10 @@ their own way; they ask the game.
   reference and information. The exceptions are **Game fixes**, which fixes the game's own bugs the way the game does
   it where it works (each fix has its own switch), and **Skip intro**, which skips the videos on start.
 - **Not for multiplayer.** The author is strictly against using these mods, or anything made from them, to get an
-  advantage over other players in a multiplayer game. By default the mods work **only in a single player game**: in an
-  online game, a hotseat game or a replay they change and show nothing. This is the game's settings, tab **Mods**,
-  "When the mods work" at the very top: always, in a single player game, never.
+  advantage over other players in a multiplayer game. **In an online game and in a replay the mods never work**: they
+  change and show nothing, whatever the settings. In the game's settings, tab **Mods**, "When the mods work" at the
+  very top: in a single player game and hotseat (the default; all the players at this computer see the same), only in a
+  single player game, or never.
 
 ## Installing
 
@@ -67,7 +68,7 @@ the main menu; the catalog offers the builds for the new version when they are o
 | **Map tooltip** | A map object's tooltip does not cover the object itself or the interface panels. |
 | **Game fixes** | Fixes of the game's own bugs, each with a switch: the weekly growth from unit dwellings captured before a save, lost after loading it. |
 | **Skip intro** | No studio logos and trailer when the game starts: straight on to the main menu. |
-| **Mod manager** | The Mods window in the main menu: installs, updates, switches off and removes the mods from the catalog. The Mods tab in the game's settings for all the mods' options, with when they work at all (always, in a single player game, never); the mods' version in the main menu. |
+| **Mod manager** | The Mods window in the main menu: installs, updates, switches off and removes the mods from the catalog. The Mods tab in the game's settings for all the mods' options, with when they work at all (single player and hotseat, single player, never; never online); the mods' version in the main menu. |
 
 What each mod and each option does: **[player's guide](docs/mods.md)**.
 

@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Os mods estão desativados: feitos para a versão {0} do jogo, e o jogo é a {1}. Eles precisam ser recompilados para esta versão. Desativados: {2}."},
 {"sid":"oe.common.mode.title","text":"Todos os mods"},
 {"sid":"oe.common.mode","text":"Quando os mods funcionam"},
-{"sid":"oe.common.mode.desc","text":"Sempre, só em partidas de um jogador ou nunca. Não é de um jogador: online, hotseat, um replay. Enquanto não funcionam, os mods não mudam nem mostram nada, como se não estivessem instalados; as opções de cada mod continuam como estão."},
-{"sid":"oe.common.mode.Always","text":"sempre"},
+{"sid":"oe.common.mode.desc","text":"Só em partidas de um jogador; em partidas de um jogador e hotseat (todos os jogadores neste computador veem o mesmo); ou nunca. Nunca em partidas online ou replays: os mods não devem dar vantagem sobre outros jogadores. Enquanto não funcionam, os mods não mudam nem mostram nada, como se não estivessem instalados; as opções de cada mod continuam como estão."},
 {"sid":"oe.common.mode.SinglePlayer","text":"em partidas de um jogador"},
+{"sid":"oe.common.mode.Hotseat","text":"em partidas de um jogador e hotseat"},
 {"sid":"oe.common.mode.Off","text":"nunca"}
 ]
 }
