@@ -37,7 +37,7 @@ public partial class Plugin
     static readonly HashSet<string> ScreenScripts = new()
     {
         "ScLoad", "BhLoadingRoot", "BhSaveLoadBase", "BhVirtualizedList", "BhSaveInfoPanel", "BhDescriptionBlocks", "BhCloudQuotaValue",
-        "BhSessionInfoElement", "BhMapPreview", "BhHeroSlotsContainer", "BhFilter", "UiAnimatorSOPrime", "BhMapPreviewInfoView",
+        "BhSessionInfoElement", "BhMapPreview", "BhHeroSlotsContainer", "UiAnimatorSOPrime", "BhMapPreviewInfoView",
     };
 
     enum WindowTab { Installed, Catalog, Sources }
@@ -56,8 +56,10 @@ public partial class Plugin
     RawImage panelPicture;
     BhGenericButton primaryButton, deleteButton, secondaryButton;
     TMP_InputField filterInput, searchInput;
-    BhDropdown tagDropdown, sourceDropdown;
-    string tagOptions, sourceOptions;
+    BhDropdown sortDropdown;
+    Hex.UI.SaveLoad.BhFilter tagBox, sourceBox;
+    GameObject tagLabel, sourceLabel;
+    string tagBoxKeys, sourceBoxKeys, sortOptions;
 
     // Copy sources: rows, texts, chips, buttons (all from the copy), and the settings' switch, the input box's field.
     GameObject rowSource, lineTemplate, wrapTemplate, chipTemplate, textButtonTemplate, crossSource, dropdownSource, deleteTemplate;
@@ -66,7 +68,9 @@ public partial class Plugin
 
     // What the player chose.
     WindowTab tab = WindowTab.Installed;
-    string filterText = "", searchText = "", tagFilter, sourceFilter, installedPick, catalogPick, sourcePick, bigShotPath;
+    // The Catalog's order: by name, not installed first (the default), installed first.
+    int sortMode = 1;
+    string filterText = "", searchText = "", installedPick, catalogPick, sourcePick, bigShotPath;
     int shotIndex;
     readonly HashSet<string> selected = new();
     readonly HashSet<string> screenshotsAsked = new();
@@ -217,8 +221,11 @@ public partial class Plugin
         // not scroll, the dropdowns opened empty: fogone 08.11).
         foreach (var scroll in window.GetComponentsInChildren<ScrollRect>(true))
             scroll.enabled = true;
+        // But not a dropdown's own button: the game keeps it off (its frame opens the list on the press, by its events);
+        // on, it closed the list again on the release (fogone 08.11).
         foreach (var control in window.GetComponentsInChildren<Selectable>(true))
-            control.enabled = true;
+            if (control.TryCast<Button>() == null || control.GetComponentInParent<BhDropdown>(true) == null)
+                control.enabled = true;
         foreach (var dropdown in window.GetComponentsInChildren<BhDropdown>(true))
             dropdown.enabled = true;
         foreach (var layout in window.GetComponentsInChildren<LayoutGroup>(true))
@@ -390,26 +397,40 @@ public partial class Plugin
                 });
             })));
 
-        // The filter row: the sorting dropdown as the tag filter, a copy of it as the source filter, the text fields.
+        // The filter row: the text fields; on the Catalog the sorting dropdown sorting, the Load screen's own filter (a
+        // funnel opening check marks) for the tags and a copy of it for the sources, each after a label in the style of
+        // the row's own "connection" label.
         filterRow = sar.Find("FilterSortGroup");
-        Hide(filterRow, "Filter", "GameTypeHeader", "GameTypeDropdown");
+        Hide(filterRow, "GameTypeDropdown");
         var sorting = filterRow.Find("SortingDropdown")?.GetComponent<BhDropdown>();
         if (sorting != null)
         {
             dropdownSource = UnityEngine.Object.Instantiate(sorting.gameObject, staging.transform, false);
-            tagDropdown = sorting;
-            BindDropdown(tagDropdown, i => Redraw(() => tagFilter = i <= 0 ? null : TagKeys().ElementAtOrDefault(i - 1)));
-            sourceDropdown = UnityEngine.Object.Instantiate(dropdownSource, filterRow, false).GetComponent<BhDropdown>();
-            sourceDropdown.name = "OE_SourceDropdown";
-            sourceDropdown.gameObject.SetActive(true);
-            BindDropdown(sourceDropdown, i => Redraw(() => sourceFilter = i <= 0 ? null : SourceKeys().ElementAtOrDefault(i - 1)));
+            sortDropdown = sorting;
+            BindDropdown(sortDropdown, i => Redraw(() => sortMode = Math.Max(0, i)));
         }
+        var labelSource = filterRow.Find("GameTypeHeader")?.gameObject;
+        if (filterRow.Find("Filter")?.GetComponent<Hex.UI.SaveLoad.BhFilter>() is { } filter)
+        {
+            // The save list's own options (Campaign, Template...) are elements under its list, not in the copy's list of
+            // them: gone, ours are made by its set-up.
+            Clear(filter.contentList);
+            tagBox = filter;
+            tagLabel = FilterLabel(labelSource, W + "tagsLabel", filter.transform.GetSiblingIndex());
+            var copy = UnityEngine.Object.Instantiate(filter.gameObject, filterRow, false);
+            copy.name = "OE_SourceFilter";
+            sourceBox = copy.GetComponent<Hex.UI.SaveLoad.BhFilter>();
+            sourceLabel = FilterLabel(labelSource, W + "sourcesLabel", copy.transform.GetSiblingIndex());
+        }
+        labelSource?.SetActive(false);
         inputTemplate = Scene.Find<ScInputBox>()?.inputField;
         filterInput = NewInput(filterRow, W + "filter", value => Redraw(() => filterText = value ?? ""));
         searchInput = NewInput(filterRow, W + "search", value => Redraw(() => searchText = value ?? ""));
         filterInput?.transform.SetAsFirstSibling();
         searchInput?.transform.SetAsFirstSibling();
         Widen(filterRow.Cast<RectTransform>(), 1040f);
+        if (sortDropdown != null)
+            Size(sortDropdown.gameObject, 300f, -1f);
         if (filterRow.GetComponent<HorizontalLayoutGroup>() is { } filterLayout)
         {
             filterLayout.spacing = 14f;
@@ -468,7 +489,7 @@ public partial class Plugin
         bigShot.gameObject.SetActive(false);
 
         switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
-        Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, dropdown {(tagDropdown != null)}, " +
+        Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, sorting {(sortDropdown != null)}, filters {(tagBox != null)}, " +
                   $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
         return true;
     }
@@ -548,8 +569,10 @@ public partial class Plugin
 
             filterInput?.gameObject.SetActive(tab == WindowTab.Installed);
             searchInput?.gameObject.SetActive(tab == WindowTab.Catalog);
-            tagDropdown?.gameObject.SetActive(tab == WindowTab.Catalog);
-            sourceDropdown?.gameObject.SetActive(tab == WindowTab.Catalog);
+            foreach (var part in new Component[] { sortDropdown, tagBox, sourceBox })
+                part?.gameObject.SetActive(tab == WindowTab.Catalog);
+            tagLabel?.SetActive(tab == WindowTab.Catalog);
+            sourceLabel?.SetActive(tab == WindowTab.Catalog);
 
             Clear(listContent);
             ClearBottom();
@@ -814,20 +837,84 @@ public partial class Plugin
 
     void FillCatalog()
     {
+        // The filters' options: the tags and the sources of the catalog; what is ticked filters (any of the ticked; none:
+        // all). A filter with nothing to offer (no tags yet) and its label are hidden.
         var tagKeys = TagKeys();
         var sourceKeys = SourceKeys();
-        if (tagFilter != null && !tagKeys.Contains(tagFilter))
-            tagFilter = null;
-        if (sourceFilter != null && !sourceKeys.Contains(sourceFilter))
-            sourceFilter = null;
-        tagOptions = SetOptions(tagDropdown, W + "tags.all", tagKeys, tagFilter, tagOptions);
-        sourceOptions = SetOptions(sourceDropdown, W + "sources.all", sourceKeys, sourceFilter, sourceOptions);
+        tagBoxKeys = SetUpFilter(tagBox, tagKeys, tagBoxKeys);
+        sourceBoxKeys = SetUpFilter(sourceBox, sourceKeys, sourceBoxKeys);
+        tagBox?.gameObject.SetActive(tagKeys.Count > 0);
+        tagLabel?.SetActive(tagKeys.Count > 0);
+        var tags = Ticked(tagBox, tagKeys);
+        var sources = Ticked(sourceBox, sourceKeys);
+        sortOptions = SetSortOptions(sortDropdown, sortOptions);
 
-        var mods = Catalog().Where(m => Matches(m, searchText) && (tagFilter == null || (m.TagKeys?.Contains(tagFilter) ?? false)) &&
-                                        (sourceFilter == null || m.SourceNameKey == sourceFilter)).ToList();
+        var mods = Catalog().Where(m => Matches(m, searchText) && (tags.Count == 0 || (m.TagKeys?.Any(tags.Contains) ?? false)) &&
+                                        (sources.Count == 0 || sources.Contains(m.SourceNameKey))).ToList();
+        var name = (Func<ModEntry, string>)(m => Texts.Get(m.NameKey));
+        mods = sortMode switch
+        {
+            0 => mods.OrderBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
+            2 => mods.OrderBy(m => m.Installed == null).ThenBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
+            _ => mods.OrderBy(m => m.Installed != null).ThenBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
+        };
         foreach (var mod in mods)
             ModRow(mod, isManager: false, catalog: true);
         ShowNothing(mods.Count == 0, W + "nothing");
+    }
+
+    // The game's filter set up with these names (localization keys: it translates them), again only when they changed
+    // (it would untick them all). Returns what they are now.
+    string SetUpFilter(Hex.UI.SaveLoad.BhFilter box, List<string> keys, string was)
+    {
+        if (box == null)
+            return was;
+        var now = $"{Texts.Language}|{string.Join("|", keys)}";
+        if (now == was)
+            return was;
+        box.SetUp(new Il2CppStringArray(keys.ToArray()), (Il2CppSystem.Action)(Action)(() => Guard("filter", () => windowDirty = true)));
+        return now;
+    }
+
+    // The names ticked in a filter (its elements are in the order of the names).
+    static HashSet<string> Ticked(Hex.UI.SaveLoad.BhFilter box, List<string> keys)
+    {
+        var ticked = new HashSet<string>();
+        if (box == null || box.Elements is not { } elements)
+            return ticked;
+        for (var i = 0; i < elements.Count && i < keys.Count; i++)
+            if (elements[i] != null && elements[i].Ticked())
+                ticked.Add(keys[i]);
+        return ticked;
+    }
+
+    // The sorting dropdown's options (by name, not installed first, installed first), set again on a language change.
+    string SetSortOptions(BhDropdown dropdown, string was)
+    {
+        if (dropdown == null)
+            return was;
+        var now = $"{Texts.Language}";
+        if (now == was)
+            return was;
+        var texts = Enumerable.Range(0, 3).Select(i => Texts.Get($"{W}sort.{i}")).ToArray();
+        dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), sortMode, EDropdownType.Text);
+        return now;
+    }
+
+    // A label before a filter: a copy of the filter row's own label.
+    GameObject FilterLabel(GameObject source, string key, int index)
+    {
+        if (source == null)
+            return null;
+        var label = UnityEngine.Object.Instantiate(source, source.transform.parent, false);
+        label.name = "OE_Label";
+        label.transform.SetSiblingIndex(index);
+        var text = label.GetComponent<TMP_Text>();
+        text.enableWordWrapping = false;
+        SetText(text, Texts.Get(key));
+        Size(label, text.GetPreferredValues(Texts.Get(key)).x + 4f, -1f);
+        label.SetActive(true);
+        return label;
     }
 
     // ---------- Sources ----------
@@ -1577,8 +1664,10 @@ public partial class Plugin
         panelPicture = null;
         primaryButton = deleteButton = secondaryButton = null;
         filterInput = searchInput = inputTemplate = null;
-        tagDropdown = sourceDropdown = null;
-        tagOptions = sourceOptions = null;
+        sortDropdown = null;
+        tagBox = sourceBox = null;
+        tagLabel = sourceLabel = null;
+        tagBoxKeys = sourceBoxKeys = sortOptions = null;
         rowSource = lineTemplate = wrapTemplate = chipTemplate = textButtonTemplate = crossSource = dropdownSource = deleteTemplate = null;
         switchSource = null;
         greyed.Clear();

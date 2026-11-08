@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"版本"},
 {"sid":"oe.settings.w.catalogLabel","text":"目錄"},
 {"sid":"oe.settings.w.modsLabel","text":"模組"},
-{"sid":"oe.settings.w.checkedLabel","text":"上次檢查"}
+{"sid":"oe.settings.w.checkedLabel","text":"上次檢查"},
+{"sid":"oe.settings.w.tagsLabel","text":"標籤"},
+{"sid":"oe.settings.w.sourcesLabel","text":"來源"},
+{"sid":"oe.settings.w.sort.0","text":"依名稱"},
+{"sid":"oe.settings.w.sort.1","text":"未安裝優先"},
+{"sid":"oe.settings.w.sort.2","text":"已安裝優先"}
 ]
 }

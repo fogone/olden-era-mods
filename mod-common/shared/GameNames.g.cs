@@ -547,6 +547,21 @@ internal static class GameNames
         public void ShowValue(bool a0) => it.yes(a0);
     }
 
+    extension(global::Hex.UI.SaveLoad.BhFilter it)
+    {
+        // save filter elements: BhFilter.cfax : List`1
+        public global::Il2CppSystem.Collections.Generic.List<global::Hex.UI.SaveLoad.BhFilterElement> Elements => it.cfax;
+
+        // save filter set up: BhFilter.uxi(Il2CppStringArray, Action) : Void
+        public void SetUp(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStringArray a0, global::Il2CppSystem.Action a1) => it.uxi(a0, a1);
+    }
+
+    extension(global::Hex.UI.SaveLoad.BhFilterElement it)
+    {
+        // save filter element ticked: BhFilterElement.uxo() : Boolean
+        public bool Ticked() => it.uxo();
+    }
+
     extension(global::Hex.UI.Tooltips.BhTooltip it)
     {
         // tooltip -> positioner: BhTooltip.cfsf : cxg

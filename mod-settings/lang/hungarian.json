@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"Verzió"},
 {"sid":"oe.settings.w.catalogLabel","text":"Katalógus"},
 {"sid":"oe.settings.w.modsLabel","text":"Modok"},
-{"sid":"oe.settings.w.checkedLabel","text":"Utoljára ellenőrizve"}
+{"sid":"oe.settings.w.checkedLabel","text":"Utoljára ellenőrizve"},
+{"sid":"oe.settings.w.tagsLabel","text":"Címkék"},
+{"sid":"oe.settings.w.sourcesLabel","text":"Források"},
+{"sid":"oe.settings.w.sort.0","text":"Név szerint"},
+{"sid":"oe.settings.w.sort.1","text":"Telepítetlenek elöl"},
+{"sid":"oe.settings.w.sort.2","text":"Telepítettek elöl"}
 ]
 }

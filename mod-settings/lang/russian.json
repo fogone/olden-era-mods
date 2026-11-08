@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"Версия"},
 {"sid":"oe.settings.w.catalogLabel","text":"Каталог"},
 {"sid":"oe.settings.w.modsLabel","text":"Модов"},
-{"sid":"oe.settings.w.checkedLabel","text":"Последняя проверка"}
+{"sid":"oe.settings.w.checkedLabel","text":"Последняя проверка"},
+{"sid":"oe.settings.w.tagsLabel","text":"Теги"},
+{"sid":"oe.settings.w.sourcesLabel","text":"Источники"},
+{"sid":"oe.settings.w.sort.0","text":"По названию"},
+{"sid":"oe.settings.w.sort.1","text":"Сначала не установленные"},
+{"sid":"oe.settings.w.sort.2","text":"Сначала установленные"}
 ]
 }

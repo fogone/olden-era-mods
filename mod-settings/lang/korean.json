@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"버전"},
 {"sid":"oe.settings.w.catalogLabel","text":"카탈로그"},
 {"sid":"oe.settings.w.modsLabel","text":"모드"},
-{"sid":"oe.settings.w.checkedLabel","text":"마지막 확인"}
+{"sid":"oe.settings.w.checkedLabel","text":"마지막 확인"},
+{"sid":"oe.settings.w.tagsLabel","text":"태그"},
+{"sid":"oe.settings.w.sourcesLabel","text":"소스"},
+{"sid":"oe.settings.w.sort.0","text":"이름순"},
+{"sid":"oe.settings.w.sort.1","text":"미설치 우선"},
+{"sid":"oe.settings.w.sort.2","text":"설치됨 우선"}
 ]
 }
