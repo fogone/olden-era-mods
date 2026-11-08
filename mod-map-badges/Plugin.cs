@@ -8,7 +8,7 @@ namespace OldenEra.Modding.MapBadges;
 // unit dwellings, the guard's danger: Buildings.cs) and over squads (would join, would flee, the fight's danger:
 // Squads.cs). Only over what the hero's side has scouted. The decisions are the game's, through the shared code
 // (Game.VisitFor, Game.MeetingOutcome, the skulls widget); drawn and scheduled by MapMarkers (mod-common).
-[BepInPlugin("nobirds.oldenera.mapbadges", "Olden Era Map Badges", "0.1.1")]
+[BepInPlugin("nobirds.oldenera.mapbadges", "Olden Era Map Badges", "0.1.2")]
 public partial class Plugin : ModBase
 {
     Choice<MarkersShown> shown;
