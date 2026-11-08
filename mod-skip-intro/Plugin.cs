@@ -8,7 +8,7 @@ namespace OldenEra.Modding.SkipIntro;
 // is a row of steps; the intro step (Game.IntroVideos: ccj.qrx on 0.82.7) hands the clips to the video player and the
 // start waits for its done flag, which the player's callback sets when the last clip ends. Here the step does not start
 // the player and only sets its flag, as that callback does: the start goes on at once.
-[BepInPlugin("nobirds.oldenera.skipintro", "Olden Era Skip Intro", "0.1.0")]
+[BepInPlugin("nobirds.oldenera.skipintro", "Olden Era Skip Intro", "0.1.1")]
 public class Plugin : ModBase
 {
     static Switch skipVideos;

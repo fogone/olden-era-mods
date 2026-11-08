@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using BepInEx;
@@ -19,7 +19,7 @@ namespace OldenEra.Modding.Visited;
 // tooltip often doesn't say so. This plugin adds a row to the map object tooltip: a big status mark (green check =
 // visited, amber ring = available) and icons for how often the building can be visited.
 // The game's members are its generated names (GameNames.g.cs, made at build time).
-[BepInPlugin("nobirds.oldenera.visited", "Olden Era Visited", "0.35.1")]
+[BepInPlugin("nobirds.oldenera.visited", "Olden Era Visited", "0.35.2")]
 public partial class Plugin : ModBase
 {
     const string RowName = "OE_VisitRow";
