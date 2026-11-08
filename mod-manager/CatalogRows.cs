@@ -89,14 +89,15 @@ public static class CatalogRows
         var updates = ManagerService.Updates;
         var busy = ManagerService.Busy;
 
-        // The catalog's state under the heading. After adding or removing a source its outcome stands in for it.
+        // A line under the heading only when there is something to say: working, the last thing failed, the catalog not
+        // read yet, the outcome of adding or removing a source. Not the counts: the tabs show them (fogone 08.11).
         var statusKey = busy ? "oe.manager.status.busy"
             : ManagerService.LastFailed ? "oe.manager.status.failed"
-            : catalog == null ? "oe.manager.status.none" : "oe.manager.status.read";
+            : catalog == null ? "oe.manager.status.none" : null;
         if (!busy && ManagerService.SourceNote is { } sourceNote)
             ModCatalog.StatusKey = Compose("status", l => F(l, sourceNote.Key, sourceNote.Args));
         else
-            ModCatalog.StatusKey = Compose("status", l => F(l, statusKey, catalog?.Count ?? 0, updates.Count));
+            ModCatalog.StatusKey = statusKey == null ? null : Compose("status", l => F(l, statusKey, catalog?.Count ?? 0, updates.Count));
 
         // The actions: none while busy (the window's buttons wait); screenshots load in the background and never wait.
         ModCatalog.Busy = busy;
