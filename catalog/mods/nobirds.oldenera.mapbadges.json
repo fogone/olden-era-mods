@@ -19,10 +19,59 @@
     "zhcn": "地图徽标",
     "zhtw": "地圖徽章"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Emblemas sobre objetos do mapa para o herói selecionado: construções não visitadas, minas, itens coletáveis, moradias e esquadrões que se juntariam, fugiriam ou lutariam, com o perigo da luta. Só sobre o que foi explorado.",
+    "czech": "Značky nad objekty na mapě pro vybraného hrdinu: nenavštívené budovy, doly, sbíratelné předměty, obydlí a oddíly, které by se připojily, utekly nebo bojovaly, s nebezpečím boje. Jen nad prozkoumaným.",
+    "english": "Badges over map objects for the selected hero: unvisited buildings, mines, pickups, unit dwellings and squads that would join, flee or fight, with the danger of the fight. Only over what is scouted.",
+    "french": "Des badges au-dessus des objets de la carte pour le héros sélectionné : bâtiments non visités, mines, objets à ramasser, habitations et groupes qui rejoindraient, fuiraient ou combattraient, avec le danger du combat. Uniquement sur ce qui est exploré.",
+    "german": "Symbole über Kartenobjekten für den gewählten Helden: unbesuchte Gebäude, Minen, Einsammelbares, Behausungen und Truppen, die sich anschließen, fliehen oder kämpfen würden, samt Kampfgefahr. Nur über Erkundetem.",
+    "hungarian": "Jelvények a térkép tárgyai fölött a kijelölt hősnek: meg nem látogatott épületek, bányák, felvehető tárgyak, lakhelyek és csapatok, amelyek csatlakoznának, menekülnének vagy harcolnának, a harc veszélyével. Csak a felderítettek fölött.",
+    "italian": "Distintivi sopra gli oggetti della mappa per l'eroe selezionato: edifici non visitati, miniere, oggetti da raccogliere, dimore e squadre che si unirebbero, fuggirebbero o combatterebbero, con la pericolosità dello scontro. Solo su ciò che è esplorato.",
+    "japanese": "選択中の英雄向けに、マップ上のオブジェクトの上にバッジを表示します：未訪問の建物、鉱山、拾えるアイテム、生息地、加わる・逃げる・戦う部隊と、その戦闘の危険度。探索済みの場所のみ。",
+    "korean": "선택한 영웅을 위해 지도 오브젝트 위에 배지를 표시합니다: 방문하지 않은 건물, 광산, 주울 수 있는 것, 거주지, 합류하거나 도망치거나 싸울 부대와 그 전투의 위험도. 탐색한 곳에서만.",
+    "polish": "Znaczki nad obiektami mapy dla wybranego bohatera: nieodwiedzone budynki, kopalnie, przedmioty do zebrania, siedliska i oddziały, które dołączyłyby, uciekły lub walczyły, z zagrożeniem walką. Tylko nad tym, co zwiedzone.",
+    "russian": "Значки над объектами карты для выбранного героя: непосещённые постройки, шахты, подбираемое, дома юнитов и отряды, которые присоединятся, сбегут или будут драться, с опасностью боя. Только над разведанным.",
+    "spanish": "Insignias sobre los objetos del mapa para el héroe seleccionado: edificios sin visitar, minas, objetos recogibles, moradas y tropas que se unirían, huirían o combatirían, con el peligro del combate. Solo sobre lo explorado.",
+    "turkish": "Seçili kahraman için harita nesnelerinin üzerinde rozetler: ziyaret edilmemiş yapılar, madenler, toplanabilir şeyler, konutlar ve katılacak, kaçacak ya da savaşacak birlikler, savaşın tehlikesiyle birlikte. Yalnızca keşfedilmiş yerlerde.",
+    "ukrainian": "Значки над об'єктами мапи для обраного героя: невідвідані будівлі, шахти, речі для підбирання, оселі юнітів і загони, що приєднаються, втечуть або битимуться, з небезпекою бою. Тільки над розвіданим.",
+    "zhcn": "为所选英雄在地图对象上方显示徽章：未访问的建筑、矿井、可拾取物、生物巢穴，以及会加入、逃跑或战斗的部队，并标出战斗的危险程度。只显示在已探索的地方。",
+    "zhtw": "為所選英雄在地圖物件上方顯示徽章：未造訪的建築、礦坑、可拾取物、生物巢穴，以及會加入、逃跑或戰鬥的部隊，並標示戰鬥的危險程度。只顯示在已探索的地方。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "map"
+  ],
+  "screenshots": [
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-map-badges/screenshots/badges.jpg",
+      "sha256": "ea78592298d63d0fcc5ed3bcf1389ae30844db9723cec173dfcd68c48ddeb155",
+      "caption": {
+        "english": "Badges over buildings, mines and squads on the map"
+      }
+    }
+  ],
   "releases": [
+    {
+      "version": "0.1.2",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraMapBadges.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/map-badges-v0.1.2/OldenEraMapBadges.dll",
+          "sha256": "8aa3d4721972265fe5e436ec179899197d7697b47e2b1b61f29d11e4c805173c"
+        }
+      ]
+    },
     {
       "version": "0.1.1",
       "games": [

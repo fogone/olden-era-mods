@@ -19,10 +19,46 @@
     "zhcn": "模组核心",
     "zhtw": "模組核心"
   },
-  "description": {},
+  "description": {
+    "brportugese": "A base em que os outros mods se apoiam: ela se conecta ao código do jogo uma só vez e repassa os eventos aos mods que precisam deles. Sozinha, não acrescenta nada ao jogo.",
+    "czech": "Základ, na kterém stojí ostatní módy: jednou se napojí na kód hry a předává události módům, které je potřebují. Sám o sobě do hry nic nepřidává.",
+    "english": "The base the other mods stand on: it hooks the game's code once and passes the events on to the mods that need them. It adds nothing to the game by itself.",
+    "french": "La base des autres mods : elle s'accroche une seule fois au code du jeu et transmet les événements aux mods qui en ont besoin. Seule, elle n'ajoute rien au jeu.",
+    "german": "Die Grundlage der anderen Mods: Sie greift einmal in den Spielcode ein und gibt die Ereignisse an die Mods weiter, die sie brauchen. Für sich allein fügt sie dem Spiel nichts hinzu.",
+    "hungarian": "Az alap, amelyre a többi mod épül: egyszer kapcsolódik a játék kódjához, és továbbadja az eseményeket a modoknak, amelyeknek szükségük van rájuk. Önmagában nem ad hozzá semmit a játékhoz.",
+    "italian": "La base su cui poggiano le altre mod: si aggancia una sola volta al codice del gioco e passa gli eventi alle mod che ne hanno bisogno. Da sola non aggiunge nulla al gioco.",
+    "japanese": "他のMODが土台にする基盤：ゲームのコードに一度だけ接続し、必要とするMODにイベントを渡します。単体ではゲームに何も追加しません。",
+    "korean": "다른 모드들이 기반으로 삼는 토대: 게임 코드에 한 번만 연결하고 이벤트를 필요로 하는 모드에 전달합니다. 혼자서는 게임에 아무것도 추가하지 않습니다.",
+    "polish": "Podstawa, na której opierają się pozostałe mody: jednorazowo podpina się pod kod gry i przekazuje zdarzenia modom, które ich potrzebują. Sama niczego do gry nie dodaje.",
+    "russian": "Основа, на которой стоят остальные моды: один раз перехватывает код игры и передаёт события тем модам, которым они нужны. Сам по себе в игру ничего не добавляет.",
+    "spanish": "La base sobre la que se apoyan los demás mods: engancha el código del juego una sola vez y pasa los eventos a los mods que los necesitan. Por sí sola no añade nada al juego.",
+    "turkish": "Diğer modların dayandığı temel: oyunun koduna bir kez bağlanır ve olayları onlara ihtiyaç duyan modlara iletir. Tek başına oyuna hiçbir şey eklemez.",
+    "ukrainian": "Основа, на якій тримаються решта модів: один раз перехоплює код гри й передає події тим модам, яким вони потрібні. Сам по собі нічого до гри не додає.",
+    "zhcn": "其他模组赖以运行的基础：只挂接一次游戏代码，并把事件传递给需要它们的模组。它本身不会给游戏添加任何东西。",
+    "zhtw": "其他模組賴以運作的基礎：只掛接一次遊戲程式碼，並把事件傳遞給需要它們的模組。它本身不會替遊戲增加任何東西。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "library"
+  ],
+  "screenshots": [],
   "releases": [
+    {
+      "version": "0.7.4",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraCore.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.4/OldenEraCore.dll",
+          "sha256": "edfc70e19f6709537254492415649cd24287c58030b7a640a06382a6b1b5f0e7"
+        }
+      ]
+    },
     {
       "version": "0.7.3",
       "games": [

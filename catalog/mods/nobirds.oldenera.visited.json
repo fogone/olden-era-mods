@@ -19,10 +19,60 @@
     "zhcn": "已造访的建筑",
     "zhtw": "已造訪的建築"
   },
-  "description": {},
+  "description": {
+    "brportugese": "Mostra na dica de uma construção se o herói selecionado ainda pode visitá-la e com que frequência, quem a guarda e o quão perigosa é a luta, e contorna as construções não visitadas no mapa.",
+    "czech": "V nápovědě budovy ukazuje, zda ji vybraný hrdina ještě může navštívit a jak často, kdo ji hlídá a jak nebezpečný je boj, a nenavštívené budovy na mapě orámuje obrysem.",
+    "english": "Shows in a building's tooltip whether the selected hero can still visit it and how often, who guards it and how dangerous the fight is, and outlines the unvisited buildings on the map.",
+    "french": "Affiche dans l'infobulle d'un bâtiment si le héros sélectionné peut encore le visiter et à quelle fréquence, qui le garde et à quel point le combat est dangereux, et entoure d'un contour les bâtiments non visités sur la carte.",
+    "german": "Zeigt im Tooltip eines Gebäudes, ob der gewählte Held es noch besuchen kann und wie oft, wer es bewacht und wie gefährlich der Kampf ist, und umrandet unbesuchte Gebäude auf der Karte.",
+    "hungarian": "Egy épület súgójában megmutatja, hogy a kijelölt hős meglátogathatja-e még és milyen gyakran, ki őrzi és mennyire veszélyes a harc, a meg nem látogatott épületeket pedig körvonallal emeli ki a térképen.",
+    "italian": "Mostra nel suggerimento di un edificio se l'eroe selezionato può ancora visitarlo e con quale frequenza, chi lo sorveglia e quanto è pericoloso lo scontro, e mette in risalto con un contorno gli edifici non visitati sulla mappa.",
+    "japanese": "建物のツールチップに、選択中の英雄がまだ訪問できるか、どのくらいの頻度か、誰が守っているか、戦闘がどれほど危険かを表示し、マップ上の未訪問の建物を輪郭で強調します。",
+    "korean": "건물 툴팁에 선택한 영웅이 아직 방문할 수 있는지와 얼마나 자주 가능한지, 누가 지키는지, 전투가 얼마나 위험한지를 표시하고, 지도에서 방문하지 않은 건물을 윤곽선으로 강조합니다.",
+    "polish": "Pokazuje w podpowiedzi budynku, czy wybrany bohater może go jeszcze odwiedzić i jak często, kto go strzeże i jak groźna jest walka, oraz obrysowuje nieodwiedzone budynki na mapie.",
+    "russian": "Показывает в подсказке постройки, может ли выбранный герой её ещё посетить и как часто, кто её охраняет и насколько опасен бой, а непосещённые постройки на карте обводит контуром.",
+    "spanish": "Muestra en la información de un edificio si el héroe seleccionado aún puede visitarlo y cada cuánto, quién lo guarda y lo peligroso que es el combate, y resalta con un contorno los edificios sin visitar en el mapa.",
+    "turkish": "Bir yapının ipucunda seçili kahramanın ona hâlâ uğrayıp uğrayamayacağını ve ne sıklıkla, onu kimin koruduğunu ve savaşın ne kadar tehlikeli olduğunu gösterir; haritada ziyaret edilmemiş yapıları çerçeveyle vurgular.",
+    "ukrainian": "Показує в підказці будівлі, чи може обраний герой її ще відвідати і як часто, хто її охороняє та наскільки небезпечний бій, а невідвідані будівлі на мапі обводить контуром.",
+    "zhcn": "在建筑的提示中显示所选英雄是否还能访问它以及多久一次、谁在守卫、战斗有多危险，并在地图上用轮廓突出未访问的建筑。",
+    "zhtw": "在建築的提示中顯示所選英雄是否還能造訪它以及多久一次、誰在守衛、戰鬥有多危險，並在地圖上以輪廓突顯未造訪的建築。"
+  },
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
+  "tags": [
+    "map",
+    "tooltip"
+  ],
+  "screenshots": [
+    {
+      "url": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/mod-visited/screenshots/outlines-and-badges.jpg",
+      "sha256": "ea78592298d63d0fcc5ed3bcf1389ae30844db9723cec173dfcd68c48ddeb155",
+      "caption": {
+        "english": "Outlines of unvisited buildings and the visit badges in a building tooltip"
+      }
+    }
+  ],
   "releases": [
+    {
+      "version": "0.35.2",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraVisited.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.35.2/OldenEraVisited.dll",
+          "sha256": "49a17b27d55a19292f525659144b3cdd896d2110e846a961e3a63200c5665335"
+        }
+      ]
+    },
     {
       "version": "0.35.1",
       "games": [
