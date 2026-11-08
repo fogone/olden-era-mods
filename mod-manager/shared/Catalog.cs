@@ -18,6 +18,7 @@ namespace OldenEra.Modding.Manager;
 //   catalog.json:   { "schema": 1, "name": "...", "mods": [ { "id": "...", "meta": "<URL of the mod's meta file>" } ] }
 //   <mod>.json:     { "schema": 1, "id": "...", "name": { "english": "...", "russian": "..." }, "author": "...",
 //                     "source": "<repository>", "description": { ... },
+//                     "tags": [ "map", "tooltip" ],
 //                     "releases": [ { "version": "0.48.0", "games": [ "0.82.07" ], "bepinex": "6.0.0-be.788",
 //                                     "requires": [ { "id": "nobirds.oldenera.core", "version": "0.7.0" } ],
 //                                     "files": [ { "name": "X.dll", "url": "https://...", "sha256": "..." } ] } ] }
@@ -43,6 +44,9 @@ public sealed class ModMeta
     [JsonPropertyName("description")] public Dictionary<string, string> Description { get; set; } = new();
     [JsonPropertyName("author")] public string Author { get; set; }
     [JsonPropertyName("source")] public string Source { get; set; }
+    // Tag ids (map, battle, tooltip, ...): the manager names the known ones per language (Tags.TagName), an unknown one
+    // is shown by its id. Meta files without it read fine (an empty list).
+    [JsonPropertyName("tags")] public List<string> Tags { get; set; } = new();
     [JsonPropertyName("releases")] public List<ModRelease> Releases { get; set; } = new();
 
     // The URL it was read from (not in the file).

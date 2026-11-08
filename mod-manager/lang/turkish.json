@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"kaldırıldı, bir sonraki açılışta silinir"},
 {"sid":"oe.manager.note.noRelease","text":"bu oyun sürümü için sürüm yok"},
 {"sid":"oe.manager.note.staged","text":"{0} bir sonraki açılışta yüklenecek"},
-{"sid":"oe.manager.note.failed","text":"güncelleme başlamadı, {0} geri geldi"}
+{"sid":"oe.manager.note.failed","text":"güncelleme başlamadı, {0} geri geldi"},
+{"sid":"oe.manager.tag.map","text":"harita"},
+{"sid":"oe.manager.tag.battle","text":"savaş"},
+{"sid":"oe.manager.tag.tooltip","text":"ipuçları"},
+{"sid":"oe.manager.tag.ui","text":"arayüz"},
+{"sid":"oe.manager.tag.fix","text":"düzeltmeler"},
+{"sid":"oe.manager.tag.qol","text":"kolaylık"},
+{"sid":"oe.manager.tag.library","text":"kütüphane"}
 ]
 }

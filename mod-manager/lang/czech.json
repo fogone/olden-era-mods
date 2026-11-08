@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"odstraněno, zmizí při příštím spuštění"},
 {"sid":"oe.manager.note.noRelease","text":"není vydání pro tuto verzi hry"},
 {"sid":"oe.manager.note.staged","text":"{0} se nainstaluje při příštím spuštění"},
-{"sid":"oe.manager.note.failed","text":"aktualizace se nespustila, vrácena {0}"}
+{"sid":"oe.manager.note.failed","text":"aktualizace se nespustila, vrácena {0}"},
+{"sid":"oe.manager.tag.map","text":"mapa"},
+{"sid":"oe.manager.tag.battle","text":"bitva"},
+{"sid":"oe.manager.tag.tooltip","text":"popisky"},
+{"sid":"oe.manager.tag.ui","text":"rozhraní"},
+{"sid":"oe.manager.tag.fix","text":"opravy"},
+{"sid":"oe.manager.tag.qol","text":"pohodlí"},
+{"sid":"oe.manager.tag.library","text":"knihovna"}
 ]
 }

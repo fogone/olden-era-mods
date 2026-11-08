@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"已移除，下次启动时卸载"},
 {"sid":"oe.manager.note.noRelease","text":"没有适用于此游戏版本的发布"},
 {"sid":"oe.manager.note.staged","text":"{0} 将在下次启动时安装"},
-{"sid":"oe.manager.note.failed","text":"更新未能启动，已恢复为 {0}"}
+{"sid":"oe.manager.note.failed","text":"更新未能启动，已恢复为 {0}"},
+{"sid":"oe.manager.tag.map","text":"地图"},
+{"sid":"oe.manager.tag.battle","text":"战斗"},
+{"sid":"oe.manager.tag.tooltip","text":"提示"},
+{"sid":"oe.manager.tag.ui","text":"界面"},
+{"sid":"oe.manager.tag.fix","text":"修复"},
+{"sid":"oe.manager.tag.qol","text":"便利"},
+{"sid":"oe.manager.tag.library","text":"库"}
 ]
 }

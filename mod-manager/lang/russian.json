@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"удалён, выгрузится при следующем запуске"},
 {"sid":"oe.manager.note.noRelease","text":"нет выпуска для этой версии игры"},
 {"sid":"oe.manager.note.staged","text":"{0} поставится при следующем запуске"},
-{"sid":"oe.manager.note.failed","text":"обновление не запустилось, возвращена {0}"}
+{"sid":"oe.manager.note.failed","text":"обновление не запустилось, возвращена {0}"},
+{"sid":"oe.manager.tag.map","text":"карта"},
+{"sid":"oe.manager.tag.battle","text":"бой"},
+{"sid":"oe.manager.tag.tooltip","text":"подсказки"},
+{"sid":"oe.manager.tag.ui","text":"интерфейс"},
+{"sid":"oe.manager.tag.fix","text":"исправления"},
+{"sid":"oe.manager.tag.qol","text":"удобство"},
+{"sid":"oe.manager.tag.library","text":"библиотека"}
 ]
 }

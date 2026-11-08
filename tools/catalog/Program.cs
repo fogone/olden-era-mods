@@ -7,6 +7,7 @@ using OldenEra.Modding.Manager;
 // Adds a release to a mod's meta file in the catalog and the mod to the root file (issue #10):
 //   catalog add --catalog <dir> --root-url <URL the catalog folder is served at> --id <id> --version <v> --game <game version>
 //               --bepinex <v> [--requires id[@version],...] [--lang <the mod's lang folder>] [--author a] [--source url]
+//               [--tags a,b,c]   (replaces the mod's tags: trimmed, lowercased, distinct, empty ones dropped)
 //               --file <path>=<download URL> [--file ...]
 // The same version again with the same files: the game version is added to it (a build that works on another game
 // version too); with other files: refused (a version is never published twice with other content).
@@ -37,6 +38,8 @@ var metaPath = Path.Combine(catalogDir, "mods", id + ".json");
 var meta = File.Exists(metaPath) ? JsonSerializer.Deserialize<ModMeta>(File.ReadAllText(metaPath), json) : new ModMeta { Id = id };
 meta.Author = One("author") ?? meta.Author;
 meta.Source = One("source") ?? meta.Source;
+if (One("tags") is { } tagsArg)
+    meta.Tags = tagsArg.Split(',').Select(t => t.Trim().ToLowerInvariant()).Where(t => t.Length > 0).Distinct().ToList();
 
 // The mod's name in every language it has (its lang/<language>.json: oe.<short id>.title).
 if (One("lang") is { } langDir && Directory.Exists(langDir))

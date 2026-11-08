@@ -1,5 +1,7 @@
 # Mod infrastructure — plan (05.11.2026)
 
+> The plan this framework was built from, kept for its reasons. How the code is now and how to write a mod: [writing-a-mod.md](writing-a-mod.md); parts below (the wrapper types, the example) no longer match the code.
+
 Task (fogone): a mod gets a clear interface — events with convenient context and ready-made ways to do typical things (settings, display, texts). Hook as little as possible ourselves and use the toolkit.
 
 ## Current state

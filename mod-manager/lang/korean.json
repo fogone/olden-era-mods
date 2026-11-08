@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"제거됨, 다음 실행 때 사라짐"},
 {"sid":"oe.manager.note.noRelease","text":"이 게임 버전용 릴리스 없음"},
 {"sid":"oe.manager.note.staged","text":"{0}은(는) 다음 실행 때 설치됨"},
-{"sid":"oe.manager.note.failed","text":"업데이트가 시작되지 않아 {0}(으)로 되돌렸습니다"}
+{"sid":"oe.manager.note.failed","text":"업데이트가 시작되지 않아 {0}(으)로 되돌렸습니다"},
+{"sid":"oe.manager.tag.map","text":"지도"},
+{"sid":"oe.manager.tag.battle","text":"전투"},
+{"sid":"oe.manager.tag.tooltip","text":"툴팁"},
+{"sid":"oe.manager.tag.ui","text":"인터페이스"},
+{"sid":"oe.manager.tag.fix","text":"수정"},
+{"sid":"oe.manager.tag.qol","text":"편의"},
+{"sid":"oe.manager.tag.library","text":"라이브러리"}
 ]
 }
