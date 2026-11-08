@@ -109,13 +109,29 @@ foreach ($mod in $selected) {
 }
 
 if ($Publish) {
+    # The repository is public: main changes only through a pull request that passed the check (check.yml). The
+    # catalog goes on a branch of its own, a pull request for it, merged once the check passed. The player's manager
+    # reads the catalog from main, so a release is seen when its pull request is merged.
     # git writes warnings (line endings) to stderr, which Windows PowerShell takes for errors under Stop.
+    $branch = "catalog/$($selected -join '-')-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    $message = "Catalog: $($selected -join ', ') for the game $gameVersion"
     & {
         $ErrorActionPreference = 'Continue'
+        $here = git -C $root rev-parse --abbrev-ref HEAD
+        git -C $root stash push -q -- catalog 2>$null
+        git -C $root switch -q -c $branch origin/main 2>$null
+        git -C $root stash pop -q 2>$null
         git -C $root add catalog 2>$null
-        git -C $root commit -q -m "Catalog: $($selected -join ', ') for the game $gameVersion" 2>$null
-        git -C $root push -q origin main 2>$null
+        git -C $root commit -q -m $message 2>$null
+        git -C $root push -q -u origin $branch 2>$null
+        gh pr create --repo $repo --head $branch --base main --title $message --body "Published by publish-mods.ps1: the catalog's meta files for $($selected -join ', ') (game $gameVersion)."
+        Start-Sleep 20   # the check is not reported at once
+        gh pr checks $branch --repo $repo --watch --fail-fast
+        if ($LASTEXITCODE -eq 0) { gh pr merge $branch --repo $repo --squash --delete-branch }
+        else { Write-Warning "the check did not pass: the pull request stays open, see it on GitHub" }
+        git -C $root switch -q $here 2>$null
+        git -C $root pull -q --ff-only 2>$null
     }
-    "The catalog committed and pushed"
+    "The catalog: pull request $branch"
 }
 else { "The catalog (not published): $catalog" }

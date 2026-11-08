@@ -3,3 +3,4 @@ obj/
 *.zip
 release/
 CLAUDE.local.md
+private-patterns.txt

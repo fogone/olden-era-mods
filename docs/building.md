@@ -89,7 +89,8 @@ with the manager's own models (`mod-manager/shared/Catalog.cs`), each file with 
 
 - `.\publish-mods.ps1` builds every mod and writes the catalog into `release\catalog-preview`; nothing is published.
 - `.\publish-mods.ps1 -Mods battle-counter` only that mod.
-- `.\publish-mods.ps1 -Publish` creates the releases (`gh`) and commits and pushes `catalog\`.
+- `.\publish-mods.ps1 -Publish` creates the releases (`gh`) and puts `catalog\` on a branch of its own with a pull
+  request, merged once the check passed (see "Changes to the repository" below).
 
 A version is published once. Run again on another game version with the same DLL, the release only gets that game
 version added (it works there too); with another DLL it stops: raise the mod's version in its `[BepInPlugin]`.
@@ -116,3 +117,15 @@ generated names), [mod-framework.md](mod-framework.md) (the mods' frame and the 
 - **Hidden numbers are off by default.** The game does not show exact counts, Diplomacy points or the armies' ratio; the
   mods do not either, until it is switched on in their settings.
 - **Visible strings go through the game's localization.** The Mods tab and the tooltips switch with the game's language.
+
+## Changes to the repository: pull requests
+
+The repository is public. `main` changes only through a pull request, and only once the check passed
+(`.github/workflows/check.yml` runs `tools/check-public.ps1`): what the pull request adds must hold nothing personal
+(a machine's paths, people's names, private places), no secrets (tokens, keys, passwords), no e-mail addresses but the
+authors', no game files nor built ones, and its commits must be by the authors.
+- The private words are not written in the repository: the check takes them from the repository's secret
+  `PRIVATE_PATTERNS` and, in a checkout, from the untracked `private-patterns.txt` in the root (one regular expression
+  a line).
+- `.\tools\install-hooks.ps1` installs a pre-push hook in a checkout that runs the same check on what a push sends.
+- `.\tools\check-public.ps1 -Base origin/main` checks the commits not on `main` yet by hand.

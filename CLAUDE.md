@@ -9,6 +9,8 @@ Start with this file, then the tasks: **GitHub Issues** of the repository (`gh i
 - `docs/mods.md` — player guide; `docs/building.md` — building and cutting a release (`release.ps1 -Publish`);
 - `docs/hero-data-schema.md` — the hero JSON format.
 
+**The repository is public: every change goes through a pull request** (a branch, `gh pr create`), merged once the check passed: `tools/check-public.ps1` looks for anything personal, secrets and game files in what it adds (`docs/building.md`, "Changes to the repository"). Before committing, read the diff for the same; run `.	oolsinstall-hooks.ps1` once in a checkout.
+
 ## Repository contents
 | Folder | What it is | Status |
 |---|---|---|

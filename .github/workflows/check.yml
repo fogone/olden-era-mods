@@ -1,0 +1,18 @@
+# Every pull request: nothing personal, no secrets, no game files in what it adds (tools/check-public.ps1).
+name: check
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Nothing personal, no secrets, no game files
+        shell: pwsh
+        env:
+          PRIVATE_PATTERNS: ${{ secrets.PRIVATE_PATTERNS }}
+        run: ./tools/check-public.ps1 -Base "origin/${{ github.base_ref }}" -Head "${{ github.event.pull_request.head.sha }}"
