@@ -25,9 +25,9 @@ $g.FillPolygon((New-Object System.Drawing.SolidBrush($navy)), $outer)
 $g.DrawPolygon((New-Object System.Drawing.Pen($goldDark, 14)), $outer)
 $g.DrawPolygon((New-Object System.Drawing.Pen($gold, 7)), $outer)
 
-# The nobirds sign (nobirds-sign.png: the bird in the red "no" circle of nobirds.org's logo) on a light disc.
+# The nobirds sign (nobirds-sign.png: the bird in the red "no" circle of nobirds.org's logo) on a muted gold disc (the game's palette).
 $sign = [System.Drawing.Image]::FromFile((Join-Path $PSScriptRoot 'nobirds-sign.png'))
-$g.FillEllipse((New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 240, 233, 218))), 46, 46, 164, 164)
+$g.FillEllipse((New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 212, 180, 120))), 46, 46, 164, 164)
 $g.DrawImage($sign, 44, 44, 168, 168)
 $sign.Dispose()
 $out = Join-Path $PSScriptRoot 'icon.png'
