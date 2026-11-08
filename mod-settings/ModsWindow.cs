@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Hex.Settings.UI;
 using Hex.UI;
 using Hex.UI.Elements;
 using Hex.UI.GeneralKit;
-using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using OldenEra.Modding.Common;
+using static OldenEra.Modding.Common.UiLayout;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,23 +14,28 @@ using UnityEngine.UI;
 
 namespace OldenEra.Modding.Settings;
 
-// The mods' own window (issue #13, #14, #6): a "Mods" button in the main menu under Additional (a copy of the game's
-// Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad, fogone 08.11: the game's existing
-// screen style) on a canvas of its own, its scripts taken off and its parts filled with ours:
+// The mods' own window (issues #6, #13, #14). A "Mods" button in the main menu under Additional (a copy of the game's
+// Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad) on a canvas of its own, its scripts
+// taken off and its parts filled with ours:
 //   its title and close cross; its tabs (BhSimpleTabs: Installed / Catalog / Sources, a third tab copied); its filter row
-//   (a text field from the game's input box, its sorting dropdown as the tag and source filters); its list with the
-//   scrollbar, rows made from its save slot rows (check box, picture, name, tag chips, information on the right); its
-//   bottom left group (select all, the actions on the selected; Add by URL / from GitHub on Sources); its information
-//   panel on the right as a mod's or a source's details (picture, texts, chips, buttons); the cloud quota line as the
-//   state line. Adding a source asks with the game's own message box and input box.
+//   (a text field from the game's input box, its sorting dropdown, its filter for the tags and a copy for the sources);
+//   its list with the scrollbar, rows made from its save rows; its bottom left group (select all, the actions on the
+//   selected; adding a source on Sources); its information panel on the right as a mod's or a source's details; a copy
+//   of its title as the state line. Adding a source asks with the game's own message box and input box.
 // The data and the actions are the mod manager's (ModCatalog, mod-common/ModMenu.cs).
+//
+// The window's code by concern:
+//   ModsWindow.cs          the main menu button, building the window from the Load screen, opening, filling, closing;
+//   ModsWindow.Rows.cs     the rows of the Installed and Catalog tabs, the filters, the bottom left group;
+//   ModsWindow.Details.cs  the right panel and the pictures (screenshots, icons, the big screenshot);
+//   ModsWindow.Sources.cs  the Sources tab and adding a source through the game's boxes;
+//   ModsWindow.Widgets.cs  copies of the game's widgets and the layout helpers.
 public partial class Plugin
 {
-    const string ModsButtonName = "OE_ModsButton", WindowName = "OE_ModsWindow", CloseKey = "oe.settings.close", W = "oe.settings.w.";
+    const string ModsButtonName = "OE_ModsButton", WindowName = "OE_ModsWindow", W = "oe.settings.w.";
     // Drawn as the game's screens are, over its Load screen (PlaceCanvas); without a UI camera over everything, under the
     // 30000 of Unity's dropdown lists.
     const int WindowOrder = 29000, ScreenOrder = 1600;
-    static readonly string[] CheckEveryValues = { "start", "daily", "weekly", "manual" };
 
     // The Load screen's scripts that run it (taken off the copy: it shows our data, not saves).
     static readonly HashSet<string> ScreenScripts = new()
@@ -42,6 +46,8 @@ public partial class Plugin
 
     enum WindowTab { Installed, Catalog, Sources }
 
+    static readonly WindowTab[] WindowTabs = { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources };
+
     BhNavigationButton modsButton;
     GameObject window, staging;
     int windowRevision = -1, nextButtonSearch;
@@ -51,9 +57,8 @@ public partial class Plugin
     TMP_Text titleText, statusText, nothingText, selectAllText, panelTitle, versionLabel, versionValue, originLabel, originValue;
     BhSimpleTabs simpleTabs;
     readonly List<BhSimpleTab> tabList = new();
-    Transform filterRow, listContent, bottomGroup, panel, emptyPanel, infoContent, bigShot;
+    Transform filterRow, listContent, bottomGroup, panel, emptyPanel, infoContent, bigShotView;
     BhToggle selectAll;
-    RawImage panelPicture;
     BhGenericButton primaryButton, deleteButton, secondaryButton;
     TMP_InputField filterInput, searchInput;
     BhDropdown sortDropdown;
@@ -70,17 +75,9 @@ public partial class Plugin
     WindowTab tab = WindowTab.Installed;
     // The Catalog's order: by name, not installed first (the default), installed first.
     int sortMode = 1;
-    string filterText = "", searchText = "", installedPick, catalogPick, sourcePick, bigShotPath;
-    int shotIndex;
+    string filterText = "", searchText = "", installedPick, catalogPick, sourcePick;
     readonly HashSet<string> selected = new();
     readonly HashSet<string> screenshotsAsked = new();
-    readonly Dictionary<string, Texture2D> textures = new();
-
-    // A game box (the warning, the input box) is open: our window waits hidden under it.
-    bool suspended;
-    int suspendedAt, resumedAt = -10;
-    Action pendingBox;
-    int pendingAt;
 
     // ---------- the button in the main menu, opening ----------
 
@@ -118,36 +115,31 @@ public partial class Plugin
         // The Escape that closed a game box over the window is not the window's (the box calls back in the same frame).
         if (Input.GetKeyDown(KeyCode.Escape) && Time.frameCount > resumedAt + 1)
         {
-            if (bigShotPath != null)
-                Redraw(() => bigShotPath = null);
+            if (bigShotIndex >= 0)
+                Redraw(() => bigShotIndex = -1);
             else
                 window.SetActive(false);
         }
-        else if (windowDirty || windowRevision != ModMenu.Revision)
+        else if (bigShotIndex >= 0 && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
+            Redraw(() => StepBigShot(Input.GetKeyDown(KeyCode.LeftArrow) ? -1 : 1));
+        // Not while the mouse button is held: a press on a row and the release on its redrawn copy would lose the click.
+        else if ((windowDirty || windowRevision != ModMenu.Revision) && !Input.GetMouseButton(0))
             Guard("fill", FillWindow);
         GreyLater();
     }
 
     void AddModsButton()
     {
-        var options = UnityEngine.Object.FindObjectsOfType<BhNavigationButton>()
-            .FirstOrDefault(b => b != null && b.name == "OptionsButton" && b.gameObject.activeInHierarchy);
+        var options = MainMenuButton("OptionsButton");
         if (options == null)
-        {
-            Logs.Once("Mods window: no OptionsButton in the main menu yet");
             return;
-        }
-        // In the main column under "Additional" (and its submenu), where there is room: the Options / Exit group is the
-        // game's to lay out (it puts it back whenever the menu shows; moving it there fought the game, 07.11).
-        var additional = UnityEngine.Object.FindObjectsOfType<BhNavigationButton>()
-            .FirstOrDefault(b => b != null && b.name == "AdditionallyButton" && b.gameObject.activeInHierarchy);
+        // In the main column under "Additional" (and its submenu), where there is room: the Options / Exit group is laid
+        // out by the game, which puts it back whenever the menu shows.
+        var additional = MainMenuButton("AdditionallyButton");
         if (additional == null)
-        {
-            Logs.Once("Mods window: no AdditionallyButton in the main menu yet");
             return;
-        }
         var column = additional.transform.parent;
-        // Buttons left by earlier builds (in this column, or under Options where they used to be): gone first.
+        // Buttons left by an earlier build of the plugin (hot reload), in this column or under Options: gone first.
         foreach (var parent in new[] { column, options.transform.parent })
             for (var i = parent.childCount - 1; i >= 0; i--)
                 if (parent.GetChild(i).name == ModsButtonName)
@@ -162,6 +154,16 @@ public partial class Plugin
         SetKey(modsButton.label, TabKey);
         modsButton.MenuClick = (Il2CppSystem.Action)(Action)OpenWindow;
         Logs.Info($"Mods button: under {additional.name} in {column.name}");
+    }
+
+    // A shown button of the main menu by its object's name.
+    BhNavigationButton MainMenuButton(string name)
+    {
+        var button = UnityEngine.Object.FindObjectsOfType<BhNavigationButton>()
+            .FirstOrDefault(b => b != null && b.name == name && b.gameObject.activeInHierarchy);
+        if (button == null)
+            Logs.Once($"Mods window: no {name} in the main menu yet");
+        return button;
     }
 
     void OpenWindow()
@@ -182,14 +184,6 @@ public partial class Plugin
 
     // ---------- building ----------
 
-    // The Load screen's running scripts off a copy (they would show saves).
-    static void StripScreenScripts(GameObject go)
-    {
-        foreach (var script in go.GetComponentsInChildren<MonoBehaviour>(true).ToList())
-            if (script != null && ScreenScripts.Contains(script.GetIl2CppType().Name))
-                UnityEngine.Object.DestroyImmediate(script);
-    }
-
     // The window: a copy of the game's Load screen (its own canvas and scaler), its scripts off, its parts ours.
     bool BuildWindow()
     {
@@ -201,41 +195,8 @@ public partial class Plugin
         }
         if (GameObject.Find(WindowName) is { } old)
             UnityEngine.Object.DestroyImmediate(old);
-        // Made under an inactive holder first: the copy's scripts do not wake up before they are taken off.
-        var holder = new GameObject("OE_ModsHolder");
-        holder.SetActive(false);
-        window = UnityEngine.Object.Instantiate(load.gameObject, holder.transform, false);
-        window.name = WindowName;
-        StripScreenScripts(window);
-        window.transform.SetParent(null, false);
-        UnityEngine.Object.Destroy(holder);
-        UnityEngine.Object.DontDestroyOnLoad(window);
-        window.SetActive(true);
-        var canvas = window.GetComponent<Canvas>();
-        canvas.enabled = true;
-        // The screen's raycaster is off while it is hidden (the game turns it on when it shows it): only the rows, under
-        // their own nested canvas, took clicks (08.11). Every raycaster of the copy on.
-        foreach (var raycaster in window.GetComponentsInChildren<GraphicRaycaster>(true))
-            raycaster.enabled = true;
-        // So are its scrolling, its scrollbars, its controls and the dropdowns with their lists' templates (the list did
-        // not scroll, the dropdowns opened empty: fogone 08.11).
-        foreach (var scroll in window.GetComponentsInChildren<ScrollRect>(true))
-            scroll.enabled = true;
-        // But not a dropdown's own button: the game keeps it off (its frame opens the list on the press, by its events);
-        // on, it closed the list again on the release (fogone 08.11).
-        foreach (var control in window.GetComponentsInChildren<Selectable>(true))
-            if (control.TryCast<Button>() == null || control.GetComponentInParent<BhDropdown>(true) == null)
-                control.enabled = true;
-        foreach (var dropdown in window.GetComponentsInChildren<BhDropdown>(true))
-            dropdown.enabled = true;
-        foreach (var layout in window.GetComponentsInChildren<LayoutGroup>(true))
-            layout.enabled = true;
+        window = ScreenCopy.Make(load.gameObject, WindowName, ScreenScripts);
         PlaceCanvas();
-        if (window.GetComponent<CanvasGroup>() is { } rootGroup)
-        {
-            rootGroup.alpha = 1f;
-            rootGroup.interactable = rootGroup.blocksRaycasts = true;
-        }
         staging = new GameObject("OE_Staging", Il2CppInterop.Runtime.Il2CppType.Of<RectTransform>());
         staging.transform.SetParent(window.transform, false);
         staging.SetActive(false);
@@ -243,10 +204,37 @@ public partial class Plugin
         var root = window.transform;
         var sar = root.Find("ShowAnimationRoot");
         // The screen as it is when shown: its show animation (taken off) starts it a little smaller and lower (0.98,
-        // 58 lower on 0.82.7) and ends at its own size, 18.6 lower than the middle (measured on screen against a copy of
-        // the shown screen, 08.11).
+        // 58 lower on 0.82.7) and ends at its own size, 18.6 lower than the middle (measured against the shown screen).
         sar.localScale = Vector3.one;
         sar.localPosition = new Vector3(0f, -18.6f, 0f);
+        BuildHeader(root, sar);
+        nothingText = sar.Find("NoSavesHeader")?.GetComponent<TMP_Text>();
+        if (!BuildList(sar))
+        {
+            Log.LogWarning("mods window: no save row to copy");
+            UnityEngine.Object.DestroyImmediate(window);
+            window = null;
+            return false;
+        }
+        BuildPanel(sar);
+        BuildBottomGroup(sar);
+        BuildFilterRow(sar);
+        BuildTabs(sar);
+
+        // A screenshot big, over everything (a click closes it).
+        bigShotView = NewRect("OE_BigShot", root);
+        Stretch(bigShotView.Cast<RectTransform>());
+        bigShotView.gameObject.SetActive(false);
+
+        switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
+        Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, sorting {(sortDropdown != null)}, filters {(tagBox != null)}, " +
+                  $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
+        return true;
+    }
+
+    // The backdrop, the title, the close cross and the state line under the title.
+    void BuildHeader(Transform root, Transform sar)
+    {
         // Its backdrop opaque: the Load screen hides the menu under it, our copy does not.
         if (root.Find("WindowBack")?.GetComponent<Image>() is { } backdrop)
             backdrop.color = new Color(backdrop.color.r, backdrop.color.g, backdrop.color.b, 1f);
@@ -254,30 +242,32 @@ public partial class Plugin
         Hide(root, "ButtonBack", "BackToSaving", "ExampleImage");
         if (root.Find("ButtonClose")?.GetComponent<BhGenericButton>() is { } close)
             Bind(close, null, () => window.SetActive(false), false);
-        // The state line: a copy of the title, smaller, just under it (the same parent and anchors); the cloud quota and
-        // the autosaves' header and switch off.
+        // The cloud quota and the autosaves' header and switch are not ours.
         Hide(sar, "CloudQuota", "AutosaveShow", "AutosavesHeader");
-        if (titleText != null)
-        {
-            var line = UnityEngine.Object.Instantiate(titleText.gameObject, root, false);
-            line.name = "OE_Status";
-            var rect = line.transform.Cast<RectTransform>();
-            rect.anchoredPosition = titleText.rectTransform.anchoredPosition + new Vector2(0f, -33f);
-            rect.sizeDelta = new Vector2(1400f, 50f);
-            // The title's font style would set its size back.
-            foreach (var style in line.GetComponents<MonoBehaviour>().Where(c => c.GetIl2CppType().Name == "BhFont").ToList())
-                UnityEngine.Object.DestroyImmediate(style);
-            statusText = line.GetComponent<TMP_Text>();
-            statusText.enableAutoSizing = false;
-            statusText.fontSize = 20f;
-            statusText.color = new Color(0.65f, 0.65f, 0.65f, 1f);
-            statusText.enableWordWrapping = false;
-            statusText.overflowMode = TextOverflowModes.Overflow;
-            statusText.alignment = TextAlignmentOptions.Center;
-        }
-        nothingText = sar.Find("NoSavesHeader")?.GetComponent<TMP_Text>();
+        if (titleText == null)
+            return;
+        // The state line: a copy of the title, smaller, just under it (the same parent and anchors).
+        var line = UnityEngine.Object.Instantiate(titleText.gameObject, root, false);
+        line.name = "OE_Status";
+        var rect = line.transform.Cast<RectTransform>();
+        rect.anchoredPosition = titleText.rectTransform.anchoredPosition + new Vector2(0f, -33f);
+        rect.sizeDelta = new Vector2(1400f, 50f);
+        // The title's font style would set its size back.
+        foreach (var style in line.GetComponents<MonoBehaviour>().Where(c => c.GetIl2CppType().Name == "BhFont").ToList())
+            UnityEngine.Object.DestroyImmediate(style);
+        statusText = line.GetComponent<TMP_Text>();
+        statusText.enableAutoSizing = false;
+        statusText.fontSize = 20f;
+        statusText.color = new Color(0.65f, 0.65f, 0.65f, 1f);
+        statusText.enableWordWrapping = false;
+        statusText.overflowMode = TextOverflowModes.Overflow;
+        statusText.alignment = TextAlignmentOptions.Center;
+    }
 
-        // The list: its rows' layout ours (the game's virtualized list placed them itself), its scrollbar kept.
+    // The list: its rows laid out by a layout group of ours (the game's virtualized list, taken off, placed them), its
+    // scrollbar kept; a save row kept as the rows' source. False when there is no save row to copy.
+    bool BuildList(Transform sar)
+    {
         var list = sar.Find("VirtualizedList");
         listContent = list.Find("Viewport/Content");
         FitViewport(list, 24f);
@@ -289,18 +279,14 @@ public partial class Plugin
             if (prefab != null)
             {
                 firstRow = UnityEngine.Object.Instantiate(prefab.gameObject, staging.transform, false);
-                StripScreenScripts(firstRow);
+                ScreenCopy.StripScripts(firstRow, ScreenScripts);
             }
         }
         if (firstRow == null)
-        {
-            Log.LogWarning("mods window: no save row to copy");
-            UnityEngine.Object.DestroyImmediate(window);
-            window = null;
             return false;
-        }
         firstRow.transform.SetParent(staging.transform, false);
         rowSource = firstRow;
+        OwnRow(rowSource);
         Clear(listContent);
         var column = listContent.gameObject.AddComponent<VerticalLayoutGroup>();
         column.spacing = 6f;
@@ -321,8 +307,26 @@ public partial class Plugin
             Clear(invisible);
         // A tag chip of the row: the chips' source.
         chipTemplate = firstRow.GetComponentInChildren<BhTag>(true)?.gameObject;
+        return true;
+    }
 
-        // The information panel: its texts and buttons.
+    // The save row's own script (an obfuscated slot class on its root, with its selection and double click) and its
+    // button's persistent click off: they answered the clicks before ours. The Unity parts of the root are kept.
+    void OwnRow(GameObject row)
+    {
+        foreach (var script in row.GetComponents<MonoBehaviour>().ToList())
+            if (script != null && !(script.GetIl2CppType().FullName ?? "").StartsWith("UnityEngine.", StringComparison.Ordinal))
+            {
+                Logs.Once($"Mods window: the row's script {script.GetIl2CppType().FullName} taken off");
+                UnityEngine.Object.DestroyImmediate(script);
+            }
+        if (row.GetComponent<Button>() is { } button)
+            button.onClick = new Button.ButtonClickedEvent();
+    }
+
+    // The information panel: its title, picture, texts and buttons; the empty panel with a hint.
+    void BuildPanel(Transform sar)
+    {
         panel = sar.Find("SaveInfoPanel/RightPanelPopup");
         emptyPanel = sar.Find("SaveInfoPanel/EmptryPanel");
         var header = panel.Find("Container/Header");
@@ -331,7 +335,7 @@ public partial class Plugin
         crossSource = header.Find("CROSS BUTTON (1)")?.gameObject;
         var back = panel.Find("Container/Main/Back");
         Hide(back, "MinimapScreenShot", "MissionIcon");
-        panelPicture = back.Find("TemplatePreview")?.GetComponent<RawImage>();
+        FindPictureSquares(back);
         var info = panel.Find("InfoScrollView");
         infoContent = info.Find("Viewport/Content");
         FitViewport(info, 20f);
@@ -352,21 +356,23 @@ public partial class Plugin
         deleteButton = panel.Find("DeleteButton")?.GetComponent<BhGenericButton>();
         textButtonTemplate = secondaryButton != null ? UnityEngine.Object.Instantiate(secondaryButton.gameObject, staging.transform, false) : null;
         deleteTemplate = deleteButton != null ? UnityEngine.Object.Instantiate(deleteButton.gameObject, staging.transform, false) : null;
-        if (emptyPanel != null && lineTemplate != null)
-        {
-            var hint = UnityEngine.Object.Instantiate(lineTemplate, emptyPanel, false);
-            hint.name = "OE_Hint";
-            var rect = hint.transform.Cast<RectTransform>();
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(440f, 80f);
-            var text = hint.GetComponent<TMP_Text>();
-            text.alignment = TextAlignmentOptions.Center;
-            text.enableWordWrapping = true;
-            hint.SetActive(true);
-        }
+        if (emptyPanel == null || lineTemplate == null)
+            return;
+        var hint = UnityEngine.Object.Instantiate(lineTemplate, emptyPanel, false);
+        hint.name = "OE_Hint";
+        var rect = hint.transform.Cast<RectTransform>();
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = Vector2.zero;
+        rect.sizeDelta = new Vector2(440f, 80f);
+        var text = hint.GetComponent<TMP_Text>();
+        text.alignment = TextAlignmentOptions.Center;
+        text.enableWordWrapping = true;
+        hint.SetActive(true);
+    }
 
-        // The bottom left group: select all and its text; the cloud and the delete wrap off (our buttons in their place).
+    // The bottom left group: select all and its text; the cloud and the delete wraps off (our buttons in their place).
+    void BuildBottomGroup(Transform sar)
+    {
         bottomGroup = sar.Find("LeftBottomGroup");
         selectAll = bottomGroup.Find("Toggle")?.GetComponent<BhToggle>();
         selectAllText = bottomGroup.Find("main")?.GetComponent<TMP_Text>();
@@ -382,24 +388,22 @@ public partial class Plugin
             bottomRow.spacing = 14f;
             bottomRow.childAlignment = TextAnchor.MiddleLeft;
         }
-        if (selectAll != null)
-            selectAll.toggle.onValueChanged.AddListener((UnityAction<bool>)(value => Guard("select all", () =>
-            {
-                if (filling)
-                    return;
+        selectAll?.toggle.onValueChanged.AddListener((UnityAction<bool>)(value => Guard("select all", () =>
+        {
+            if (!filling)
                 Redraw(() =>
                 {
                     foreach (var mod in InstalledShown())
-                        if (value)
-                            selected.Add(mod.Id);
-                        else
-                            selected.Remove(mod.Id);
+                        Select(mod.Id, value);
                 });
-            })));
+        })));
+    }
 
-        // The filter row: the text fields; on the Catalog the sorting dropdown sorting, the Load screen's own filter (a
-        // funnel opening check marks) for the tags and a copy of it for the sources, each after a label in the style of
-        // the row's own "connection" label.
+    // The filter row: the text fields; on the Catalog the sorting dropdown, the Load screen's own filter (a funnel
+    // opening check marks) for the tags and a copy of it for the sources, each after a label in the style of the row's
+    // own "game type" label.
+    void BuildFilterRow(Transform sar)
+    {
         filterRow = sar.Find("FilterSortGroup");
         Hide(filterRow, "GameTypeDropdown");
         var sorting = filterRow.Find("SortingDropdown")?.GetComponent<BhDropdown>();
@@ -412,8 +416,8 @@ public partial class Plugin
         var labelSource = filterRow.Find("GameTypeHeader")?.gameObject;
         if (filterRow.Find("Filter")?.GetComponent<Hex.UI.SaveLoad.BhFilter>() is { } filter)
         {
-            // The save list's own options (Campaign, Template...) are elements under its list, not in the copy's list of
-            // them: gone, ours are made by its set-up.
+            // The save list's own options (Campaign, Template...) are elements under its list, not in the filter's list
+            // of them: gone, ours are made by its set-up.
             Clear(filter.contentList);
             tagBox = filter;
             tagLabel = FilterLabel(labelSource, W + "tagsLabel", filter.transform.GetSiblingIndex());
@@ -436,67 +440,58 @@ public partial class Plugin
             filterLayout.spacing = 14f;
             filterLayout.childAlignment = TextAnchor.MiddleLeft;
         }
+    }
 
-        // The tabs: the game's two and a third, set up by the game's own Init (their click selects through Select).
+    // The tabs: the game's two and a third, set up by the game's own Init (their click selects through Select).
+    void BuildTabs(Transform sar)
+    {
         simpleTabs = sar.Find("Tabs")?.GetComponent<BhSimpleTabs>();
-        if (simpleTabs != null && simpleTabs.tabs.Count > 0)
+        if (simpleTabs == null || simpleTabs.tabs.Count == 0)
+            return;
+        var first = simpleTabs.tabs[0];
+        var third = UnityEngine.Object.Instantiate(first.gameObject, first.transform.parent, false).GetComponent<BhSimpleTab>();
+        third.name = "OE_Tab3";
+        simpleTabs.tabs.Add(third);
+        tabList.Clear();
+        for (var i = 0; i < simpleTabs.tabs.Count; i++)
+            tabList.Add(simpleTabs.tabs[i]);
+        var width = simpleTabs.transform.Cast<RectTransform>().rect.width / 3f;
+        foreach (var t in tabList)
         {
-            var first = simpleTabs.tabs[0];
-            var third = UnityEngine.Object.Instantiate(first.gameObject, first.transform.parent, false).GetComponent<BhSimpleTab>();
-            third.name = "OE_Tab3";
-            simpleTabs.tabs.Add(third);
-            tabList.Clear();
-            for (var i = 0; i < simpleTabs.tabs.Count; i++)
-                tabList.Add(simpleTabs.tabs[i]);
-            var width = simpleTabs.transform.Cast<RectTransform>().rect.width / 3f;
-            foreach (var t in tabList)
-            {
-                Size(t.gameObject, width, -1f);
-                t.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, t.transform.Cast<RectTransform>().sizeDelta.y);
-            }
-            LayoutRebuilder.ForceRebuildLayoutImmediate(simpleTabs.transform.Cast<RectTransform>());
-            var data = new Il2CppSystem.Collections.Generic.List<GameSimpleTabData>();
-            foreach (var which in new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources })
-            {
-                var item = new GameSimpleTabData();
-                item.Label = TabLabel(which);
-                var chosen = which;
-                item.Click = (Il2CppSystem.Action)(Action)(() => Guard("tab", () =>
-                {
-                    if (!filling && tab != chosen)
-                        Redraw(() => SwitchTab(chosen));
-                }));
-                data.Add(item);
-            }
-            filling = true;
-            try { simpleTabs.Init(data, (int)tab); }
-            finally { filling = false; }
-            // The game's tab answers the press (OnPointerDown); a click (keyboard, tools) selects it the same way, once.
-            for (var i = 0; i < tabList.Count; i++)
-            {
-                var index = i;
-                Clickable(tabList[i].gameObject, () =>
-                {
-                    if ((int)tab != index)
-                        simpleTabs.Select(index, true);
-                });
-            }
+            Size(t.gameObject, width, -1f);
+            t.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, t.transform.Cast<RectTransform>().sizeDelta.y);
         }
-
-        // A screenshot big, over everything (a click closes it).
-        bigShot = NewRect("OE_BigShot", root);
-        Stretch(bigShot.Cast<RectTransform>());
-        bigShot.gameObject.SetActive(false);
-
-        switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
-        Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, sorting {(sortDropdown != null)}, filters {(tagBox != null)}, " +
-                  $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
-        return true;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(simpleTabs.transform.Cast<RectTransform>());
+        var data = new Il2CppSystem.Collections.Generic.List<GameSimpleTabData>();
+        foreach (var which in WindowTabs)
+        {
+            var item = new GameSimpleTabData();
+            item.Label = TabLabel(which);
+            var chosen = which;
+            item.Click = (Il2CppSystem.Action)(Action)(() => Guard("tab", () =>
+            {
+                if (!filling && tab != chosen)
+                    Redraw(() => SwitchTab(chosen));
+            }));
+            data.Add(item);
+        }
+        filling = true;
+        try { simpleTabs.Init(data, (int)tab); }
+        finally { filling = false; }
+        // The game's tab answers the press (OnPointerDown); a click (keyboard, tools) selects it the same way, once.
+        for (var i = 0; i < tabList.Count; i++)
+        {
+            var index = i;
+            Clickable(tabList[i].gameObject, () =>
+            {
+                if ((int)tab != index)
+                    simpleTabs.Select(index, true);
+            });
+        }
     }
 
     // A scroll view's viewport over the whole view but its scrollbar's strip on the right. The Load screen sizes it
-    // itself when it shows (its list script, taken off): a copy made while the screen was never shown had it 0x0, and
-    // nothing in it was drawn (08.11).
+    // itself when it shows (its list script, taken off): on a copy of a screen never shown it is 0x0 and draws nothing.
     static void FitViewport(Transform view, float scrollbar)
     {
         if (view?.Find("Viewport") is not { } viewport)
@@ -511,13 +506,15 @@ public partial class Plugin
             scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
     }
 
-    static void Hide(Transform parent, params string[] names)
+    // The window drawn as the game's screens are, with the Load screen's camera and layer, so the game's message and
+    // input boxes come over it; without a camera to share, over everything (and hidden while a box is open). Above every
+    // screen the game keeps switched on (settings ~2000, profile 1000, the Load screen 1600: one with a
+    // raycast target would take the player's clicks) and just under the game's message box (ScreenCopy.Place).
+    void PlaceCanvas()
     {
-        if (parent == null)
-            return;
-        foreach (var name in names)
-            if (parent.Find(name) is { } part)
-                part.gameObject.SetActive(false);
+        var canvas = window.GetComponent<Canvas>();
+        var camera = ScreenCopy.Place(canvas, Scene.Find<Hex.UI.SaveLoad.ScLoad>()?.GetComponent<Canvas>(), ScreenOrder, WindowOrder);
+        Logs.Once(camera == null ? "Mods window: no UI camera, drawn over everything" : $"Mods window: drawn with the camera {camera.name}, order {canvas.sortingOrder}");
     }
 
     // ---------- filling ----------
@@ -526,6 +523,13 @@ public partial class Plugin
     {
         change();
         windowDirty = true;
+    }
+
+    void SwitchTab(WindowTab which)
+    {
+        tab = which;
+        bigShotIndex = -1;
+        shotIndex = 0;
     }
 
     static string TabLabel(WindowTab which) => string.Format(Texts.Get(W + "tab." + which.ToString().ToLowerInvariant()), which switch
@@ -548,9 +552,7 @@ public partial class Plugin
             if (ModCatalog.Busy)
                 status = status.Length > 0 ? $"{status} · {Texts.Get(W + "busy")}" : Texts.Get(W + "busy");
             if (statusText != null)
-            {
                 SetText(statusText, status);
-            }
 
             var installedIds = Installed().Select(m => m.Id).ToHashSet();
             selected.RemoveWhere(id => !installedIds.Contains(id));
@@ -562,10 +564,9 @@ public partial class Plugin
                 sourcePick = null;
 
             // The tabs' labels (with the counts): the game's tab keeps them in its labels.
-            var tabs = new[] { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources };
-            for (var i = 0; i < tabList.Count && i < tabs.Length; i++)
+            for (var i = 0; i < tabList.Count && i < WindowTabs.Length; i++)
                 foreach (var label in tabList[i].labels)
-                    SetText(label, TabLabel(tabs[i]));
+                    SetText(label, TabLabel(WindowTabs[i]));
 
             filterInput?.gameObject.SetActive(tab == WindowTab.Installed);
             searchInput?.gameObject.SetActive(tab == WindowTab.Catalog);
@@ -595,1142 +596,7 @@ public partial class Plugin
         finally { filling = false; }
     }
 
-    // The mods installed (the manager is apart, on top) and the catalog's (from a source), as the window lists them.
-    static List<ModEntry> Installed() => ModCatalog.Mods.Where(m => m.Installed != null)
-        .OrderBy(m => Texts.Get(m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
-
-    static List<ModEntry> Catalog() => ModCatalog.Mods.Where(m => m.SourceNameKey != null)
-        .OrderBy(m => m.Installed != null).ThenBy(m => Texts.Get(m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
-
-    List<ModEntry> InstalledShown() => Installed().Where(m => Matches(m, filterText)).ToList();
-
-    // The text typed matches a mod: its name, description or author.
-    static bool Matches(ModEntry mod, string text) =>
-        string.IsNullOrWhiteSpace(text) || new[] { Texts.Get(mod.NameKey), mod.DescriptionKey != null ? Texts.Get(mod.DescriptionKey) : "", mod.Author ?? "" }
-            .Any(s => s.IndexOf(text.Trim(), StringComparison.CurrentCultureIgnoreCase) >= 0);
-
-    void ShowNothing(bool nothing, string key)
-    {
-        if (nothingText == null)
-            return;
-        nothingText.gameObject.SetActive(nothing);
-        if (nothing)
-            SetText(nothingText, Texts.Get(key));
-    }
-
-    // ---------- Installed ----------
-
-    void FillInstalled()
-    {
-        var mods = InstalledShown();
-        if (ModCatalog.Manager is { } manager)
-            ModRow(manager, isManager: true);
-        foreach (var mod in mods)
-            ModRow(mod, isManager: false);
-        ShowNothing(mods.Count == 0, ModCatalog.Mods.Any(m => m.Installed != null) ? W + "nothing" : W + "noneInstalled");
-
-        // The bottom left: select all (the mods listed), how many are selected, the actions on them.
-        selectAll?.gameObject.SetActive(true);
-        selectAll?.ShowValue(mods.Count > 0 && mods.All(m => selected.Contains(m.Id)));
-        if (selectAllText != null)
-        {
-            selectAllText.gameObject.SetActive(true);
-            SetText(selectAllText, string.Format(Texts.Get(W + "selectAll"), selected.Count));
-        }
-        var chosen = mods.Where(m => selected.Contains(m.Id)).ToList();
-        var ids = chosen.Select(m => m.Id).ToList();
-        // A mod BepInEx loaded itself (ByHand) is switched like the others but never updated nor removed here.
-        BottomButton(W + "enable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == false && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, true));
-        BottomButton(W + "disable", ModCatalog.SetEnabled != null && chosen.Any(m => m.Enabled == true && !m.RequiredByOthers), () => ModCatalog.SetEnabled?.Invoke(ids, false));
-        var updatable = chosen.Where(m => m.HasUpdate && !m.ByHand).Select(m => m.Id).ToList();
-        BottomButton(W + "update", ModCatalog.Update != null && updatable.Count > 0, () => ModCatalog.Update?.Invoke(updatable));
-        var updateAll = ModCatalog.UpdateAll != null && (ModCatalog.Mods.Any(m => m.HasUpdate) || ModCatalog.Manager?.HasUpdate == true);
-        BottomButton(W + "updateAll", updateAll, () => ModCatalog.UpdateAll?.Invoke());
-        var removable = chosen.Where(m => !m.RequiredByOthers && !m.ByHand).Select(m => m.Id).ToList();
-        if (deleteTemplate != null)
-        {
-            var remove = Copy(deleteTemplate, bottomGroup).GetComponent<BhGenericButton>();
-            remove.name = "OE_RemoveSelected";
-            remove.gameObject.SetActive(true);
-            Bind(remove, null, () =>
-            {
-                ModCatalog.Remove?.Invoke(removable);
-                selected.ExceptWith(removable);
-            }, true);
-            if (ModCatalog.Remove == null || removable.Count == 0)
-                GreyOut(remove, true);
-        }
-    }
-
-    // A row made from the game's save slot row: check box, picture, name, tag chips; on the right the version, the
-    // note; the switch, the update (to the new version) and the remove cross. The manager: its update only.
-    void ModRow(ModEntry mod, bool isManager, bool catalog = false)
-    {
-        var row = Copy(rowSource, listContent);
-        row.name = "OE_Row_" + mod.Id;
-        row.SetActive(true);
-        var picked = (catalog ? catalogPick : installedPick) == mod.Id;
-        RowBase(row, picked, () =>
-        {
-            if (catalog)
-                catalogPick = mod.Id;
-            else
-                installedPick = mod.Id;
-            shotIndex = 0;
-        });
-        var check = row.transform.Find("Toggle")?.GetComponent<BhToggle>();
-        if (check != null)
-        {
-            check.gameObject.SetActive(!catalog && !isManager);
-            if (!catalog && !isManager)
-            {
-                check.ShowValue(selected.Contains(mod.Id));
-                check.toggle.onValueChanged.AddListener((UnityAction<bool>)(value => Guard("check", () =>
-                {
-                    if (filling)
-                        return;
-                    Redraw(() =>
-                    {
-                        if (value)
-                            selected.Add(mod.Id);
-                        else
-                            selected.Remove(mod.Id);
-                    });
-                })));
-            }
-        }
-        // The row's picture is its catalog's icon (fogone 08.11; screenshots are the details'), else its first letter.
-        RowPicture(row, CatalogIcon(mod.SourceNameKey), Texts.Get(mod.NameKey));
-        RowName(row, Texts.Get(mod.NameKey), mod.TagKeys);
-        if (catalog)
-            RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "", mod.Available ?? mod.Installed ?? "",
-                mod.Installed != null ? Texts.Get(W + "installed") : mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
-        else
-        {
-            // The catalog it comes from on top (fogone 08.11), "by hand" when none; the version; the note ("by hand" once).
-            var origin = mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand");
-            var note = mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "";
-            RowInfo(row, origin, mod.Installed ?? "", string.Equals(note, origin, StringComparison.CurrentCultureIgnoreCase) ? "" : note);
-        }
-        if (catalog)
-            return;
-
-        // The controls in one group, vertically centred, just left of the information on the right.
-        var controls = NewRect("OE_Controls", row.transform);
-        controls.anchorMin = controls.anchorMax = controls.pivot = new Vector2(1f, 0.5f);
-        controls.anchoredPosition = new Vector2(InfoLeft(row) - 24f, 0f);
-        controls.sizeDelta = new Vector2(330f, 60f);
-        HRow(controls.gameObject, 10f, TextAnchor.MiddleRight);
-        // No update and no cross for a mod BepInEx loaded itself (ByHand).
-        if (mod.HasUpdate && !mod.ByHand && ModCatalog.Update != null && textButtonTemplate != null)
-            TextButton(controls, string.Format(Texts.Get(W + "updateTo"), mod.Available), 170f, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
-        if (!isManager && mod.Enabled is { } on && !mod.RequiredByOthers && ModCatalog.SetEnabled != null && switchSource != null)
-            NewSwitch(controls, on, value => Guard("switch " + mod.Id, () => ModCatalog.SetEnabled?.Invoke(new[] { mod.Id }, value)));
-        if (!isManager && !mod.RequiredByOthers && !mod.ByHand && ModCatalog.Remove != null && crossSource != null)
-            NewCross(controls, () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
-    }
-
-    // The row's own parts: its selected look, the cloud and the map's icons off, a click picks it.
-    void RowBase(GameObject row, bool picked, Action pick)
-    {
-        var t = row.transform;
-        Hide(t, "CloudOn", "CloudOff", "InfoIcons", "CampaignInfo");
-        Hide(t.Find("HeaderGroup"), "RenameBtn");
-        // The game's save row laid out for a mod (fogone 08.11: it looked crooked): as high as it needs, the check box
-        // and the picture vertically centred at the left, the name above the middle (the tags under it, RowName), the
-        // three lines of information on the right around the middle.
-        Size(row, -1f, ModRowHeight);
-        var rowRect = row.transform.Cast<RectTransform>();
-        PinLeft(t.Find("Toggle"), rowRect, 0f);
-        PinLeft(t.Find("IconFrame"), rowRect, 0f);
-        PinLeft(t.Find("HeaderGroup"), rowRect, 15f);
-        PinRight(t.Find("LastSaveHeader"), rowRect, 27f);
-        PinRight(t.Find("LastSaveTime"), rowRect, 0f);
-        PinRight(t.Find("LastSaveGameTime"), rowRect, -27f);
-        // The row's backs (default, hovered, selected) are the save row's fixed 122 for its 110 (6 over each edge, their
-        // pictures' own margins making the gaps between rows): as much over ours, centred, or the rows run together.
-        foreach (var backName in new[] { "DefaultBack", "HoveredBack", "SelectedBack" })
-            if (t.Find(backName) is { } back)
-            {
-                var rect = back.Cast<RectTransform>();
-                var width = rect.rect.width;
-                rect.anchorMin = new Vector2(rect.anchorMin.x, 0.5f);
-                rect.anchorMax = new Vector2(rect.anchorMax.x, 0.5f);
-                rect.pivot = new Vector2(rect.pivot.x, 0.5f);
-                rect.sizeDelta = new Vector2(rect.anchorMin.x == rect.anchorMax.x ? width : rect.sizeDelta.x, ModRowHeight + 12f);
-                rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, 0f);
-                // The selected back's frame: 5 over the save row's 110.
-                if (back.Find("Frame") is { } frame)
-                {
-                    var frameRect = frame.Cast<RectTransform>();
-                    if (frameRect.anchorMin.y == frameRect.anchorMax.y)
-                        frameRect.sizeDelta = new Vector2(frameRect.sizeDelta.x, ModRowHeight + 5f);
-                }
-            }
-        // The row's check box drawn as the bottom group's (the save row's is a faint outline until hovered).
-        if (t.Find("Toggle/Background")?.GetComponent<Image>() is { } box && selectAll?.transform.Find("Background")?.GetComponent<Image>() is { } shown)
-            box.color = shown.color;
-        if (t.Find("SelectedBack") is { } selectedBack)
-            selectedBack.gameObject.SetActive(picked);
-        if (t.Find("HoveredBack")?.GetComponent<CanvasGroup>() is { } hovered)
-            hovered.alpha = 0f;
-        if (row.GetComponent<CanvasGroup>() is { } group)
-        {
-            group.alpha = 1f;
-            group.interactable = group.blocksRaycasts = true;
-        }
-        Clickable(row, () => Redraw(pick));
-    }
-
-    const float ModRowHeight = 96f;
-
-    // A part of the row kept where it is across, pinned to the row's left (or right) edge at a height from its middle
-    // (anchors and pivot middle; the row's own anchors were the save row's, for its 110).
-    static void PinLeft(Transform part, RectTransform row, float y)
-    {
-        if (part == null)
-            return;
-        var rect = part.Cast<RectTransform>();
-        var size = rect.rect.size;
-        var left = rect.localPosition.x + rect.rect.xMin - row.rect.xMin;
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
-        rect.sizeDelta = size;
-        rect.anchoredPosition = new Vector2(left, y);
-    }
-
-    static void PinRight(Transform part, RectTransform row, float y)
-    {
-        if (part == null)
-            return;
-        var rect = part.Cast<RectTransform>();
-        var size = rect.rect.size;
-        var right = row.rect.xMax - (rect.localPosition.x + rect.rect.xMax);
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = size;
-        rect.anchoredPosition = new Vector2(-right, y);
-    }
-
-    // Where the information on the right begins (from the row's right edge, negative): its widest line's text.
-    static float InfoLeft(GameObject row)
-    {
-        var left = 0f;
-        foreach (var name in new[] { "LastSaveHeader", "LastSaveTime", "LastSaveGameTime" })
-            if (row.transform.Find(name)?.GetComponent<TMP_Text>() is { } text && !string.IsNullOrEmpty(text.text))
-                left = Math.Min(left, text.rectTransform.anchoredPosition.x - text.GetPreferredValues(text.text).x);
-        return left;
-    }
-
-    // The row's picture: a screenshot or the catalog's icon in the save's icon frame; with none, the name's first
-    // letter in the frame, in the name's own font and colour (as the game's campaign rows show their act's numeral).
-    void RowPicture(GameObject row, string path, string name)
-    {
-        var icon = row.transform.Find("IconFrame/Icon");
-        if (icon == null)
-            return;
-        // The save's icon is not ours.
-        if (icon.GetComponent<Image>() is { } image)
-            image.enabled = false;
-        if (Picture(path) != null)
-        {
-            var picture = NewRect("OE_Shot", icon).gameObject.AddComponent<RawImage>();
-            Stretch(picture.rectTransform);
-            picture.raycastTarget = false;
-            ShowPicture(picture, path, crop: true);
-            return;
-        }
-        var title = row.transform.Find("HeaderGroup/SessionName")?.GetComponent<TMP_Text>();
-        var letter = string.IsNullOrWhiteSpace(name) ? "" : name.Trim().Substring(0, 1).ToUpperInvariant();
-        if (title == null || letter.Length == 0)
-            return;
-        var text = NewRect("OE_Letter", icon).gameObject.AddComponent<TextMeshProUGUI>();
-        Stretch(text.rectTransform);
-        text.font = title.font;
-        text.fontSharedMaterial = title.fontSharedMaterial;
-        text.color = title.color;
-        text.fontSize = 52f;
-        text.alignment = TextAlignmentOptions.Center;
-        text.enableWordWrapping = false;
-        text.overflowMode = TextOverflowModes.Overflow;
-        text.raycastTarget = false;
-        text.text = letter;
-    }
-
-    // The icon of the catalog a mod comes from (its name key is the source's), or null.
-    static string CatalogIcon(string sourceNameKey) =>
-        sourceNameKey == null ? null : ModCatalog.Sources.FirstOrDefault(s => s.TitleKey == sourceNameKey)?.IconPath;
-
-    void RowName(GameObject row, string name, IReadOnlyList<string> tagKeys)
-    {
-        var group = row.transform.Find("HeaderGroup");
-        if (group == null)
-            return;
-        if (group.Find("SessionName")?.GetComponent<TMP_Text>() is { } title)
-            SetText(title, name);
-        // The game's chips: the first four tags, on their own line under the name (the save row has them after its
-        // name; ours read better under it).
-        var chips = group.GetComponentsInChildren<BhTag>(true).ToList();
-        var line = row.transform.Find("OE_Tags");
-        if (line == null)
-        {
-            var rect = NewRect("OE_Tags", row.transform);
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
-            rect.sizeDelta = new Vector2(560f, 24f);
-            rect.anchoredPosition = new Vector2(group.Cast<RectTransform>().anchoredPosition.x, -17f);
-            HRow(rect.gameObject, 6f, TextAnchor.MiddleLeft);
-            line = rect;
-        }
-        // The row has two chips; more are copies of the first, up to four tags.
-        while (chips.Count > 0 && chips.Count < 4)
-            chips.Add(UnityEngine.Object.Instantiate(chips[0].gameObject, line, false).GetComponent<BhTag>());
-        foreach (var chip in chips)
-            if (line != null)
-                chip.transform.SetParent(line, false);
-        for (var i = 0; i < chips.Count; i++)
-        {
-            var key = tagKeys != null && i < tagKeys.Count ? tagKeys[i] : null;
-            chips[i].gameObject.SetActive(key != null);
-            if (key != null)
-                ShowChip(chips[i], key);
-        }
-    }
-
-    // A tag chip: its text, sized by the game (BhTag.ShowText), in the colours of the save list's "Template" chip (the
-    // row prefab's own chip is a bare pink one the save list recolours by the session's tag).
-    static void ShowChip(BhTag chip, string key)
-    {
-        chip.ShowText(Texts.Get(key));
-        chip.ShowColor(new Color(0.33f, 0.19f, 0.40f, 1f));
-        if (chip.label != null)
-            chip.label.color = new Color(0.92f, 0.88f, 0.80f, 1f);
-    }
-
-    static void RowInfo(GameObject row, string header, string value, string note)
-    {
-        var t = row.transform;
-        if (t.Find("LastSaveHeader")?.GetComponent<TMP_Text>() is { } h)
-            SetText(h, $"<color=#A5A5A5>{header}</color>");
-        if (t.Find("LastSaveTime")?.GetComponent<TMP_Text>() is { } v)
-            SetText(v, value);
-        if (t.Find("LastSaveGameTime")?.GetComponent<TMP_Text>() is { } n)
-            SetText(n, note);
-    }
-
-    // ---------- Catalog ----------
-
-    // The tags and the sources of the catalog's mods, in the order of their names: the dropdowns' options after "All".
-    static List<string> TagKeys() => ModCatalog.Mods.Where(m => m.SourceNameKey != null).SelectMany(m => m.TagKeys ?? Array.Empty<string>())
-        .Where(k => k != null).Distinct().OrderBy(Texts.Get, StringComparer.CurrentCultureIgnoreCase).ToList();
-
-    static List<string> SourceKeys() => ModCatalog.Mods.Select(m => m.SourceNameKey).Where(k => k != null).Distinct()
-        .OrderBy(Texts.Get, StringComparer.CurrentCultureIgnoreCase).ToList();
-
-    void FillCatalog()
-    {
-        // The filters' options: the tags and the sources of the catalog; what is ticked filters (any of the ticked; none:
-        // all). A filter with nothing to offer (no tags yet) and its label are hidden.
-        var tagKeys = TagKeys();
-        var sourceKeys = SourceKeys();
-        tagBoxKeys = SetUpFilter(tagBox, tagKeys, tagBoxKeys);
-        sourceBoxKeys = SetUpFilter(sourceBox, sourceKeys, sourceBoxKeys);
-        tagBox?.gameObject.SetActive(tagKeys.Count > 0);
-        tagLabel?.SetActive(tagKeys.Count > 0);
-        var tags = Ticked(tagBox, tagKeys);
-        var sources = Ticked(sourceBox, sourceKeys);
-        sortOptions = SetSortOptions(sortDropdown, sortOptions);
-
-        var mods = Catalog().Where(m => Matches(m, searchText) && (tags.Count == 0 || (m.TagKeys?.Any(tags.Contains) ?? false)) &&
-                                        (sources.Count == 0 || sources.Contains(m.SourceNameKey))).ToList();
-        var name = (Func<ModEntry, string>)(m => Texts.Get(m.NameKey));
-        mods = sortMode switch
-        {
-            0 => mods.OrderBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
-            2 => mods.OrderBy(m => m.Installed == null).ThenBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
-            _ => mods.OrderBy(m => m.Installed != null).ThenBy(name, StringComparer.CurrentCultureIgnoreCase).ToList(),
-        };
-        foreach (var mod in mods)
-            ModRow(mod, isManager: false, catalog: true);
-        ShowNothing(mods.Count == 0, W + "nothing");
-    }
-
-    // The game's filter set up with these names (localization keys: it translates them), again only when they changed
-    // (it would untick them all). Returns what they are now.
-    string SetUpFilter(Hex.UI.SaveLoad.BhFilter box, List<string> keys, string was)
-    {
-        if (box == null)
-            return was;
-        var now = $"{Texts.Language}|{string.Join("|", keys)}";
-        if (now == was)
-            return was;
-        box.SetUp(new Il2CppStringArray(keys.ToArray()), (Il2CppSystem.Action)(Action)(() => Guard("filter", () => windowDirty = true)));
-        return now;
-    }
-
-    // The names ticked in a filter (its elements are in the order of the names).
-    static HashSet<string> Ticked(Hex.UI.SaveLoad.BhFilter box, List<string> keys)
-    {
-        var ticked = new HashSet<string>();
-        if (box == null || box.Elements is not { } elements)
-            return ticked;
-        for (var i = 0; i < elements.Count && i < keys.Count; i++)
-            if (elements[i] != null && elements[i].Ticked())
-                ticked.Add(keys[i]);
-        return ticked;
-    }
-
-    // The sorting dropdown's options (by name, not installed first, installed first), set again on a language change.
-    string SetSortOptions(BhDropdown dropdown, string was)
-    {
-        if (dropdown == null)
-            return was;
-        var now = $"{Texts.Language}";
-        if (now == was)
-            return was;
-        var texts = Enumerable.Range(0, 3).Select(i => Texts.Get($"{W}sort.{i}")).ToArray();
-        dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), sortMode, EDropdownType.Text);
-        return now;
-    }
-
-    // A label before a filter: a copy of the filter row's own label.
-    GameObject FilterLabel(GameObject source, string key, int index)
-    {
-        if (source == null)
-            return null;
-        var label = UnityEngine.Object.Instantiate(source, source.transform.parent, false);
-        label.name = "OE_Label";
-        label.transform.SetSiblingIndex(index);
-        var text = label.GetComponent<TMP_Text>();
-        text.enableWordWrapping = false;
-        SetText(text, Texts.Get(key));
-        Size(label, text.GetPreferredValues(Texts.Get(key)).x + 4f, -1f);
-        label.SetActive(true);
-        return label;
-    }
-
-    // ---------- Sources ----------
-
-    void FillSources()
-    {
-        foreach (var source in ModCatalog.Sources)
-        {
-            var row = Copy(rowSource, listContent);
-            row.name = "OE_Source";
-            row.SetActive(true);
-            var url = source.Url;
-            RowBase(row, sourcePick == url, () => sourcePick = url);
-            row.transform.Find("Toggle")?.gameObject.SetActive(false);
-            RowPicture(row, source.IconPath, Texts.Get(source.TitleKey));
-            RowName(row, Texts.Get(source.TitleKey), source.BuiltIn ? new[] { W + "builtIn" } : null);
-            RowInfo(row, string.Format(Texts.Get(W + "mods"), source.Mods), Checked(source), source.NoteKey != null ? Texts.Get(source.NoteKey) : "");
-        }
-        ShowNothing(ModCatalog.Sources.Count == 0, W + "nothing");
-        BottomButton(W + "addUrl", ModCatalog.AddSource != null, () => AskForSource(W + "url.caption", W + "url.placeholder", ModCatalog.AddSource), 260f);
-        BottomButton(W + "addGitHub", ModCatalog.AddGitHubSource != null, () => AskForSource(W + "github.caption", W + "github.placeholder", ModCatalog.AddGitHubSource), 260f);
-        BottomButton(W + "checkAll", ModCatalog.CheckAll != null, () => ModCatalog.CheckAll?.Invoke(), 220f);
-    }
-
-    static string Checked(CatalogSource source) => source.LastChecked is { } when
-        ? string.Format(Texts.Get(W + "checked"), when.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture))
-        : Texts.Get(W + "checkedNever");
-
-    // ---------- the bottom left group ----------
-
-    void ClearBottom()
-    {
-        if (bottomGroup == null)
-            return;
-        for (var i = bottomGroup.childCount - 1; i >= 0; i--)
-            if (bottomGroup.GetChild(i).name.StartsWith("OE_", StringComparison.Ordinal))
-                UnityEngine.Object.DestroyImmediate(bottomGroup.GetChild(i).gameObject);
-        selectAll?.gameObject.SetActive(false);
-        selectAllText?.gameObject.SetActive(false);
-    }
-
-    void BottomButton(string key, bool available, Action click, float width = 150f)
-    {
-        if (textButtonTemplate == null || bottomGroup == null)
-            return;
-        var button = TextButton(bottomGroup, Texts.Get(key), width, click);
-        button.name = "OE_" + key.Substring(W.Length);
-        if (!available)
-            GreyOut(button, true);
-    }
-
-    // ---------- details ----------
-
-    void FillDetails()
-    {
-        Clear(infoContent);
-        if (tab == WindowTab.Sources)
-        {
-            var source = ModCatalog.Sources.FirstOrDefault(s => s.Url == sourcePick);
-            ShowPanel(source != null, W + "pickSource");
-            if (source != null)
-                SourceDetails(source);
-            return;
-        }
-        var id = tab == WindowTab.Installed ? installedPick : catalogPick;
-        var mod = id == null ? null : ModCatalog.Manager?.Id == id ? ModCatalog.Manager : ModCatalog.Mods.FirstOrDefault(m => m.Id == id);
-        ShowPanel(mod != null, W + "pickMod");
-        if (mod == null)
-            return;
-        if (screenshotsAsked.Add(mod.Id) && ModCatalog.LoadScreenshots is { } load)
-            Guard("load screenshots " + mod.Id, () => load(mod.Id));
-
-        if (panelTitle != null)
-            SetText(panelTitle, Texts.Get(mod.NameKey));
-        // The picture: the screenshot chosen (a click shows it big); none: the catalog's icon; neither: the panel's own
-        // ornaments.
-        var shots = (mod.Screenshots ?? Array.Empty<ModScreenshot>()).Where(s => s?.Path != null).ToList();
-        if (shotIndex >= shots.Count)
-            shotIndex = 0;
-        if (shots.Count > 0 && panelPicture != null)
-        {
-            ShowPanelPicture(null);
-            panelPicture.gameObject.SetActive(true);
-            ShowPicture(panelPicture, shots[shotIndex].Path, crop: false);
-            var path = shots[shotIndex].Path;
-            Clickable(panelPicture.gameObject, () => Redraw(() => bigShotPath = path));
-        }
-        else
-            ShowPanelPicture(CatalogIcon(mod.SourceNameKey));
-        SetPair(versionLabel, versionValue, Texts.Get(W + "versionLabel"),
-            mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available ?? "");
-        SetPair(originLabel, originValue, Texts.Get(W + "catalogLabel"), mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"));
-
-        if (!string.IsNullOrEmpty(mod.Author))
-            InfoLine(string.Format(Texts.Get(W + "author"), mod.Author));
-        InfoLine(mod.Installed != null && mod.HasUpdate && mod.Available != null ? string.Format(Texts.Get(W + "versions"), mod.Installed, mod.Available)
-            : mod.Installed != null ? string.Format(Texts.Get(W + "version"), mod.Installed)
-            : mod.Available != null ? string.Format(Texts.Get(W + "available"), mod.Available) : "");
-        if (mod.NoteKey != null)
-            InfoLine($"<color=#A5A5A5>{Texts.Get(mod.NoteKey)}</color>");
-        // The thumbnails: a click shows that one in the picture.
-        if (shots.Count > 1)
-        {
-            var strip = NewRect("OE_Shots", infoContent);
-            Size(strip.gameObject, 440f, 70f);
-            HRow(strip.gameObject, 8f, TextAnchor.MiddleLeft);
-            for (var i = 0; i < shots.Count && i < 5; i++)
-            {
-                var thumb = NewRect("Shot", strip);
-                Size(thumb.gameObject, 112f, 63f);
-                var picture = thumb.gameObject.AddComponent<RawImage>();
-                ShowPicture(picture, shots[i].Path, crop: true);
-                var index = i;
-                Clickable(thumb.gameObject, () => Redraw(() => shotIndex = index));
-            }
-        }
-        if (mod.TagKeys is { Count: > 0 } tagKeys)
-            Chips(tagKeys);
-        if (mod.DescriptionKey != null)
-            InfoText(Texts.Get(mod.DescriptionKey));
-        if (mod.RequiresKeys is { Count: > 0 } requires)
-            InfoText(string.Format(Texts.Get(W + "requires"), string.Join(", ", requires.Select(Texts.Get))));
-
-        // The buttons by tab: the big one Update / Install, the bin Remove.
-        // No Update and no Remove for a mod BepInEx loaded itself (ByHand).
-        if (tab == WindowTab.Installed)
-        {
-            PanelButton(primaryButton, W + "update", mod.HasUpdate && !mod.ByHand && ModCatalog.Update != null, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
-            PanelButton(deleteButton, null, mod != ModCatalog.Manager && mod.Installed != null && !mod.RequiredByOthers && !mod.ByHand && ModCatalog.Remove != null,
-                () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
-        }
-        else
-        {
-            PanelButton(primaryButton, W + "install", mod.Installed == null && mod.Available != null && ModCatalog.Install != null, () => ModCatalog.Install?.Invoke(mod.Id));
-            PanelButton(deleteButton, null, false, null);
-        }
-        PanelButton(secondaryButton, null, false, null);
-    }
-
-    void SourceDetails(CatalogSource source)
-    {
-        if (panelTitle != null)
-            SetText(panelTitle, Texts.Get(source.TitleKey));
-        ShowPanelPicture(source.IconPath);
-        SetPair(versionLabel, versionValue, Texts.Get(W + "modsLabel"), source.Mods.ToString());
-        SetPair(originLabel, originValue, Texts.Get(W + "checkedLabel"), source.LastChecked is { } when
-            ? when.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) : Texts.Get(W + "checkedNever"));
-        InfoText($"<color=#A5A5A5>{source.Url}</color>");
-        if (source.BuiltIn)
-            InfoLine(Texts.Get(W + "builtIn"));
-        if (source.NoteKey != null)
-            InfoText(Texts.Get(source.NoteKey));
-        if (source.SetCheckEvery is { } setEvery && dropdownSource != null)
-        {
-            InfoLine(Texts.Get(W + "every"));
-            var holder = NewRect("OE_Every", infoContent);
-            Size(holder.gameObject, 440f, 40f);
-            // Laid out from the left by the holder (the dropdown's own anchors are its row's).
-            var everyRow = HRow(holder.gameObject, 0f, TextAnchor.MiddleLeft);
-            everyRow.childControlWidth = everyRow.childControlHeight = false;
-            var dropdown = Copy(dropdownSource, holder).GetComponent<BhDropdown>();
-            dropdown.gameObject.SetActive(true);
-            BindDropdown(dropdown, i =>
-            {
-                if (i >= 0 && i < CheckEveryValues.Length)
-                    Guard("check every", () => setEvery(CheckEveryValues[i]));
-            });
-            var texts = Enumerable.Range(0, CheckEveryValues.Length).Select(i => Texts.Get($"{W}every.{i}")).ToArray();
-            dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), Math.Max(0, Array.IndexOf(CheckEveryValues, source.CheckEvery)), EDropdownType.Text);
-        }
-        PanelButton(primaryButton, W + "check", source.Check != null, () => source.Check?.Invoke());
-        PanelButton(deleteButton, null, source.Remove != null && !source.BuiltIn, () => source.Remove?.Invoke());
-        PanelButton(secondaryButton, null, false, null);
-    }
-
-    // An icon in the panel's picture area: whole, centred, at most a square in its middle (the area is the screenshot's,
-    // much bigger than an icon); null: the area off (the panel's ornaments show).
-    void ShowPanelPicture(string iconPath)
-    {
-        if (panelPicture == null)
-            return;
-        Clear(panelPicture.transform);
-        var texture = Picture(iconPath);
-        panelPicture.gameObject.SetActive(texture != null);
-        if (texture == null)
-            return;
-        panelPicture.texture = null;
-        panelPicture.color = new Color(0f, 0f, 0f, 0f);
-        Clickable(panelPicture.gameObject, () => { });
-        var icon = NewRect("OE_Icon", panelPicture.transform).gameObject.AddComponent<RawImage>();
-        icon.raycastTarget = false;
-        icon.texture = texture;
-        var rect = icon.rectTransform;
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = Vector2.zero;
-        var side = Math.Min(260f, Math.Min(panelPicture.rectTransform.rect.width, panelPicture.rectTransform.rect.height) - 40f);
-        var aspect = texture.height > 0 ? (float)texture.width / texture.height : 1f;
-        rect.sizeDelta = aspect >= 1f ? new Vector2(side, side / aspect) : new Vector2(side * aspect, side);
-    }
-
-    // The panel, or the empty one with a hint.
-    void ShowPanel(bool show, string hintKey)
-    {
-        panel?.gameObject.SetActive(show);
-        if (emptyPanel == null)
-            return;
-        emptyPanel.gameObject.SetActive(!show);
-        if (emptyPanel.Find("OE_Hint")?.GetComponent<TMP_Text>() is { } hint)
-            SetText(hint, Texts.Get(hintKey));
-    }
-
-    static void SetPair(TMP_Text label, TMP_Text value, string labelText, string valueText)
-    {
-        if (label != null)
-            SetText(label, labelText);
-        if (value != null)
-            SetText(value, valueText);
-    }
-
-    // A line of the panel's information, in its own style.
-    void InfoLine(string text)
-    {
-        if (lineTemplate == null || string.IsNullOrEmpty(text))
-            return;
-        var line = Copy(lineTemplate, infoContent);
-        line.name = "OE_Line";
-        line.SetActive(true);
-        var tmp = line.GetComponent<TMP_Text>();
-        tmp.enableWordWrapping = false;
-        tmp.overflowMode = TextOverflowModes.Ellipsis;
-        SetText(tmp, text);
-    }
-
-    // A text that wraps (the description), as the panel's own description.
-    void InfoText(string text)
-    {
-        var template = wrapTemplate ?? lineTemplate;
-        if (template == null || string.IsNullOrEmpty(text))
-            return;
-        var block = Copy(template, infoContent);
-        block.name = "OE_Text";
-        block.SetActive(true);
-        var tmp = block.GetComponent<TMP_Text>();
-        tmp.enableWordWrapping = true;
-        tmp.overflowMode = TextOverflowModes.Overflow;
-        SetText(tmp, text);
-        if (block.GetComponent<LayoutElement>() is { } element)
-            element.preferredHeight = element.minHeight = -1f;
-        if (block.GetComponent<ContentSizeFitter>() == null)
-            block.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-    }
-
-    // The tags as the game's chips, in rows as wide as the panel.
-    void Chips(IReadOnlyList<string> keys)
-    {
-        if (chipTemplate == null)
-            return;
-        Transform row = null;
-        var width = 0f;
-        foreach (var key in keys)
-        {
-            if (row == null || width > 360f)
-            {
-                row = NewRect("OE_Chips", infoContent);
-                Size(row.gameObject, 440f, 26f);
-                HRow(row.gameObject, 6f, TextAnchor.MiddleLeft);
-                width = 0f;
-            }
-            var chip = Copy(chipTemplate, row).GetComponent<BhTag>();
-            chip.gameObject.SetActive(true);
-            ShowChip(chip, key);
-            width += (chip.layoutElement != null ? chip.layoutElement.preferredWidth : 80f) + 6f;
-        }
-    }
-
-    // A button of the panel: our label (null: keep its picture) and action, hidden while not available.
-    void PanelButton(BhGenericButton button, string key, bool available, Action click)
-    {
-        if (button == null)
-            return;
-        button.gameObject.SetActive(available);
-        if (available)
-            Bind(button, key != null ? Texts.Get(key) : null, click, true);
-        if (available && ModCatalog.Busy)
-            GreyOut(button, true);
-    }
-
-    // ---------- the big screenshot ----------
-
-    void FillBigShot()
-    {
-        Clear(bigShot);
-        var path = bigShotPath;
-        bigShot.gameObject.SetActive(path != null);
-        if (path == null)
-            return;
-        bigShot.SetAsLastSibling();
-        var shade = bigShot.gameObject.GetComponent<Image>() ?? bigShot.gameObject.AddComponent<Image>();
-        shade.color = new Color(0f, 0f, 0f, 0.85f);
-        Clickable(bigShot.gameObject, () => Redraw(() => bigShotPath = null));
-        var picture = NewRect("Shot", bigShot).gameObject.AddComponent<RawImage>();
-        picture.raycastTarget = false;
-        var texture = Picture(path);
-        picture.texture = texture;
-        var rect = picture.rectTransform;
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = Vector2.zero;
-        var area = window.GetComponent<RectTransform>().rect;
-        var aspect = texture != null && texture.height > 0 ? (float)texture.width / texture.height : 16f / 9f;
-        var width = Math.Min(area.width - 80f, (area.height - 80f) * aspect);
-        rect.sizeDelta = new Vector2(width, width / aspect);
-    }
-
-    // ---------- the game's boxes: adding a source ----------
-
-    // First the game's own message box warning that nobody reviews other sources, then its input box for the address;
-    // they come over our window (PlaceCanvas), which waits under them.
-    void AskForSource(string captionKey, string placeholderKey, Action<string> add)
-    {
-        if (add == null)
-            return;
-        var options = new GameMessageBoxOptions();
-        options.Caption = Texts.Get(W + "warn.title");
-        options.Text = Texts.Get(W + "warn.text");
-        var go = new GameMessageBoxButton();
-        go.Label = Texts.Get(W + "warn.go");
-        go.Click = (Il2CppSystem.Action)(Action)(() => Guard("warning confirmed", () =>
-        {
-            // The input box a moment later: the message box closes first.
-            pendingBox = () => OpenInputBox(captionKey, placeholderKey, add);
-            pendingAt = Time.frameCount + 20;
-            suspendedAt = Time.frameCount + 20;
-        }));
-        var cancel = new GameMessageBoxButton();
-        cancel.Label = GameText("button_cancel", W + "cancel");
-        cancel.Click = (Il2CppSystem.Action)(Action)(() => Guard("warning cancelled", ResumeWindow));
-        options.Confirm = go;
-        options.Cancel = cancel;
-        SuspendWindow();
-        ScMessageBox.Open(options);
-    }
-
-    void OpenInputBox(string captionKey, string placeholderKey, Action<string> add)
-    {
-        var options = new GameInputBoxOptions();
-        options.Caption = Texts.Get(captionKey);
-        options.Placeholder = Texts.Get(placeholderKey);
-        options.ConfirmText = Texts.Get(W + "add");
-        options.CancelText = GameText("button_cancel", W + "cancel");
-        options.OnConfirm = (Il2CppSystem.Action<string>)(Action<string>)(text => Guard("source typed", () =>
-        {
-            ResumeWindow();
-            if (!string.IsNullOrWhiteSpace(text))
-                add(text.Trim());
-        }));
-        options.OnCancel = (Il2CppSystem.Action)(Action)(() => Guard("input cancelled", ResumeWindow));
-        SuspendWindow();
-        ScInputBox.Open(options);
-    }
-
-    // A game box is open over the window: the window stays (drawn under it, PlaceCanvas), only its own Escape waits;
-    // when the window is drawn over everything (no camera to share), it hides meanwhile.
-    void SuspendWindow()
-    {
-        suspended = true;
-        suspendedAt = Time.frameCount;
-        if (window != null && window.GetComponent<Canvas>().renderMode == RenderMode.ScreenSpaceOverlay)
-            window.SetActive(false);
-    }
-
-    void ResumeWindow()
-    {
-        if (!suspended || window == null)
-            return;
-        suspended = false;
-        resumedAt = Time.frameCount;
-        window.SetActive(true);
-        windowDirty = true;
-    }
-
-    // The window drawn as the game's screens are (its Load screen's canvas: the camera, its layer, an order above the
-    // Load screen's), so the game's message and input boxes, drawn above the screens, come over it. Without a camera
-    // to share (none found): over everything, and hidden while a box is open.
-    void PlaceCanvas()
-    {
-        var canvas = window.GetComponent<Canvas>();
-        var load = Scene.Find<Hex.UI.SaveLoad.ScLoad>()?.GetComponent<Canvas>();
-        var camera = load?.worldCamera ?? Scene.Find<ScMessageBox>()?.canvas?.worldCamera
-                     ?? UnityEngine.Object.FindObjectsOfType<Canvas>().FirstOrDefault(c => c != null && c.renderMode == RenderMode.ScreenSpaceCamera && c.worldCamera != null)?.worldCamera;
-        if (camera == null)
-        {
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = WindowOrder;
-            Logs.Once("Mods window: no UI camera, drawn over everything");
-            return;
-        }
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = camera;
-        if (load != null)
-        {
-            canvas.planeDistance = load.planeDistance;
-            canvas.sortingLayerID = load.sortingLayerID;
-        }
-        canvas.overrideSorting = true;
-        // Above every screen the game keeps switched on (settings ~2000, profile 1000, the Load screen 1600: one with a
-        // raycast target took the player's clicks, fogone 08.11) and just under the game's message box, which must come
-        // over it; the input box is drawn over the screen anyway.
-        var box = Scene.Find<ScMessageBox>()?.GetComponent<Canvas>();
-        var order = box != null ? box.sortingOrder - 2 : (load != null ? load.sortingOrder : ScreenOrder) + 50;
-        var old = canvas.sortingOrder;
-        canvas.sortingOrder = order;
-        foreach (var nested in window.GetComponentsInChildren<Canvas>(true))
-            if (nested != canvas && nested.overrideSorting)
-                nested.sortingOrder = order + (nested.sortingOrder - old);
-        Logs.Once($"Mods window: drawn with the camera {camera.name}, order {canvas.sortingOrder}");
-    }
-
-    // A box closed without telling us (the game's Escape, or a scene change): the window comes back once neither box
-    // is shown for a while.
-    void WatchGameBoxes()
-    {
-        if (pendingBox != null || Time.frameCount < suspendedAt + 60)
-            return;
-        if (Shown(Scene.Find<ScMessageBox>()) || Shown(Scene.Find<ScInputBox>()))
-        {
-            suspendedAt = Time.frameCount;
-            return;
-        }
-        ResumeWindow();
-    }
-
-    static bool Shown(BhScreen screen) => screen != null && screen.gameObject.activeInHierarchy && (screen.cg == null || screen.cg.alpha > 0.01f);
-
-    // A text of the game's own (its Cancel), ours when it has none.
-    static string GameText(string gameKey, string ownKey)
-    {
-        string text = null;
-        try { text = Game.Translate(gameKey); }
-        catch (Exception) { }
-        return string.IsNullOrEmpty(text) || text == gameKey ? Texts.Get(ownKey) : text;
-    }
-
-    // ---------- widgets ----------
-
-    void SwitchTab(WindowTab which)
-    {
-        tab = which;
-        bigShotPath = null;
-        shotIndex = 0;
-    }
-
-    // A text field: a copy of the game's input box's, in the filter row's size (its font halved: that box is drawn on
-    // a canvas twice as big), its placeholder ours, each change reported.
-    TMP_InputField NewInput(Transform parent, string placeholderKey, Action<string> changed)
-    {
-        if (inputTemplate == null)
-            return null;
-        var copy = Copy(inputTemplate.gameObject, parent);
-        copy.name = "OE_Input";
-        Size(copy, 380f, 31f);
-        copy.transform.Cast<RectTransform>().sizeDelta = new Vector2(380f, 31f);
-        copy.SetActive(true);
-        var input = copy.GetComponent<TMP_InputField>();
-        foreach (var text in copy.GetComponentsInChildren<TMP_Text>(true))
-            text.fontSize = 18f;
-        input.text = "";
-        input.characterLimit = 0;
-        if (input.placeholder != null && input.placeholder.GetComponent<TMP_Text>() is { } placeholder)
-            SetKey(placeholder, placeholderKey);
-        input.onValueChanged.AddListener((UnityAction<string>)(value => Guard("input", () => changed(value))));
-        return input;
-    }
-
-    // What a dropdown does with the option chosen (not while the window fills it).
-    void BindDropdown(BhDropdown dropdown, Action<int> changed) =>
-        dropdown.onValueChanged.AddListener((UnityAction<int>)(i => Guard("dropdown", () =>
-        {
-            if (!filling)
-                changed(i);
-        })));
-
-    // The dropdown's options: "All ..." and the names; set again only when they changed (Init closes a list the player
-    // has open). Returns what they are now.
-    static string SetOptions(BhDropdown dropdown, string allKey, List<string> keys, string chosen, string was)
-    {
-        if (dropdown == null)
-            return was;
-        var now = $"{Texts.Language}|{string.Join("|", keys)}|{chosen}";
-        if (now == was)
-            return was;
-        var texts = new[] { Texts.Get(allKey) }.Concat(keys.Select(Texts.Get)).ToArray();
-        var index = chosen != null ? keys.IndexOf(chosen) + 1 : 0;
-        dropdown.Init(new Il2CppSystem.Array(new Il2CppStringArray(texts).Pointer), index, EDropdownType.Text);
-        return now;
-    }
-
-    // The switch: a copy of the settings tab's switch, only its knob shown, centred (half size: the settings' canvas is
-    // twice as big).
-    void NewSwitch(Transform line, bool on, Action<bool> set)
-    {
-        var holder = NewRect("OE_Switch", line);
-        Size(holder.gameObject, 70f, 50f);
-        var copy = UnityEngine.Object.Instantiate(switchSource.gameObject, holder, false);
-        copy.name = "Switch";
-        copy.SetActive(true);
-        var copyRect = copy.transform.Cast<RectTransform>();
-        copyRect.anchorMin = copyRect.anchorMax = copyRect.pivot = new Vector2(0.5f, 0.5f);
-        copyRect.sizeDelta = new Vector2(140f, 100f);
-        copyRect.anchoredPosition = Vector2.zero;
-        copyRect.localScale = new Vector3(0.5f, 0.5f, 1f);
-        if (copy.GetComponent<Image>() is { } rowImage)
-            rowImage.color = new Color(0f, 0f, 0f, 0f);
-        for (var i = 0; i < copy.transform.childCount; i++)
-        {
-            var part = copy.transform.GetChild(i);
-            if (part.name == "CheckBox")
-            {
-                var knob = part.Cast<RectTransform>();
-                knob.anchorMin = knob.anchorMax = knob.pivot = new Vector2(0.5f, 0.5f);
-                knob.anchoredPosition = Vector2.zero;
-            }
-            else
-                part.gameObject.SetActive(false);
-        }
-        copy.GetComponent<BhSettingsCheckbox>().Init((Action<bool>)set, on);
-    }
-
-    // The remove cross: the information panel's own.
-    void NewCross(Transform line, Action click)
-    {
-        var cross = Copy(crossSource, line).GetComponent<BhGenericButton>();
-        cross.name = "OE_Remove";
-        Size(cross.gameObject, 37f, 37f);
-        cross.gameObject.SetActive(true);
-        Bind(cross, null, click, true);
-    }
-
-    // A text button: a copy of the panel's "Set up in the lobby" button.
-    BhGenericButton TextButton(Transform parent, string label, float width, Action click)
-    {
-        var button = Copy(textButtonTemplate, parent).GetComponent<BhGenericButton>();
-        button.name = "OE_Button";
-        Size(button.gameObject, width, 40f);
-        button.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, 40f);
-        button.gameObject.SetActive(true);
-        Bind(button, label, click, true);
-        if (button.label != null)
-        {
-            button.label.enableAutoSizing = true;
-            button.label.fontSizeMin = 10f;
-            button.label.fontSizeMax = Math.Max(button.label.fontSize, 12f);
-        }
-        if (ModCatalog.Busy)
-            GreyOut(button, true);
-        return button;
-    }
-
-    // Our label and action on a game button (the copy keeps the original's persistent click: a new event with ours).
-    void Bind(BhGenericButton button, string label, Action click, bool waits)
-    {
-        if (label != null)
-            SetText(button.label, label);
-        button.UnityClickEvent = new UnityEvent();
-        button.UnityClickEvent.AddListener((UnityAction)(() =>
-        {
-            if (waits && ModCatalog.Busy)
-                return;
-            Guard(label ?? button.name, click);
-            windowDirty = true;
-        }));
-    }
-
-    // A new button's Start (on its first shown frame) makes it available again: greyed out then, and on the frame after.
-    readonly List<(BhGenericButton button, int until)> greyed = new();
-
-    void GreyOut(BhGenericButton button, bool grey)
-    {
-        button.SetAvailable(!grey);
-        // Its label dimmed too (the grey picture keeps a bright label).
-        if (button.label != null)
-            button.label.alpha = grey ? 0.45f : 1f;
-        if (grey)
-            greyed.Add((button, Time.frameCount + 2));
-    }
-
-    void GreyLater()
-    {
-        for (var i = greyed.Count - 1; i >= 0; i--)
-        {
-            var (button, until) = greyed[i];
-            if (button == null || Time.frameCount > until)
-            {
-                greyed.RemoveAt(i);
-                continue;
-            }
-            button.SetAvailable(false);
-        }
-    }
-
-    // ---------- pictures ----------
-
-    // A screenshot's file as a texture, loaded once (the window's; destroyed with it).
-    Texture2D Picture(string path)
-    {
-        if (path == null)
-            return null;
-        if (textures.TryGetValue(path, out var known))
-            return known;
-        Texture2D texture = null;
-        try
-        {
-            texture = new Texture2D(2, 2);
-            if (!ImageConversion.LoadImage(texture, File.ReadAllBytes(path)))
-            {
-                UnityEngine.Object.Destroy(texture);
-                texture = null;
-            }
-        }
-        catch (Exception e)
-        {
-            Logs.Once($"Mods window: screenshot {path}: {e.Message}");
-            texture = null;
-        }
-        textures[path] = texture;
-        return texture;
-    }
-
-    // A picture in a frame of its own size: cut to fill it (crop) or whole.
-    void ShowPicture(RawImage image, string path, bool crop)
-    {
-        var texture = Picture(path);
-        image.texture = texture;
-        image.color = texture != null ? Color.white : new Color(0f, 0f, 0f, 0.35f);
-        if (texture == null || !crop || texture.height == 0)
-        {
-            image.uvRect = new Rect(0f, 0f, 1f, 1f);
-            return;
-        }
-        var frame = image.rectTransform.rect;
-        var frameAspect = frame.height > 0 ? frame.width / frame.height : 1f;
-        if (image.GetComponent<LayoutElement>() is { preferredHeight: > 0 } size)
-            frameAspect = size.preferredWidth / size.preferredHeight;
-        var aspect = (float)texture.width / texture.height;
-        image.uvRect = aspect > frameAspect
-            ? new Rect(0.5f - frameAspect / aspect / 2f, 0f, frameAspect / aspect, 1f)
-            : new Rect(0f, 0.5f - aspect / frameAspect / 2f, 1f, aspect / frameAspect);
-    }
-
-    // ---------- layout helpers ----------
-
-    static RectTransform NewRect(string name, Transform parent)
-    {
-        var go = new GameObject(name, Il2CppInterop.Runtime.Il2CppType.Of<RectTransform>());
-        go.transform.SetParent(parent, false);
-        return go.transform.Cast<RectTransform>();
-    }
-
-    // Wider, its left edge where it was (the group lays its children out from the left).
-    static void Widen(RectTransform rect, float width)
-    {
-        var grow = width - rect.rect.width;
-        if (grow <= 0f)
-            return;
-        rect.sizeDelta = new Vector2(rect.sizeDelta.x + grow, rect.sizeDelta.y);
-        rect.anchoredPosition += new Vector2(grow * rect.pivot.x, 0f);
-    }
-
-    static void Stretch(RectTransform rect)
-    {
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.offsetMin = rect.offsetMax = Vector2.zero;
-    }
-
-    // A copy of a widget, made inactive (its scripts wake up when it is shown), then put under the parent.
-    GameObject Copy(GameObject template, Transform parent)
-    {
-        var copy = UnityEngine.Object.Instantiate(template, staging.transform, false);
-        copy.SetActive(false);
-        copy.transform.SetParent(parent, false);
-        return copy;
-    }
-
-    static void Clear(Transform parent)
-    {
-        if (parent == null)
-            return;
-        for (var i = parent.childCount - 1; i >= 0; i--)
-            UnityEngine.Object.DestroyImmediate(parent.GetChild(i).gameObject);
-    }
-
-    static HorizontalLayoutGroup HRow(GameObject go, float spacing, TextAnchor alignment)
-    {
-        var line = go.GetComponent<HorizontalLayoutGroup>() ?? go.AddComponent<HorizontalLayoutGroup>();
-        line.spacing = spacing;
-        line.childAlignment = alignment;
-        line.childControlWidth = true;
-        line.childControlHeight = true;
-        line.childForceExpandWidth = line.childForceExpandHeight = false;
-        return line;
-    }
-
-    void Clickable(GameObject go, Action click)
-    {
-        if (go.GetComponent<Graphic>() == null)
-            go.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-        var button = go.GetComponent<Button>() ?? go.AddComponent<Button>();
-        button.transition = Selectable.Transition.None;
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener((UnityAction)(() => Guard("click", click)));
-    }
-
-    static LayoutElement Size(GameObject go, float width, float height)
-    {
-        var size = go.GetComponent<LayoutElement>() ?? go.AddComponent<LayoutElement>();
-        if (width >= 0f)
-            size.preferredWidth = size.minWidth = width;
-        if (height >= 0f)
-            size.preferredHeight = size.minHeight = height;
-        return size;
-    }
-
-    void Guard(string what, Action action)
-    {
-        try { action(); }
-        catch (Exception e) { Log.LogError($"mods window: {what}: {e}"); }
-    }
+    // ---------- closing ----------
 
     void HideModsWindow()
     {
@@ -1739,18 +605,18 @@ public partial class Plugin
             UnityEngine.Object.DestroyImmediate(window);
         if (modsButton != null)
             UnityEngine.Object.DestroyImmediate(modsButton.gameObject);
-        foreach (var texture in textures.Values)
-            if (texture != null)
-                UnityEngine.Object.Destroy(texture);
-        textures.Clear();
+        pictures?.Clear();
         window = staging = null;
         modsButton = null;
         titleText = statusText = nothingText = selectAllText = panelTitle = versionLabel = versionValue = originLabel = originValue = null;
         simpleTabs = null;
         tabList.Clear();
-        filterRow = listContent = bottomGroup = panel = emptyPanel = infoContent = bigShot = null;
+        filterRow = listContent = bottomGroup = panel = emptyPanel = infoContent = bigShotView = null;
         selectAll = null;
-        panelPicture = null;
+        shotSlots.Clear();
+        squaresBack = null;
+        panelShots.Clear();
+        bigShotIndex = -1;
         primaryButton = deleteButton = secondaryButton = null;
         filterInput = searchInput = inputTemplate = null;
         sortDropdown = null;
@@ -1762,5 +628,11 @@ public partial class Plugin
         greyed.Clear();
         suspended = false;
         pendingBox = null;
+    }
+
+    void Guard(string what, Action action)
+    {
+        try { action(); }
+        catch (Exception e) { Log.LogError($"mods window: {what}: {e}"); }
     }
 }

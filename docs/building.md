@@ -89,6 +89,9 @@ with the manager's own models (`mod-manager/shared/Catalog.cs`), each file with 
 
 - `.\publish-mods.ps1` builds every mod and writes the catalog into `release\catalog-preview`; nothing is published.
 - `.\publish-mods.ps1 -Mods battle-counter` only that mod.
+- `.\publish-mods.ps1 -Mods manager -MetaOnly core,visited` also the description of `core` and `visited` (texts, tags,
+  screenshots; `tools/catalog meta`), neither built nor released: their released versions stay. For a description
+  change of a mod whose code did not change, while the shared code compiled into it did.
 - `.\publish-mods.ps1 -Publish` creates the releases (`gh`) and puts `catalog\` on a branch of its own with a pull
   request, merged once the check passed (see "Changes to the repository" below).
 

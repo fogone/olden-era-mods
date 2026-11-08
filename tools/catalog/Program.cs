@@ -15,6 +15,9 @@ using OldenEra.Modding.Manager;
 //               --file <path>=<download URL> [--file ...]
 // The same version again with the same files: the game version is added to it (a build that works on another game
 // version too); with other files: refused (a version is never published twice with other content).
+//   catalog meta --catalog <dir> --root-url <url> --id <id> [the options above but --version, --game, --bepinex,
+//                --requires and --file]   (only the mod's description: name, texts, tags, screenshots, author, source,
+//                and the root file's name and icon; its releases stay as they are)
 var options = new Dictionary<string, List<string>>();
 for (var i = 1; i + 1 < args.Length; i += 2)
 {
@@ -25,8 +28,10 @@ for (var i = 1; i + 1 < args.Length; i += 2)
         options[key] = list = new List<string>();
     list.Add(args[i + 1]);
 }
-if (args.Length == 0 || args[0] != "add")
-    return Fail("usage: catalog add --catalog <dir> --root-url <url> --id <id> --version <v> --game <g> --bepinex <v> --file <path>=<url> ...");
+if (args.Length == 0 || args[0] is not ("add" or "meta"))
+    return Fail("usage: catalog add --catalog <dir> --root-url <url> --id <id> --version <v> --game <g> --bepinex <v> --file <path>=<url> ...\n" +
+                "       catalog meta --catalog <dir> --root-url <url> --id <id> [--tags ...] [--lang ...] [--screenshot ...]");
+var metaOnly = args[0] == "meta";
 
 string One(string key) => options.TryGetValue(key, out var v) ? v[^1] : null;
 string Need(string key) => One(key) ?? throw new ArgumentException($"--{key} is needed");
@@ -35,8 +40,6 @@ var json = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScrip
 var catalogDir = Need("catalog");
 var rootUrl = Need("root-url").TrimEnd('/');
 var id = Need("id");
-var version = Need("version");
-var game = Need("game");
 
 // The root file's name is required (it is shown everywhere): given now, or already in the file.
 var rootPath = Path.Combine(catalogDir, "catalog.json");
@@ -126,47 +129,14 @@ if (One("lang") is { } langDir && Directory.Exists(langDir))
     }
 }
 
-var files = (options.TryGetValue("file", out var fileArgs) ? fileArgs : new List<string>()).Select(f =>
+if (metaOnly)
 {
-    var at = f.IndexOf('=');
-    if (at <= 0)
-        throw new ArgumentException($"--file {f}: <path>=<url>");
-    var path = f[..at];
-    return new ReleaseFile
-    {
-        Name = Path.GetFileName(path),
-        Url = f[(at + 1)..],
-        Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant(),
-    };
-}).ToList();
-if (files.Count == 0)
-    return Fail("no --file");
-
-var release = meta.Releases.FirstOrDefault(r => r.Version == version);
-if (release != null)
-{
-    var same = release.Files.Count == files.Count && release.Files.All(r => files.Any(f => f.Name == r.Name && f.Sha256 == r.Sha256));
-    if (!same)
-        return Fail($"{id} {version} is published already with other files: raise the version");
-    if (!release.Games.Contains(game))
-        release.Games.Add(game);
-    Console.WriteLine($"{id} {version}: the same files, now also for the game {game}");
+    if (!meta.Releases.Any())
+        return Fail($"{id}: no release in the catalog yet; add one first");
+    Console.WriteLine($"{id}: the description only, the releases kept");
 }
-else
-{
-    release = new ModRelease
-    {
-        Version = version,
-        Games = { game },
-        BepInEx = One("bepinex"),
-        Files = files,
-        Requires = (One("requires") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(r => r.Split('@')).Select(p => new Requirement { Id = p[0].Trim(), Version = p.Length > 1 ? p[1].Trim() : null }).ToList(),
-    };
-    meta.Releases.Add(release);
-    meta.Releases.Sort((a, b) => VersionComparer.Instance.Compare(b.Version, a.Version));
-    Console.WriteLine($"{id} {version}: added for the game {game}");
-}
+else if (AddRelease() is var failed && failed != 0)
+    return failed;
 Directory.CreateDirectory(Path.GetDirectoryName(metaPath)!);
 File.WriteAllText(metaPath, JsonSerializer.Serialize(meta, json) + "\n");
 
@@ -177,6 +147,55 @@ if (!root.Mods.Any(m => m.Id == id))
 }
 File.WriteAllText(rootPath, JsonSerializer.Serialize(root, json) + "\n");
 return 0;
+
+// A release added to the meta file, or the game version added to the same release; non-zero: refused.
+int AddRelease()
+{
+    var version = Need("version");
+    var game = Need("game");
+    var files = (options.TryGetValue("file", out var fileArgs) ? fileArgs : new List<string>()).Select(f =>
+    {
+        var at = f.IndexOf('=');
+        if (at <= 0)
+            throw new ArgumentException($"--file {f}: <path>=<url>");
+        var path = f[..at];
+        return new ReleaseFile
+        {
+            Name = Path.GetFileName(path),
+            Url = f[(at + 1)..],
+            Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant(),
+        };
+    }).ToList();
+    if (files.Count == 0)
+        return Fail("no --file");
+    
+    var release = meta.Releases.FirstOrDefault(r => r.Version == version);
+    if (release != null)
+    {
+        var same = release.Files.Count == files.Count && release.Files.All(r => files.Any(f => f.Name == r.Name && f.Sha256 == r.Sha256));
+        if (!same)
+            return Fail($"{id} {version} is published already with other files: raise the version");
+        if (!release.Games.Contains(game))
+            release.Games.Add(game);
+        Console.WriteLine($"{id} {version}: the same files, now also for the game {game}");
+    }
+    else
+    {
+        release = new ModRelease
+        {
+            Version = version,
+            Games = { game },
+            BepInEx = One("bepinex"),
+            Files = files,
+            Requires = (One("requires") ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(r => r.Split('@')).Select(p => new Requirement { Id = p[0].Trim(), Version = p.Length > 1 ? p[1].Trim() : null }).ToList(),
+        };
+        meta.Releases.Add(release);
+        meta.Releases.Sort((a, b) => VersionComparer.Instance.Compare(b.Version, a.Version));
+        Console.WriteLine($"{id} {version}: added for the game {game}");
+    }
+    return 0;
+}
 
 static int Fail(string message)
 {

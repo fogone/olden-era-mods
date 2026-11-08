@@ -11,13 +11,12 @@ using OldenEra.Modding.Common;
 
 namespace OldenEra.Modding.Manager;
 
-// The manager's work with the catalog (issue #10, step 3): reading the sources, the updates for this game version,
-// installing and updating mods. The network on background threads; the results and the loading on the main thread
-// (Pump, every frame). Nothing is installed or updated by itself: the player asks (fogone 07.11: "Update" per mod and
-// "Update all", no automatic updates); the Mods window's buttons (issue #13, from the main menu) call these.
+// The manager's work with the catalog: reading the sources, the updates for this game version, installing and updating
+// mods. The network on background threads; the results and the loading on the main thread (Pump, every frame).
+// Nothing is installed or updated by itself: the Mods window's buttons call these when the player asks.
 public static class ManagerService
 {
-    // Our own catalog, built in (the repository's catalog/, issue #10); the player's own sources in oldenera-mods\sources.json (SourceStore).
+    // Our own catalog, built in (the repository's catalog/); the player's own sources are in oldenera-mods\sources.json (SourceStore).
     public const string BuiltInSource = "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/catalog.json";
     // The manager and the library: not reloadable, updated through the patcher at the next start (Updater).
     public const string ManagerId = "nobirds.oldenera.manager";
@@ -34,9 +33,9 @@ public static class ManagerService
     public static IReadOnlyList<ModMeta> Catalog { get; private set; }
     public static IReadOnlyList<Update> Updates { get; private set; } = Array.Empty<Update>();
     public static bool Busy { get; private set; }
-    // The last thing done or failed, for the tab.
+    // The last thing done or failed, for the log.
     public static string LastMessage { get; private set; }
-    // Whether the last thing asked failed (the tab says so; the log says why).
+    // Whether the last thing asked failed (the window says so; the log says why).
     public static bool LastFailed { get; private set; }
 
     public static void Init(ConfigFile config, ManualLogSource logSource, string game, string manager)
@@ -47,10 +46,10 @@ public static class ManagerService
         managerVersion = manager;
         // The config line is only read for the migration into sources.json (once, when that file is not there yet).
         var legacy = config.Bind("Catalog", "Sources", "",
-            "Old place of the player's sources, moved to oldenera-mods/sources.json in the BepInEx folder (the Mods window adds and removes them now).");
+            "Old place of the player's sources, moved to oldenera-mods/sources.json in the BepInEx folder (the Mods window adds and removes them).");
         store = SourceStore.Load(ManagerState.Folder, legacy.Value, line => log.LogWarning(line), BuiltInSource);
-        // A token for a private GitHub repository (debugging before the repository is public): the player's own, in a
-        // local file next to the state (oldenera-mods\github-token.txt), never in the catalog, git or a build.
+        // An optional GitHub token (a private repository, the API's rate limit): the player's own, in a local file next
+        // to the state (oldenera-mods\github-token.txt), never in the catalog, git or a build.
         var tokenFile = System.IO.Path.Combine(ManagerState.Folder, "github-token.txt");
         var token = System.IO.File.Exists(tokenFile) ? System.IO.File.ReadAllText(tokenFile) : null;
         fetcher = new GitHubFetch("OldenEraModManager/" + manager, token);
@@ -61,8 +60,6 @@ public static class ManagerService
 
     // The built-in source first, then the player's in the order added.
     public static IEnumerable<string> Sources => new[] { BuiltInSource }.Concat(store.Entries.Select(e => e.Url)).Distinct(StringComparer.OrdinalIgnoreCase);
-    // The player's sources with the names their root files gave (for the Mods window).
-    public static IReadOnlyList<SourceEntry> OwnSources => store.Entries;
     // How each source read the last time (the built-in one first); empty until read.
     public static IReadOnlyList<SourceResult> SourceResults { get; private set; } = Array.Empty<SourceResult>();
     // What the last add or remove of a source said, for the status line: a localization key and its arguments
@@ -183,7 +180,7 @@ public static class ManagerService
         });
     }
 
-    // ---------- the player's sources (issue #6) ----------
+    // ---------- the player's sources ----------
 
     static void Note(string key, params object[] args)
     {

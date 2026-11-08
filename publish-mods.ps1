@@ -6,8 +6,11 @@
 #   .\publish-mods.ps1                         -> builds every mod, writes the catalog into release\catalog-preview, publishes nothing
 #   .\publish-mods.ps1 -Mods battle-counter    -> only that one (the folder's name without mod-), still nothing published
 #   .\publish-mods.ps1 -Publish                -> the GitHub releases (gh, logged in) and catalog\ in the repository, committed and pushed
+#   .\publish-mods.ps1 -Mods manager -MetaOnly core,visited -Publish
+#                                              -> also the description (texts, tags, screenshots) of core and visited, neither
+#                                                 built nor released: their released versions stay as they are
 # The builds need the game's files (BepInEx interop), so they are made here; nothing is installed into the game.
-param([string[]]$Mods, [switch]$Publish, [string]$GameDir = "C:\XboxGames\Heroes of Might and Magic- Olden Era\Content")
+param([string[]]$Mods, [string[]]$MetaOnly, [switch]$Publish, [string]$GameDir = "C:\XboxGames\Heroes of Might and Magic- Olden Era\Content")
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
@@ -29,10 +32,10 @@ $catalogParts = [ordered]@{
     'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'fix,qol' }
     'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = ''; Tags = 'ui,qol' }
 }
-if ($Mods) {
-    foreach ($m in $Mods) { if (-not $catalogParts.Contains($m)) { throw "No mod $m; one of: $($catalogParts.Keys -join ', ')" } }
+foreach ($m in @($Mods) + @($MetaOnly) | Where-Object { $_ }) {
+    if (-not $catalogParts.Contains($m)) { throw "No mod $m; one of: $($catalogParts.Keys -join ', ')" }
 }
-$selected = if ($Mods) { $Mods } else { @($catalogParts.Keys) }
+$selected = @(if ($Mods -or $MetaOnly) { @($Mods) + @($MetaOnly) | Where-Object { $_ } } else { $catalogParts.Keys })
 
 # The game's version the builds are for: the generated names'.
 $names = Get-Content (Join-Path $root 'mod-common\shared\GameNames.g.cs') -Raw
@@ -52,10 +55,13 @@ $iconArgs = @('--icon', "$(Join-Path $root 'catalog\icon.png')=https://raw.githu
 
 foreach ($mod in $selected) {
     $part = $catalogParts[$mod]
-    "== $mod"
-    $builds = if ($part.Builds) { $part.Builds } else { @("mod-$mod") }
-    foreach ($b in $builds) {
-        & (Join-Path $root "$b\build.ps1") -GameDir $GameDir | Select-Object -Last 1
+    $descriptionOnly = $MetaOnly -contains $mod
+    "== $mod$(if ($descriptionOnly) { ' (the description only)' })"
+    if (-not $descriptionOnly) {
+        $builds = if ($part.Builds) { $part.Builds } else { @("mod-$mod") }
+        foreach ($b in $builds) {
+            & (Join-Path $root "$b\build.ps1") -GameDir $GameDir | Select-Object -Last 1
+        }
     }
     $pluginFolder = Join-Path $root "mod-$mod"
     $plugin = Get-ChildItem $pluginFolder -Filter *.cs | Select-String -Pattern 'BepInPlugin\("([^"]+)", "([^"]+)", "([^"]+)"\)' | Select-Object -First 1
@@ -95,6 +101,12 @@ foreach ($mod in $selected) {
         }
     }
     $tagsArgs = @(); if ($part.Tags) { $tagsArgs = @('--tags', $part.Tags) }
+    if ($descriptionOnly) {
+        & $dotnet $tool meta --catalog $catalog --root-url $rootUrl --id $id @tagsArgs @iconArgs --name 'Nobirds catalog' `
+            --author fogone --source "https://github.com/$repo" @langArgs @shotArgs
+        if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
+        continue
+    }
     & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
         @requiresArgs @tagsArgs @iconArgs --name 'Nobirds catalog' --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }

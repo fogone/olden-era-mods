@@ -254,7 +254,7 @@ public sealed class CatalogClient
         return (new SourceResult(source, root.Name, listed.Count, cached ? SourceState.Cached : SourceState.Read, null, root.Icon), metas);
     }
 
-    // ---------- screenshots (issue #14) ----------
+    // ---------- screenshots and icons ----------
 
     public const long MaxScreenshotSize = 2L * 1024 * 1024;
 
@@ -263,14 +263,17 @@ public sealed class CatalogClient
     static bool IsSha256(string text) => text != null && text.Length == 64 && text.All(Uri.IsHexDigit);
 
     // The cached file of a screenshot (<sha256>.png or .jpg in .cache\screens), or null while it is not downloaded.
-    public string ScreenshotPath(ScreenshotFile shot)
+    public string ScreenshotPath(ScreenshotFile shot) => CachedPicture(shot?.Sha256, ScreensFolder);
+
+    // A picture kept in a cache folder under its sha256 (.png or .jpg), or null.
+    static string CachedPicture(string sha256, string folder)
     {
-        if (!IsSha256(shot?.Sha256))
+        if (!IsSha256(sha256))
             return null;
-        var name = shot.Sha256.ToLowerInvariant();
+        var name = sha256.ToLowerInvariant();
         foreach (var extension in new[] { ".png", ".jpg" })
         {
-            var path = Path.Combine(ScreensFolder, name + extension);
+            var path = Path.Combine(folder, name + extension);
             if (File.Exists(path))
                 return path;
         }
@@ -313,26 +316,12 @@ public sealed class CatalogClient
         return path;
     }
 
-    // ---------- the catalog's icon ----------
-
     public const long MaxIconSize = 512L * 1024;
 
     string IconsFolder => Path.Combine(cacheFolder, "icons");
 
     // The cached file of a catalog's icon (<sha256>.png or .jpg in .cache\icons), or null while it is not downloaded.
-    public string IconPath(IconFile icon)
-    {
-        if (!IsSha256(icon?.Sha256))
-            return null;
-        var name = icon.Sha256.ToLowerInvariant();
-        foreach (var extension in new[] { ".png", ".jpg" })
-        {
-            var path = Path.Combine(IconsFolder, name + extension);
-            if (File.Exists(path))
-                return path;
-        }
-        return null;
-    }
+    public string IconPath(IconFile icon) => CachedPicture(icon?.Sha256, IconsFolder);
 
     // The icon into the cache and its path (already there: no download). Refused like a screenshot, 512 KB at most.
     public async Task<string> LoadIcon(IconFile icon) =>

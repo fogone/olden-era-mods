@@ -166,8 +166,6 @@ public sealed class SourceStore
             return CheckSchedule.IsDue(Find(url)?.CheckEvery, Find(url)?.LastChecked, now);
     }
 
-    public bool Contains(string url) { lock (gate) return entries.Any(e => string.Equals(e.Url, url, StringComparison.OrdinalIgnoreCase)); }
-
     // False when it is there already (case-insensitive) or empty.
     public bool Add(string url, string name)
     {
