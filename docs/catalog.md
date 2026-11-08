@@ -74,7 +74,7 @@ Nothing is installed or updated without the player's click; installing a mod fir
 | `description` | object | no | Same shape as `name`: what the mod does, shown in its details and searched by the Mods window's search box. May be `{}`. |
 | `author` | string | no | Shown to the player. |
 | `source` | string | no | Link to the repository or page. |
-| `tags` | string[] | no | Tag ids; the manager knows these by name: `map`, `battle`, `tooltip`, `ui`, `fix`, `qol`, `library`. The manager shows known tags by name (in the game's language) and unknown ones by id; the Mods window filters by them. Meta files without `tags` still read. |
+| `tags` | string[] | no | Tag ids; the manager knows these by name: `map`, `battle`, `tooltip`, `ui`, `fix`, `qol`, `library`, `info`, `squads`, `buildings`. The manager shows known tags by name (in the game's language) and unknown ones by id; the Mods window filters by them. Meta files without `tags` still read. |
 | `screenshots` | array | no | Pictures for the mod's details (see "Screenshots"). Meta files without it still read. |
 | `screenshots[].url` | string | yes | https URL of a PNG or JPG. |
 | `screenshots[].sha256` | string | yes | Hex sha256 (64 digits) of the file; a screenshot without a valid one is refused. |
