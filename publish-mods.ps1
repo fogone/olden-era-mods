@@ -47,6 +47,8 @@ $rootUrl = "https://raw.githubusercontent.com/$repo/main/catalog"
 & $dotnet build (Join-Path $root 'tools\catalog') -c Release -nologo -v:quiet | Out-Null
 if ($LASTEXITCODE -ne 0) { throw "tools\catalog does not build" }
 $tool = Join-Path $root 'tools\catalog\bin\Release\net10.0\catalog.dll'
+# The catalog's icon (catalog\icon.png, drawn by catalog\make-icon.ps1): shown for our mods that have no picture of their own.
+$iconArgs = @('--icon', "$(Join-Path $root 'catalog\icon.png')=https://raw.githubusercontent.com/$repo/main/catalog/icon.png")
 
 foreach ($mod in $selected) {
     $part = $catalogParts[$mod]
@@ -94,7 +96,7 @@ foreach ($mod in $selected) {
     }
     $tagsArgs = @(); if ($part.Tags) { $tagsArgs = @('--tags', $part.Tags) }
     & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
-        @requiresArgs @tagsArgs --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
+        @requiresArgs @tagsArgs @iconArgs --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the
