@@ -7,6 +7,36 @@
   "source": "https://github.com/fogone/olden-era-mods",
   "releases": [
     {
+      "version": "0.3.3",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraModManager.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.3.3/OldenEraModManager.dll",
+          "sha256": "b78b3b45287c57b45f68e141a68399107f42114d558ed5aa186d624afda6602a"
+        },
+        {
+          "name": "OldenEraCommon.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.3.3/OldenEraCommon.dll",
+          "sha256": "63b8eead098d13dc65b7ffb74de49ab819162364362d69863155b3e6c2d0740f"
+        },
+        {
+          "name": "OldenEraModManager.Patcher.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.3.3/OldenEraModManager.Patcher.dll",
+          "sha256": "cecd902abf1b6608cc3fa22c201f88387e469aa252cab92a6cb8d955124d04ba"
+        },
+        {
+          "name": "OldenEraSettings.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/manager-v0.3.3/OldenEraSettings.dll",
+          "sha256": "a358341b82386edbc570cce4a58f7973a1850e2381e3b830ffb9007d4a44bcef"
+        }
+      ]
+    },
+    {
       "version": "0.3.2",
       "games": [
         "0.82.07"
