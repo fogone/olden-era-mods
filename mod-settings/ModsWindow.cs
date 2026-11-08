@@ -247,7 +247,10 @@ public partial class Plugin
         windowRevision = ModMenu.Revision;
         SetText(windowHeader, Texts.Get(ModCatalog.TitleKey ?? TabKey));
         SetText(windowStatus, ModCatalog.StatusKey != null ? Texts.Get(ModCatalog.StatusKey) : "");
-        if (tableHeader.childCount == 0)
+        // Made again each time, as the rows are: the column names in the language of now (they stayed in the old one
+        // after the game's language changed).
+        for (var i = tableHeader.childCount - 1; i >= 0; i--)
+            UnityEngine.Object.DestroyImmediate(tableHeader.GetChild(i).gameObject);
         {
             var line = Line(tableHeader.gameObject, RowHeight);
             var dim = windowStatus.GetComponent<TMP_Text>().color * new Color(1f, 1f, 1f, 0.6f);
