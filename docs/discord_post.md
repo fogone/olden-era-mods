@@ -1,6 +1,7 @@
 # Discord post draft (Unfrozen, Olden Era mods channel)
 
-A draft, not posted. The channel's rule is one mod, one thread, updates in the same thread.
+**Posted** on 8 Nov 2026, the mod manager's thread: <https://discord.com/channels/446666100684357643/1568983544393367662>.
+The channel's rule is one mod, one thread: the manager's updates (and the catalog's news) go into that thread, never a new one.
 
 **The plan:** one thread for the mod manager first (it is how every other mod is installed and updated, and it lists
 them), then a thread of its own for each mod once it has screenshots, each linking back to the manager's thread.
