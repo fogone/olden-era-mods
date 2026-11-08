@@ -127,7 +127,7 @@ if ($Publish) {
         gh pr create --repo $repo --head $branch --base main --title $message --body "Published by publish-mods.ps1: the catalog's meta files for $($selected -join ', ') (game $gameVersion)."
         Start-Sleep 20   # the check is not reported at once
         gh pr checks $branch --repo $repo --watch --fail-fast
-        if ($LASTEXITCODE -eq 0) { gh pr merge $branch --repo $repo --squash --delete-branch }
+        if ($LASTEXITCODE -eq 0) { gh pr merge $branch --repo $repo --rebase --delete-branch   # rebase: the commit keeps its author (a squash takes the GitHub profile's name) }
         else { Write-Warning "the check did not pass: the pull request stays open, see it on GitHub" }
         git -C $root switch -q $here 2>$null
         git -C $root pull -q --ff-only 2>$null
