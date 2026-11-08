@@ -206,6 +206,24 @@ internal sealed class Commands
                     write(handler != null ? $"clicked {PathOf(target)}: handled by {PathOf(handler.transform)}" : $"clicked {PathOf(target)}: nobody handles a click there");
                 }
                 break;
+            case "hit":
+                // hit <x> <y>: what the UI raycast finds at a screen point (pixels from the bottom left), the topmost first:
+                // who takes a click there.
+                {
+                    if (words.Length < 3 || !float.TryParse(words[1], out var hx) || !float.TryParse(words[2], out var hy)) { write("hit <x> <y>"); break; }
+                    var es = UnityEngine.EventSystems.EventSystem.current;
+                    if (es == null) { write("no EventSystem"); break; }
+                    var data = new UnityEngine.EventSystems.PointerEventData(es) { position = new UnityEngine.Vector2(hx, hy) };
+                    var results = new Il2CppSystem.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+                    es.RaycastAll(data, results);
+                    write($"{results.Count} hits at {hx},{hy} (screen {UnityEngine.Screen.width}x{UnityEngine.Screen.height}):");
+                    for (var i = 0; i < results.Count && i < 15; i++)
+                    {
+                        var r = results[i];
+                        write($"  {r.sortingOrder} {r.sortingLayer} d={r.depth} {(r.gameObject != null ? PathOf(r.gameObject.transform) : "?")}");
+                    }
+                }
+                break;
             case "shot":
                 // shot <file.png>: the game's screen into a file, opaque, at full size.
                 {
