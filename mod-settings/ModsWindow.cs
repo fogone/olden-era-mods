@@ -209,6 +209,10 @@ public partial class Plugin
         window.SetActive(true);
         var canvas = window.GetComponent<Canvas>();
         canvas.enabled = true;
+        // The screen's raycaster is off while it is hidden (the game turns it on when it shows it): only the rows, under
+        // their own nested canvas, took clicks (08.11). Every raycaster of the copy on.
+        foreach (var raycaster in window.GetComponentsInChildren<GraphicRaycaster>(true))
+            raycaster.enabled = true;
         PlaceCanvas();
         if (window.GetComponent<CanvasGroup>() is { } rootGroup)
         {
@@ -1218,7 +1222,16 @@ public partial class Plugin
             canvas.sortingLayerID = load.sortingLayerID;
         }
         canvas.overrideSorting = true;
-        canvas.sortingOrder = (load != null ? load.sortingOrder : ScreenOrder) + 50;
+        // Above every screen the game keeps switched on (settings ~2000, profile 1000, the Load screen 1600: one with a
+        // raycast target took the player's clicks, fogone 08.11) and just under the game's message box, which must come
+        // over it; the input box is drawn over the screen anyway.
+        var box = Scene.Find<ScMessageBox>()?.GetComponent<Canvas>();
+        var order = box != null ? box.sortingOrder - 2 : (load != null ? load.sortingOrder : ScreenOrder) + 50;
+        var old = canvas.sortingOrder;
+        canvas.sortingOrder = order;
+        foreach (var nested in window.GetComponentsInChildren<Canvas>(true))
+            if (nested != canvas && nested.overrideSorting)
+                nested.sortingOrder = order + (nested.sortingOrder - old);
         Logs.Once($"Mods window: drawn with the camera {camera.name}, order {canvas.sortingOrder}");
     }
 
