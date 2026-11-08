@@ -16,3 +16,13 @@ jobs:
         env:
           PRIVATE_PATTERNS: ${{ secrets.PRIVATE_PATTERNS }}
         run: ./tools/check-public.ps1 -Base "origin/${{ github.base_ref }}" -Head "${{ github.event.pull_request.head.sha }}"
+      - name: The PowerShell scripts parse
+        shell: pwsh
+        run: |
+          $bad = 0
+          foreach ($script in Get-ChildItem -Recurse -Filter *.ps1) {
+            $errors = $null; $tokens = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($script.FullName, [ref]$tokens, [ref]$errors) | Out-Null
+            foreach ($e in $errors) { "$($script.FullName):$($e.Extent.StartLineNumber): $($e.Message)"; $bad++ }
+          }
+          if ($bad) { exit 1 }
