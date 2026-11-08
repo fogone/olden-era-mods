@@ -33,7 +33,7 @@ Nothing is installed or updated without the player's click; installing a mod fir
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `schema` | int | no | Format version, `1`. Not checked by the manager yet. |
-| `name` | string | no | Name of the catalog. Not used for anything the manager decides. |
+| `name` | string | yes | Name of the catalog, shown everywhere the source is. A root file without it still works, but the Mods window shows the source by its URL, with a note. `tools/catalog add` refuses to write a root file that has none (`--name`). |
 | `mods[].id` | string | yes | The mod's id (see "The mod id"). Must equal `id` inside the meta file, compared ignoring case. |
 | `mods[].meta` | string | yes | URL of the mod's meta file (https or a local `file:` URL). An entry without it is skipped. |
 
@@ -48,6 +48,9 @@ Nothing is installed or updated without the player's click; installing a mod fir
   "author": "me",
   "source": "https://github.com/me/mods",
   "tags": ["qol", "ui"],
+  "screenshots": [
+    { "url": "https://raw.githubusercontent.com/me/mods/HEAD/catalog/shots/hello.png", "sha256": "<64 hex digits>", "caption": { "english": "Hello on the map" } }
+  ],
   "releases": [
     {
       "version": "1.0.0",
@@ -71,6 +74,10 @@ Nothing is installed or updated without the player's click; installing a mod fir
 | `author` | string | no | Shown to the player. |
 | `source` | string | no | Link to the repository or page. |
 | `tags` | string[] | no | Tag ids, for example `["map","battle","ui","fix","qol","library"]`. The manager shows known tags by name and unknown ones by id. Meta files without `tags` still read. |
+| `screenshots` | array | no | Pictures for the mod's details (see "Screenshots"). Meta files without it still read. |
+| `screenshots[].url` | string | yes | https URL of a PNG or JPG. |
+| `screenshots[].sha256` | string | yes | Hex sha256 (64 digits) of the file; a screenshot without a valid one is refused. |
+| `screenshots[].caption` | object | no | Same shape as `name`; the game's language, English when missing, none when empty. |
 | `releases` | array | yes | One entry per version, any order (the manager sorts). |
 | `releases[].version` | string | yes | Dotted number such as `0.48.1`. Also the folder name `<id>\<version>\` on the player's disk. |
 | `releases[].games` | string[] | yes | Game versions this build works on, exactly as the game reports them (`0.82.07`, with the leading zero). A release is offered only when the list contains the running version. |
@@ -97,12 +104,22 @@ Nothing is installed or updated without the player's click; installing a mod fir
 - **Game version.** `ReleaseFor` takes the newest release (by version, see below) whose `games` contains the running
   game's version string, compared exactly. No match, no install, no update.
 - **Id match.** A mod whose meta file says another `id` than its catalog entry is left out (logged).
-- **Several sources.** A mod id present in several sources is taken from the first source (the built-in one comes
-  first); the rest are ignored. Ids compare ignoring case.
+- **Several sources.** A mod id present in several sources is taken from the source the installed mod came from (the
+  mod's `Source` in the state is its meta file's URL) when that source still lists it; otherwise from the first source
+  (the built-in one comes first). Ids compare ignoring case.
+- **Updates only from the source installed from.** An installed mod is offered an update only when the chosen meta file
+  is the one it was installed from. A mod whose source was removed, or that no longer lists it, gets no updates (it
+  stays installed). A mod put in by hand has no source and may update from any.
 - **Versions.** Compared by numbers, part by part, split on `.`, `-` and `+` (`0.48.10` is newer than `0.48.9`; a part
   that is not a number is compared as text). An update is offered when the release is newer than the installed version.
-- **Offline.** Root and meta files are cached in `BepInEx\oldenera-mods\.cache`; when a source cannot be fetched, the
-  cached copy is used. A source that fails with no cache is skipped.
+- **Offline and not due.** Root and meta files are cached in `BepInEx\oldenera-mods\.cache`; when a source cannot be
+  fetched, the cached copy is used. A source that fails with no cache is skipped. A source that is not due for a check
+  (see "Sources") is read from the cache only; with no cache it is "not checked".
+- **Screenshots.** Only https (a local file is not accepted here). At most 2 MB (2097152 bytes). The sha256 must be
+  given and must match. The file must be a PNG or a JPG by its first bytes, whatever the URL or extension says. Kept in
+  `BepInEx\oldenera-mods\.cache\screens\<sha256>.png|jpg` (written through a temporary file). Downloaded in the
+  background when the player opens the mod's details, not when the catalog is read; one already cached is not fetched
+  again. A refused or failed one is logged and left out; the others still load.
 - **A version is never republished with other files.** This is a convention enforced by `tools/catalog`, not by the
   manager: players who installed `1.0.0` would not be offered a changed `1.0.0`. Raise the version instead. The same
   files may be listed again with one more game version in `games`.
@@ -133,15 +150,39 @@ Mods that need our core (`nobirds.oldenera.core`) list it in `requires`.
    `https://raw.githubusercontent.com/<owner>/<repo>/HEAD/catalog/catalog.json`.
    The `meta` URLs inside can point to the same repository the same way.
 
-A player adds the source today by editing `BepInEx\config\nobirds.oldenera.manager.cfg`:
+The player adds it in the game's Mods window (the window is being built, issue #14; the manager's side is done):
 
-```ini
-[Catalog]
-Sources = https://raw.githubusercontent.com/<owner>/<repo>/HEAD/catalog/catalog.json
+- **Add by URL** takes the root file's URL. Only https; a URL already in the list is refused. The root file is read
+  from the network first (never from the cache); a source that cannot be read is not added. The mods it lists then
+  appear in the window.
+- **Add from GitHub** takes `owner` or `owner/repo` (a pasted `https://github.com/owner[/repo]` works too, deeper
+  paths are cut to owner and repository) and builds
+  `https://raw.githubusercontent.com/<owner>/<repo>/HEAD/catalog/catalog.json`; without a repository the name is
+  `olden-era-mods`. Owner: letters, digits and `-`, up to 39 characters; repository: letters, digits, `-`, `_`, `.`, up to
+  100. Anything else is refused. Then it is added like any URL.
+
+The player's sources can be removed (the built-in one cannot). Removing a source leaves its mods installed; they get no
+updates, because a mod updates only from the source it was installed from.
+
+How often each source is checked is set per source: `start` (every start, the default), `daily`, `weekly` or `manual`.
+At the game's start a source that is due is read from the network and gets a last-check time; the others are read
+from the cache. `daily`: last read on an earlier day; `weekly`: seven or more days ago; `manual`: never by itself; a
+source never read is due unless `manual`. Unknown values read as `start`. **Check** reads one source now, **Check all**
+every source; neither installs anything.
+
+Sources are stored in `BepInEx\oldenera-mods\sources.json`:
+
+```json
+{ "schema": 1,
+  "builtIn": { "checkEvery": "daily", "lastChecked": "2026-11-08T10:00:00" },
+  "sources": [ { "url": "https://.../catalog.json", "name": "My mods", "added": "2026-11-08", "checkEvery": "weekly", "lastChecked": "2026-11-08T10:00:00" } ] }
 ```
 
-Several URLs are separated by spaces. The change is read at the next start. An "Add from GitHub" button in the game
-that takes `<owner>/<repo>` and builds this URL is planned (issue #6).
+`name` is the root file's name as last read. The built-in source is not in `sources` (its URL is fixed in the manager);
+only its check settings are kept. When the file does not exist yet, the old config line `[Catalog] Sources` in
+`BepInEx\config\nobirds.oldenera.manager.cfg` (URLs separated by spaces) is moved into it once; after that the config
+line is ignored. A file that cannot be read is copied to `sources.json.bad` and the list starts empty. Nothing is
+installed or updated by a source check: the player asks for each.
 
 ## Writing meta files with tools/catalog
 
@@ -151,12 +192,17 @@ that takes `<owner>/<repo>` and builds this URL is planned (issue #6).
 dotnet run --project tools/catalog -- add --catalog catalog --root-url https://raw.githubusercontent.com/me/mods/HEAD/catalog ^
   --id me.oldenera.hello --version 1.0.0 --game 0.82.07 --bepinex 6.0.0-be.788 ^
   --requires nobirds.oldenera.core --lang mod-hello/lang --author me --source https://github.com/me/mods ^
+  --name "My mods" --screenshot shots/hello.png=https://raw.githubusercontent.com/me/mods/HEAD/catalog/shots/hello.png^|Hello ^
   --file Hello.dll=https://github.com/me/mods/releases/download/hello-v1.0.0/Hello.dll
 ```
 
 Options: `--catalog <dir>` (holds `catalog.json` and `mods\`), `--root-url`, `--id`, `--version`, `--game`, `--file
 <path>=<URL>` (repeatable; the name is the path's file name) are required (`--file` at least once); `--bepinex`,
-`--requires id[@version],...`, `--author`, `--source` are optional; `--lang <folder>` takes the mod's names from every
+`--requires id[@version],...`, `--author`, `--source` are optional; `--name <catalog name>` sets the root file's name
+and is required while the root file has none (the tool refuses otherwise); `--screenshot <path>=<url>[|<english
+caption>]` (repeatable) computes the sha256 of the local picture and writes the list, replacing the mod's screenshots
+(refused: no such file, over 2 MB, not a PNG or JPG, URL not https; the caption is written as `english`; split at the
+last `|`); `--lang <folder>` takes the mod's names from every
 `<language>.json` in it (token `oe.<last part of the id>.title`); `--tags a,b,c` sets the tags (replacing them). The
 tool does not write `description` yet; edit the file by hand. Same version with the same files adds the game version to `games`; the same version with other
 files is refused. Releases are written newest first, root entries sorted by id.

@@ -48,8 +48,9 @@ on hover. "mods …" next to the game's version in the main menu means everythin
 the mods and their state.
 
 **Where the mods come from.** The manager reads the catalog of this repository (`catalog/`) over HTTPS and checks every
-downloaded file against its SHA-256 in the catalog. More catalogs can be added in
-`BepInEx\config\nobirds.oldenera.manager.cfg` (`[Catalog] Sources`); nobody reviews them, add only ones you trust.
+downloaded file against its SHA-256 in the catalog. More catalogs can be added in the Mods window (by URL, or from
+GitHub by `owner` or `owner/repo`; kept in `BepInEx\oldenera-mods\sources.json`); nobody reviews them, add only ones you
+trust.
 
 **Removing:** remove the mods in the mods window, then delete `OldenEra*.dll` from `BepInEx\plugins` and
 `BepInEx\patchers`, and the folder `BepInEx\oldenera-mods`.
