@@ -7,8 +7,8 @@ using OldenEra.Modding.Common;
 
 namespace OldenEra.Modding.Manager;
 
-// The mods window's data (issue #10, #13, #14, #6: the Mods button in the main menu; mod-settings draws it from
-// ModCatalog): the manager's own entry, every mod (installed and the catalog's), the sources and the actions.
+// The Mods window's data (mod-settings draws it from ModCatalog): the manager's own entry, every mod (installed and the
+// catalog's), the sources and the actions.
 // The names, descriptions, notes and tags are composed per language (a mod's name in that language from its meta
 // file), under keys stable per mod id. Made again when what they show changes (Refresh, from ManagerService.Pump).
 public static class CatalogRows
@@ -35,9 +35,9 @@ public static class CatalogRows
         string.Join(";", ManagerService.SourceResults.Select(r => $"{r.Url},{r.Name},{r.Mods},{r.State}")) + "/" + ManagerService.SourceNote?.Key + ManagerService.SourceNote?.Args.FirstOrDefault();
 
     // The mods with a menu that the manager did not install: their set, versions, switches and state.
-    static IEnumerable<ModMenu> ByHand() => ModMenu.All.Where(m => m.Guid != ManagerService.ManagerId && ModLoader.State.Find(m.Guid) == null);
+    static IEnumerable<ModMenu> ByHand() => ModMenu.All.Where(m => ManagerService.IsByHand(m.Guid));
 
-    static string ByHandSignature() => ModMenu.Revision + ":" + string.Join(",", ByHand().Select(m => m.Guid + m.Version + m.Enabled.Value + m.IsOff));
+    static string ByHandSignature() => string.Join(",", ByHand().Select(m => m.Guid + m.Version + m.Enabled.Value + m.IsOff));
 
     static string Compose(string key, Func<ELang, string> text) => Texts.Compose(Prefix + key, text);
 
@@ -90,7 +90,7 @@ public static class CatalogRows
         var busy = ManagerService.Busy;
 
         // A line under the heading only when there is something to say: working, the last thing failed, the catalog not
-        // read yet, the outcome of adding or removing a source. Not the counts: the tabs show them (fogone 08.11).
+        // read yet, the outcome of adding or removing a source. Not the counts: the tabs show them.
         var statusKey = busy ? "oe.manager.status.busy"
             : ManagerService.LastFailed ? "oe.manager.status.failed"
             : catalog == null ? "oe.manager.status.none" : null;
@@ -133,7 +133,7 @@ public static class CatalogRows
                 requires.Select(NameKey).ToList(), shots, note);
         }
 
-        // The manager itself: its update, what the patcher did at the start (no "updated from": fogone 07.11).
+        // The manager itself: its update, and what the patcher did at the start when it staged or rolled back an update.
         var self = updates.FirstOrDefault(u => u.Id == ManagerService.ManagerId);
         var managerMeta = MetaOf(ManagerService.ManagerId);
         var managerRelease = managerMeta == null ? null : CatalogClient.ReleaseFor(managerMeta, gameVersion);

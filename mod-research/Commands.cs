@@ -35,7 +35,8 @@ internal sealed class Commands
 #   types <regex>               the game's types whose name matches (at most 100)
 #   click <path end>              a mouse click on the active UI object whose path ends so (enter, down, up, click, exit),
 #                                 e.g. click OE_Row_nobirds.oldenera.visited/Remove
-#   objects Type                  the live Unity objects of that type (at most 80): name, active, scene, path; each kept as $o0, $o1...
+#   objects Type [regex]          the live Unity objects of that type (at most 80; regex: by name, sprite or path): name, active, scene, path; each kept as $o0, $o1...
+#   sprite <name> <file.png>      a loaded sprite of the game into a PNG file (with its size and 9-slice border)
 #   holders Type              the game's properties of that type (who holds a config, a service)
 #   fields Type                 the class's fields with their offsets (code reading [obj+0xB8] reads the one at +0xB8)
 #   slot Type 0x238             the method in the class's virtual slot (code calling [klass+0x238])
@@ -172,13 +173,20 @@ internal sealed class Commands
                 {
                     var il2cppType = Il2CppInterop.Runtime.Il2CppType.From(type);
                     var number = 0;
-                    foreach (var o in UnityEngine.Resources.FindObjectsOfTypeAll(il2cppType).Take(80))
+                    // objects Type <regex>: only those whose name, image sprite or path matches.
+                    var filter = words.Length > 2 ? new System.Text.RegularExpressions.Regex(string.Join(" ", words.Skip(2)), System.Text.RegularExpressions.RegexOptions.IgnoreCase) : null;
+                    static string SpriteOf(UnityEngine.Object o) => o.TryCast<UnityEngine.UI.Image>()?.sprite?.name;
+                    foreach (var o in UnityEngine.Resources.FindObjectsOfTypeAll(il2cppType)
+                                 .Where(o => filter == null || filter.IsMatch(o.name) || (SpriteOf(o) is { } s && filter.IsMatch(s))
+                                             || (o.TryCast<UnityEngine.Component>() is { } c && filter.IsMatch(PathOf(c.transform))))
+                                 .Take(80))
                     {
                         var go = o.TryCast<UnityEngine.Component>()?.gameObject;
                         var canvas = o.TryCast<UnityEngine.Canvas>();
+                        var sprite = SpriteOf(o);
                         // Each one kept as $o<n>, as the type it was asked for, for eval and inspect.
                         Eval.Variables[$"o{number}"] = ((object)o).CastTo(type);
-                        write($"  $o{number++} {type.Name} '{o.name}'{(canvas != null ? $" order={canvas.sortingOrder} layer={canvas.sortingLayerName} mode={canvas.renderMode} root={canvas.isRootCanvas} scale={canvas.scaleFactor}" : "")}{(go != null ? $" active={go.activeInHierarchy} scene='{go.scene.name}' path={PathOf(go.transform)}" : "")}");
+                        write($"  $o{number++} {type.Name} '{o.name}'{(sprite != null ? $" sprite={sprite}" : "")}{(canvas != null ? $" order={canvas.sortingOrder} layer={canvas.sortingLayerName} mode={canvas.renderMode} root={canvas.isRootCanvas} scale={canvas.scaleFactor}" : "")}{(go != null ? $" active={go.activeInHierarchy} scene='{go.scene.name}' path={PathOf(go.transform)}" : "")}");
                     }
                 }
                 break;
@@ -238,6 +246,31 @@ internal sealed class Commands
                     UnityEngine.Object.Destroy(rgb);
                     System.IO.File.WriteAllBytes(argument, png);
                     write($"screenshot {png.Length} bytes into {argument}");
+                }
+                break;
+            case "sprite":
+                // sprite <name> <file.png>: a loaded sprite of the game into a file (its atlas is not readable: drawn
+                // into a render texture first, then its rect read back).
+                {
+                    var sprite = UnityEngine.Resources.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<UnityEngine.Sprite>())
+                        .Select(o => o.TryCast<UnityEngine.Sprite>()).FirstOrDefault(s => s != null && s.name == argument);
+                    if (sprite == null || words.Length < 3) { write($"no sprite {argument} (sprite <name> <file.png>)"); break; }
+                    var source = sprite.texture;
+                    var rt = UnityEngine.RenderTexture.GetTemporary(source.width, source.height, 0, UnityEngine.RenderTextureFormat.ARGB32);
+                    UnityEngine.Graphics.Blit(source, rt);
+                    var before = UnityEngine.RenderTexture.active;
+                    UnityEngine.RenderTexture.active = rt;
+                    var r = sprite.textureRect;
+                    var picture = new UnityEngine.Texture2D((int)r.width, (int)r.height, UnityEngine.TextureFormat.RGBA32, false);
+                    picture.ReadPixels(new UnityEngine.Rect(r.x, r.y, r.width, r.height), 0, 0);
+                    picture.Apply();
+                    UnityEngine.RenderTexture.active = before;
+                    UnityEngine.RenderTexture.ReleaseTemporary(rt);
+                    var png = UnityEngine.ImageConversion.EncodeToPNG(picture);
+                    UnityEngine.Object.Destroy(picture);
+                    var file = string.Join(" ", words.Skip(2));
+                    System.IO.File.WriteAllBytes(file, png);
+                    write($"sprite {sprite.name} {r.width:0}x{r.height:0} (border {sprite.border}) into {file}");
                 }
                 break;
             case "tree":

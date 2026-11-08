@@ -207,6 +207,25 @@ protected override void OnLoad()
 
 `mod-fixes/Plugin.cs` is a short example of an event plus a tick; `mod-map-tooltip/Plugin.cs` of several events.
 
+### UI helpers (`mod-common/shared`)
+
+A window or a panel of a mod is best made from the game's own widgets, so it looks and behaves like the game. These
+helpers are compiled into every mod; each file starts with a short usage example. `mod-settings/ModsWindow*.cs` (the
+Mods window, a copy of the game's Load screen) uses all of them.
+
+- `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
+  off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts); `Place`
+  draws it with the game's UI camera just under the game's message box; `DrawOnTop` puts a part over the rest.
+  Destroy the copy with `DestroyImmediate` in `OnUnload`.
+- `GameBoxes` — the game's message box (`Confirm`: a question with two buttons) and input box (`Ask`: a line of text),
+  one call each with callbacks; `AnyShown` tells whether one is on screen.
+- `Pictures`, `PictureCache` — PNG or JPG files loaded once into textures; shown filling a frame (`Cover`, cut) or whole
+  in an area (`FitInside`), the aspect kept.
+- `GameUi` — the Load screen's filter (`SetUpFilter`, `Ticked`), a tag chip (`ShowChip`), a dropdown's options
+  (`SetDropdownTexts`), a check box (`Check`), through the game's own methods.
+- `UiLayout` — `NewRect`, `Stretch`, `Size`, `HRow`, `Widen`, `Clear`, `Hide`, `Clickable` for building UI next to
+  the game's widgets (`using static OldenEra.Modding.Common.UiLayout;`).
+
 ## 4. Using the game's code
 
 **The main rule: use the game's own functions, do not rewrite its logic.** Damage, danger, joining, fleeing, visits,
