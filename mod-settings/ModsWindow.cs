@@ -28,8 +28,9 @@ namespace OldenEra.Modding.Settings;
 public partial class Plugin
 {
     const string ModsButtonName = "OE_ModsButton", WindowName = "OE_ModsWindow", CloseKey = "oe.settings.close", W = "oe.settings.w.";
-    // Under the 30000 of Unity's dropdown lists, over the menus.
-    const int WindowOrder = 29000;
+    // Drawn as the game's screens are, over its Load screen (PlaceCanvas); without a UI camera over everything, under the
+    // 30000 of Unity's dropdown lists.
+    const int WindowOrder = 29000, ScreenOrder = 1600;
     static readonly string[] CheckEveryValues = { "start", "daily", "weekly", "manual" };
 
     // The Load screen's scripts that run it (taken off the copy: it shows our data, not saves).
@@ -73,7 +74,7 @@ public partial class Plugin
 
     // A game box (the warning, the input box) is open: our window waits hidden under it.
     bool suspended;
-    int suspendedAt;
+    int suspendedAt, resumedAt = -10;
     Action pendingBox;
     int pendingAt;
 
@@ -110,7 +111,8 @@ public partial class Plugin
         }
         if (!window.activeSelf)
             return;
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // The Escape that closed a game box over the window is not the window's (the box calls back in the same frame).
+        if (Input.GetKeyDown(KeyCode.Escape) && Time.frameCount > resumedAt + 1)
         {
             if (bigShotPath != null)
                 Redraw(() => bigShotPath = null);
@@ -164,6 +166,7 @@ public partial class Plugin
         {
             if (window == null && !BuildWindow())
                 return;
+            PlaceCanvas();
             window.SetActive(true);
             suspended = false;
             screenshotsAsked.Clear();
@@ -206,8 +209,7 @@ public partial class Plugin
         window.SetActive(true);
         var canvas = window.GetComponent<Canvas>();
         canvas.enabled = true;
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = WindowOrder;
+        PlaceCanvas();
         if (window.GetComponent<CanvasGroup>() is { } rootGroup)
         {
             rootGroup.alpha = 1f;
@@ -633,7 +635,7 @@ public partial class Plugin
                 })));
             }
         }
-        RowPicture(row, mod.Screenshots?.FirstOrDefault(s => s?.Path != null)?.Path);
+        RowPicture(row, mod.Screenshots?.FirstOrDefault(s => s?.Path != null)?.Path ?? CatalogIcon(mod.SourceNameKey), Texts.Get(mod.NameKey));
         RowName(row, Texts.Get(mod.NameKey), mod.TagKeys);
         if (catalog)
             RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "", mod.Available ?? mod.Installed ?? "",
@@ -677,21 +679,44 @@ public partial class Plugin
         Clickable(row, () => Redraw(pick));
     }
 
-    void RowPicture(GameObject row, string path)
+    // The row's picture: a screenshot or the catalog's icon in the save's icon frame; with none, the name's first
+    // letter in the frame, in the name's own font and colour (as the game's campaign rows show their act's numeral).
+    void RowPicture(GameObject row, string path, string name)
     {
         var icon = row.transform.Find("IconFrame/Icon");
         if (icon == null)
             return;
-        // The save's icon is not ours: the first screenshot over it, or the frame empty.
+        // The save's icon is not ours.
         if (icon.GetComponent<Image>() is { } image)
             image.enabled = false;
-        if (path == null)
+        if (Picture(path) != null)
+        {
+            var picture = NewRect("OE_Shot", icon).gameObject.AddComponent<RawImage>();
+            Stretch(picture.rectTransform);
+            picture.raycastTarget = false;
+            ShowPicture(picture, path, crop: true);
             return;
-        var picture = NewRect("OE_Shot", icon).gameObject.AddComponent<RawImage>();
-        Stretch(picture.rectTransform);
-        picture.raycastTarget = false;
-        ShowPicture(picture, path, crop: true);
+        }
+        var title = row.transform.Find("HeaderGroup/SessionName")?.GetComponent<TMP_Text>();
+        var letter = string.IsNullOrWhiteSpace(name) ? "" : name.Trim().Substring(0, 1).ToUpperInvariant();
+        if (title == null || letter.Length == 0)
+            return;
+        var text = NewRect("OE_Letter", icon).gameObject.AddComponent<TextMeshProUGUI>();
+        Stretch(text.rectTransform);
+        text.font = title.font;
+        text.fontSharedMaterial = title.fontSharedMaterial;
+        text.color = title.color;
+        text.fontSize = 52f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.enableWordWrapping = false;
+        text.overflowMode = TextOverflowModes.Overflow;
+        text.raycastTarget = false;
+        text.text = letter;
     }
+
+    // The icon of the catalog a mod comes from (its name key is the source's), or null.
+    static string CatalogIcon(string sourceNameKey) =>
+        sourceNameKey == null ? null : ModCatalog.Sources.FirstOrDefault(s => s.TitleKey == sourceNameKey)?.IconPath;
 
     void RowName(GameObject row, string name, IReadOnlyList<string> tagKeys)
     {
@@ -761,7 +786,7 @@ public partial class Plugin
             var url = source.Url;
             RowBase(row, sourcePick == url, () => sourcePick = url);
             row.transform.Find("Toggle")?.gameObject.SetActive(false);
-            RowPicture(row, null);
+            RowPicture(row, source.IconPath, Texts.Get(source.TitleKey));
             RowName(row, Texts.Get(source.TitleKey), source.BuiltIn ? new[] { W + "builtIn" } : null);
             RowInfo(row, string.Format(Texts.Get(W + "mods"), source.Mods), Checked(source), source.NoteKey != null ? Texts.Get(source.NoteKey) : "");
         }
@@ -821,20 +846,21 @@ public partial class Plugin
 
         if (panelTitle != null)
             SetText(panelTitle, Texts.Get(mod.NameKey));
-        // The picture: the screenshot chosen (a click shows it big); none: the panel's own ornaments.
+        // The picture: the screenshot chosen (a click shows it big); none: the catalog's icon; neither: the panel's own
+        // ornaments.
         var shots = (mod.Screenshots ?? Array.Empty<ModScreenshot>()).Where(s => s?.Path != null).ToList();
         if (shotIndex >= shots.Count)
             shotIndex = 0;
-        if (panelPicture != null)
+        if (shots.Count > 0 && panelPicture != null)
         {
-            panelPicture.gameObject.SetActive(shots.Count > 0);
-            if (shots.Count > 0)
-            {
-                ShowPicture(panelPicture, shots[shotIndex].Path, crop: false);
-                var path = shots[shotIndex].Path;
-                Clickable(panelPicture.gameObject, () => Redraw(() => bigShotPath = path));
-            }
+            ShowPanelPicture(null);
+            panelPicture.gameObject.SetActive(true);
+            ShowPicture(panelPicture, shots[shotIndex].Path, crop: false);
+            var path = shots[shotIndex].Path;
+            Clickable(panelPicture.gameObject, () => Redraw(() => bigShotPath = path));
         }
+        else
+            ShowPanelPicture(CatalogIcon(mod.SourceNameKey));
         SetPair(versionLabel, versionValue, Texts.Get(W + "versionLabel"),
             mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available ?? "");
         SetPair(originLabel, originValue, Texts.Get(W + "catalogLabel"), mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"));
@@ -889,7 +915,7 @@ public partial class Plugin
     {
         if (panelTitle != null)
             SetText(panelTitle, Texts.Get(source.TitleKey));
-        panelPicture?.gameObject.SetActive(false);
+        ShowPanelPicture(source.IconPath);
         SetPair(versionLabel, versionValue, Texts.Get(W + "modsLabel"), source.Mods.ToString());
         SetPair(originLabel, originValue, Texts.Get(W + "checkedLabel"), source.LastChecked is { } when
             ? when.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture) : Texts.Get(W + "checkedNever"));
@@ -919,6 +945,31 @@ public partial class Plugin
         PanelButton(primaryButton, W + "check", source.Check != null, () => source.Check?.Invoke());
         PanelButton(deleteButton, null, source.Remove != null && !source.BuiltIn, () => source.Remove?.Invoke());
         PanelButton(secondaryButton, null, false, null);
+    }
+
+    // An icon in the panel's picture area: whole, centred, at most a square in its middle (the area is the screenshot's,
+    // much bigger than an icon); null: the area off (the panel's ornaments show).
+    void ShowPanelPicture(string iconPath)
+    {
+        if (panelPicture == null)
+            return;
+        Clear(panelPicture.transform);
+        var texture = Picture(iconPath);
+        panelPicture.gameObject.SetActive(texture != null);
+        if (texture == null)
+            return;
+        panelPicture.texture = null;
+        panelPicture.color = new Color(0f, 0f, 0f, 0f);
+        Clickable(panelPicture.gameObject, () => { });
+        var icon = NewRect("OE_Icon", panelPicture.transform).gameObject.AddComponent<RawImage>();
+        icon.raycastTarget = false;
+        icon.texture = texture;
+        var rect = icon.rectTransform;
+        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = Vector2.zero;
+        var side = Math.Min(260f, Math.Min(panelPicture.rectTransform.rect.width, panelPicture.rectTransform.rect.height) - 40f);
+        var aspect = texture.height > 0 ? (float)texture.width / texture.height : 1f;
+        rect.sizeDelta = aspect >= 1f ? new Vector2(side, side / aspect) : new Vector2(side * aspect, side);
     }
 
     // The panel, or the empty one with a hint.
@@ -1037,7 +1088,7 @@ public partial class Plugin
     // ---------- the game's boxes: adding a source ----------
 
     // First the game's own message box warning that nobody reviews other sources, then its input box for the address;
-    // our window waits hidden while they are open (the game's boxes draw under our canvas).
+    // they come over our window (PlaceCanvas), which waits under them.
     void AskForSource(string captionKey, string placeholderKey, Action<string> add)
     {
         if (add == null)
@@ -1081,11 +1132,14 @@ public partial class Plugin
         ScInputBox.Open(options);
     }
 
+    // A game box is open over the window: the window stays (drawn under it, PlaceCanvas), only its own Escape waits;
+    // when the window is drawn over everything (no camera to share), it hides meanwhile.
     void SuspendWindow()
     {
         suspended = true;
         suspendedAt = Time.frameCount;
-        window.SetActive(false);
+        if (window != null && window.GetComponent<Canvas>().renderMode == RenderMode.ScreenSpaceOverlay)
+            window.SetActive(false);
     }
 
     void ResumeWindow()
@@ -1093,8 +1147,37 @@ public partial class Plugin
         if (!suspended || window == null)
             return;
         suspended = false;
+        resumedAt = Time.frameCount;
         window.SetActive(true);
         windowDirty = true;
+    }
+
+    // The window drawn as the game's screens are (its Load screen's canvas: the camera, its layer, an order above the
+    // Load screen's), so the game's message and input boxes, drawn above the screens, come over it. Without a camera
+    // to share (none found): over everything, and hidden while a box is open.
+    void PlaceCanvas()
+    {
+        var canvas = window.GetComponent<Canvas>();
+        var load = Scene.Find<Hex.UI.SaveLoad.ScLoad>()?.GetComponent<Canvas>();
+        var camera = load?.worldCamera ?? Scene.Find<ScMessageBox>()?.canvas?.worldCamera
+                     ?? UnityEngine.Object.FindObjectsOfType<Canvas>().FirstOrDefault(c => c != null && c.renderMode == RenderMode.ScreenSpaceCamera && c.worldCamera != null)?.worldCamera;
+        if (camera == null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = WindowOrder;
+            Logs.Once("Mods window: no UI camera, drawn over everything");
+            return;
+        }
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = camera;
+        if (load != null)
+        {
+            canvas.planeDistance = load.planeDistance;
+            canvas.sortingLayerID = load.sortingLayerID;
+        }
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = (load != null ? load.sortingOrder : ScreenOrder) + 50;
+        Logs.Once($"Mods window: drawn with the camera {camera.name}, order {canvas.sortingOrder}");
     }
 
     // A box closed without telling us (the game's Escape, or a scene change): the window comes back once neither box
