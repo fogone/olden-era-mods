@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"Versión"},
 {"sid":"oe.settings.w.catalogLabel","text":"Catálogo"},
 {"sid":"oe.settings.w.modsLabel","text":"Mods"},
-{"sid":"oe.settings.w.checkedLabel","text":"Última comprobación"}
+{"sid":"oe.settings.w.checkedLabel","text":"Última comprobación"},
+{"sid":"oe.settings.w.tagsLabel","text":"Etiquetas"},
+{"sid":"oe.settings.w.sourcesLabel","text":"Fuentes"},
+{"sid":"oe.settings.w.sort.0","text":"Por nombre"},
+{"sid":"oe.settings.w.sort.1","text":"No instalados primero"},
+{"sid":"oe.settings.w.sort.2","text":"Instalados primero"}
 ]
 }

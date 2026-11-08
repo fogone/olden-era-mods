@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"Verze"},
 {"sid":"oe.settings.w.catalogLabel","text":"Katalog"},
 {"sid":"oe.settings.w.modsLabel","text":"Módy"},
-{"sid":"oe.settings.w.checkedLabel","text":"Naposledy zkontrolováno"}
+{"sid":"oe.settings.w.checkedLabel","text":"Naposledy zkontrolováno"},
+{"sid":"oe.settings.w.tagsLabel","text":"Štítky"},
+{"sid":"oe.settings.w.sourcesLabel","text":"Zdroje"},
+{"sid":"oe.settings.w.sort.0","text":"Podle názvu"},
+{"sid":"oe.settings.w.sort.1","text":"Nenainstalované první"},
+{"sid":"oe.settings.w.sort.2","text":"Nainstalované první"}
 ]
 }

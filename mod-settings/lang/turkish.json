@@ -63,6 +63,11 @@
 {"sid":"oe.settings.w.versionLabel","text":"Sürüm"},
 {"sid":"oe.settings.w.catalogLabel","text":"Katalog"},
 {"sid":"oe.settings.w.modsLabel","text":"Modlar"},
-{"sid":"oe.settings.w.checkedLabel","text":"Son kontrol"}
+{"sid":"oe.settings.w.checkedLabel","text":"Son kontrol"},
+{"sid":"oe.settings.w.tagsLabel","text":"Etiketler"},
+{"sid":"oe.settings.w.sourcesLabel","text":"Kaynaklar"},
+{"sid":"oe.settings.w.sort.0","text":"Ada göre"},
+{"sid":"oe.settings.w.sort.1","text":"Önce yüklenmeyenler"},
+{"sid":"oe.settings.w.sort.2","text":"Önce yüklenenler"}
 ]
 }

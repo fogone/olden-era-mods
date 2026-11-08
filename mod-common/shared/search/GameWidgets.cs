@@ -124,6 +124,24 @@ internal static partial class Game
     static readonly Lookup<MethodInfo> tagColor = Lookup<MethodInfo>.Among("tag chip colour",
         () => typeof(BhTag).Methods().Instance().Returns(typeof(void)).Takes(typeof(UnityEngine.Color)).DistinctCode(), Members.Name, onlyOne: true).Generate("ShowColor");
 
+    // ---------- the save list's filter (BhFilter: a funnel button opening a list of check marks) ----------
+
+    // Its options set up (BhFilter.uxi(string[], Action)): an element per name (a localization key the game translates),
+    // the action called when one is ticked or unticked.
+    static readonly Lookup<MethodInfo> filterInit = Lookup<MethodInfo>.Among("save filter set up",
+        () => typeof(Hex.UI.SaveLoad.BhFilter).Methods().Instance().Returns(typeof(void))
+            .Takes(typeof(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStringArray), typeof(Il2CppSystem.Action)).DistinctCode(),
+        Members.Name, onlyOne: true).Generate("SetUp");
+
+    // Its elements (BhFilter.cfax), in the order of the names.
+    static readonly Lookup<PropertyInfo> filterElements = Lookup<PropertyInfo>.Among("save filter elements",
+        () => Properties(typeof(Hex.UI.SaveLoad.BhFilter)).Where(p => p.PropertyType == typeof(Il2CppSystem.Collections.Generic.List<Hex.UI.SaveLoad.BhFilterElement>)),
+        Name, onlyOne: true).Generate("Elements");
+
+    // Whether an element is ticked (BhFilterElement.uxo, its flag +0x48).
+    static readonly GameMethod<Hex.UI.SaveLoad.BhFilterElement, bool> filterElementOn =
+        new GameMethod<Hex.UI.SaveLoad.BhFilterElement, bool>("save filter element ticked", m => !m.IsStatic && m.GetParameters().Length == 0).Generate("Ticked");
+
     // ---------- buttons and check marks ----------
 
     // A button available or greyed out (BhGenericButton.uhb): the active and grey looks, and its flag (+0xA8).
