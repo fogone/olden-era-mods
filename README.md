@@ -20,14 +20,34 @@ their own way; they ask the game.
 
 ## Installing
 
-In PowerShell (Windows 10/11, no administrator rights needed), paste:
+Close the game, open PowerShell (Windows 10/11, no administrator rights needed) and paste one of these.
+
+**Install** (BepInEx and the mod manager; the mods you then pick in the game):
 
 ```powershell
 irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1 | iex
 ```
 
-Options: `& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -DryRun`
-(also `-Uninstall`, `-RemoveBepInEx` with it, `-Game <folder>`). `-DryRun` only looks and says what it would do.
+**See what it would do**, changing nothing:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -DryRun
+```
+
+**Uninstall** the mods and the mod manager (BepInEx stays):
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -Uninstall
+```
+
+**Uninstall everything**, BepInEx too:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -Uninstall -RemoveBepInEx
+```
+
+When the game is not found by itself, add `-Game "<the game's folder>"` (the folder with `HeroesOldenEra.exe`), e.g.
+`& ([scriptblock]::Create((irm https://raw.githubusercontent.com/fogone/olden-era-mods/main/install/install.ps1))) -Game "D:\Games\Olden Era"`.
 
 The script finds the game (Game Pass or Steam; it asks if it cannot), refuses while the game runs, checks the game's
 version and BepInEx's, installs BepInEx `6.0.0-be.788` if it is missing or another (SHA-256 checked), then the mod
