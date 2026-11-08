@@ -260,12 +260,20 @@ public static class ManagerService
         });
     });
 
+    // A mod with a menu that the manager did not install (BepInEx loaded it from plugins or devplugins).
+    public static bool IsByHand(string id) => id != ManagerId && ModLoader.State.Find(id) == null && ModMenu.All.Any(m => m.Guid == id);
+
     // Removes installed mods (ModLoader.Remove), dependents first; one that a mod staying installed requires is left
     // out. On the main thread, nothing to download.
     public static void Remove(IReadOnlyList<string> ids)
     {
         if (Busy || ids == null)
             return;
+        // Mods BepInEx loaded by itself (installed by hand) are not the manager's to remove: their files are the player's.
+        var byHand = ids.Count(IsByHand);
+        if (byHand > 0)
+            log.LogInfo($"remove: {byHand} mods installed by hand are left, remove their files yourself");
+        ids = ids.Where(id => !IsByHand(id)).ToList();
         var order = Batch.Removable(ids, ModLoader.State.Mods);
         var failed = 0;
         foreach (var id in order)
@@ -289,6 +297,14 @@ public static class ManagerService
         if (Busy || ids == null)
             return;
         var failed = 0;
+        // A mod installed by hand: its own switch in its menu (the next start, or at once for a mod that can reload).
+        foreach (var id in ids.Where(IsByHand))
+            if (ModMenu.All.FirstOrDefault(m => m.Guid == id) is { } menu)
+            {
+                menu.Enabled.Value = enabled;
+                log.LogInfo($"{(enabled ? "on" : "off")} {id}: its menu switch");
+            }
+        ids = ids.Where(id => !IsByHand(id)).ToList();
         var order = Batch.SwitchOrder(ids, ModLoader.State.Mods, enabled);
         foreach (var id in order)
         {
