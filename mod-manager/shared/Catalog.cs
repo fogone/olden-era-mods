@@ -51,6 +51,8 @@ public sealed class ModMeta
 
     // The URL it was read from (not in the file).
     [JsonIgnore] public string Url { get; set; }
+    // The root file (the source) that listed it (not in the file).
+    [JsonIgnore] public string SourceUrl { get; set; }
 
     public string NameIn(string language) =>
         Name.TryGetValue(language, out var name) || Name.TryGetValue("english", out name) ? name : Id;
@@ -78,6 +80,21 @@ public sealed class ReleaseFile
     [JsonPropertyName("name")] public string Name { get; set; }
     [JsonPropertyName("url")] public string Url { get; set; }
     [JsonPropertyName("sha256")] public string Sha256 { get; set; }
+}
+
+public enum SourceState { Read, Failed, Cached }
+
+// How one source's root file read: its name, how many mods it lists, its state (Failed: nothing came and there is no
+// cached copy; Cached: a cached copy was used) and why when it failed.
+public sealed record SourceResult(string Url, string Name, int Mods, SourceState State, string Error);
+
+// What a reading of the sources gave: every meta of every source (All, in the sources' order), the one chosen per id
+// (Mods) and how each source read.
+public sealed class CatalogReading
+{
+    public List<ModMeta> Mods { get; set; } = new();
+    public List<ModMeta> All { get; set; } = new();
+    public List<SourceResult> Sources { get; set; } = new();
 }
 
 // What the catalog has for one installed mod: a newer release for this game version.
@@ -120,8 +137,9 @@ public sealed class CatalogClient
         return bytes;
     }
 
-    // A meta file read from its URL, kept in the cache; the cached one when it cannot be read (no network).
-    async Task<T> GetJson<T>(string url) where T : class
+    // A meta file read from its URL, kept in the cache; the cached one when it cannot be read (no network) and
+    // `useCache` (a source being added is not taken from the cache). Cached: whether the cached copy was used.
+    async Task<(T value, bool cached)> GetJson<T>(string url, bool useCache = true) where T : class
     {
         var cached = Path.Combine(cacheFolder, Hex(SHA256.HashData(Encoding.UTF8.GetBytes(url))) + ".json");
         try
@@ -130,47 +148,81 @@ public sealed class CatalogClient
             var value = JsonSerializer.Deserialize<T>(bytes, options) ?? throw new IOException($"{url}: empty");
             Directory.CreateDirectory(cacheFolder);
             File.WriteAllBytes(cached, bytes);
-            return value;
+            return (value, false);
         }
-        catch (Exception e) when (File.Exists(cached))
+        catch (Exception e) when (useCache && File.Exists(cached))
         {
             log($"{url}: {e.Message}; the cached copy is used");
-            return JsonSerializer.Deserialize<T>(File.ReadAllBytes(cached), options);
+            return (JsonSerializer.Deserialize<T>(File.ReadAllBytes(cached), options), true);
         }
     }
 
-    // Every mod of the sources (their root files): a mod in several sources is taken from the first.
-    public async Task<List<ModMeta>> Read(IEnumerable<string> sources)
+    // Every mod of the sources (their root files). A mod in several sources: the one from the source it was installed
+    // from (an installed mod's Source is its meta file's URL), else from the first source.
+    public async Task<List<ModMeta>> Read(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null) =>
+        (await ReadAll(sources, installed)).Mods;
+
+    public async Task<CatalogReading> ReadAll(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null)
     {
-        var mods = new List<ModMeta>();
+        var reading = new CatalogReading();
         foreach (var source in sources)
         {
-            CatalogRoot root;
-            try { root = await GetJson<CatalogRoot>(source); }
-            catch (Exception e)
-            {
-                log($"source {source}: {e.Message}");
-                continue;
-            }
-            foreach (var entry in root.Mods.Where(m => !string.IsNullOrWhiteSpace(m?.Meta)))
-            {
-                if (mods.Any(m => string.Equals(m.Id, entry.Id, StringComparison.OrdinalIgnoreCase)))
-                    continue;
-                try
-                {
-                    var meta = await GetJson<ModMeta>(entry.Meta);
-                    if (!string.Equals(meta.Id, entry.Id, StringComparison.OrdinalIgnoreCase))
-                    {
-                        log($"{entry.Meta}: says it is {meta.Id}, the catalog lists it as {entry.Id}; left out");
-                        continue;
-                    }
-                    meta.Url = entry.Meta;
-                    mods.Add(meta);
-                }
-                catch (Exception e) { log($"{entry.Id} ({entry.Meta}): {e.Message}"); }
-            }
+            var (result, metas) = await ReadSource(source, true);
+            reading.Sources.Add(result);
+            reading.All.AddRange(metas);
         }
-        return mods;
+        reading.Mods = Choose(reading.All, installed);
+        return reading;
+    }
+
+    // One source's root file and the mods' meta files it lists. `useCache`: the cached copies stand in for what cannot
+    // be read; off for a source being added, which must read for real.
+    public async Task<(SourceResult result, List<ModMeta> metas)> ReadSource(string source, bool useCache)
+    {
+        var metas = new List<ModMeta>();
+        CatalogRoot root;
+        bool cached;
+        try { (root, cached) = await GetJson<CatalogRoot>(source, useCache); }
+        catch (Exception e)
+        {
+            log($"source {source}: {e.Message}");
+            return (new SourceResult(source, null, 0, SourceState.Failed, e.Message), metas);
+        }
+        var listed = root.Mods?.Where(m => !string.IsNullOrWhiteSpace(m?.Meta)).ToList() ?? new List<CatalogEntry>();
+        foreach (var entry in listed)
+        {
+            if (metas.Any(m => string.Equals(m.Id, entry.Id, StringComparison.OrdinalIgnoreCase)))
+                continue;
+            try
+            {
+                var (meta, metaCached) = await GetJson<ModMeta>(entry.Meta, useCache);
+                cached |= metaCached;
+                if (!string.Equals(meta.Id, entry.Id, StringComparison.OrdinalIgnoreCase))
+                {
+                    log($"{entry.Meta}: says it is {meta.Id}, the catalog lists it as {entry.Id}; left out");
+                    continue;
+                }
+                meta.Url = entry.Meta;
+                meta.SourceUrl = source;
+                metas.Add(meta);
+            }
+            catch (Exception e) { log($"{entry.Id} ({entry.Meta}): {e.Message}"); }
+        }
+        return (new SourceResult(source, root.Name, listed.Count, cached ? SourceState.Cached : SourceState.Read, null), metas);
+    }
+
+    // One meta per id, in the order the ids first appear: the installed mod's own source's (its Source is the meta
+    // file's URL) when that source listed it, else the first source's.
+    public static List<ModMeta> Choose(IEnumerable<ModMeta> all, IEnumerable<InstalledMod> installed)
+    {
+        var own = (installed ?? Array.Empty<InstalledMod>()).Where(m => !string.IsNullOrEmpty(m.Source)).ToList();
+        var chosen = new List<ModMeta>();
+        foreach (var group in all.GroupBy(m => m.Id, StringComparer.OrdinalIgnoreCase))
+        {
+            var from = own.FirstOrDefault(m => string.Equals(m.Id, group.Key, StringComparison.OrdinalIgnoreCase))?.Source;
+            chosen.Add(from != null ? group.FirstOrDefault(m => string.Equals(m.Url, from, StringComparison.OrdinalIgnoreCase)) ?? group.First() : group.First());
+        }
+        return chosen;
     }
 
     // The newest release made for this game version, or null.
@@ -180,7 +232,8 @@ public sealed class CatalogClient
     // The installed mods the catalog has a newer release of for this game version (not one that failed before).
     public static List<Update> Updates(IEnumerable<ModMeta> catalog, ManagerState state, string gameVersion) =>
         state.Mods.Select(installed => (installed, meta: catalog.FirstOrDefault(m => string.Equals(m.Id, installed.Id, StringComparison.OrdinalIgnoreCase))))
-            .Where(x => x.meta != null)
+            // A mod updates only from the source it was installed from (one put by hand has none).
+            .Where(x => x.meta != null && (string.IsNullOrEmpty(x.installed.Source) || string.Equals(x.installed.Source, x.meta.Url, StringComparison.OrdinalIgnoreCase)))
             .Select(x => (x.installed, x.meta, release: ReleaseFor(x.meta, gameVersion)))
             .Where(x => x.release != null && VersionComparer.Instance.Compare(x.release.Version, x.installed.Version) > 0)
             .Select(x => new Update(x.installed.Id, x.installed.Version, x.release, x.meta))

@@ -25,5 +25,14 @@
 {"sid":"oe.manager.tag.fix","text":"修正"},
 {"sid":"oe.manager.tag.qol","text":"便利機能"},
 {"sid":"oe.manager.tag.library","text":"ライブラリ"}
+{"sid":"oe.manager.src.notHttps","text":"追加できません: https のアドレスのみ使えます"},
+{"sid":"oe.manager.src.duplicate","text":"追加できません: このソースはすでにリストにあります"},
+{"sid":"oe.manager.src.badGitHub","text":"追加できません: GitHub 名は owner または owner/repo の形で入力してください"},
+{"sid":"oe.manager.src.readFailed","text":"追加できません: 読み込めません ({0})"},
+{"sid":"oe.manager.src.added","text":"ソースを追加しました: {0}、MOD {1} 件"},
+{"sid":"oe.manager.src.removed","text":"ソースを削除しました: {0}"},
+{"sid":"oe.manager.src.note.failed","text":"読み込めません"},
+{"sid":"oe.manager.src.note.cached","text":"保存したコピーから"},
+{"sid":"oe.manager.src.note.read","text":"読み込み済み"}
 ]
 }

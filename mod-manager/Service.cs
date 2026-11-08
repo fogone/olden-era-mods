@@ -17,14 +17,14 @@ namespace OldenEra.Modding.Manager;
 // "Update all", no automatic updates); the Mods window's buttons (issue #13, from the main menu) call these.
 public static class ManagerService
 {
-    // Our own catalog, built in (the repository's catalog/, issue #10); more sources in the config, one URL per line.
+    // Our own catalog, built in (the repository's catalog/, issue #10); the player's own sources in oldenera-mods\sources.json (SourceStore).
     public const string BuiltInSource = "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/catalog.json";
     // The manager and the library: not reloadable, updated through the patcher at the next start (Updater).
     public const string ManagerId = "nobirds.oldenera.manager";
 
     static ManualLogSource log;
     static CatalogClient client;
-    static ConfigEntry<string> extraSources;
+    static SourceStore store;
     static string gameVersion;
     static string managerVersion;
     static GitHubFetch fetcher;
@@ -45,8 +45,10 @@ public static class ManagerService
         Texts.Load(typeof(ManagerService).Assembly);
         gameVersion = game;
         managerVersion = manager;
-        extraSources = config.Bind("Catalog", "Sources", "",
-            "More catalog sources: the URLs of their root meta files (https), separated by spaces. Nobody reviews them: add only sources you trust.");
+        // The config line is only read for the migration into sources.json (once, when that file is not there yet).
+        var legacy = config.Bind("Catalog", "Sources", "",
+            "Old place of the player's sources, moved to oldenera-mods/sources.json in the BepInEx folder (the Mods window adds and removes them now).");
+        store = SourceStore.Load(ManagerState.Folder, legacy.Value, line => log.LogWarning(line));
         // A token for a private GitHub repository (debugging before the repository is public): the player's own, in a
         // local file next to the state (oldenera-mods\github-token.txt), never in the catalog, git or a build.
         var tokenFile = System.IO.Path.Combine(ManagerState.Folder, "github-token.txt");
@@ -57,8 +59,15 @@ public static class ManagerService
         client = new CatalogClient(fetcher.Get, ManagerState.Folder, line => log.LogInfo(line));
     }
 
-    public static IEnumerable<string> Sources =>
-        new[] { BuiltInSource }.Concat((extraSources?.Value ?? "").Split(new[] { ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries)).Distinct();
+    // The built-in source first, then the player's in the order added.
+    public static IEnumerable<string> Sources => new[] { BuiltInSource }.Concat(store.Entries.Select(e => e.Url)).Distinct(StringComparer.OrdinalIgnoreCase);
+    // The player's sources with the names their root files gave (for the Mods window).
+    public static IReadOnlyList<SourceEntry> OwnSources => store.Entries;
+    // How each source read the last time (the built-in one first); empty until read.
+    public static IReadOnlyList<SourceResult> SourceResults { get; private set; } = Array.Empty<SourceResult>();
+    // What the last add or remove of a source said, for the status line: a localization key and its arguments
+    // (null: nothing to say; cleared by the next thing asked).
+    public static (string Key, object[] Args)? SourceNote { get; private set; }
 
     // Every frame on the main thread: what the background work left to do here (loading mods, the results).
     public static void Pump()
@@ -77,6 +86,7 @@ public static class ManagerService
             return;
         Busy = true;
         LastFailed = false;
+        SourceNote = null;
         Task.Run(async () =>
         {
             try { await work(); }
@@ -90,12 +100,20 @@ public static class ManagerService
     }
 
     // Reads the sources and works out the updates; the manager's own update among them.
-    public static void Refresh() => Run("catalog", async () =>
+    public static void Refresh() => Run("catalog", ReadCatalog);
+
+    static async Task ReadCatalog()
     {
-        var catalog = await client.Read(Sources);
+        var sources = Sources.ToList();
+        var installed = ModLoader.State.Mods.ToList();
+        var reading = await client.ReadAll(sources, installed);
+        var catalog = reading.Mods;
         mainThread.Enqueue(() =>
         {
             Catalog = catalog;
+            SourceResults = reading.Sources;
+            foreach (var result in reading.Sources)
+                store.SetName(result.Url, result.Name);
             var updates = CatalogClient.Updates(catalog, ModLoader.State, gameVersion);
             // The manager is not in the state: compared with its own version.
             if (catalog.FirstOrDefault(m => m.Id == ManagerId) is { } self && CatalogClient.ReleaseFor(self, gameVersion) is { } release &&
@@ -106,7 +124,76 @@ public static class ManagerService
             LastMessage = $"catalog read: {catalog.Count} mods, {updates.Count} updates";
             log.LogInfo(LastMessage);
         });
-    });
+    }
+
+    // ---------- the player's sources (issue #6) ----------
+
+    static void Note(string key, params object[] args)
+    {
+        SourceNote = (key, args);
+        log.LogInfo($"sources: {key} {string.Join(", ", args)}");
+    }
+
+    // A source by its root meta file's URL (https only; one already there is refused). Read at once: one that does not
+    // read is not added. The outcome is in SourceNote.
+    public static void AddSource(string url)
+    {
+        url = url?.Trim();
+        if (Busy)
+            return;
+        if (string.IsNullOrEmpty(url) || !CatalogClient.Allowed(url) || new Uri(url).IsFile)
+        {
+            Note("oe.manager.src.notHttps");
+            return;
+        }
+        if (Sources.Contains(url, StringComparer.OrdinalIgnoreCase))
+        {
+            Note("oe.manager.src.duplicate");
+            return;
+        }
+        Run("add source", async () =>
+        {
+            var (result, _) = await client.ReadSource(url, false);
+            if (result.State == SourceState.Failed)
+            {
+                mainThread.Enqueue(() => Note("oe.manager.src.readFailed", result.Error));
+                return;
+            }
+            store.Add(url, result.Name);
+            // The catalog read again with the new source in it (the mods it lists show in the window).
+            await ReadCatalog();
+            mainThread.Enqueue(() => Note("oe.manager.src.added", string.IsNullOrWhiteSpace(result.Name) ? url : result.Name, result.Mods));
+        });
+    }
+
+    // "owner" or "owner/repo" of GitHub, or a pasted github.com address, at the standard place (SourceStore.GitHubUrl).
+    public static void AddGitHubSource(string input)
+    {
+        if (Busy)
+            return;
+        var url = SourceStore.GitHubUrl(input);
+        if (url == null)
+            Note("oe.manager.src.badGitHub");
+        else
+            AddSource(url);
+    }
+
+    // The mods of the source stay installed (no updates from it then: they update only from their own source).
+    public static void RemoveSource(string url)
+    {
+        if (Busy)
+            return;
+        if (string.Equals(url, BuiltInSource, StringComparison.OrdinalIgnoreCase))
+            return;
+        var name = store.Entries.FirstOrDefault(e => string.Equals(e.Url, url, StringComparison.OrdinalIgnoreCase))?.Name;
+        if (!store.Remove(url))
+            return;
+        Run("remove source", async () =>
+        {
+            await ReadCatalog();
+            mainThread.Enqueue(() => Note("oe.manager.src.removed", string.IsNullOrWhiteSpace(name) ? url : name));
+        });
+    }
 
     // Installs a mod of the catalog (its release for this game version) with the mods it requires that are not there
     // yet (the core), each before the ones needing it, and loads them.

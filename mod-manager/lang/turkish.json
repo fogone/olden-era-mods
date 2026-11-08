@@ -25,5 +25,14 @@
 {"sid":"oe.manager.tag.fix","text":"düzeltmeler"},
 {"sid":"oe.manager.tag.qol","text":"kolaylık"},
 {"sid":"oe.manager.tag.library","text":"kütüphane"}
+{"sid":"oe.manager.src.notHttps","text":"Eklenmedi: yalnızca https adreslerine izin verilir"},
+{"sid":"oe.manager.src.duplicate","text":"Eklenmedi: bu kaynak zaten listede"},
+{"sid":"oe.manager.src.badGitHub","text":"Eklenmedi: GitHub adını owner veya owner/repo olarak yaz"},
+{"sid":"oe.manager.src.readFailed","text":"Eklenmedi: okunamadı ({0})"},
+{"sid":"oe.manager.src.added","text":"Kaynak eklendi: {0}, {1} mod"},
+{"sid":"oe.manager.src.removed","text":"Kaynak kaldırıldı: {0}"},
+{"sid":"oe.manager.src.note.failed","text":"okunamadı"},
+{"sid":"oe.manager.src.note.cached","text":"kayıtlı kopyadan"},
+{"sid":"oe.manager.src.note.read","text":"okundu"}
 ]
 }

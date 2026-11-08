@@ -247,6 +247,11 @@ public sealed record CatalogButton(string Key, Action Click);
 public sealed record CatalogRow(string Name, string TitleKey, string Version, string NoteKey, bool? Enabled, Action<bool> SetEnabled,
     CatalogButton Action, Action Remove);
 
+// A source of the catalog (issue #6): its name (a localization key composed by the manager: the root meta file's name,
+// the URL when it has none), its URL, how many mods it gave, a note on its state (a key: read, failed, from the cache;
+// null: none), and Remove (null for the built-in source, which stays).
+public sealed record CatalogSource(string TitleKey, string Url, int Mods, string NoteKey, bool BuiltIn, Action Remove);
+
 public static class ModCatalog
 {
     public static IReadOnlyList<CatalogRow> Rows { get; private set; } = Array.Empty<CatalogRow>();
@@ -260,10 +265,25 @@ public static class ModCatalog
     // The mod manager's version (it sets it on load): the mods' version shown next to the game's in the main menu.
     public static string ManagerVersion { get; set; }
 
+    // The catalog's sources (issue #6), for the window's Sources view: the built-in one first. Set by the manager with
+    // the rows (SetSources), drawn by mod-settings.
+    public static IReadOnlyList<CatalogSource> Sources { get; private set; } = Array.Empty<CatalogSource>();
+    // Adding a source, each null while not available (no manager, or busy): the text the player typed in the game's
+    // input box. AddSource takes a root meta file's URL, AddGitHubSource "owner" or "owner/repo". The manager reads the
+    // source first and says how it went in StatusKey (and the source's row); the window only asks and passes the text.
+    public static Action<string> AddSource { get; set; }
+    public static Action<string> AddGitHubSource { get; set; }
+
     public static void Set(string titleKey, IReadOnlyList<CatalogRow> rows)
     {
         TitleKey = titleKey;
         Rows = rows ?? Array.Empty<CatalogRow>();
+        ModMenu.Changed();
+    }
+
+    public static void SetSources(IReadOnlyList<CatalogSource> sources)
+    {
+        Sources = sources ?? Array.Empty<CatalogSource>();
         ModMenu.Changed();
     }
 

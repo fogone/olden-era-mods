@@ -25,5 +25,14 @@
 {"sid":"oe.manager.tag.fix","text":"correzioni"},
 {"sid":"oe.manager.tag.qol","text":"comodità"},
 {"sid":"oe.manager.tag.library","text":"libreria"}
+{"sid":"oe.manager.src.notHttps","text":"Non aggiunta: sono ammessi solo indirizzi https"},
+{"sid":"oe.manager.src.duplicate","text":"Non aggiunta: questa fonte è già nell'elenco"},
+{"sid":"oe.manager.src.badGitHub","text":"Non aggiunta: scrivi un nome GitHub come owner oppure owner/repo"},
+{"sid":"oe.manager.src.readFailed","text":"Non aggiunta: non leggibile ({0})"},
+{"sid":"oe.manager.src.added","text":"Fonte aggiunta: {0}, {1} mod"},
+{"sid":"oe.manager.src.removed","text":"Fonte rimossa: {0}"},
+{"sid":"oe.manager.src.note.failed","text":"non leggibile"},
+{"sid":"oe.manager.src.note.cached","text":"dalla copia salvata"},
+{"sid":"oe.manager.src.note.read","text":"letta"}
 ]
 }
