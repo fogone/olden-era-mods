@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"removido, sai na próxima inicialização"},
 {"sid":"oe.manager.note.noRelease","text":"sem versão para esta versão do jogo"},
 {"sid":"oe.manager.note.staged","text":"{0} será instalado na próxima inicialização"},
-{"sid":"oe.manager.note.failed","text":"a atualização não iniciou, {0} voltou"}
+{"sid":"oe.manager.note.failed","text":"a atualização não iniciou, {0} voltou"},
+{"sid":"oe.manager.tag.map","text":"mapa"},
+{"sid":"oe.manager.tag.battle","text":"batalha"},
+{"sid":"oe.manager.tag.tooltip","text":"dicas"},
+{"sid":"oe.manager.tag.ui","text":"interface"},
+{"sid":"oe.manager.tag.fix","text":"correções"},
+{"sid":"oe.manager.tag.qol","text":"conforto"},
+{"sid":"oe.manager.tag.library","text":"biblioteca"}
 ]
 }

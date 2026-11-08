@@ -19,15 +19,15 @@ if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }
 # What a player can install: folder -> its DLLs (the first holds the plugin) and what it requires. The library
 # (OldenEraCommon) and the Mods tab (OldenEraSettings, where the catalog is shown) go with the manager, not as mods of their own.
 $catalogParts = [ordered]@{
-    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings'); Requires = '' }
-    'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll'); Requires = '' }
-    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core' }
-    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core' }
-    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core' }
-    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core' }
-    'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll'); Requires = 'nobirds.oldenera.core' }
-    'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core' }
-    'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = '' }
+    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings'); Requires = ''; Tags = 'library' }
+    'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll'); Requires = ''; Tags = 'library' }
+    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip' }
+    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip' }
+    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map' }
+    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'battle' }
+    'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,tooltip' }
+    'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'fix' }
+    'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = ''; Tags = 'qol' }
 }
 if ($Mods) {
     foreach ($m in $Mods) { if (-not $catalogParts.Contains($m)) { throw "No mod $m; one of: $($catalogParts.Keys -join ', ')" } }
@@ -74,7 +74,7 @@ foreach ($mod in $selected) {
     $langArgs = @()
     if (Test-Path (Join-Path $pluginFolder 'lang')) { $langArgs = @('--lang', (Join-Path $pluginFolder 'lang')) }
     & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
-        @requiresArgs --author fogone --source "https://github.com/$repo" @langArgs @fileArgs
+        @requiresArgs @tagsArgs --author fogone --source "https://github.com/$repo" @langArgs @fileArgs
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the

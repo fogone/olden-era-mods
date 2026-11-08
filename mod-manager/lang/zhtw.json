@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"已移除，下次啟動時卸載"},
 {"sid":"oe.manager.note.noRelease","text":"沒有適用於此遊戲版本的發行版"},
 {"sid":"oe.manager.note.staged","text":"{0} 將在下次啟動時安裝"},
-{"sid":"oe.manager.note.failed","text":"更新未能啟動，已恢復為 {0}"}
+{"sid":"oe.manager.note.failed","text":"更新未能啟動，已恢復為 {0}"},
+{"sid":"oe.manager.tag.map","text":"地圖"},
+{"sid":"oe.manager.tag.battle","text":"戰鬥"},
+{"sid":"oe.manager.tag.tooltip","text":"提示"},
+{"sid":"oe.manager.tag.ui","text":"介面"},
+{"sid":"oe.manager.tag.fix","text":"修復"},
+{"sid":"oe.manager.tag.qol","text":"便利"},
+{"sid":"oe.manager.tag.library","text":"庫"}
 ]
 }

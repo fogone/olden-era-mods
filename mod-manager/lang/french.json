@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"supprimé, disparaît au prochain lancement"},
 {"sid":"oe.manager.note.noRelease","text":"pas de version pour ce jeu"},
 {"sid":"oe.manager.note.staged","text":"{0} s'installe au prochain lancement"},
-{"sid":"oe.manager.note.failed","text":"la mise à jour n'a pas démarré, {0} est restaurée"}
+{"sid":"oe.manager.note.failed","text":"la mise à jour n'a pas démarré, {0} est restaurée"},
+{"sid":"oe.manager.tag.map","text":"carte"},
+{"sid":"oe.manager.tag.battle","text":"combat"},
+{"sid":"oe.manager.tag.tooltip","text":"infobulles"},
+{"sid":"oe.manager.tag.ui","text":"interface"},
+{"sid":"oe.manager.tag.fix","text":"corrections"},
+{"sid":"oe.manager.tag.qol","text":"confort"},
+{"sid":"oe.manager.tag.library","text":"bibliothèque"}
 ]
 }

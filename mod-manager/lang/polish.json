@@ -17,6 +17,13 @@
 {"sid":"oe.manager.note.removed","text":"usunięty, zniknie przy następnym uruchomieniu"},
 {"sid":"oe.manager.note.noRelease","text":"brak wydania dla tej wersji gry"},
 {"sid":"oe.manager.note.staged","text":"{0} zainstaluje się przy następnym uruchomieniu"},
-{"sid":"oe.manager.note.failed","text":"aktualizacja się nie uruchomiła, przywrócono {0}"}
+{"sid":"oe.manager.note.failed","text":"aktualizacja się nie uruchomiła, przywrócono {0}"},
+{"sid":"oe.manager.tag.map","text":"mapa"},
+{"sid":"oe.manager.tag.battle","text":"bitwa"},
+{"sid":"oe.manager.tag.tooltip","text":"podpowiedzi"},
+{"sid":"oe.manager.tag.ui","text":"interfejs"},
+{"sid":"oe.manager.tag.fix","text":"poprawki"},
+{"sid":"oe.manager.tag.qol","text":"wygoda"},
+{"sid":"oe.manager.tag.library","text":"biblioteka"}
 ]
 }

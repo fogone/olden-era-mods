@@ -51,6 +51,17 @@ void Install(string root, string version)
 
 Updater U(string root) => new(root, _ => { });
 
+Case("catalog meta: tags round-trip, a file without them reads as an empty list", root =>
+{
+    var opts = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    var withTags = System.Text.Json.JsonSerializer.Deserialize<ModMeta>("""{ "id": "a", "tags": [ "map", "tooltip" ] }""", opts);
+    Check(withTags.Tags.SequenceEqual(new[] { "map", "tooltip" }), "tags not read");
+    var again = System.Text.Json.JsonSerializer.Deserialize<ModMeta>(System.Text.Json.JsonSerializer.Serialize(withTags), opts);
+    Check(again.Tags.SequenceEqual(new[] { "map", "tooltip" }), "tags lost on a round trip");
+    var without = System.Text.Json.JsonSerializer.Deserialize<ModMeta>("""{ "id": "b" }""", opts);
+    Check(without.Tags != null && without.Tags.Count == 0, "no tags is not an empty list");
+});
+
 Case("nothing staged: the start changes nothing", root =>
 {
     Install(root, "0.1");

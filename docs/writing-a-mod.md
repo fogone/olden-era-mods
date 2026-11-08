@@ -1,0 +1,321 @@
+# Writing a mod
+
+A guide for writing a BepInEx 6 (IL2CPP) mod for Heroes of Might and Magic: Olden Era on this repository's framework.
+The worked example is `mod-skip-intro/`, the smallest mod. Read it next to this page.
+
+Related: [building.md](building.md) (building, releases, pull requests), [process.md](process.md) (the work cycle, the
+research console), [game-names.md](game-names.md) (the generated names), [catalog.md](catalog.md) (the mod catalog),
+[game-internals.md](game-internals.md) (what is known about the game's code).
+
+## 1. What you need
+
+- The game, with **BepInEx `6.0.0-be.788` (IL2CPP)** in its folder, **started once to the main menu**: BepInEx then
+  makes the wrappers of the game's code in `<game>\BepInEx\interop` (`Hex.dll` holds the game's code). After a game
+  patch, start it once again.
+- The **.NET SDK 10**. Plugins target `net6.0` and compile against `<game>\dotnet\*.dll`, `BepInEx\core` and
+  `BepInEx\interop`. There is no NuGet and no download.
+- PowerShell. The build scripts default to the Game Pass folder
+  (`C:\XboxGames\Heroes of Might and Magic- Olden Era\Content`); pass `-GameDir` for another one.
+
+The game's code is obfuscated and its names change with every patch. A mod is built for **one** game version and stays
+off on another one (see ModBase below).
+
+## 2. The smallest mod, step by step
+
+Folder `mod-<id>/`, as in `mod-skip-intro/`:
+
+```
+mod-skip-intro/
+  OldenEraSkipIntro.csproj
+  CompilerAttributes.cs      copy it as it is (stubs of NullableAttribute, needed for the .NET 6 runtime assemblies)
+  Plugin.cs
+  build.ps1                  copy it, change the DLL's name
+  lang/english.json
+  lang/russian.json
+```
+
+### The csproj
+
+Copy `OldenEraSkipIntro.csproj` and change `AssemblyName` and `RootNamespace`. What matters in it:
+
+- References: `<game>\dotnet\*.dll`, `BepInEx.Core`, `BepInEx.Unity.IL2CPP`, `0Harmony`, `Il2CppInterop.*`,
+  `BepInEx\interop\*.dll`, all with `Private="false"`.
+- `<ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />`: the common library
+  (`ModBase`, `ModMenu`, `Texts`, `ModEvents`, `Ticker`). It is installed once and shared by all mods.
+- `<Compile Include="..\mod-common\shared\**\*.cs" Link="shared\..." />`: the shared code (`Game*.cs`,
+  `GameNames.g.cs`, `search/`, `MapMarkers`, ...) is **compiled into every mod**, so it reloads with the mod.
+- `<EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />`: the texts.
+  The name must be `<root namespace>.lang.<language>.json`; `Texts.Load` reads it from there.
+- `Directory.Build.targets` in the root makes `GameNames.g.cs` again before the build when the game or the searches
+  changed (section 4) and writes the mods' version (`version.txt`) into the assembly.
+
+### The plugin
+
+```csharp
+using BepInEx;
+using HarmonyLib;
+using OldenEra.Modding.Common;
+
+namespace OldenEra.Modding.SkipIntro;
+
+[BepInPlugin("nobirds.oldenera.skipintro", "Olden Era Skip Intro", "0.1.0")]
+public class Plugin : ModBase
+{
+    static Switch skipVideos;
+    static Plugin instance;
+
+    protected override void OnLoad()
+    {
+        instance = this;
+        Game.Log = Logs.Info;                          // what the game-member lookups found goes to the log
+        skipVideos = Menu.Toggle("SkipVideos", true);  // a switch in the Mods tab, on by default
+        if (Harmony.PatchEach(new[] { GameTargets.IntroVideos },
+                prefix: new HarmonyMethod(typeof(Plugin), nameof(IntroPrefix))).Count == 0)
+            Logs.Warn("the game's intro step not found: the videos play");
+    }
+
+    static bool IntroPrefix(GameIntroStep __instance)
+    {
+        if (skipVideos?.On != true)
+            return true;                               // the switch is off: the game runs its own code
+        __instance.Done = true;                        // what the video player's callback would set
+        return false;                                  // and the step does not start the player
+    }
+}
+```
+
+- The GUID is `nobirds.oldenera.<id>`. **`<id>` (the last part of the GUID) names the mod's texts**; the config file is
+  `BepInEx\config\<GUID>.cfg`.
+- Use `OnLoad`, never `Load` (it is sealed in `ModBase`). Patch through `Harmony` from the base class, never
+  `new Harmony`: the base class unpatches it all on unload.
+- Read a switch where the feature works (`skipVideos.On`), not once in `OnLoad`: `On` is false while the whole mod is
+  switched off or the mods do not work now (section 3).
+- Patch methods are static and take the game's own types: `__instance`, `__result`, `__args`, the game's parameters.
+
+### The texts
+
+Every string the player sees is a key in `lang/<language>.json`, never a literal in code. The file is in the game's own
+format; `<language>` is a `Hex.UI.ELang` name (`english`, `russian`, `german`, `zhcn`, ...). A language without a file
+falls back to English, then Russian.
+
+```json
+{
+"tokens": [
+{"sid":"oe.skipintro.title","text":"Skip intro"},
+{"sid":"oe.skipintro.SkipVideos","text":"Skip the videos on start"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"The studios' logos and the trailer are not shown ..."}
+]
+}
+```
+
+- `oe.<id>.title`: the mod's name in the Mods tab. Required.
+- `oe.<id>.<Key>`: the label of the switch made with `Menu.Toggle("<Key>", ...)`; `oe.<id>.<Key>.desc` its hover text.
+- For `Menu.Choose`: `oe.<id>.<Key>` the label and `oe.<id>.<Key>.<EnumValueName>` each option.
+- The game's font has no `≈`.
+- Keep the game's own words for its terms (its texts are in `Core.zip`, `Lang/<language>/texts`).
+
+### Build and try
+
+```powershell
+.\mod-skip-intro\build.ps1 -Dev      # into <game>\BepInEx\devplugins; the game may run
+```
+
+Section 5 has the rest. The mod's lines are in `<game>\BepInEx\LogOutput.log`, under its plugin name.
+
+## 3. The framework
+
+### ModBase (`mod-common/ModBase.cs`)
+
+Your plugin derives from it. On `Load` it:
+
+- makes `Harmony` (named by the GUID), `Logs` (a `ModLog`: `Info`, `Warn`, `Error`, `Once`, `Report`, `Guard`) and
+  `Menu`;
+- loads your `lang/*.json` (`Texts.Load`);
+- **checks the game version**: the generated `GameNames.g.cs` compiled into your DLL carries the game version it was
+  made for (`GameNames.GameVersion`). If `Application.version` differs, `OnLoad` is not called, the log says why, the
+  main menu shows a notice, and the mod's row in the Mods tab says it is off. (`NeedsGameNames => false` skips the check;
+  only the research plugin does that.)
+- calls `OnLoad`. If it throws, the mod unloads at once: half loaded is worse than off.
+
+On `Unload` (hot reload, section 5) it calls `OnUnload`, removes the Harmony patches, ticks, event handlers and the
+menu, and destroys scene objects whose names start with a prefix from `ObjectPrefixes`.
+
+Rules that follow:
+
+- Whatever you changed in the game's own objects, put back in `OnUnload`.
+- Name the scene objects you create with a prefix and return it from `ObjectPrefixes` (`new[] { "OE_Counter" }`).
+- **Do not write your own `MonoBehaviour`s**: a reloaded build cannot register the class a second time. Use `OnTick`.
+- `HasMenu => false` for a mod with no switches (the core).
+- `DebugFlag("Name", "description")` is a developer flag in the config's `[Debug]` section, not in the menu.
+
+### ModMenu (`mod-common/ModMenu.cs`)
+
+The mod's entry in the **Mods** tab of the game's settings (drawn by `mod-settings`). `Menu` already has a master switch
+for the mod; you add rows. Values live in the mod's config file, section `[Menu]`.
+
+```csharp
+Switch highlight = Menu.Toggle("Highlight", true);                    // highlight.On
+Choice<MarkersShown> shown = Menu.Choose("Shown", MarkersShown.Alt);  // shown.Value(MarkersShown.Never)
+enum MarkersShown { Always, Alt, Never }                              // the options, in this order
+```
+
+`Choice<T>.Value(whenOff)` gives the chosen value, or `whenOff` while the mod is switched off.
+
+**"When the mods work"** is the first row of the tab: single player only, single player and hotseat (the default), or
+never (`ModMenu.Mode`, file `BepInEx\config\OldenEra.Mods.cfg`). Online games and replays are never included, so the
+mods give no advantage there. `Switch.On` and `Choice.Value` already obey it. A feature built outside them should check
+`ModMenu.ModsWork`. The answer "is it single player" comes from the core; without the core the game counts as single
+player.
+
+### Texts (`mod-common/Texts.cs`)
+
+`Texts` puts your keys into the game's own localization table, so the game's widgets show them by key and switch them
+with the game's language.
+
+- `Texts.Get("oe.myid.Key")`: your text in the game's current language, for places where you set a string yourself
+  (a tooltip line, a label you draw). Unknown key: the key itself comes back.
+- `Texts.GetIn(language, key)`, `Texts.Has(key)`, `Texts.Add(key, russian, english)` for a text made in code.
+- The game's own text of its key: `Game.Translate(key)` (shared code).
+
+### The core's events (`ModEvents` in `mod-common/Events.cs`; `mod-core/`)
+
+Patching the same game method from several mods is fragile. So **`mod-core`** (`nobirds.oldenera.core`) patches the game
+once for all mods and raises typed events. A mod subscribes:
+
+```csharp
+protected override void OnLoad()
+{
+    On(ModEvents.MapLoaded, _ => { checksLeft = 5; });   // a state event: a mod loaded later gets the last one at once
+    On(ModEvents.SquadTooltipFilled, fill => Logs.Guard("tooltip", () => Show(fill)));
+    OnTick(Tick);                                        // every frame, on the main thread
+}
+```
+
+- Events (see `ModEvents`): `MapLoaded`, `MapClosed`, `HeroSelected`, `LanguageChanged`, `AltInfo`,
+  `SquadTooltipFilling`/`Filled`, `TooltipTexts`, `SkullsFilled`, `DwellingTooltipFilling`/`Filled`, `EncounterStarting`,
+  `Encounter`, `TooltipShown`/`Hidden`/`LateUpdate`/`Place`, `ForecastBuilt`, `OtherForecast`, `ForecastShown`,
+  `CounterDecided`. Each has its own context class in `Events.cs` and `shared/EventTypes.cs`.
+- A handler's exception goes to your mod's log, once per handler. A switched-off mod gets no events.
+- **Such a mod needs the core installed.** Without it the events never come; `On` says so once in the log. In the
+  catalog the mod lists `nobirds.oldenera.core` as required (section 6). A mod that only patches the game itself
+  (like skip-intro) needs nothing.
+- To add an event, patch the game in `mod-core/Plugin.cs` and add a `GameEvent<T>` to `ModEvents`.
+  `OldenEraCommon.dll` changes need the game restarted.
+
+`mod-fixes/Plugin.cs` is a short example of an event plus a tick; `mod-map-tooltip/Plugin.cs` of several events.
+
+## 4. Using the game's code
+
+**The main rule: use the game's own functions, do not rewrite its logic.** Damage, danger, joining, fleeing, visits,
+widgets, sprites, fonts and texts come from the game: find its method and call it. Write your own only when the game
+has none, and say so. First look at how the game does the same thing in a similar place.
+
+### The generated names
+
+- A search finds a member of the game by **signatures and the game's code**, not by its obfuscated name. The searches
+  are in `mod-common/shared/search/*.cs`.
+- At build time `tools/game-names` runs them over the game's files (no running game) and writes
+  `mod-common/shared/GameNames.g.cs`, which is in git: type aliases (`GameIntroStep = ccj`), extension members with
+  readable names (`introStep.Done`), patch targets (`GameTargets.IntroVideos`), constants, and the game version.
+  `Directory.Build.targets` runs it when the game's files, the searches or the pins are newer than the file.
+- Zero or several candidates stop the build with `GN0002` and the candidates listed. Choose one in
+  `mod-common/shared/GameNames.pins.txt` (`GameHero.Data = fgd.cwtl  # why`). `GN0001`: BepInEx's wrappers are older
+  than the game; start the game once.
+- Obfuscated names appear only in comments, with the version: "`ccj.qrx` on 0.82.7".
+- Mod code uses only the generated names and the readable wrappers in `mod-common/shared/Game*.cs` (`Game`,
+  `GameBattle`, `GameTooltip`, `GameVisits`, `GameEncounter`, `GameSettingsUI`). No searching by obfuscated name in a mod.
+- After a game patch, `git diff` on `GameNames.g.cs` shows what was renamed.
+
+### Adding a search: `mod-common/shared/search/GameIntro.cs`
+
+```csharp
+internal static partial class Game
+{
+    // The video player's Play(ClipInfo[], bool, Action): found by its readable signature.
+    static readonly Lookup<MethodInfo> playVideos = Lookup<MethodInfo>.Among("play videos (ClipInfo[], bool, Action)",
+        () => Types.Methods().Static().Named("Play").Returns(typeof(void))
+            .Takes(typeof(Il2CppReferenceArray<Hex.Videoplayer.ClipInfo>), typeof(bool), typeof(Il2CppSystem.Action)),
+        Members.Name, onlyOne: true);
+
+    // The start's step that calls it: a void M() of a class that has an EResualt method, whose code calls Play.
+    static readonly Lookup<MethodInfo> introVideos = Lookup<MethodInfo>.Among("intro videos step",
+        () => playVideos.Value is { } play
+            ? Types.Where(t => t.Methods().Instance().Returns(typeof(Hex.InitScene.EResualt)).Takes().Any())
+                .Methods().Instance().Returns(typeof(void)).Takes()
+                .Where(m => GameCode.Calls(m).Any(c => GameCode.At(c.target).Contains(play)))
+            : null,
+        Members.Name, onlyOne: true).GenerateTarget("IntroVideos");        // -> GameTargets.IntroVideos
+
+    // The class: a type alias GameIntroStep.
+    static readonly Lookup<Type> introStep = Lookup<Type>.Among("intro videos step class",
+        () => introVideos.Value is { } run ? new[] { run.DeclaringType } : null, t => t.Name).Generate("GameIntroStep");
+
+    // Its one own bool property: an extension `Done`, writable.
+    static readonly Lookup<PropertyInfo> introDone = Lookup<PropertyInfo>.Among("intro videos step done",
+        () => introStep.Value is { } step ? Properties(step).Where(p => p.DeclaringType == step && p.PropertyType == typeof(bool)) : null,
+        Name, onlyOne: true).Generate("Done", writable: true);
+}
+```
+
+- `Lookup<T>.Among(what, candidates, describe, onlyOne)`: `what` names it in the log; `onlyOne` makes several candidates
+  mean "not found" (the generator stops on them).
+- Finish with `.Generate("Name")` (a type alias, a property or method as an extension, a static in `GameNames`),
+  `.GenerateTarget("Name")` (a method for `GameTargets`), `.GenerateAll("Name")` (a list) or `.GenerateConstant("Name")`
+  (a number read from the game's code). `writable: true` makes a property settable; properties are read-only otherwise.
+- Helpers: `Types`, `Types.Methods().Static()/Instance().Named().Returns().Takes()`, `Properties(type)`, `GameCode.Calls`,
+  `GameCode.At`, `DistinctCode()`. Simple cases: `GameProperty<TOwner, TValue>`, `GameMethod<TOwner, TResult>`,
+  `GameAction<TOwner>` (in `search/Members.cs`).
+- Search code in `search/` never uses the generated names; the rest of `shared/` is written on top of them.
+- Put a readable wrapper over the generated names in a `Game*.cs` file in `shared/` (an `extension(T x) { ... }` block,
+  C# 14).
+- **Patch with `PatchEach` / `PatchOne`** (`shared/Patches.cs`): each native address once; a method whose machine code is
+  shared with others is skipped (and the log says so), because the patch would run for all of them.
+  `Harmony.PatchOne(method, "what it is", prefix: ..., postfix: ...)` returns false and logs when the method is
+  missing. Never use Il2CppInterop's `XrefScanner` on arbitrary methods: it crashed the game twice.
+
+### The research console (`mod-research`)
+
+A development plugin: a console on `127.0.0.1:8766` (key in `BepInEx\research-token.txt`, sent as the
+`X-Research-Token` header) and the file `BepInEx\research.txt`. It finds out what a game method does without a rebuild.
+`eval` reads values and calls methods of live objects, `members` lists a type, `code` shows a method's instructions
+with the names of its calls, `callers` finds who calls a method, `tree` and `click` look at and press the live UI,
+`shot` writes a screenshot. `eval` with a method call really runs the game's code, so use it with care. Commands and
+the order that worked: [process.md](process.md), "Researching game code".
+
+## 5. Build, run, iterate
+
+| Command | What it does |
+|---|---|
+| `.\mod-x\build.ps1` | build only: `bin\Release\net6.0\<Dll>.dll` |
+| `.\mod-x\build.ps1 -Dev` | build and copy into `<game>\BepInEx\devplugins`; **the game may run** |
+| `.\mod-x\build.ps1 -Install` | build and copy into `<game>\BepInEx\plugins`; **refuses while the game runs** |
+| `.\mod-x\build.ps1 -Uninstall` | remove it from `plugins` |
+| `.\install.ps1` | build and install all mods (the list is in the script; add yours there) |
+
+- **Hot reload.** `mod-devloader` (itself in `plugins`) loads the DLLs in `devplugins` and reloads one when its file
+  changes: `DEV unloaded <dll>` and `DEV loaded <name> <version>` appear in the log after a second or two. It works only
+  for mods on `ModBase`. The first `-Dev` of a mod that was in `plugins` must be done with the game closed (it moves
+  the DLL). Old assemblies stay in memory; that is fine for a session.
+- **Not reloadable:** `OldenEraCommon.dll` (`ModBase`, `ModMenu`, `Texts`, `ModEvents`, `Ticker`) and `mod-devloader`.
+  Install them with `-Install` and restart the game. This is why new shared code goes into `mod-common/shared/` by
+  default: it is compiled into each mod and reloads with it.
+- **Logs:** `<game>\BepInEx\LogOutput.log` (BepInEx) and
+  `%USERPROFILE%\AppData\LocalLow\Unfrozen\HeroesOldenEra\Player.log` (Unity). Wait for `Chainloader startup complete`.
+  What `Game.Log = Logs.Info` collects (what each lookup found, `Patch: ... not patched`) is there too.
+- Start the game from Game Pass: `Start-Process "shell:AppsFolder\HoodedHorse.HeroesofMightandMagicOldenEra_znaey1dw2bdpr!Game"`.
+- After a game patch: start the game once to the main menu, then rebuild. The build makes the names for the new
+  version; fix the searches that stopped it, check `git diff`.
+
+## 6. Publishing
+
+- A new mod joins the list in three scripts: `install.ps1` (`$parts`), `release.ps1` (folder to DLL name), and
+  `publish-mods.ps1` (`$catalogParts`: the DLL path, `Tags` (catalog.md) and `Requires`: `'nobirds.oldenera.core'` for a mod that listens to
+  core events, `''` otherwise). The plugin's GUID, name and version are read from its `[BepInPlugin(...)]`.
+- `.\publish-mods.ps1 -Mods <id>` builds the mod and writes its catalog files into `release\catalog-preview`; nothing is
+  published. `-Publish` makes a GitHub release `<id>-v<version>` (the DLL is the asset) and a pull request with
+  `catalog\`. A version is published once: change the mod and **raise the version in `[BepInPlugin]`** to publish again.
+- The catalog, its files and the mod manager: [catalog.md](catalog.md). Releases of the whole set and the rules for
+  versions: [building.md](building.md).
+- The repository is public. `main` changes only through a pull request that passes `tools/check-public.ps1` (no
+  personal paths, names, secrets, game files or built files). Install the hook with `.\tools\install-hooks.ps1` to run
+  the same check before a push.
