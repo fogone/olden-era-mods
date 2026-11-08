@@ -41,7 +41,9 @@
   "source": "https://github.com/fogone/olden-era-mods",
   "tags": [
     "map",
-    "tooltip"
+    "tooltip",
+    "info",
+    "buildings"
   ],
   "screenshots": [
     {

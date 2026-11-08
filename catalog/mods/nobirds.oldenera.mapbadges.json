@@ -40,7 +40,11 @@
   "author": "fogone",
   "source": "https://github.com/fogone/olden-era-mods",
   "tags": [
-    "map"
+    "map",
+    "info",
+    "squads",
+    "buildings",
+    "qol"
   ],
   "screenshots": [
     {
