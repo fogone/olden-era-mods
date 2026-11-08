@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"続ける"},
 {"sid":"oe.settings.w.url.caption","text":"カタログのアドレス"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"GitHub上のカタログ: オーナー または オーナー/リポジトリ"},
-{"sid":"oe.settings.w.github.placeholder","text":"オーナー/リポジトリ"},
+{"sid":"oe.settings.w.github.caption","text":"GitHub上のカタログ"},
+{"sid":"oe.settings.w.github.placeholder","text":"オーナー または オーナー/リポジトリ"},
 {"sid":"oe.settings.w.add","text":"追加"},
-{"sid":"oe.settings.w.cancel","text":"キャンセル"}
+{"sid":"oe.settings.w.cancel","text":"キャンセル"},
+{"sid":"oe.settings.w.selectAll","text":"すべて選択 · 選択数: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"バージョン"},
+{"sid":"oe.settings.w.catalogLabel","text":"カタログ"},
+{"sid":"oe.settings.w.modsLabel","text":"Mod"},
+{"sid":"oe.settings.w.checkedLabel","text":"最終確認"}
 ]
 }

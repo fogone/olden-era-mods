@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"Tovább"},
 {"sid":"oe.settings.w.url.caption","text":"A katalógus címe"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"Katalógus a GitHubon: tulajdonos vagy tulajdonos/repository"},
-{"sid":"oe.settings.w.github.placeholder","text":"tulajdonos/repository"},
+{"sid":"oe.settings.w.github.caption","text":"Katalógus a GitHubon"},
+{"sid":"oe.settings.w.github.placeholder","text":"tulajdonos vagy tulajdonos/repository"},
 {"sid":"oe.settings.w.add","text":"Hozzáadás"},
-{"sid":"oe.settings.w.cancel","text":"Mégse"}
+{"sid":"oe.settings.w.cancel","text":"Mégse"},
+{"sid":"oe.settings.w.selectAll","text":"Összes kijelölése · kijelölve: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"Verzió"},
+{"sid":"oe.settings.w.catalogLabel","text":"Katalógus"},
+{"sid":"oe.settings.w.modsLabel","text":"Modok"},
+{"sid":"oe.settings.w.checkedLabel","text":"Utoljára ellenőrizve"}
 ]
 }

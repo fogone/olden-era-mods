@@ -55,9 +55,14 @@
 {"sid":"oe.settings.w.warn.go","text":"繼續"},
 {"sid":"oe.settings.w.url.caption","text":"目錄的位址"},
 {"sid":"oe.settings.w.url.placeholder","text":"https://.../catalog.json"},
-{"sid":"oe.settings.w.github.caption","text":"GitHub 上的目錄:擁有者 或 擁有者/儲存庫"},
-{"sid":"oe.settings.w.github.placeholder","text":"擁有者/儲存庫"},
+{"sid":"oe.settings.w.github.caption","text":"GitHub 上的目錄"},
+{"sid":"oe.settings.w.github.placeholder","text":"擁有者 或 擁有者/儲存庫"},
 {"sid":"oe.settings.w.add","text":"新增"},
-{"sid":"oe.settings.w.cancel","text":"取消"}
+{"sid":"oe.settings.w.cancel","text":"取消"},
+{"sid":"oe.settings.w.selectAll","text":"全選 · 已選: {0}"},
+{"sid":"oe.settings.w.versionLabel","text":"版本"},
+{"sid":"oe.settings.w.catalogLabel","text":"目錄"},
+{"sid":"oe.settings.w.modsLabel","text":"模組"},
+{"sid":"oe.settings.w.checkedLabel","text":"上次檢查"}
 ]
 }

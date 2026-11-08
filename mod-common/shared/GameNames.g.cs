@@ -35,6 +35,7 @@ global using GameSideAi = global::fzh;
 global using GameSideBonusReceiver = global::dyj;
 global using GameSideLogic = global::edc;
 global using GameSideState = global::fmr;
+global using GameSimpleTabData = global::dcs;
 global using GameSquad = global::frc;
 global using GameSquadEntity = global::fgy;
 global using GameSquadStore = global::fre;
@@ -342,6 +343,15 @@ internal static class GameNames
         public bool NoFleeOffers => sideState.cqyh;
     }
 
+    extension(GameSimpleTabData simpleTabData)
+    {
+        // simple tab click: dcs.chiy : Action
+        public global::Il2CppSystem.Action Click { get => simpleTabData.chiy; set => simpleTabData.chiy = value; }
+
+        // simple tab label: dcs.chix : String
+        public string Label { get => simpleTabData.chix; set => simpleTabData.chix = value; }
+    }
+
     extension(GameSquad squad)
     {
         // squad -> entity: frc.crom : fhf
@@ -520,6 +530,15 @@ internal static class GameNames
     {
         // menu button click: BhNavigationButton.chbk : Action
         public global::Il2CppSystem.Action MenuClick { get => it.chbk; set => it.chbk = value; }
+    }
+
+    extension(global::Hex.UI.GeneralKit.BhTag it)
+    {
+        // tag chip colour: BhTag.yeq(Color) : Void
+        public void ShowColor(global::UnityEngine.Color a0) => it.yeq(a0);
+
+        // tag chip text: BhTag.yeo(String) : Void
+        public void ShowText(string a0) => it.yeo(a0);
     }
 
     extension(global::Hex.UI.GeneralKit.BhToggle it)
