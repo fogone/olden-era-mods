@@ -269,6 +269,117 @@ Case("catalog: updates for the game's version, newer only", root =>
     Check(CatalogClient.Updates(mods, state, "0.81.04").Count == 0, "an update for a game version nobody built for");
 });
 
+// ---------- the player's sources (issue #6) ----------
+
+Case("sources: GitHub names -> the standard place of the root file", root =>
+{
+    const string Std = "https://raw.githubusercontent.com/{0}/{1}/HEAD/catalog/catalog.json";
+    Check(SourceStore.GitHubUrl("alice") == string.Format(Std, "alice", "olden-era-mods"), "owner");
+    Check(SourceStore.GitHubUrl(" alice/my_mods.v2 ") == string.Format(Std, "alice", "my_mods.v2"), "owner/repo");
+    Check(SourceStore.GitHubUrl("https://github.com/alice") == string.Format(Std, "alice", "olden-era-mods"), "github.com/owner");
+    Check(SourceStore.GitHubUrl("https://github.com/alice/mods") == string.Format(Std, "alice", "mods"), "github.com/owner/repo");
+    Check(SourceStore.GitHubUrl("https://github.com/alice/mods.git") == string.Format(Std, "alice", "mods"), ".git");
+    Check(SourceStore.GitHubUrl("https://github.com/alice/mods/tree/main/catalog") == string.Format(Std, "alice", "mods"), "a deeper page");
+    foreach (var bad in new[] { "", "  ", null, "a b", "al!ce", "alice/", "/mods", "a/b/c", "alice/mo ds", "alice/..", "al_ice", "-x/", "https://github.com/", "https://example.com/alice", "alice/mods?x=1" })
+        Check(SourceStore.GitHubUrl(bad) == null, $"accepted: {bad}");
+});
+
+Case("sources: sources.json round trip, no duplicates (any case), remove", root =>
+{
+    var folder = Path.Combine(root, "oldenera-mods");
+    var store = SourceStore.Load(folder, "");
+    Check(store.Entries.Count == 0, "not empty at first");
+    Check(store.Add("https://a.test/catalog.json", "A"), "not added");
+    Check(!store.Add("HTTPS://A.TEST/catalog.json", "again"), "a duplicate in another case was added");
+    Check(store.Add("https://b.test/catalog.json", null), "second not added");
+    var again = SourceStore.Load(folder, "https://ignored.test/x.json");
+    Check(again.Entries.Select(e => e.Url).SequenceEqual(new[] { "https://a.test/catalog.json", "https://b.test/catalog.json" }), "the order or the content changed");
+    Check(again.Entries[0].Name == "A" && again.Entries[0].Added.Length == 10, "name or date lost");
+    again.SetName("https://b.test/catalog.json", "B");
+    Check(SourceStore.Load(folder, "").Entries[1].Name == "B", "the name was not saved");
+    Check(again.Remove("https://A.test/catalog.json") && !again.Remove("https://a.test/catalog.json"), "remove");
+    Check(SourceStore.Load(folder, "").Entries.Count == 1, "the removal was not saved");
+});
+
+Case("sources: the old config value moves into sources.json once", root =>
+{
+    var folder = Path.Combine(root, "oldenera-mods");
+    var store = SourceStore.Load(folder, "https://a.test/c.json  https://b.test/c.json\nhttps://A.test/c.json");
+    Check(store.Entries.Count == 2, "the config's URLs: " + store.Entries.Count);
+    Check(File.Exists(Path.Combine(folder, "sources.json")), "not saved");
+    store.Remove("https://a.test/c.json");
+    // The config still has it, but the file is there now: the config is not read again.
+    Check(SourceStore.Load(folder, "https://a.test/c.json https://b.test/c.json").Entries.Select(e => e.Url).SequenceEqual(new[] { "https://b.test/c.json" }), "the config was taken again");
+});
+
+Case("sources: an unreadable sources.json is kept aside and the list starts empty", root =>
+{
+    var folder = Path.Combine(root, "oldenera-mods");
+    Directory.CreateDirectory(folder);
+    File.WriteAllText(Path.Combine(folder, "sources.json"), "{ not json");
+    var warned = new List<string>();
+    Check(SourceStore.Load(folder, "https://a.test/c.json", warned.Add).Entries.Count == 0 && warned.Count == 1 && File.Exists(Path.Combine(folder, "sources.json.bad")), "not kept aside");
+});
+
+// Two sources listing the same mod with different meta files.
+const string OtherSource = "https://other.test/catalog.json";
+const string OtherMeta = "https://other.test/counter.json";
+
+void PublishOther(Dictionary<string, byte[]> net)
+{
+    net[OtherSource] = Bytes($$"""{ "schema": 1, "name": "Other", "mods": [ { "id": "oe.counter", "meta": "{{OtherMeta}}" }, { "id": "oe.extra", "meta": "https://other.test/extra.json" } ] }""");
+    net[OtherMeta] = Bytes("""{ "schema": 1, "id": "oe.counter", "name": { "english": "Their counter" }, "releases": [ { "version": "9.0.0", "games": [ "0.82.07" ], "files": [] } ] }""");
+    net["https://other.test/extra.json"] = Bytes("""{ "schema": 1, "id": "oe.extra", "name": { "english": "Extra" }, "releases": [] }""");
+}
+
+Case("sources: each source reports its name, mods and state; a failed one does not stop the others", root =>
+{
+    var (client, net, _) = Net(root);
+    Publish(net);
+    PublishOther(net);
+    var reading = client.ReadAll(new[] { Source, "https://missing.test/catalog.json", OtherSource }).Result;
+    Check(reading.Sources.Count == 3, "a result per source");
+    Check(reading.Sources[0].Name == "test" && reading.Sources[0].Mods == 1 && reading.Sources[0].State == SourceState.Read, "the first source");
+    Check(reading.Sources[1].State == SourceState.Failed && reading.Sources[1].Error != null, "the missing source");
+    Check(reading.Sources[2].Name == "Other" && reading.Sources[2].Mods == 2, "the third source");
+    Check(reading.All.Count == 3 && reading.Mods.Count == 2, "all and chosen");
+    Check(reading.All.All(m => m.SourceUrl == (m.Url.StartsWith("https://other.test") ? OtherSource : Source)), "SourceUrl");
+    // Offline: the cached copies, said so.
+    var (offline, _, _) = Net(root, offline: true);
+    var cached = offline.ReadAll(new[] { Source, "https://missing.test/catalog.json" }).Result;
+    Check(cached.Sources[0].State == SourceState.Cached && cached.Sources[0].Mods == 1 && cached.Sources[1].State == SourceState.Failed, "the cached source");
+});
+
+Case("sources: one source read for adding does not use the cache", root =>
+{
+    var (client, net, _) = Net(root);
+    Publish(net);
+    Check(client.ReadSource(Source, false).Result.result.State == SourceState.Read, "not read");
+    var (offline, _, _) = Net(root, offline: true);
+    Check(offline.ReadSource(Source, false).Result.result.State == SourceState.Failed, "the cache stood in for a source being added");
+});
+
+Case("sources: an installed mod's own source wins, otherwise the first source", root =>
+{
+    var (client, net, _) = Net(root);
+    Publish(net);
+    PublishOther(net);
+    var both = new[] { Source, OtherSource };
+    Check(client.Read(both).Result.First(m => m.Id == "oe.counter").Url == MetaUrl, "not the first source");
+    var fromOther = new[] { new InstalledMod { Id = "oe.counter", Version = "9.0.0", Source = OtherMeta } };
+    Check(client.Read(both, fromOther).Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "the installed mod's source did not win");
+    var fromFirst = new[] { new InstalledMod { Id = "oe.counter", Version = "0.48.0", Source = MetaUrl } };
+    Check(client.Read(new[] { OtherSource, Source }, fromFirst).Result.First(m => m.Id == "oe.counter").Url == MetaUrl, "the mod's own source did not win over the first");
+    var byHand = new[] { new InstalledMod { Id = "oe.counter", Version = "0.48.0" } };
+    Check(client.Read(new[] { OtherSource, Source }, byHand).Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "a mod put by hand: the first source");
+    // Its source gone from the list: the other source's meta is chosen but offers no update.
+    var chosen = client.Read(new[] { OtherSource }, fromFirst).Result;
+    var state = new ManagerState { Mods = { new InstalledMod { Id = "oe.counter", Version = "0.48.0", Source = MetaUrl } } };
+    Check(CatalogClient.Updates(chosen, state, "0.82.07").Count == 0, "an update from another source than the mod's own");
+    var home = client.Read(both, state.Mods).Result;
+    Check(CatalogClient.Updates(home, state, "0.82.07").Count == 1, "no update from the mod's own source");
+});
+
 Case("versions compare by numbers", root =>
 {
     var c = VersionComparer.Instance;

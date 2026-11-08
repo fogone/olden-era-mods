@@ -28,18 +28,52 @@ public static class CatalogRows
         var status = new Updater(Paths.BepInExRootPath, null).Status();
         var catalog = ManagerService.Catalog;
         var signature = string.Join("|", ManagerService.Busy, ManagerService.LastFailed, catalog?.Count ?? -1, ManagerService.Updates.Count,
-            status.State, status.Version, string.Join(",", ModLoader.State.Mods.Select(m => m.Id + m.Version + m.Enabled)), string.Join(",", ModLoader.Pending.Keys));
+            status.State, status.Version, string.Join(",", ModLoader.State.Mods.Select(m => m.Id + m.Version + m.Enabled)), string.Join(",", ModLoader.Pending.Keys),
+            SourcesSignature());
         if (signature == shown)
             return;
         shown = signature;
         Build(catalog, status, managerVersion, gameVersion);
     }
 
+    // What the sources show: their URLs, names, counts and states, and the last note on adding or removing one.
+    static string SourcesSignature() => string.Join(";", ManagerService.OwnSources.Select(s => s.Url + "," + s.Name)) + "/" +
+        string.Join(";", ManagerService.SourceResults.Select(r => $"{r.Url},{r.Name},{r.Mods},{r.State}")) + "/" + ManagerService.SourceNote?.Key + ManagerService.SourceNote?.Args.FirstOrDefault();
+
     static string Compose(string key, Func<ELang, string> text) => Texts.Compose(Prefix + key, text);
 
     static string F(ELang language, string key, params object[] args) => string.Format(Texts.GetIn(language, key), args);
 
     static string Note(string id, string key, params object[] args) => key == null ? null : Compose(id + ".note", l => F(l, key, args));
+
+    // The Sources view: the built-in source first (no Remove), then the player's in the order added. A name is the
+    // root file's (the one read last, else the one remembered), the URL when there is none.
+    static void BuildSources(bool busy)
+    {
+        var results = ManagerService.SourceResults;
+        var list = new List<CatalogSource>();
+        var own = ManagerService.OwnSources;
+        var index = 0;
+        foreach (var url in ManagerService.Sources)
+        {
+            var builtIn = string.Equals(url, ManagerService.BuiltInSource, StringComparison.OrdinalIgnoreCase);
+            var result = results.FirstOrDefault(r => string.Equals(r.Url, url, StringComparison.OrdinalIgnoreCase));
+            var name = result?.Name;
+            if (string.IsNullOrWhiteSpace(name))
+                name = own.FirstOrDefault(e => string.Equals(e.Url, url, StringComparison.OrdinalIgnoreCase))?.Name;
+            if (string.IsNullOrWhiteSpace(name))
+                name = url;
+            var noteKey = result == null ? null
+                : result.State == SourceState.Failed ? "oe.manager.src.note.failed"
+                : result.State == SourceState.Cached ? "oe.manager.src.note.cached" : "oe.manager.src.note.read";
+            var titleKey = Compose("src." + index + ".name", _ => name);
+            var note = noteKey == null ? null : Compose("src." + index + ".note", l => F(l, noteKey));
+            var source = url;
+            list.Add(new CatalogSource(titleKey, url, result?.Mods ?? 0, note, builtIn, builtIn || busy ? null : () => ManagerService.RemoveSource(source)));
+            index++;
+        }
+        ModCatalog.SetSources(list);
+    }
 
     static void Build(IReadOnlyList<ModMeta> catalog, UpdateStatus status, string managerVersion, string gameVersion)
     {
@@ -52,7 +86,14 @@ public static class CatalogRows
         var statusKey = busy ? "oe.manager.status.busy"
             : ManagerService.LastFailed ? "oe.manager.status.failed"
             : catalog == null ? "oe.manager.status.none" : "oe.manager.status.read";
-        ModCatalog.StatusKey = Compose("status", l => F(l, statusKey, catalog?.Count ?? 0, updates.Count));
+        // After adding or removing a source its outcome stands in for the catalog's state.
+        if (!busy && ManagerService.SourceNote is { } sourceNote)
+            ModCatalog.StatusKey = Compose("status", l => F(l, sourceNote.Key, sourceNote.Args));
+        else
+            ModCatalog.StatusKey = Compose("status", l => F(l, statusKey, catalog?.Count ?? 0, updates.Count));
+        ModCatalog.AddSource = busy ? null : ManagerService.AddSource;
+        ModCatalog.AddGitHubSource = busy ? null : ManagerService.AddGitHubSource;
+        BuildSources(busy);
         ModCatalog.Check = busy ? null : new CatalogButton("oe.manager.check", ManagerService.Refresh);
         ModCatalog.UpdateAll = busy || updates.Count < 2 ? null : new CatalogButton("oe.manager.updateAll", ManagerService.UpdateAll);
 

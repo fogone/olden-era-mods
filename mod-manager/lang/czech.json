@@ -25,5 +25,14 @@
 {"sid":"oe.manager.tag.fix","text":"opravy"},
 {"sid":"oe.manager.tag.qol","text":"pohodlí"},
 {"sid":"oe.manager.tag.library","text":"knihovna"}
+{"sid":"oe.manager.src.notHttps","text":"Nepřidáno: povoleny jsou jen adresy https"},
+{"sid":"oe.manager.src.duplicate","text":"Nepřidáno: tento zdroj už v seznamu je"},
+{"sid":"oe.manager.src.badGitHub","text":"Nepřidáno: jméno na GitHubu napište jako owner nebo owner/repo"},
+{"sid":"oe.manager.src.readFailed","text":"Nepřidáno: nelze přečíst ({0})"},
+{"sid":"oe.manager.src.added","text":"Zdroj přidán: {0}, módů: {1}"},
+{"sid":"oe.manager.src.removed","text":"Zdroj odebrán: {0}"},
+{"sid":"oe.manager.src.note.failed","text":"nelze přečíst"},
+{"sid":"oe.manager.src.note.cached","text":"z uložené kopie"},
+{"sid":"oe.manager.src.note.read","text":"přečteno"}
 ]
 }

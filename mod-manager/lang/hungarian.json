@@ -25,5 +25,14 @@
 {"sid":"oe.manager.tag.fix","text":"javítások"},
 {"sid":"oe.manager.tag.qol","text":"kényelem"},
 {"sid":"oe.manager.tag.library","text":"könyvtár"}
+{"sid":"oe.manager.src.notHttps","text":"Nincs hozzáadva: csak https címek engedélyezettek"},
+{"sid":"oe.manager.src.duplicate","text":"Nincs hozzáadva: ez a forrás már a listán van"},
+{"sid":"oe.manager.src.badGitHub","text":"Nincs hozzáadva: a GitHub-nevet így írd: owner vagy owner/repo"},
+{"sid":"oe.manager.src.readFailed","text":"Nincs hozzáadva: nem olvasható ({0})"},
+{"sid":"oe.manager.src.added","text":"Forrás hozzáadva: {0}, {1} mod"},
+{"sid":"oe.manager.src.removed","text":"Forrás eltávolítva: {0}"},
+{"sid":"oe.manager.src.note.failed","text":"nem olvasható"},
+{"sid":"oe.manager.src.note.cached","text":"a mentett másolatból"},
+{"sid":"oe.manager.src.note.read","text":"beolvasva"}
 ]
 }
