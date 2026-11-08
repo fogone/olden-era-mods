@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -207,11 +207,17 @@ internal sealed class Commands
                 }
                 break;
             case "shot":
-                // shot <file.png>: the game's screen into a file (at the end of this frame), at half size.
+                // shot <file.png>: the game's screen into a file, opaque, at full size.
                 {
+                    // The capture's alpha is 0 over the 3D scene (the colours are right): copied into an RGB texture, so
+                    // the file is opaque wherever it is shown or cropped.
                     var shot = UnityEngine.ScreenCapture.CaptureScreenshotAsTexture();
-                    var png = UnityEngine.ImageConversion.EncodeToPNG(shot);
+                    var rgb = new UnityEngine.Texture2D(shot.width, shot.height, UnityEngine.TextureFormat.RGB24, false);
+                    rgb.SetPixels32(shot.GetPixels32());
+                    rgb.Apply();
+                    var png = UnityEngine.ImageConversion.EncodeToPNG(rgb);
                     UnityEngine.Object.Destroy(shot);
+                    UnityEngine.Object.Destroy(rgb);
                     System.IO.File.WriteAllBytes(argument, png);
                     write($"screenshot {png.Length} bytes into {argument}");
                 }
