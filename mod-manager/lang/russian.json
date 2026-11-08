@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"из сохранённой копии"},
 {"sid":"oe.manager.src.note.read","text":"прочитан"},
 {"sid":"oe.manager.src.note.notChecked","text":"ещё не проверялся"},
-{"sid":"oe.manager.src.note.noName","text":"у каталога нет названия"}
+{"sid":"oe.manager.src.note.noName","text":"у каталога нет названия"},
+{"sid":"oe.manager.description","text":"Менеджер модов и окно «Моды» в главном меню: каталоги модов, установка, обновление, выключение и удаление модов в один щелчок. Без вашего щелчка ничего не ставится и не обновляется."}
 ]
 }

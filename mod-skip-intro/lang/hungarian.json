@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Videók átugrása indításkor"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"A stúdiók logói és az előzetes nem jelennek meg a játék indításakor: a játék rögtön a főmenüre lép. A következő indításkor lép életbe."},
+{"sid":"oe.skipintro.title","text":"Intró átugrása"},
+{"sid":"oe.skipintro.description","text":"A játék indításakor átugorja a stúdiók logóit és az előzetest, és rögtön a főmenübe lép."}
+]
+}

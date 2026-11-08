@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"部隊上方顯示加入與逃跑徽章"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"針對所選英雄，在已探明的部隊上方顯示：若部隊會加入，則顯示外交圖示；若部隊會提出逃跑，則顯示遊戲內建的逃跑圖示。不顯示數字。"},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"部隊上方顯示危險骷髏"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"在既不會加入也不會逃跑的已探明部隊上方：顯示依所選英雄面對該戰鬥的危險程度著色的骷髏，與提示框中的骷髏相同。"}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"在既不會加入也不會逃跑的已探明部隊上方：顯示依所選英雄面對該戰鬥的危險程度著色的骷髏，與提示框中的骷髏相同。"},
+{"sid":"oe.mapbadges.description","text":"為所選英雄在地圖物件上方顯示徽章：未造訪的建築、礦坑、可拾取物、生物巢穴，以及會加入、逃跑或戰鬥的部隊，並標示戰鬥的危險程度。只顯示在已探索的地方。"}
 ]
 }

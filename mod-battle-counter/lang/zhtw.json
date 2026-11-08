@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"多一行預測：生命值圖示和防禦方的生命值，若有反擊，則在劍圖示之後顯示攻擊方的生命值。兩者：頂部生物與整個部隊的生命值（350 · 12350）。智慧：單一生物顯示其自身生命值；部隊顯示整體生命值，若這一擊殺死的生物不足兩個，則在前面加上頂部生物的生命值。"},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"關閉"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"兩者"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"智慧"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"智慧"},
+{"sid":"oe.battlecounter.description","text":"戰鬥中將游標移到一次攻擊上，會依序顯示整個交鋒：攻擊前的反擊、攻擊、攻擊後的反擊，以及雙重打擊的第二擊。數字是遊戲本身的預測。"}
 ]
 }

@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"da cópia salva"},
 {"sid":"oe.manager.src.note.read","text":"lida"},
 {"sid":"oe.manager.src.note.notChecked","text":"ainda não verificada"},
-{"sid":"oe.manager.src.note.noName","text":"o catálogo não tem nome"}
+{"sid":"oe.manager.src.note.noName","text":"o catálogo não tem nome"},
+{"sid":"oe.manager.description","text":"O gerenciador de mods e a janela «Mods» do menu principal: navegue por catálogos, instale, atualize, desative e remova mods com um clique. Nada é instalado ou atualizado sem o seu clique."}
 ]
 }

@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Nucleo delle mod"}
+{"sid":"oe.core.title","text":"Nucleo delle mod"},
+{"sid":"oe.core.description","text":"La base su cui poggiano le altre mod: si aggancia una sola volta al codice del gioco e passa gli eventi alle mod che ne hanno bisogno. Da sola non aggiunge nulla al gioco."}
 ]
 }

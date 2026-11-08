@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"d'après la copie enregistrée"},
 {"sid":"oe.manager.src.note.read","text":"lue"},
 {"sid":"oe.manager.src.note.notChecked","text":"pas encore vérifiée"},
-{"sid":"oe.manager.src.note.noName","text":"le catalogue n'a pas de nom"}
+{"sid":"oe.manager.src.note.noName","text":"le catalogue n'a pas de nom"},
+{"sid":"oe.manager.description","text":"Le gestionnaire de mods et la fenêtre « Mods » du menu principal : parcourez les catalogues, installez, mettez à jour, désactivez et supprimez des mods en un clic. Rien n'est installé ni mis à jour sans votre clic."}
 ]
 }

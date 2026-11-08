@@ -23,6 +23,7 @@
 {"sid":"oe.visited.text.Weekly","text":"reinicia toda semana"},
 {"sid":"oe.visited.text.Daily","text":"reinicia todo dia"},
 {"sid":"oe.visited.text.Visited","text":"visitada"},
-{"sid":"oe.visited.text.Available","text":"disponível"}
+{"sid":"oe.visited.text.Available","text":"disponível"},
+{"sid":"oe.visited.description","text":"Mostra na dica de uma construção se o herói selecionado ainda pode visitá-la e com que frequência, quem a guarda e o quão perigosa é a luta, e contorna as construções não visitadas no mapa."}
 ]
 }

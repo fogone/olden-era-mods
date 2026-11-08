@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Mais uma linha na previsão: o ícone de vida e a vida do defensor e, havendo contra-ataque, a do atacante depois das espadas. Ambas: a da criatura do topo e a do grupo inteiro (350 · 12350). Inteligente: a de uma criatura sozinha; a do grupo inteiro, com a da criatura do topo antes dela quando o golpe mata menos de duas."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"desligado"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"ambas"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligente"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligente"},
+{"sid":"oe.battlecounter.description","text":"Em batalha, ao passar o cursor sobre um ataque, mostra toda a troca em ordem: contra-ataque antes do golpe, o golpe, contra-ataque depois e o segundo golpe do Golpe duplo. Os números são as previsões do próprio jogo."}
 ]
 }

@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Pomijaj filmy przy starcie"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Logo studiów i zwiastun nie są pokazywane przy starcie gry: od razu otwiera się menu główne. Działa od następnego uruchomienia."},
+{"sid":"oe.skipintro.title","text":"Pomiń intro"},
+{"sid":"oe.skipintro.description","text":"Pomija logo studiów i zwiastun przy starcie gry i od razu przechodzi do menu głównego."}
+]
+}

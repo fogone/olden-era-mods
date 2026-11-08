@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Passer les vidéos au démarrage"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Les logos des studios et la bande-annonce ne sont pas montrés au démarrage : le jeu passe directement au menu principal. Prend effet au prochain démarrage."},
+{"sid":"oe.skipintro.title","text":"Passer l'intro"},
+{"sid":"oe.skipintro.description","text":"Saute les logos des studios et la bande-annonce au démarrage du jeu et passe directement au menu principal."}
+]
+}

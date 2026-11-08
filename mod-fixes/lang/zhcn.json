@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"读取后的巢穴增长"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"地图上的生物巢穴每周会在其所有者的城镇中增加自己生物的增长。读取存档后，游戏会忘记存档前占领的巢穴的这项增长；本修复会像游戏在占领时那样把它恢复。"},
+{"sid":"oe.fixes.title","text":"游戏修复"},
+{"sid":"oe.fixes.description","text":"修复游戏本身的错误，每项都有独立开关。目前有：读取存档后，生物巢穴的每周增长会恢复。"}
+]
+}

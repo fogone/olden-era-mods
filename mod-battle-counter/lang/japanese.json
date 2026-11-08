@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"予測の行をもう一つ追加：HPアイコンと防御側のHP、反撃がある場合は剣の後に攻撃側のHP。「両方」：先頭のクリーチャーとスタック全体のHP（350 · 12350）。「スマート」：単独のクリーチャーはそのHP、スタックは全体のHPで、攻撃で倒されるのが2体未満の場合はその前に先頭のクリーチャーのHP。"},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"オフ"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"両方"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"スマート"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"スマート"},
+{"sid":"oe.battlecounter.description","text":"戦闘中、攻撃にカーソルを合わせると、やり取り全体を順番に表示します：攻撃前の反撃、攻撃、攻撃後の反撃、ダブルストライクの2撃目。数値はゲーム自身の予測です。"}
 ]
 }

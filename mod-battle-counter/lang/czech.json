@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Jeden řádek předpovědi navíc: ikona zdraví a zdraví obránce, a při protiútoku zdraví útočníka za meči. Obojí: zdraví horního stvoření a celé skupiny (350 · 12350). Chytře: u osamělého stvoření jeho vlastní; u skupiny celkové zdraví, a když zásah zabije méně než dvě stvoření, před ním zdraví horního stvoření."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"vypnuto"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"obojí"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"chytře"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"chytře"},
+{"sid":"oe.battlecounter.description","text":"V boji ukáže najetí na útok celou výměnu ran popořadě: protiútok před úderem, úder, protiútok po něm a druhý zásah Dvojitého úderu. Čísla jsou předpovědi samotné hry."}
 ]
 }

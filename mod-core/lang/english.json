@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Mods core"}
+{"sid":"oe.core.title","text":"Mods core"},
+{"sid":"oe.core.description","text":"The base the other mods stand on: it hooks the game's code once and passes the events on to the mods that need them. It adds nothing to the game by itself."}
 ]
 }

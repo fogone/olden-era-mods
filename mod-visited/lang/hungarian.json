@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"naponta újra elérhető"},
 {"sid":"oe.visited.text.Visited","text":"meglátogatva"},
 {"sid":"oe.visited.text.Available","text":"elérhető"}
-
+,
+{"sid":"oe.visited.description","text":"Egy épület súgójában megmutatja, hogy a kijelölt hős meglátogathatja-e még és milyen gyakran, ki őrzi és mennyire veszélyes a harc, a meg nem látogatott épületeket pedig körvonallal emeli ki a térképen."}
 ]
 }

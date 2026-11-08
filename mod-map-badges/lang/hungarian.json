@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Csatlakozás és menekülés jelvények a csapatok felett"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"A felderített csapatok felett, a kijelölt hősnek: a Diplomácia ikonja, ha a csapat csatlakozna, a játék menekülés ikonja, ha menekülést ajánlana fel. Számok nélkül."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Veszélykoponya a csapatok felett"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Egy felderített csapat felett, amely nem csatlakozna és nem menekülne: a csata veszélyének színével koponya a kijelölt hősnek, mint a súgó koponyái."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Egy felderített csapat felett, amely nem csatlakozna és nem menekülne: a csata veszélyének színével koponya a kijelölt hősnek, mint a súgó koponyái."},
+{"sid":"oe.mapbadges.description","text":"Jelvények a térkép tárgyai fölött a kijelölt hősnek: meg nem látogatott épületek, bányák, felvehető tárgyak, lakhelyek és csapatok, amelyek csatlakoznának, menekülnének vagy harcolnának, a harc veszélyével. Csak a felderítettek fölött."}
 ]
 }

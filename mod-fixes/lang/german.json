@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Wachstum der Behausungen nach dem Laden"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Eine Einheitenbehausung auf der Karte fügt den Städten ihres Besitzers wöchentliches Wachstum ihrer Einheit hinzu. Nach dem Laden eines Spielstands vergisst das Spiel dies für Behausungen, die vor dem Speichern erobert wurden; die Korrektur gibt es zurück, so wie das Spiel es bei einer Eroberung tut."},
+{"sid":"oe.fixes.title","text":"Spielkorrekturen"},
+{"sid":"oe.fixes.description","text":"Korrekturen für Fehler des Spiels selbst, jede mit eigenem Schalter. Vorerst: Das wöchentliche Wachstum aus Behausungen kehrt nach dem Laden eines Spielstands zurück."}
+]
+}

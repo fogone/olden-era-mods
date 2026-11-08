@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"Podpowiedź na mapie"},
 {"sid":"oe.maptooltip.PlaceFree","text":"Podpowiedź nie zasłania obiektu"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"Gdy podpowiedź obiektu na mapie zasłania sam obiekt, przesuwa się na wolne miejsce: nad niego, na prawo, na lewo lub pod niego, także poza panelami interfejsu."}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Gdy podpowiedź obiektu na mapie zasłania sam obiekt, przesuwa się na wolne miejsce: nad niego, na prawo, na lewo lub pod niego, także poza panelami interfejsu."},
+{"sid":"oe.maptooltip.description","text":"Chroni obiekt na mapie przed zasłonięciem przez własną podpowiedź: przesuwa ją na wolne miejsce nad, na prawo, na lewo lub pod obiektem, także poza panelami interfejsu. Domyślnie wyłączone."}
 ]
 }

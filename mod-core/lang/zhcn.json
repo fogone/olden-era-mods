@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"模组核心"}
+{"sid":"oe.core.title","text":"模组核心"},
+{"sid":"oe.core.description","text":"其他模组赖以运行的基础：只挂接一次游戏代码，并把事件传递给需要它们的模组。它本身不会给游戏添加任何东西。"}
 ]
 }

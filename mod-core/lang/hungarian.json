@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Modmag"}
+{"sid":"oe.core.title","text":"Modmag"},
+{"sid":"oe.core.description","text":"Az alap, amelyre a többi mod épül: egyszer kapcsolódik a játék kódjához, és továbbadja az eseményeket a modoknak, amelyeknek szükségük van rájuk. Önmagában nem ad hozzá semmit a játékhoz."}
 ]
 }

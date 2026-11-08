@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"kayıtlı kopyadan"},
 {"sid":"oe.manager.src.note.read","text":"okundu"},
 {"sid":"oe.manager.src.note.notChecked","text":"henüz denetlenmedi"},
-{"sid":"oe.manager.src.note.noName","text":"kataloğun adı yok"}
+{"sid":"oe.manager.src.note.noName","text":"kataloğun adı yok"},
+{"sid":"oe.manager.description","text":"Mod yöneticisi ve ana menüdeki „Modlar” penceresi: katalogları gezin, modları tek tıkla kurun, güncelleyin, kapatın ve kaldırın. Sizin tıklamanız olmadan hiçbir şey kurulmaz veya güncellenmez."}
 ]
 }

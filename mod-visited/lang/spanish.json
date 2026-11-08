@@ -23,6 +23,7 @@
 {"sid":"oe.visited.text.Weekly","text":"se restablece cada semana"},
 {"sid":"oe.visited.text.Daily","text":"se restablece cada día"},
 {"sid":"oe.visited.text.Visited","text":"visitado"},
-{"sid":"oe.visited.text.Available","text":"disponible"}
+{"sid":"oe.visited.text.Available","text":"disponible"},
+{"sid":"oe.visited.description","text":"Muestra en la información de un edificio si el héroe seleccionado aún puede visitarlo y cada cuánto, quién lo guarda y lo peligroso que es el combate, y resalta con un contorno los edificios sin visitar en el mapa."}
 ]
 }

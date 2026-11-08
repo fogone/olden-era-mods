@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Připojí se asi {0:N0} z {1:N0} stvoření ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Armády: ta vaše je {0:0.#}krát silnější"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Armády: oddíl je {0:0.#}krát silnější"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Najeďte na oddíl na mapě: nápověda řekne, zda by se připojil k vašemu hrdinovi, nebo nabídl útěk, s ikonou Diplomacie či útěku místo lebek obtížnosti. Odpovědi dává sama hra."}
 ]
 }

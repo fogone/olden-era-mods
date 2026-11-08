@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"部隊の上に加入・逃走バッジ"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"選択中のヒーローにとって、偵察済みの部隊の上に表示：加わる場合は外交アイコン、逃走を申し出る場合はゲーム標準の逃走アイコン。数値は表示しません。"},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"部隊の上に危険度のドクロ"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"加わりも逃げもしない偵察済みの部隊の上に、ツールチップのドクロと同じく、選択中のヒーローにとっての戦闘の危険度を示す色のドクロを表示します。"}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"加わりも逃げもしない偵察済みの部隊の上に、ツールチップのドクロと同じく、選択中のヒーローにとっての戦闘の危険度を示す色のドクロを表示します。"},
+{"sid":"oe.mapbadges.description","text":"選択中の英雄向けに、マップ上のオブジェクトの上にバッジを表示します：未訪問の建物、鉱山、拾えるアイテム、生息地、加わる・逃げる・戦う部隊と、その戦闘の危険度。探索済みの場所のみ。"}
 ]
 }

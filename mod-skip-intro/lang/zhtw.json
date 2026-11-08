@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"啟動時跳過影片"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"遊戲啟動時不顯示工作室標誌與預告片：遊戲直接進入主選單。下次啟動時生效。"},
+{"sid":"oe.skipintro.title","text":"跳過開場"},
+{"sid":"oe.skipintro.description","text":"遊戲啟動時跳過工作室標誌與預告片，直接進入主選單。"}
+]
+}

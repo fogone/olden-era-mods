@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"from the saved copy"},
 {"sid":"oe.manager.src.note.read","text":"read"},
 {"sid":"oe.manager.src.note.notChecked","text":"not checked yet"},
-{"sid":"oe.manager.src.note.noName","text":"the catalog has no name"}
+{"sid":"oe.manager.src.note.noName","text":"the catalog has no name"},
+{"sid":"oe.manager.description","text":"The mod manager and the Mods window in the main menu: browse mod catalogs, install, update, switch off and remove mods with a click. Nothing is installed or updated without your click."}
 ]
 }

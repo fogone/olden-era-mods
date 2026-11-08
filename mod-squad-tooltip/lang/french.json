@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Environ {0:N0} créatures sur {1:N0} se joignent à vous ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Armées : la vôtre est {0:0.#} fois plus forte"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Armées : l'escouade est {0:0.#} fois plus forte"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Survolez un groupe sur la carte : l'infobulle indique s'il rejoindrait votre héros ou proposerait de fuir, avec l'icône de Diplomatie ou de fuite à la place des crânes de difficulté. Les réponses viennent du jeu lui-même."}
 ]
 }

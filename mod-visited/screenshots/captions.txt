@@ -1,0 +1,1 @@
+outlines-and-badges.jpg=Outlines of unvisited buildings and the visit badges in a building tooltip

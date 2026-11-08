@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Přírůstek z obydlí po načtení"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Obydlí jednotek na mapě přidává každý týden přírůstek své jednotky do měst majitele. Po načtení uložené hry na to hra zapomene u obydlí dobytých před uložením; oprava jej vrací, jako to hra dělá při dobytí."},
+{"sid":"oe.fixes.title","text":"Opravy hry"},
+{"sid":"oe.fixes.description","text":"Opravy chyb samotné hry, každá s vlastním přepínačem. Zatím: týdenní přírůstek z obydlí se vrací po načtení uložené hry."}
+]
+}

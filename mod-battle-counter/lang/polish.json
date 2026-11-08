@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Jeszcze jeden wiersz prognozy: ikona zdrowia i zdrowie obrońcy, a przy kontrataku zdrowie atakującego po mieczach. Oba: górnego stworzenia i całego oddziału (350 · 12350). Inteligentnie: pojedynczego stworzenia; całego oddziału, a przed nim górnego stworzenia, gdy cios zabija mniej niż dwa."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"wyłączone"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"oba"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligentnie"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligentnie"},
+{"sid":"oe.battlecounter.description","text":"W walce najechanie na atak pokazuje całą wymianę ciosów po kolei: kontratak przed uderzeniem, uderzenie, kontratak po nim i drugie uderzenie Podwójnego ciosu. Liczby to prognozy samej gry."}
 ]
 }

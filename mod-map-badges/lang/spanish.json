@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Insignias de unión y huida sobre las formaciones"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Sobre las formaciones exploradas, para el héroe seleccionado: el icono de Diplomacia si la formación se uniría, el icono de huida del juego si se ofrecería a huir. Sin cifras."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Calavera de peligro sobre las formaciones"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre una formación explorada que ni se uniría ni huiría: una calavera del color del peligro del combate para el héroe seleccionado, como las calaveras de la descripción emergente."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre una formación explorada que ni se uniría ni huiría: una calavera del color del peligro del combate para el héroe seleccionado, como las calaveras de la descripción emergente."},
+{"sid":"oe.mapbadges.description","text":"Insignias sobre los objetos del mapa para el héroe seleccionado: edificios sin visitar, minas, objetos recogibles, moradas y tropas que se unirían, huirían o combatirían, con el peligro del combate. Solo sobre lo explorado."}
 ]
 }

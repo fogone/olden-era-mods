@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Icone di unione e fuga sopra le squadre"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Sopra le squadre esplorate, per l'eroe selezionato: l'icona di Diplomazia se la squadra si unirebbe, l'icona di fuga del gioco se proporrebbe di fuggire. Senza numeri."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Teschio di pericolo sopra le squadre"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sopra una squadra esplorata che non si unirebbe né fuggirebbe: un teschio del colore del pericolo dello scontro per l'eroe selezionato, come i teschi della descrizione."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sopra una squadra esplorata che non si unirebbe né fuggirebbe: un teschio del colore del pericolo dello scontro per l'eroe selezionato, come i teschi della descrizione."},
+{"sid":"oe.mapbadges.description","text":"Distintivi sopra gli oggetti della mappa per l'eroe selezionato: edifici non visitati, miniere, oggetti da raccogliere, dimore e squadre che si unirebbero, fuggirebbero o combatterebbero, con la pericolosità dello scontro. Solo su ciò che è esplorato."}
 ]
 }

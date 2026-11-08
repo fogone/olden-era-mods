@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Jádro modů"}
+{"sid":"oe.core.title","text":"Jádro modů"},
+{"sid":"oe.core.description","text":"Základ, na kterém stojí ostatní módy: jednou se napojí na kód hry a předává události módům, které je potřebují. Sám o sobě do hry nic nepřidává."}
 ]
 }

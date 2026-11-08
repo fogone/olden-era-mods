@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Značky připojení a útěku nad oddíly"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Nad prozkoumanými oddíly, pro vybraného hrdinu: ikona Diplomacie, pokud by se oddíl připojil, herní ikona útěku, pokud by nabídl útěk. Bez čísel."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Lebka nebezpečnosti nad oddíly"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad prozkoumaným oddílem, který by se nepřipojil ani neutekl: lebka v barvě nebezpečnosti boje pro vybraného hrdinu, jako lebky v popisku."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad prozkoumaným oddílem, který by se nepřipojil ani neutekl: lebka v barvě nebezpečnosti boje pro vybraného hrdinu, jako lebky v popisku."},
+{"sid":"oe.mapbadges.description","text":"Značky nad objekty na mapě pro vybraného hrdinu: nenavštívené budovy, doly, sbíratelné předměty, obydlí a oddíly, které by se připojily, utekly nebo bojovaly, s nebezpečím boje. Jen nad prozkoumaným."}
 ]
 }

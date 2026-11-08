@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"About {0:N0} of {1:N0} creatures join ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Armies: yours is {0:0.#} times stronger"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Armies: the squad is {0:0.#} times stronger"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Hover a squad on the map: its tooltip says whether it would join your hero or offer to flee, with the Diplomacy or escape icon instead of the difficulty skulls. The answers are the game's own."}
 ]
 }

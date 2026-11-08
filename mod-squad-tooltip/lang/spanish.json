@@ -14,6 +14,7 @@
 {"sid":"oe.squadtooltip.text.Points","text":"Diplomacia {0:N0} de {1:N0} necesarios"},
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Se unen unas {0:N0} de {1:N0} criaturas ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Ejércitos: el tuyo es {0:0.#} veces más fuerte"},
-{"sid":"oe.squadtooltip.text.SquadStronger","text":"Ejércitos: la formación es {0:0.#} veces más fuerte"}
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Ejércitos: la formación es {0:0.#} veces más fuerte"},
+{"sid":"oe.squadtooltip.description","text":"Pasa el cursor sobre una tropa en el mapa: la información emergente dice si se uniría a tu héroe o ofrecería huir, con el icono de Diplomacia o de huida en lugar de las calaveras de dificultad. Las respuestas son las del propio juego."}
 ]
 }

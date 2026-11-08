@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"생물 {1:N0}마리 중 약 {0:N0}마리 합류 ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"군대: 아군이 {0:0.#}배 더 강함"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"군대: 분대가 {0:0.#}배 더 강함"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"지도에서 부대 위에 커서를 올리면 툴팁이 그 부대가 영웅에게 합류할지 도망을 제안할지 알려 주며, 난이도 해골 대신 외교 또는 도주 아이콘을 보여 줍니다. 답은 게임 자체의 것입니다."}
 ]
 }

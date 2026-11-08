@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Kb. {0:N0} a(z) {1:N0} lényből csatlakozik ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Seregek: a tiéd {0:0.#}-szor erősebb"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Seregek: a csapat {0:0.#}-szor erősebb"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Vigye az egeret egy csapat fölé a térképen: a súgó megmondja, csatlakozna-e a hőséhez vagy menekülést ajánlana, a nehézségi koponyák helyett a Diplomácia vagy a menekülés ikonjával. A válaszokat maga a játék adja."}
 ]
 }

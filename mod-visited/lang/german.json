@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"wird jeden Tag zurückgesetzt"},
 {"sid":"oe.visited.text.Visited","text":"besucht"},
 {"sid":"oe.visited.text.Available","text":"verfügbar"}
-
+,
+{"sid":"oe.visited.description","text":"Zeigt im Tooltip eines Gebäudes, ob der gewählte Held es noch besuchen kann und wie oft, wer es bewacht und wie gefährlich der Kampf ist, und umrandet unbesuchte Gebäude auf der Karte."}
 ]
 }

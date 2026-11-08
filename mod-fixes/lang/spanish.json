@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Crecimiento de las moradas tras cargar"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Una morada de unidades en el mapa añade cada semana el crecimiento de su unidad en las ciudades de su propietario. Tras cargar una partida, el juego lo olvida para las moradas capturadas antes de guardar; la corrección lo devuelve, como hace el juego al capturar."},
+{"sid":"oe.fixes.title","text":"Correcciones del juego"},
+{"sid":"oe.fixes.description","text":"Correcciones de errores del propio juego, cada una con su interruptor. Por ahora: el crecimiento semanal de las moradas vuelve tras cargar una partida guardada."}
+]
+}

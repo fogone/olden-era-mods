@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Une ligne de prévision de plus : l'icône de points de vie et ceux du défenseur, et en cas de contre-attaque ceux de l'attaquant après les épées. Les deux : ceux de la créature du dessus et de toute la pile (350 · 12350). Intelligent : ceux d'une créature seule ; ceux de toute la pile, précédés de ceux de la créature du dessus quand le coup en tue moins de deux."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"désactivé"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"les deux"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"intelligent"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"intelligent"},
+{"sid":"oe.battlecounter.description","text":"En combat, survoler une attaque montre tout l'échange dans l'ordre : contre-attaque avant le coup, le coup, contre-attaque après et second coup de la Double frappe. Les chiffres sont les prévisions du jeu."}
 ]
 }

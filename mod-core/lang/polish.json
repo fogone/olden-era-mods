@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Rdzeń modów"}
+{"sid":"oe.core.title","text":"Rdzeń modów"},
+{"sid":"oe.core.description","text":"Podstawa, na której opierają się pozostałe mody: jednorazowo podpina się pod kod gry i przekazuje zdarzenia modom, które ich potrzebują. Sama niczego do gry nie dodaje."}
 ]
 }

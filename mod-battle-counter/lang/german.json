@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Eine weitere Zeile der Vorschau: das Trefferpunkte-Symbol und die Trefferpunkte des Verteidigers, bei einem Gegenangriff nach den Schwertern die des Angreifers. Beide: die der obersten Kreatur und des ganzen Stapels (350 · 12350). Klug: bei einer einzelnen Kreatur ihre eigenen; bei einem Stapel die gesamten, davor die der obersten Kreatur, wenn der Treffer weniger als zwei tötet."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"aus"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"beide"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"klug"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"klug"},
+{"sid":"oe.battlecounter.description","text":"Im Kampf zeigt der Mauszeiger über einem Angriff den ganzen Schlagabtausch der Reihe nach: Gegenangriff vor dem Schlag, der Schlag, Gegenangriff danach und der zweite Treffer des Doppelschlags. Die Zahlen sind die Prognosen des Spiels."}
 ]
 }

@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Crescita delle dimore dopo un caricamento"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Una dimora di unità sulla mappa aggiunge ogni settimana la crescita della sua unità nelle città del proprietario. Dopo il caricamento di un salvataggio il gioco la dimentica per le dimore conquistate prima del salvataggio; la correzione la restituisce, come fa il gioco alla conquista."},
+{"sid":"oe.fixes.title","text":"Correzioni del gioco"},
+{"sid":"oe.fixes.description","text":"Correzioni di bug del gioco stesso, ciascuna con il proprio interruttore. Per ora: la crescita settimanale delle dimore torna dopo il caricamento di un salvataggio."}
+]
+}

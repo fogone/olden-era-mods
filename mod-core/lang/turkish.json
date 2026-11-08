@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Mod çekirdeği"}
+{"sid":"oe.core.title","text":"Mod çekirdeği"},
+{"sid":"oe.core.description","text":"Diğer modların dayandığı temel: oyunun koduna bir kez bağlanır ve olayları onlara ihtiyaç duyan modlara iletir. Tek başına oyuna hiçbir şey eklemez."}
 ]
 }

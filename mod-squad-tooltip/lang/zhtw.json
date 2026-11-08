@@ -14,6 +14,7 @@
 {"sid":"oe.squadtooltip.text.Points","text":"外交 {0:N0}，需要 {1:N0}"},
 {"sid":"oe.squadtooltip.text.JoinCount","text":"約 {0:N0} / {1:N0} 個生物加入（{2:0%}）"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"軍隊：你的軍隊強 {0:0.#} 倍"},
-{"sid":"oe.squadtooltip.text.SquadStronger","text":"軍隊：該部隊強 {0:0.#} 倍"}
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"軍隊：該部隊強 {0:0.#} 倍"},
+{"sid":"oe.squadtooltip.description","text":"在地圖上將游標移到一支部隊上：提示會說明它是否會加入你的英雄或提出逃跑，並以外交或逃跑圖示取代難度骷髏。答案來自遊戲本身。"}
 ]
 }

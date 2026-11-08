@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"Mod-Kern"}
+{"sid":"oe.core.title","text":"Mod-Kern"},
+{"sid":"oe.core.description","text":"Die Grundlage der anderen Mods: Sie greift einmal in den Spielcode ein und gibt die Ereignisse an die Mods weiter, die sie brauchen. Für sich allein fügt sie dem Spiel nichts hinzu."}
 ]
 }
