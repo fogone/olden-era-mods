@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Crescimento das moradias após carregar"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Uma moradia de unidades no mapa adiciona o crescimento semanal da sua unidade nas cidades do dono. Ao carregar um jogo salvo, o jogo esquece isso nas moradias capturadas antes de salvar; a correção o devolve, como o jogo faz numa captura."},
+{"sid":"oe.fixes.title","text":"Correções do jogo"},
+{"sid":"oe.fixes.description","text":"Correções de erros do próprio jogo, cada uma com seu interruptor. Por enquanto: o crescimento semanal das moradias volta depois de carregar um jogo salvo."}
+]
+}

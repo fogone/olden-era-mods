@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"Harita ipucu"},
 {"sid":"oe.maptooltip.PlaceFree","text":"İpucu nesneyi örtmez"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"Bir harita nesnesinin ipucu nesnenin kendisini örttüğünde, boş bir yere taşınır: üste, sağa, sola veya alta; arayüz panellerini de örtmez."}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Bir harita nesnesinin ipucu nesnenin kendisini örttüğünde, boş bir yere taşınır: üste, sağa, sola veya alta; arayüz panellerini de örtmez."},
+{"sid":"oe.maptooltip.description","text":"Bir harita nesnesinin ipucunun nesnenin kendisini örtmesini engeller: arayüz panellerinden de uzakta, üstte, sağda, solda veya altta boş bir yere kayar. Varsayılan olarak kapalıdır."}
 ]
 }

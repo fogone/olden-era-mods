@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"來自已儲存的副本"},
 {"sid":"oe.manager.src.note.read","text":"已讀取"},
 {"sid":"oe.manager.src.note.notChecked","text":"尚未檢查"},
-{"sid":"oe.manager.src.note.noName","text":"該目錄沒有名稱"}
+{"sid":"oe.manager.src.note.noName","text":"該目錄沒有名稱"},
+{"sid":"oe.manager.description","text":"模組管理員與主選單中的「模組」視窗：瀏覽模組目錄，一鍵安裝、更新、關閉與移除模組。沒有你的點擊，不會安裝或更新任何東西。"}
 ]
 }

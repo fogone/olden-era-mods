@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Emblemas de adesão e fuga sobre os grupos"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Sobre grupos explorados, para o herói selecionado: o ícone de Diplomacia se o grupo se juntaria, o ícone de fuga do jogo se ele se ofereceria para fugir. Sem números."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Caveira de perigo sobre os grupos"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre um grupo explorado que nem se juntaria nem fugiria: uma caveira da cor do perigo da luta para o herói selecionado, como as caveiras da dica."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre um grupo explorado que nem se juntaria nem fugiria: uma caveira da cor do perigo da luta para o herói selecionado, como as caveiras da dica."},
+{"sid":"oe.mapbadges.description","text":"Emblemas sobre objetos do mapa para o herói selecionado: construções não visitadas, minas, itens coletáveis, moradias e esquadrões que se juntariam, fugiriam ou lutariam, com o perigo da luta. Só sobre o que foi explorado."}
 ]
 }

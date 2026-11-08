@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Birliklerin üstünde katılma ve kaçma rozetleri"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Keşfedilmiş birliklerin üstünde, seçili kahraman için: birlik katılacaksa Diplomasi simgesi, kaçmayı önerecekse oyunun kaçış simgesi. Sayı yok."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Birliklerin üstünde tehlike kafatası"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Ne katılacak ne de kaçacak keşfedilmiş bir birliğin üstünde: seçili kahraman için savaşın tehlikesine göre renkli bir kafatası, ipucundaki kafatasları gibi."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Ne katılacak ne de kaçacak keşfedilmiş bir birliğin üstünde: seçili kahraman için savaşın tehlikesine göre renkli bir kafatası, ipucundaki kafatasları gibi."},
+{"sid":"oe.mapbadges.description","text":"Seçili kahraman için harita nesnelerinin üzerinde rozetler: ziyaret edilmemiş yapılar, madenler, toplanabilir şeyler, konutlar ve katılacak, kaçacak ya da savaşacak birlikler, savaşın tehlikesiyle birlikte. Yalnızca keşfedilmiş yerlerde."}
 ]
 }

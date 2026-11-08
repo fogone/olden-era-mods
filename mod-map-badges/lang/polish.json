@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Znaczki dołączenia i ucieczki nad oddziałami"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Nad zwiadowanymi oddziałami, dla wybranego bohatera: ikona Dyplomacji, jeśli oddział by dołączył, ikona ucieczki z gry, jeśli zaproponowałby ucieczkę. Bez liczb."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Czaszka niebezpieczeństwa nad oddziałami"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad zwiadowanym oddziałem, który by ani nie dołączył, ani nie uciekł: czaszka w kolorze niebezpieczeństwa walki dla wybranego bohatera, jak czaszki w podpowiedzi."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad zwiadowanym oddziałem, który by ani nie dołączył, ani nie uciekł: czaszka w kolorze niebezpieczeństwa walki dla wybranego bohatera, jak czaszki w podpowiedzi."},
+{"sid":"oe.mapbadges.description","text":"Znaczki nad obiektami mapy dla wybranego bohatera: nieodwiedzone budynki, kopalnie, przedmioty do zebrania, siedliska i oddziały, które dołączyłyby, uciekły lub walczyły, z zagrożeniem walką. Tylko nad tym, co zwiedzone."}
 ]
 }

@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Croissance des habitations après un chargement"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Une habitation d'unités sur la carte ajoute chaque semaine la croissance de son unité dans les villes de son propriétaire. Après le chargement d'une sauvegarde, le jeu l'oublie pour les habitations capturées avant la sauvegarde ; le correctif la rétablit, comme le jeu le fait lors d'une capture."},
+{"sid":"oe.fixes.title","text":"Correctifs du jeu"},
+{"sid":"oe.fixes.description","text":"Correctifs de bogues du jeu lui-même, chacun avec son interrupteur. Pour l'instant : la croissance hebdomadaire des habitations revient après le chargement d'une sauvegarde."}
+]
+}

@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"Infobulle de carte"},
 {"sid":"oe.maptooltip.PlaceFree","text":"L'infobulle ne cache pas l'objet"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"Quand l'infobulle d'un objet de la carte le recouvre, elle se déplace vers un emplacement libre : au-dessus, à droite, à gauche ou en dessous, en évitant aussi les panneaux de l'interface."}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Quand l'infobulle d'un objet de la carte le recouvre, elle se déplace vers un emplacement libre : au-dessus, à droite, à gauche ou en dessous, en évitant aussi les panneaux de l'interface."},
+{"sid":"oe.maptooltip.description","text":"Empêche l'infobulle d'un objet de la carte de couvrir l'objet : elle passe à un endroit libre, au-dessus, à droite, à gauche ou en dessous, hors des panneaux de l'interface. Désactivé par défaut."}
 ]
 }

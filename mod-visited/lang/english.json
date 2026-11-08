@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"resets each day"},
 {"sid":"oe.visited.text.Visited","text":"visited"},
 {"sid":"oe.visited.text.Available","text":"available"}
-
+,
+{"sid":"oe.visited.description","text":"Shows in a building's tooltip whether the selected hero can still visit it and how often, who guards it and how dangerous the fight is, and outlines the unvisited buildings on the map."}
 ]
 }

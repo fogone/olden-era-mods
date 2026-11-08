@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"분대 위에 합류·도주 배지"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"선택한 영웅 기준으로 정찰된 분대 위에 표시: 분대가 합류할 경우 외교 아이콘, 도주를 제안할 경우 게임의 도주 아이콘. 수치는 표시하지 않습니다."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"분대 위에 위험 해골"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"합류하지도 도주하지도 않는 정찰된 분대 위에 툴팁의 해골과 같이, 선택한 영웅에게 전투가 얼마나 위험한지를 나타내는 색의 해골을 표시합니다."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"합류하지도 도주하지도 않는 정찰된 분대 위에 툴팁의 해골과 같이, 선택한 영웅에게 전투가 얼마나 위험한지를 나타내는 색의 해골을 표시합니다."},
+{"sid":"oe.mapbadges.description","text":"선택한 영웅을 위해 지도 오브젝트 위에 배지를 표시합니다: 방문하지 않은 건물, 광산, 주울 수 있는 것, 거주지, 합류하거나 도망치거나 싸울 부대와 그 전투의 위험도. 탐색한 곳에서만."}
 ]
 }

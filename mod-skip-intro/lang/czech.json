@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Přeskakovat videa při spuštění"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Loga studií a upoutávka se při spuštění hry nezobrazují: hra rovnou přejde do hlavní nabídky. Projeví se při příštím spuštění."},
+{"sid":"oe.skipintro.title","text":"Přeskočit intro"},
+{"sid":"oe.skipintro.description","text":"Při spuštění hry přeskočí loga studií a upoutávku a rovnou otevře hlavní nabídku."}
+]
+}

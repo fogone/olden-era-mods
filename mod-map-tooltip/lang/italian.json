@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"Descrizione sulla mappa"},
 {"sid":"oe.maptooltip.PlaceFree","text":"La descrizione non copre l'oggetto"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"Quando la descrizione di un oggetto della mappa copre l'oggetto stesso, si sposta in uno spazio libero: sopra, a destra, a sinistra o sotto, evitando anche i pannelli dell'interfaccia."}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Quando la descrizione di un oggetto della mappa copre l'oggetto stesso, si sposta in uno spazio libero: sopra, a destra, a sinistra o sotto, evitando anche i pannelli dell'interfaccia."},
+{"sid":"oe.maptooltip.description","text":"Impedisce al suggerimento di un oggetto della mappa di coprire l'oggetto: si sposta in un punto libero sopra, a destra, a sinistra o sotto, anche fuori dai pannelli dell'interfaccia. Disattivato per impostazione predefinita."}
 ]
 }

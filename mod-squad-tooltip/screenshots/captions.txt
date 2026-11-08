@@ -1,0 +1,1 @@
+want-to-flee.jpg=A squad that would offer to flee: the escape icon and a Want to flee line in its tooltip

@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"aus der gespeicherten Kopie"},
 {"sid":"oe.manager.src.note.read","text":"gelesen"},
 {"sid":"oe.manager.src.note.notChecked","text":"noch nicht geprüft"},
-{"sid":"oe.manager.src.note.noName","text":"der Katalog hat keinen Namen"}
+{"sid":"oe.manager.src.note.noName","text":"der Katalog hat keinen Namen"},
+{"sid":"oe.manager.description","text":"Der Mod-Manager und das Fenster „Mods“ im Hauptmenü: Mod-Kataloge durchsuchen, Mods mit einem Klick installieren, aktualisieren, ausschalten und entfernen. Ohne Ihren Klick wird nichts installiert oder aktualisiert."}
 ]
 }

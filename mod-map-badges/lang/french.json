@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Icônes de ralliement et de fuite sur les escouades"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Sur les escouades explorées, pour le héros sélectionné : l'icône de Diplomatie si l'escouade se joindrait à vous, l'icône de fuite du jeu si elle proposerait de fuir. Sans chiffres."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Crâne de danger sur les escouades"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sur une escouade explorée qui ne se joindrait pas à vous et ne fuirait pas : un crâne de la couleur du danger du combat pour le héros sélectionné, comme les crânes de l'infobulle."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sur une escouade explorée qui ne se joindrait pas à vous et ne fuirait pas : un crâne de la couleur du danger du combat pour le héros sélectionné, comme les crânes de l'infobulle."},
+{"sid":"oe.mapbadges.description","text":"Des badges au-dessus des objets de la carte pour le héros sélectionné : bâtiments non visités, mines, objets à ramasser, habitations et groupes qui rejoindraient, fuiraient ou combattraient, avec le danger du combat. Uniquement sur ce qui est exploré."}
 ]
 }

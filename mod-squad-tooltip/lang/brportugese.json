@@ -14,6 +14,7 @@
 {"sid":"oe.squadtooltip.text.Points","text":"Diplomacia {0:N0} de {1:N0} necessários"},
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Cerca de {0:N0} de {1:N0} criaturas se juntam ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Exércitos: o seu é {0:0.#} vezes mais forte"},
-{"sid":"oe.squadtooltip.text.SquadStronger","text":"Exércitos: o grupo é {0:0.#} vezes mais forte"}
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Exércitos: o grupo é {0:0.#} vezes mais forte"},
+{"sid":"oe.squadtooltip.description","text":"Passe o cursor sobre um esquadrão no mapa: a dica diz se ele se juntaria ao seu herói ou ofereceria fuga, com o ícone de Diplomacia ou de fuga no lugar das caveiras de dificuldade. As respostas são do próprio jogo."}
 ]
 }

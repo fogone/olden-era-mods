@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Salta i video all'avvio"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"I loghi degli studi e il trailer non vengono mostrati all'avvio del gioco: si passa direttamente al menu principale. Ha effetto dal prossimo avvio."},
+{"sid":"oe.skipintro.title","text":"Salta intro"},
+{"sid":"oe.skipintro.description","text":"Salta i loghi degli studi e il trailer all'avvio del gioco e passa direttamente al menu principale."}
+]
+}

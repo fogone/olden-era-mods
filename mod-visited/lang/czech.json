@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"obnoví se každý den"},
 {"sid":"oe.visited.text.Visited","text":"navštíveno"},
 {"sid":"oe.visited.text.Available","text":"dostupné"}
-
+,
+{"sid":"oe.visited.description","text":"V nápovědě budovy ukazuje, zda ji vybraný hrdina ještě může navštívit a jak často, kdo ji hlídá a jak nebezpečný je boj, a nenavštívené budovy na mapě orámuje obrysem."}
 ]
 }

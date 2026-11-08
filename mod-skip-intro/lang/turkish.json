@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Başlangıçta videoları atla"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Oyun başlarken stüdyo logoları ve fragman gösterilmez: oyun doğrudan ana menüye geçer. Bir sonraki başlatmada geçerli olur."},
+{"sid":"oe.skipintro.title","text":"Girişi atla"},
+{"sid":"oe.skipintro.description","text":"Oyun başlarken stüdyo logolarını ve fragmanı atlar, doğrudan ana menüye geçer."}
+]
+}

@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Yüklemeden sonra konut artışı"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Haritadaki bir birim konutu, sahibinin şehirlerine her hafta kendi biriminin artışını ekler. Kayıt yüklendikten sonra oyun, kayıttan önce ele geçirilen konutlar için bunu unutur; düzeltme, oyunun ele geçirmede yaptığı gibi bunu geri verir."},
+{"sid":"oe.fixes.title","text":"Oyun düzeltmeleri"},
+{"sid":"oe.fixes.description","text":"Oyunun kendi hatalarına düzeltmeler, her biri ayrı bir anahtarla. Şimdilik: konutlardan gelen haftalık artış, kayıt yüklendikten sonra geri gelir."}
+]
+}

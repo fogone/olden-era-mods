@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"来自已保存的副本"},
 {"sid":"oe.manager.src.note.read","text":"已读取"},
 {"sid":"oe.manager.src.note.notChecked","text":"尚未检查"},
-{"sid":"oe.manager.src.note.noName","text":"该目录没有名称"}
+{"sid":"oe.manager.src.note.noName","text":"该目录没有名称"},
+{"sid":"oe.manager.description","text":"模组管理器和主菜单中的“模组”窗口：浏览模组目录，一键安装、更新、关闭和移除模组。没有你的点击，不会安装或更新任何东西。"}
 ]
 }

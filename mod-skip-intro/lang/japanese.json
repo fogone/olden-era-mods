@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"起動時に動画をスキップ"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"ゲーム起動時にスタジオのロゴとトレーラーを表示せず、そのままメインメニューへ進みます。次回の起動から有効です。"},
+{"sid":"oe.skipintro.title","text":"イントロをスキップ"},
+{"sid":"oe.skipintro.description","text":"ゲーム起動時にスタジオのロゴとトレーラーを飛ばし、そのままメインメニューへ進みます。"}
+]
+}

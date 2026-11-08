@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Etwa {0:N0} von {1:N0} Kreaturen schließen sich an ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Armeen: Eure ist {0:0.#}-mal stärker"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Armeen: die Truppe ist {0:0.#}-mal stärker"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Fahren Sie auf der Karte über eine Truppe: Der Tooltip sagt, ob sie sich Ihrem Helden anschließen oder die Flucht anbieten würde, mit dem Diplomatie- oder Fluchtsymbol statt der Schwierigkeits-Totenköpfe. Die Antworten stammen vom Spiel selbst."}
 ]
 }

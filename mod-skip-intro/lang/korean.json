@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"시작 시 영상 건너뛰기"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"게임을 시작할 때 스튜디오 로고와 트레일러를 보여 주지 않고 곧바로 메인 메뉴로 갑니다. 다음 시작부터 적용됩니다."},
+{"sid":"oe.skipintro.title","text":"인트로 건너뛰기"},
+{"sid":"oe.skipintro.description","text":"게임을 시작할 때 스튜디오 로고와 트레일러를 건너뛰고 곧바로 메인 메뉴로 갑니다."}
+]
+}

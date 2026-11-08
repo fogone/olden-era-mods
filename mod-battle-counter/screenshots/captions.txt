@@ -1,0 +1,2 @@
+double-strike.jpg=The forecast of an attack with Double Strike: both strikes in order
+strike-and-counter.jpg=The forecast of a strike and the counterattack that follows it

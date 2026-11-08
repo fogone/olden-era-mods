@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Videos beim Start überspringen"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Beim Spielstart werden die Logos der Studios und der Trailer nicht gezeigt: Das Spiel geht gleich ins Hauptmenü. Wirkt ab dem nächsten Start."},
+{"sid":"oe.skipintro.title","text":"Intro überspringen"},
+{"sid":"oe.skipintro.description","text":"Überspringt beim Spielstart die Studio-Logos und den Trailer und geht direkt ins Hauptmenü."}
+]
+}

@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"Térkép súgója"},
 {"sid":"oe.maptooltip.PlaceFree","text":"A súgó nem takarja az objektumot"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"Ha egy térképobjektum súgója magát az objektumot takarja, szabad helyre kerül: fölé, jobbra, balra vagy alá, a kezelőfelület paneljeit is kikerülve."}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Ha egy térképobjektum súgója magát az objektumot takarja, szabad helyre kerül: fölé, jobbra, balra vagy alá, a kezelőfelület paneljeit is kikerülve."},
+{"sid":"oe.maptooltip.description","text":"Megakadályozza, hogy egy térképi tárgy súgója eltakarja magát a tárgyat: szabad helyre kerül fölé, jobbra, balra vagy alá, a felületi panelektől is távol. Alapértelmezetten ki van kapcsolva."}
 ]
 }

@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"매일 초기화"},
 {"sid":"oe.visited.text.Visited","text":"방문함"},
 {"sid":"oe.visited.text.Available","text":"방문 가능"}
-
+,
+{"sid":"oe.visited.description","text":"건물 툴팁에 선택한 영웅이 아직 방문할 수 있는지와 얼마나 자주 가능한지, 누가 지키는지, 전투가 얼마나 위험한지를 표시하고, 지도에서 방문하지 않은 건물을 윤곽선으로 강조합니다."}
 ]
 }

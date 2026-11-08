@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Anschluss- und Fluchtsymbole über Truppen"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Über erkundeten Truppen, für den ausgewählten Helden: das Diplomatie-Symbol, wenn sich die Truppe anschließen würde, das Fluchtsymbol des Spiels, wenn sie die Flucht anbieten würde. Keine Zahlen."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Gefahren-Totenkopf über Truppen"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Über einer erkundeten Truppe, die sich weder anschließen noch fliehen würde: ein Totenkopf in der Farbe der Kampfgefahr für den ausgewählten Helden, wie die Totenköpfe im Tooltip."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Über einer erkundeten Truppe, die sich weder anschließen noch fliehen würde: ein Totenkopf in der Farbe der Kampfgefahr für den ausgewählten Helden, wie die Totenköpfe im Tooltip."},
+{"sid":"oe.mapbadges.description","text":"Symbole über Kartenobjekten für den gewählten Helden: unbesuchte Gebäude, Minen, Einsammelbares, Behausungen und Truppen, die sich anschließen, fliehen oder kämpfen würden, samt Kampfgefahr. Nur über Erkundetem."}
 ]
 }

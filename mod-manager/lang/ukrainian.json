@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"із збереженої копії"},
 {"sid":"oe.manager.src.note.read","text":"прочитано"},
 {"sid":"oe.manager.src.note.notChecked","text":"ще не перевірялося"},
-{"sid":"oe.manager.src.note.noName","text":"у каталогу немає назви"}
+{"sid":"oe.manager.src.note.noName","text":"у каталогу немає назви"},
+{"sid":"oe.manager.description","text":"Менеджер модів і вікно «Моди» в головному меню: каталоги модів, установлення, оновлення, вимкнення та видалення модів одним клацанням. Без вашого клацання нічого не встановлюється й не оновлюється."}
 ]
 }

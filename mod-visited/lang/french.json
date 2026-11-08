@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"se réinitialise chaque jour"},
 {"sid":"oe.visited.text.Visited","text":"visité"},
 {"sid":"oe.visited.text.Available","text":"disponible"}
-
+,
+{"sid":"oe.visited.description","text":"Affiche dans l'infobulle d'un bâtiment si le héros sélectionné peut encore le visiter et à quelle fréquence, qui le garde et à quel point le combat est dangereux, et entoure d'un contour les bâtiments non visités sur la carte."}
 ]
 }

@@ -23,6 +23,7 @@
 {"sid":"oe.visited.text.Weekly","text":"odnawia się co tydzień"},
 {"sid":"oe.visited.text.Daily","text":"odnawia się codziennie"},
 {"sid":"oe.visited.text.Visited","text":"odwiedzona"},
-{"sid":"oe.visited.text.Available","text":"dostępna"}
+{"sid":"oe.visited.text.Available","text":"dostępna"},
+{"sid":"oe.visited.description","text":"Pokazuje w podpowiedzi budynku, czy wybrany bohater może go jeszcze odwiedzić i jak często, kto go strzeże i jak groźna jest walka, oraz obrysowuje nieodwiedzone budynki na mapie."}
 ]
 }

@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"z zapisanej kopii"},
 {"sid":"oe.manager.src.note.read","text":"odczytano"},
 {"sid":"oe.manager.src.note.notChecked","text":"jeszcze nie sprawdzono"},
-{"sid":"oe.manager.src.note.noName","text":"katalog nie ma nazwy"}
+{"sid":"oe.manager.src.note.noName","text":"katalog nie ma nazwy"},
+{"sid":"oe.manager.description","text":"Menedżer modów i okno „Mody” w menu głównym: przeglądaj katalogi, instaluj, aktualizuj, wyłączaj i usuwaj mody jednym kliknięciem. Nic nie jest instalowane ani aktualizowane bez Twojego kliknięcia."}
 ]
 }

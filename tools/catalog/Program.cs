@@ -104,16 +104,25 @@ if (options.TryGetValue("screenshot", out var shotArgs))
     meta.Screenshots = shots;
 }
 
-// The mod's name in every language it has (its lang/<language>.json: oe.<short id>.title).
+// The mod's name and description in every language it has (its lang/<language>.json: oe.<short id>.title, or
+// oe.<short id>.name where a mod has no title, and oe.<short id>.description).
 if (One("lang") is { } langDir && Directory.Exists(langDir))
 {
     var shortId = id.Split('.').Last();
     foreach (var file in Directory.GetFiles(langDir, "*.json"))
     {
+        var language = Path.GetFileNameWithoutExtension(file);
         using var doc = JsonDocument.Parse(File.ReadAllText(file));
         foreach (var token in doc.RootElement.GetProperty("tokens").EnumerateArray())
-            if (token.GetProperty("sid").GetString() == $"oe.{shortId}.title")
-                meta.Name[Path.GetFileNameWithoutExtension(file)] = token.GetProperty("text").GetString();
+        {
+            var sid = token.GetProperty("sid").GetString();
+            if (sid == $"oe.{shortId}.title")
+                meta.Name[language] = token.GetProperty("text").GetString();
+            else if (sid == $"oe.{shortId}.name" && !meta.Name.ContainsKey(language))
+                meta.Name[language] = token.GetProperty("text").GetString();
+            else if (sid == $"oe.{shortId}.description")
+                meta.Description[language] = token.GetProperty("text").GetString();
+        }
     }
 }
 

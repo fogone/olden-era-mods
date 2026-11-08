@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Przyrost z siedlisk po wczytaniu"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"Siedlisko jednostek na mapie dodaje co tydzień przyrost swojej jednostki w miastach właściciela. Po wczytaniu zapisu gra zapomina o tym dla siedlisk zdobytych przed zapisem; poprawka go przywraca, tak jak gra robi to przy zdobyciu."},
+{"sid":"oe.fixes.title","text":"Poprawki gry"},
+{"sid":"oe.fixes.description","text":"Poprawki błędów samej gry, każda z własnym przełącznikiem. Na razie: cotygodniowy przyrost z siedlisk wraca po wczytaniu zapisu."}
+]
+}

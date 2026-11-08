@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"si azzera ogni giorno"},
 {"sid":"oe.visited.text.Visited","text":"visitato"},
 {"sid":"oe.visited.text.Available","text":"disponibile"}
-
+,
+{"sid":"oe.visited.description","text":"Mostra nel suggerimento di un edificio se l'eroe selezionato può ancora visitarlo e con quale frequenza, chi lo sorveglia e quanto è pericoloso lo scontro, e mette in risalto con un contorno gli edifici non visitati sulla mappa."}
 ]
 }

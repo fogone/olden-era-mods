@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"저장된 사본에서"},
 {"sid":"oe.manager.src.note.read","text":"읽음"},
 {"sid":"oe.manager.src.note.notChecked","text":"아직 확인하지 않음"},
-{"sid":"oe.manager.src.note.noName","text":"카탈로그에 이름이 없습니다"}
+{"sid":"oe.manager.src.note.noName","text":"카탈로그에 이름이 없습니다"},
+{"sid":"oe.manager.description","text":"모드 관리자와 메인 메뉴의 '모드' 창: 카탈로그를 둘러보고 모드를 한 번의 클릭으로 설치, 업데이트, 끄기, 제거할 수 있습니다. 당신의 클릭 없이는 아무것도 설치되거나 업데이트되지 않습니다."}
 ]
 }

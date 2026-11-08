@@ -73,8 +73,28 @@ foreach ($mod in $selected) {
     $requiresArgs = @(); if ($part.Requires) { $requiresArgs = @('--requires', $part.Requires) }
     $langArgs = @()
     if (Test-Path (Join-Path $pluginFolder 'lang')) { $langArgs = @('--lang', (Join-Path $pluginFolder 'lang')) }
+    # Screenshots: every PNG/JPG in the mod's screenshots folder, served from the repository's main branch; the optional
+    # screenshots\captions.txt has lines "<file name>=<english caption>". None: the meta file keeps the screenshots it has.
+    $shotArgs = @()
+    $shotFolder = Join-Path $pluginFolder 'screenshots'
+    if (Test-Path $shotFolder) {
+        $captions = @{}
+        $captionFile = Join-Path $shotFolder 'captions.txt'
+        if (Test-Path $captionFile) {
+            foreach ($line in [IO.File]::ReadAllLines($captionFile, [Text.Encoding]::UTF8)) {
+                $eq = $line.IndexOf('=')
+                if ($eq -gt 0) { $captions[$line.Substring(0, $eq).Trim()] = $line.Substring($eq + 1).Trim().Replace('|', ' ').Replace('"', '''') }
+            }
+        }
+        foreach ($shot in (Get-ChildItem $shotFolder -File | Where-Object { $_.Extension -in '.jpg', '.jpeg', '.png' } | Sort-Object Name)) {
+            $shotUrl = "https://raw.githubusercontent.com/$repo/main/mod-$mod/screenshots/$($shot.Name)"
+            if ($captions.ContainsKey($shot.Name)) { $shotUrl += "|$($captions[$shot.Name])" }
+            $shotArgs += '--screenshot'; $shotArgs += "$($shot.FullName)=$shotUrl"
+        }
+    }
+    $tagsArgs = @(); if ($part.Tags) { $tagsArgs = @('--tags', $part.Tags) }
     & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
-        @requiresArgs @tagsArgs --author fogone --source "https://github.com/$repo" @langArgs @fileArgs
+        @requiresArgs @tagsArgs --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the

@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.SkipVideos","text":"Omitir los vídeos al iniciar"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"Los logotipos de los estudios y el tráiler no se muestran al iniciar el juego: pasa directamente al menú principal. Surte efecto en el próximo inicio."},
+{"sid":"oe.skipintro.title","text":"Omitir intro"},
+{"sid":"oe.skipintro.description","text":"Omite los logotipos de los estudios y el tráiler al iniciar el juego y pasa directamente al menú principal."}
+]
+}

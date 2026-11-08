@@ -1,5 +1,6 @@
 {
 "tokens": [
-{"sid":"oe.core.title","text":"MODコア"}
+{"sid":"oe.core.title","text":"MODコア"},
+{"sid":"oe.core.description","text":"他のMODが土台にする基盤：ゲームのコードに一度だけ接続し、必要とするMODにイベントを渡します。単体ではゲームに何も追加しません。"}
 ]
 }

@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"保存したコピーから"},
 {"sid":"oe.manager.src.note.read","text":"読み込み済み"},
 {"sid":"oe.manager.src.note.notChecked","text":"まだ確認していません"},
-{"sid":"oe.manager.src.note.noName","text":"カタログに名前がありません"}
+{"sid":"oe.manager.src.note.noName","text":"カタログに名前がありません"},
+{"sid":"oe.manager.description","text":"MODマネージャーとメインメニューの「MOD」ウィンドウ：カタログを見て、MODをワンクリックでインストール、更新、無効化、削除できます。あなたのクリックなしには何もインストールも更新もされません。"}
 ]
 }

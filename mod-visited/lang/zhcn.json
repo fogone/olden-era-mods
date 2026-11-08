@@ -23,6 +23,7 @@
 {"sid":"oe.visited.text.Weekly","text":"每周重置"},
 {"sid":"oe.visited.text.Daily","text":"每日重置"},
 {"sid":"oe.visited.text.Visited","text":"已造访"},
-{"sid":"oe.visited.text.Available","text":"可造访"}
+{"sid":"oe.visited.text.Available","text":"可造访"},
+{"sid":"oe.visited.description","text":"在建筑的提示中显示所选英雄是否还能访问它以及多久一次、谁在守卫、战斗有多危险，并在地图上用轮廓突出未访问的建筑。"}
 ]
 }

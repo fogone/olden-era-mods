@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Még egy sor az előrejelzésben: az életerő ikonja és a védő életereje, visszatámadás esetén pedig a támadóé a kardok után. Mindkettő: a felső lény és az egész egység életereje (350 · 12350). Okos: magányos lénynél a sajátja; egységnél az egész életereje, és előtte a felső lényé, ha a találat kettőnél kevesebbet öl meg."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"ki"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"mindkettő"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"okos"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"okos"},
+{"sid":"oe.battlecounter.description","text":"Csatában egy támadás fölé víve az egeret sorrendben látszik az egész ütésváltás: ellentámadás az ütés előtt, az ütés, ellentámadás utána és a Dupla ütés második találata. A számok magának a játéknak az előrejelzései."}
 ]
 }

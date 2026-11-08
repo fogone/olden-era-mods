@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"z uložené kopie"},
 {"sid":"oe.manager.src.note.read","text":"přečteno"},
 {"sid":"oe.manager.src.note.notChecked","text":"ještě nezkontrolováno"},
-{"sid":"oe.manager.src.note.noName","text":"katalog nemá název"}
+{"sid":"oe.manager.src.note.noName","text":"katalog nemá název"},
+{"sid":"oe.manager.description","text":"Správce modů a okno „Módy“ v hlavní nabídce: procházejte katalogy, instalujte, aktualizujte, vypínejte a odstraňujte módy jedním kliknutím. Nic se neinstaluje ani neaktualizuje bez vašeho kliknutí."}
 ]
 }

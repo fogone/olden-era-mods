@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"her gün sıfırlanır"},
 {"sid":"oe.visited.text.Visited","text":"ziyaret edildi"},
 {"sid":"oe.visited.text.Available","text":"uygun"}
-
+,
+{"sid":"oe.visited.description","text":"Bir yapının ipucunda seçili kahramanın ona hâlâ uğrayıp uğrayamayacağını ve ne sıklıkla, onu kimin koruduğunu ve savaşın ne kadar tehlikeli olduğunu gösterir; haritada ziyaret edilmemiş yapıları çerçeveyle vurgular."}
 ]
 }

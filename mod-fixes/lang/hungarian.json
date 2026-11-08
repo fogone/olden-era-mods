@@ -1,0 +1,8 @@
+{
+"tokens": [
+{"sid":"oe.fixes.DwellingGrowth","text":"Lakhelyek szaporulata betöltés után"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"A térképen álló egységlakhely hetente hozzáadja egységének szaporulatát a tulajdonos városaihoz. Mentés betöltése után a játék elfelejti ezt a mentés előtt elfoglalt lakhelyeknél; a javítás visszaadja, ahogy a játék is teszi elfoglaláskor."},
+{"sid":"oe.fixes.title","text":"Játékjavítások"},
+{"sid":"oe.fixes.description","text":"A játék saját hibáinak javításai, mindegyik külön kapcsolóval. Egyelőre: a lakhelyek heti szaporulata visszatér mentés betöltése után."}
+]
+}

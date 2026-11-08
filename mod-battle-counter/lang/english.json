@@ -12,6 +12,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"One more forecast row: the health icon and the defender's health, and with a counterattack the attacker's after the swords. One and all: the top creature's and the whole stack's health (350 · 12350). Smart: a lone creature's own; a stack's whole health, with the top creature's before it when the hit kills fewer than two."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"off"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"one and all"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"smart"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"smart"},
+{"sid":"oe.battlecounter.description","text":"In battle, hovering an attack shows the whole exchange in order: counterattack before the strike, the strike, counterattack after it and Double Strike's second hit. The numbers are the game's own forecasts."}
 ]
 }

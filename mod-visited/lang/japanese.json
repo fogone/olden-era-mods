@@ -24,6 +24,7 @@
 {"sid":"oe.visited.text.Daily","text":"毎日リセット"},
 {"sid":"oe.visited.text.Visited","text":"訪問済み"},
 {"sid":"oe.visited.text.Available","text":"訪問可能"}
-
+,
+{"sid":"oe.visited.description","text":"建物のツールチップに、選択中の英雄がまだ訪問できるか、どのくらいの頻度か、誰が守っているか、戦闘がどれほど危険かを表示し、マップ上の未訪問の建物を輪郭で強調します。"}
 ]
 }

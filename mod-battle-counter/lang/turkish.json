@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"Tahmine bir satır daha: sağlık simgesi ve savunanın sağlığı, karşı saldırı varsa kılıçlardan sonra saldıranın sağlığı. Hem hem de: üstteki yaratığın ve tüm kümenin sağlığı (350 · 12350). Akıllı: tek yaratıkta kendi sağlığı; kümede tüm sağlık, vuruş ikiden az yaratık öldürüyorsa önünde üstteki yaratığınki."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"kapalı"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"hem hem de"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"akıllı"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"akıllı"},
+{"sid":"oe.battlecounter.description","text":"Savaşta bir saldırının üzerine gelmek tüm vuruş alışverişini sırayla gösterir: vuruştan önce karşı saldırı, vuruş, ondan sonra karşı saldırı ve Çifte Vuruş'un ikinci darbesi. Sayılar oyunun kendi tahminleridir."}
 ]
 }

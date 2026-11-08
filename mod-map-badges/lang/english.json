@@ -25,6 +25,7 @@
 {"sid":"oe.mapbadges.ShowSquads","text":"Join and flee badges over squads"},
 {"sid":"oe.mapbadges.ShowSquads.desc","text":"Over scouted squads, for the selected hero: the Diplomacy icon if the squad would join, the game's escape icon if it would offer to flee. No numbers."},
 {"sid":"oe.mapbadges.ShowSquadDanger","text":"Danger skull over squads"},
-{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Over a scouted squad that would neither join nor flee: a skull in the colour of the fight's danger for the selected hero, as the tooltip's skulls."}
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Over a scouted squad that would neither join nor flee: a skull in the colour of the fight's danger for the selected hero, as the tooltip's skulls."},
+{"sid":"oe.mapbadges.description","text":"Badges over map objects for the selected hero: unvisited buildings, mines, pickups, unit dwellings and squads that would join, flee or fight, with the danger of the fight. Only over what is scouted."}
 ]
 }

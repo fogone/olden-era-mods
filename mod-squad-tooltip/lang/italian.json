@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"Circa {0:N0} creature su {1:N0} si uniscono ({2:0%})"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"Eserciti: il tuo è {0:0.#} volte più forte"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"Eserciti: la squadra è {0:0.#} volte più forte"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"Passa il cursore su una squadra sulla mappa: il suggerimento dice se si unirebbe al tuo eroe o offrirebbe di fuggire, con l'icona della Diplomazia o della fuga al posto dei teschi di difficoltà. Le risposte sono quelle del gioco stesso."}
 ]
 }

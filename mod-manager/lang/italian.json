@@ -38,6 +38,7 @@
 {"sid":"oe.manager.src.note.cached","text":"dalla copia salvata"},
 {"sid":"oe.manager.src.note.read","text":"letta"},
 {"sid":"oe.manager.src.note.notChecked","text":"non ancora controllata"},
-{"sid":"oe.manager.src.note.noName","text":"il catalogo non ha un nome"}
+{"sid":"oe.manager.src.note.noName","text":"il catalogo non ha un nome"},
+{"sid":"oe.manager.description","text":"Il gestore di mod e la finestra «Mod» del menu principale: sfoglia i cataloghi, installa, aggiorna, disattiva e rimuovi le mod con un clic. Niente viene installato o aggiornato senza il tuo clic."}
 ]
 }

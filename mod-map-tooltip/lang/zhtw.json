@@ -2,6 +2,7 @@
 "tokens": [
 {"sid":"oe.maptooltip.title","text":"地圖提示框"},
 {"sid":"oe.maptooltip.PlaceFree","text":"提示框不遮擋物件"},
-{"sid":"oe.maptooltip.PlaceFree.desc","text":"當地圖物件的提示框遮擋了該物件本身時，會移到空閒位置：上方、右側、左側或下方，同時避開介面面板。"}
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"當地圖物件的提示框遮擋了該物件本身時，會移到空閒位置：上方、右側、左側或下方，同時避開介面面板。"},
+{"sid":"oe.maptooltip.description","text":"避免地圖物件的提示遮住物件本身：它會移到上方、右側、左側或下方的空位，同樣避開介面面板。預設為關閉。"}
 ]
 }

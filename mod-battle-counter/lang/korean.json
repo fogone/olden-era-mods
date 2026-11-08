@@ -7,6 +7,7 @@
 {"sid":"oe.battlecounter.HealthShown.desc","text":"예측에 한 줄 추가: 체력 아이콘과 방어자의 체력, 반격이 있으면 검 뒤에 공격자의 체력. 전부: 맨 위 생물과 부대 전체의 체력(350 · 12350). 스마트: 단독 생물은 그 생물의 체력, 부대는 전체 체력이며 공격으로 두 마리 미만이 죽으면 그 앞에 맨 위 생물의 체력."},
 {"sid":"oe.battlecounter.HealthShown.Off","text":"끔"},
 {"sid":"oe.battlecounter.HealthShown.Both","text":"전부"},
-{"sid":"oe.battlecounter.HealthShown.Smart","text":"스마트"}
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"스마트"},
+{"sid":"oe.battlecounter.description","text":"전투 중 공격 위에 커서를 올리면 주고받는 전체 과정을 순서대로 보여 줍니다: 타격 전 반격, 타격, 그 뒤의 반격, 더블 스트라이크의 두 번째 타격. 수치는 게임 자체의 예측입니다."}
 ]
 }

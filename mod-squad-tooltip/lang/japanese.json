@@ -15,6 +15,7 @@
 {"sid":"oe.squadtooltip.text.JoinCount","text":"{1:N0}体のうち約{0:N0}体のクリーチャーが加わる（{2:0%}）"},
 {"sid":"oe.squadtooltip.text.HeroStronger","text":"軍勢：自軍が{0:0.#}倍強い"},
 {"sid":"oe.squadtooltip.text.SquadStronger","text":"軍勢：部隊が{0:0.#}倍強い"}
-
+,
+{"sid":"oe.squadtooltip.description","text":"マップ上の部隊にカーソルを合わせると、ツールチップがその部隊が英雄に加わるか逃走を申し出るかを示し、難易度のドクロの代わりに外交または逃走のアイコンを表示します。答えはゲーム自身のものです。"}
 ]
 }
