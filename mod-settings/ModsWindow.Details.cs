@@ -238,8 +238,8 @@ public partial class Plugin
         return row;
     }
 
-    // A line of the panel's style that keeps its own width (in a row).
-    void AddLine(Transform row, string text)
+    // A line of the panel's style that keeps its own width (in a row); that width.
+    float AddLine(Transform row, string text)
     {
         var line = Copy(lineTemplate, row);
         line.name = "OE_Line";
@@ -251,6 +251,7 @@ public partial class Plugin
         var element = line.GetComponent<LayoutElement>() ?? line.AddComponent<LayoutElement>();
         element.preferredWidth = element.minWidth = tmp.GetPreferredValues(text).x;
         element.flexibleWidth = 0f;
+        return element.preferredWidth;
     }
 
     // A text that wraps (the description), as the panel's own description.
@@ -283,9 +284,13 @@ public partial class Plugin
         {
             if (row == null || width > 360f)
             {
+                var first = row == null;
                 row = InfoRow("OE_Chips", 26f);
                 HRow(row.gameObject, 6f, TextAnchor.MiddleLeft);
                 width = 0f;
+                // "Tags:" before the first row, as the other lines' labels.
+                if (first && lineTemplate != null)
+                    width += AddLine(row, PairText(W + "tagsLabel", "")) + 6f;
             }
             var chip = Copy(chipTemplate, row).GetComponent<BhTag>();
             chip.gameObject.SetActive(true);
