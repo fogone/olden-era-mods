@@ -48,6 +48,12 @@ internal static partial class Game
         return (data?.sides?.hotseatSides?.Length ?? 0) <= 1;
     }
 
+    // Whether the game played now is a hotseat one: played here (EPlay.Local) with more than one side played by people
+    // at this computer (the map data's hotseat sides). Not online nor a replay.
+    public static bool Hotseat(GameSession session) =>
+        session != null && session.Play == Hex.EPlay.Local &&
+        (session.TryCast<GameMapGameSession>()?.MapData?.sides?.hotseatSides?.Length ?? 0) > 1;
+
     // Every map object (null entries possible); null when there is no map session now.
     public static IEnumerable<GameMapObject> MapObjects() => GameNames.MapSession?.MapObjects?.ById is { } byId ? ValuesOf(byId) : null;
 

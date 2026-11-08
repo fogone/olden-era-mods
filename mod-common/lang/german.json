@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Mods sind aus: erstellt für die Spielversion {0}, das Spiel hat {1}. Sie müssen für diese Version neu erstellt werden. Aus: {2}."},
 {"sid":"oe.common.mode.title","text":"Alle Mods"},
 {"sid":"oe.common.mode","text":"Wann die Mods wirken"},
-{"sid":"oe.common.mode.desc","text":"Immer, nur im Einzelspielerspiel oder nie. Kein Einzelspielerspiel: online, Hotseat, eine Wiederholung. Solange sie nicht wirken, ändern und zeigen die Mods nichts, als wären sie nicht installiert; die eigenen Schalter jeder Mod bleiben, wie sie sind."},
-{"sid":"oe.common.mode.Always","text":"immer"},
+{"sid":"oe.common.mode.desc","text":"Nur im Einzelspielerspiel; im Einzelspielerspiel und Hotseat (alle Spieler an diesem Computer sehen dasselbe); oder nie. Nie in einem Online-Spiel oder einer Wiederholung: Die Mods dürfen keinen Vorteil gegenüber anderen Spielern geben. Solange sie nicht wirken, ändern und zeigen die Mods nichts, als wären sie nicht installiert; die eigenen Schalter jeder Mod bleiben, wie sie sind."},
 {"sid":"oe.common.mode.SinglePlayer","text":"im Einzelspielerspiel"},
+{"sid":"oe.common.mode.Hotseat","text":"im Einzelspielerspiel und Hotseat"},
 {"sid":"oe.common.mode.Off","text":"nie"}
 ]
 }

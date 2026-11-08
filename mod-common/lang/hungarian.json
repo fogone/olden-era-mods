@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"A modok ki vannak kapcsolva: a játék {0} verziójához készültek, a játék verziója {1}. Ehhez a verzióhoz újra kell őket fordítani. Kikapcsolva: {2}."},
 {"sid":"oe.common.mode.title","text":"Minden mod"},
 {"sid":"oe.common.mode","text":"Mikor működnek a modok"},
-{"sid":"oe.common.mode.desc","text":"Mindig, csak egyjátékos játékban, vagy soha. Nem egyjátékos: online, hotseat, visszajátszás. Amíg nem működnek, a modok semmit sem változtatnak és nem mutatnak, mintha nem lennének telepítve; az egyes modok saját kapcsolói megmaradnak."},
-{"sid":"oe.common.mode.Always","text":"mindig"},
+{"sid":"oe.common.mode.desc","text":"Csak egyjátékos játékban; egyjátékos játékban és hotseatben (a gépnél ülő összes játékos ugyanazt látja); vagy soha. Online játékban és visszajátszásban soha: a modok nem adhatnak előnyt a többi játékossal szemben. Amíg nem működnek, a modok semmit sem változtatnak és nem mutatnak, mintha nem lennének telepítve; az egyes modok saját kapcsolói megmaradnak."},
 {"sid":"oe.common.mode.SinglePlayer","text":"egyjátékos játékban"},
+{"sid":"oe.common.mode.Hotseat","text":"egyjátékos játékban és hotseatben"},
 {"sid":"oe.common.mode.Off","text":"soha"}
 ]
 }

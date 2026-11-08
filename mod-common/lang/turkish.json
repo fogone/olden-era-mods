@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Modlar kapalı: oyunun {0} sürümü için derlendiler, oyun ise {1}. Bu sürüm için yeniden derlenmeleri gerekir. Kapalı: {2}."},
 {"sid":"oe.common.mode.title","text":"Tüm modlar"},
 {"sid":"oe.common.mode","text":"Modlar ne zaman çalışır"},
-{"sid":"oe.common.mode.desc","text":"Her zaman, yalnızca tek oyunculu oyunda ya da hiçbir zaman. Tek oyunculu olmayan: çevrimiçi, hotseat, tekrar izleme. Çalışmadıkları sürece modlar, sanki yüklü değillermiş gibi hiçbir şeyi değiştirmez ve göstermez; her modun kendi ayarları olduğu gibi kalır."},
-{"sid":"oe.common.mode.Always","text":"her zaman"},
+{"sid":"oe.common.mode.desc","text":"Yalnızca tek oyunculu oyunda; tek oyunculu oyunda ve hotseat'te (bu bilgisayardaki tüm oyuncular aynı şeyi görür); ya da hiçbir zaman. Çevrimiçi oyunda ve tekrar izlemede asla: modlar diğer oyunculara karşı avantaj sağlamamalıdır. Çalışmadıkları sürece modlar, sanki yüklü değillermiş gibi hiçbir şeyi değiştirmez ve göstermez; her modun kendi ayarları olduğu gibi kalır."},
 {"sid":"oe.common.mode.SinglePlayer","text":"tek oyunculu oyunda"},
+{"sid":"oe.common.mode.Hotseat","text":"tek oyunculu oyunda ve hotseat'te"},
 {"sid":"oe.common.mode.Off","text":"hiçbir zaman"}
 ]
 }

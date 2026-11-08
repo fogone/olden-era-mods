@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Módy jsou vypnuty: sestaveno pro verzi hry {0}, hra má verzi {1}. Pro tuto verzi je třeba je znovu sestavit. Vypnuto: {2}."},
 {"sid":"oe.common.mode.title","text":"Všechny mody"},
 {"sid":"oe.common.mode","text":"Kdy mody fungují"},
-{"sid":"oe.common.mode.desc","text":"Vždy, jen ve hře jednoho hráče, nebo nikdy. Ne hra jednoho hráče: online, hotseat, záznam. Dokud nefungují, mody nic nemění ani neukazují, jako by nebyly nainstalované; vlastní přepínače každého modu zůstávají, jak jsou."},
-{"sid":"oe.common.mode.Always","text":"vždy"},
+{"sid":"oe.common.mode.desc","text":"Jen ve hře jednoho hráče; ve hře jednoho hráče a hotseatu (všichni hráči u tohoto počítače vidí totéž); nebo nikdy. V online hře ani v záznamu nikdy: mody nesmějí dávat výhodu oproti ostatním hráčům. Dokud nefungují, mody nic nemění ani neukazují, jako by nebyly nainstalované; vlastní přepínače každého modu zůstávají, jak jsou."},
 {"sid":"oe.common.mode.SinglePlayer","text":"ve hře jednoho hráče"},
+{"sid":"oe.common.mode.Hotseat","text":"ve hře jednoho hráče a hotseatu"},
 {"sid":"oe.common.mode.Off","text":"nikdy"}
 ]
 }

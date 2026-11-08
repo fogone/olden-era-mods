@@ -6,9 +6,9 @@
 {"sid":"oe.common.versionOff","text":"Mods are off: built for the game's version {0}, the game is {1}. They need a rebuild for this version. Off: {2}."},
 {"sid":"oe.common.mode.title","text":"All mods"},
 {"sid":"oe.common.mode","text":"When the mods work"},
-{"sid":"oe.common.mode.desc","text":"Always; only in a single player game; or never. Not in a single player game: online, hotseat, a replay. While they do not work, the mods change and show nothing, as if not installed; each mod's own switches stay as they are."},
-{"sid":"oe.common.mode.Always","text":"always"},
+{"sid":"oe.common.mode.desc","text":"Only in a single player game; in a single player game and hotseat (all the players at this computer see the same); or never. Never in an online game or a replay: the mods must give no advantage over other players. While they do not work, the mods change and show nothing, as if not installed; each mod's own switches stay as they are."},
 {"sid":"oe.common.mode.SinglePlayer","text":"in a single player game"},
+{"sid":"oe.common.mode.Hotseat","text":"in single player and hotseat"},
 {"sid":"oe.common.mode.Off","text":"never"}
 ]
 }

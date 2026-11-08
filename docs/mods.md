@@ -4,14 +4,16 @@ The mods are not official, and they are not for multiplayer: they only tell what
 author is strictly against using them to get an advantage over other players (see the [README](../README.md)).
 
 Every mod is set up in the game's settings, tab **Mods**. At the very top, **All mods**, "When the mods work":
-- always;
-- in a single player game (the default): not in an online game, a hotseat game (more than one person playing at this
-  computer) or a replay. The game says which it is: how its session is played (here, online, a replay) and the map's
-  hotseat sides;
+- in a single player game and hotseat (the default): hotseat is more than one person playing at this computer, all of
+  them seeing the same;
+- in a single player game: not in a hotseat game either;
 - never: the main menu says "mods … off" next to the game's version.
 
+In an online game and in a replay the mods never work, whatever is chosen: they must give no advantage over other
+players. The game says which it is: how its session is played (here, online, a replay) and the map's hotseat sides.
+
 While the mods do not work, every mod is off as by its own switch, and its own switches keep their values. (In the
-files: `BepInEx\config\OldenEra.Mods.cfg`, `[Mods] Mode` = `Always`, `SinglePlayer` or `Off`.)
+files: `BepInEx\config\OldenEra.Mods.cfg`, `[Mods] Mode` = `Hotseat`, `SinglePlayer` or `Off`.)
 
 Each mod has:
 - a "Mod enabled" switch: a switched-off mod changes nothing in the game;

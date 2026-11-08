@@ -31,18 +31,20 @@ public sealed class ModMenu
     {
         Texts.LoadOwn();   // "Mod enabled" and its description, the off heading: the library's lang files
         var common = new ConfigFile(System.IO.Path.Combine(Paths.ConfigPath, "OldenEra.Mods.cfg"), true);
-        Mode = common.Bind("Mods", "Mode", ModsMode.SinglePlayer, "Когда моды работают: Always — всегда, SinglePlayer — только в одиночной игре, Off — никогда");
+        Mode = common.Bind("Mods", "Mode", ModsMode.Hotseat, "When the mods work: SinglePlayer, Hotseat (single player and hotseat), Off. Never online.");
         var values = Enum.GetValues(typeof(ModsMode)).Cast<object>().ToArray();
         for (var i = 0; i < values.Length; i++)
             Texts.Alias(ChoiceItem.OptionKeyOf(ModeKey, i), $"{ModeKey}.{values[i]}");
         ModeItem = new ChoiceItem("Mode", ModeKey, Mode, values);
     }
 
-    // When the mods work at all (fogone 07.11): always, only in a single player game (the default: the mods are not for
-    // multiplayer), or never. A mod that does not work is off as by its own switch, which keeps its value. Lives in the
-    // library's own config file (BepInEx\config\OldenEra.Mods.cfg), not a plugin's: the mods obey it with or without the
-    // Mods tab, which shows it first (ModeItem, texts in the library's lang files).
-    public enum ModsMode { Always, SinglePlayer, Off }
+    // When the mods work at all: only in a single player game, in a single player game and hotseat (the default; all
+    // the players at this computer see the same), or never; never online nor in a replay (fogone 08.11: no "always", the
+    // mods must give no advantage in a multiplayer game). A mod that does not work is off as by its own switch, which
+    // keeps its value. Lives in the library's own config file (BepInEx\config\OldenEra.Mods.cfg), not a plugin's: the
+    // mods obey it with or without the Mods tab, which shows it first (ModeItem, texts in the library's lang files).
+    // A config with the old "Always" is not read and gets the default.
+    public enum ModsMode { SinglePlayer, Hotseat, Off }
     public const string ModeKey = "oe.common.mode", ModeTitleKey = "oe.common.mode.title";
     public static ConfigEntry<ModsMode> Mode { get; }
     public static ChoiceItem ModeItem { get; }
@@ -51,11 +53,15 @@ public sealed class ModMenu
     // game's session (Game.SinglePlayer), once per session; nobody answers it without the core (then: single player).
     public static Func<bool> NotSinglePlayer { get; set; }
 
+    // Whether it is a hotseat game (played here, more than one side played by people at this computer; Game.Hotseat):
+    // the core answers it too (from 0.7.3); without an answer, not hotseat.
+    public static Func<bool> HotseatGame { get; set; }
+
     // The mods work now, by the mode.
     public static bool ModsWork => Mode.Value switch
     {
-        ModsMode.Always => true,
         ModsMode.SinglePlayer => NotSinglePlayer?.Invoke() != true,
+        ModsMode.Hotseat => NotSinglePlayer?.Invoke() != true || HotseatGame?.Invoke() == true,
         _ => false,
     };
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +19,7 @@ namespace OldenEra.Modding.Core;
 // not found: its event does not come, and the log says which.
 //
 // The game's members through Game (mod-common/shared/Game*.cs). This plugin reloads like the others (devplugins).
-[BepInPlugin("nobirds.oldenera.core", "Olden Era Core", "0.7.2")]
+[BepInPlugin("nobirds.oldenera.core", "Olden Era Core", "0.7.3")]
 public class Plugin : ModBase
 {
     static ModLog log;
@@ -46,6 +46,9 @@ public class Plugin : ModBase
         PatchBattle(harmony);
         OnTick(Watch);
         ModMenu.NotSinglePlayer = NotSinglePlayer;
+        // The library of a manager before 0.3.4 has no HotseatGame: then the core goes on without it.
+        try { AnswerHotseat(HotseatGame); }
+        catch (MissingMemberException) { log.Info("the library has no hotseat answer yet (an older manager): hotseat counts as not single player"); }
         ModEvents.SourceReady = true;
         log.Info("The game's events ready");
     }
@@ -54,7 +57,13 @@ public class Plugin : ModBase
     {
         ModEvents.SourceReady = false;
         ModMenu.NotSinglePlayer = null;
+        try { AnswerHotseat(null); }
+        catch (MissingMemberException) { }
     }
+
+    // Apart, so that a library without the property fails here (when this is compiled), not in Load.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    static void AnswerHotseat(Func<bool> answer) => ModMenu.HotseatGame = answer;
 
     // ---------- single player or not (the mods' mode) ----------
 
@@ -62,7 +71,13 @@ public class Plugin : ModBase
     // again only when the session or its map data is another object (a new game, a load, back to the menu).
     static int sessionFrame = -1;
     static (IntPtr session, IntPtr data) seenSession = (IntPtr.Zero, IntPtr.Zero);
-    static bool notSinglePlayer;
+    static bool notSinglePlayer, hotseat;
+
+    static bool HotseatGame()
+    {
+        NotSinglePlayer();
+        return hotseat;
+    }
 
     static bool NotSinglePlayer()
     {
@@ -75,9 +90,10 @@ public class Plugin : ModBase
             return notSinglePlayer;
         seenSession = seen;
         notSinglePlayer = !Game.SinglePlayer(session);
+        hotseat = Game.Hotseat(session);
         if (session != null)
             log.Info($"session: {session.Play}, hotseat sides {session.TryCast<GameMapGameSession>()?.MapData?.sides?.hotseatSides?.Length ?? 0}: " +
-                     (notSinglePlayer ? "not single player" : "single player"));
+                     (hotseat ? "hotseat" : notSinglePlayer ? "not single player" : "single player"));
         return notSinglePlayer;
     }
 
