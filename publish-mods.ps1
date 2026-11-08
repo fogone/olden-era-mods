@@ -96,7 +96,7 @@ foreach ($mod in $selected) {
     }
     $tagsArgs = @(); if ($part.Tags) { $tagsArgs = @('--tags', $part.Tags) }
     & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
-        @requiresArgs @tagsArgs @iconArgs --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
+        @requiresArgs @tagsArgs @iconArgs --name 'Nobirds catalog' --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the
