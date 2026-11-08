@@ -71,12 +71,11 @@ public partial class Plugin
         ShowSquares();
         SetPair(versionLabel, versionValue, Texts.Get(W + "versionLabel"),
             mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available ?? "");
-        SetPair(originLabel, originValue, Texts.Get(W + "catalogLabel"), mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"));
+        // The catalog's box: its icon at the left, its name over the mod's author.
+        SetPair(originLabel, originValue, Coloured(mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"), versionValue),
+            string.IsNullOrEmpty(mod.Author) ? "" : PairText(W + "authorLabel", mod.Author));
+        BoxIcon(Picture(CatalogIcon(mod.SourceNameKey)));
 
-        InfoPair(W + "catalogLabel", mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"), CatalogIcon(mod.SourceNameKey));
-        if (!string.IsNullOrEmpty(mod.Author))
-            InfoPair(W + "authorLabel", mod.Author);
-        InfoPair(W + "versionLabel", mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available);
         if (mod.NoteKey != null)
             InfoLine($"<color=#A5A5A5>{Texts.Get(mod.NoteKey)}</color>");
         if (mod.TagKeys is { Count: > 0 } tagKeys)
@@ -184,6 +183,46 @@ public partial class Plugin
             SetText(value, valueText);
     }
 
+    // A picture at the left of the panel's second box (its two lines moved right to make room for it); null: none.
+    void BoxIcon(Texture2D icon)
+    {
+        if (originLabel == null || originValue == null)
+            return;
+        var parent = originLabel.transform.parent;
+        var image = parent.Find("OE_BoxIcon")?.GetComponent<RawImage>();
+        var room = 0f;
+        if (icon == null)
+            image?.gameObject.SetActive(false);
+        else
+        {
+            if (image == null)
+            {
+                image = NewRect("OE_BoxIcon", parent).gameObject.AddComponent<RawImage>();
+                image.raycastTarget = false;
+            }
+            image.gameObject.SetActive(true);
+            image.texture = icon;
+            // The box's two lines, from the top of the first to the bottom of the second, in the parent's space.
+            var top = Corners(originLabel.rectTransform, parent);
+            var bottom = Corners(originValue.rectTransform, parent);
+            var side = Math.Min(56f, top.yMax - bottom.yMin);
+            Pictures.FitInside(image.rectTransform, icon, new Vector2(side, side));
+            var left = Math.Min(top.xMin, bottom.xMin) + 12f;
+            image.rectTransform.localPosition = new Vector3(left + side / 2f, (top.yMax + bottom.yMin) / 2f, 0f);
+            room = side + 20f;
+        }
+        originLabel.margin = originValue.margin = new Vector4(room, 0f, 0f, 0f);
+    }
+
+    // A rect's corners in another transform's space (GetWorldCorners does not fill a managed array under Il2Cpp).
+    static Rect Corners(RectTransform rect, Transform space)
+    {
+        var r = rect.rect;
+        var a = space.InverseTransformPoint(rect.TransformPoint(new Vector3(r.xMin, r.yMin, 0f)));
+        var b = space.InverseTransformPoint(rect.TransformPoint(new Vector3(r.xMax, r.yMax, 0f)));
+        return Rect.MinMaxRect(a.x, a.y, b.x, b.y);
+    }
+
     // A line of the panel's information, in its own style.
     void InfoLine(string text)
     {
@@ -251,6 +290,9 @@ public partial class Plugin
         var element = line.GetComponent<LayoutElement>() ?? line.AddComponent<LayoutElement>();
         element.preferredWidth = element.minWidth = tmp.GetPreferredValues(text).x;
         element.flexibleWidth = 0f;
+        // Its own width too, for a row that does not size its children.
+        var rect = line.transform.Cast<RectTransform>();
+        rect.sizeDelta = new Vector2(element.preferredWidth, rect.sizeDelta.y);
         return element.preferredWidth;
     }
 
