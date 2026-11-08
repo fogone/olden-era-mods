@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"Не додано: таке джерело вже є"},
 {"sid":"oe.manager.src.badGitHub","text":"Не додано: ім'я на GitHub пишеться як власник або власник/репозиторій"},
 {"sid":"oe.manager.src.readFailed","text":"Не додано: не читається ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"Каталог не прочитано: {0}"},
 {"sid":"oe.manager.src.added","text":"Джерело додано: {0}, модів {1}"},
 {"sid":"oe.manager.src.removed","text":"Джерело прибрано: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"не читається"},

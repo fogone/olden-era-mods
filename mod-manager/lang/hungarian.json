@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"Nincs hozzáadva: ez a forrás már a listán van"},
 {"sid":"oe.manager.src.badGitHub","text":"Nincs hozzáadva: a GitHub-nevet így írd: owner vagy owner/repo"},
 {"sid":"oe.manager.src.readFailed","text":"Nincs hozzáadva: nem olvasható ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"A katalógus nem olvasható: {0}"},
 {"sid":"oe.manager.src.added","text":"Forrás hozzáadva: {0}, {1} mod"},
 {"sid":"oe.manager.src.removed","text":"Forrás eltávolítva: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"nem olvasható"},

@@ -20,6 +20,8 @@ public partial class Plugin
     int suspendedAt, resumedAt = -10;
     // The input box, opened a moment after the warning closes.
     Action pendingBox;
+    // The manager's failures told so far (ModCatalog.ProblemRevision).
+    int shownProblem;
     int pendingAt;
 
     void FillSources()
@@ -116,6 +118,16 @@ public partial class Plugin
                     add(text.Trim());
             }),
             () => Guard("input cancelled", ResumeWindow));
+    }
+
+    // The manager's latest failure (a source not read or not added, an action failed) in the game's message box, once;
+    // one that happened before the window opened is told when it opens.
+    void TellProblem()
+    {
+        shownProblem = ModCatalog.ProblemRevision;
+        SuspendWindow();
+        GameBoxes.Tell(Texts.Get(W + "problem"), Texts.Get(ModCatalog.ProblemKey), GameText("button_ok", W + "ok"),
+            () => Guard("problem told", ResumeWindow));
     }
 
     // A game box is open over the window: the window stays (drawn under it, PlaceCanvas), only its own Escape waits;

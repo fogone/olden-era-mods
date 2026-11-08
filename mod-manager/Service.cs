@@ -177,6 +177,11 @@ public static class ManagerService
             Updates = updates;
             LastMessage = $"catalog read: {catalog.Count} mods, {updates.Count} updates";
             log.LogInfo(LastMessage);
+            // The sources asked for from the network that did not read: told once (the window's message box).
+            var failed = reading.Sources.Where(r => r.State == SourceState.Failed && online(r.Url))
+                .Select(r => string.IsNullOrWhiteSpace(r.Name) ? store.Settings(r.Url)?.Name ?? r.Url : r.Name).ToList();
+            if (failed.Count > 0)
+                Note("oe.manager.src.checkFailed", string.Join(", ", failed));
         });
     }
 

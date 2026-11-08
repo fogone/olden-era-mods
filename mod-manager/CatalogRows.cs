@@ -15,6 +15,10 @@ public static class CatalogRows
 {
     const string Prefix = "oe.manager.row.";
     static string shown;
+    // The source notes that are failures (told in the game's message box), and the last failure told (once each).
+    static readonly HashSet<string> ProblemNotes = new()
+        { "oe.manager.src.notHttps", "oe.manager.src.duplicate", "oe.manager.src.badGitHub", "oe.manager.src.readFailed", "oe.manager.src.checkFailed" };
+    static string reportedProblem;
 
     // Once a few frames: the data again when what it shows changed.
     public static void Refresh(string managerVersion, string gameVersion)
@@ -89,13 +93,23 @@ public static class CatalogRows
         var updates = ManagerService.Updates;
         var busy = ManagerService.Busy;
 
-        // A line under the heading only when there is something to say: working, the last thing failed, the catalog not
-        // read yet, the outcome of adding or removing a source. Not the counts: the tabs show them.
-        var statusKey = busy ? "oe.manager.status.busy"
-            : ManagerService.LastFailed ? "oe.manager.status.failed"
-            : catalog == null ? "oe.manager.status.none" : null;
-        if (!busy && ManagerService.SourceNote is { } sourceNote)
-            ModCatalog.StatusKey = Compose("status", l => F(l, sourceNote.Key, sourceNote.Args));
+        // A failure goes to the game's message box, once (ModCatalog.Problem): a source not added or not read, an action
+        // that failed. The line under the heading only for the rest: working, the catalog not read yet, a source added
+        // or removed. Not the counts: the tabs show them.
+        var sourceNote = busy ? null : ManagerService.SourceNote;
+        var failedNote = sourceNote is { } n && ProblemNotes.Contains(n.Key);
+        var problem = busy ? null
+            : failedNote ? $"{sourceNote.Value.Key}|{string.Join("|", sourceNote.Value.Args)}"
+            : ManagerService.LastFailed ? "oe.manager.status.failed" : null;
+        if (problem != null && problem != reportedProblem)
+        {
+            var (key, args) = failedNote ? sourceNote.Value : ("oe.manager.status.failed", Array.Empty<object>());
+            ModCatalog.Problem(Compose("problem", l => F(l, key, args)));
+        }
+        reportedProblem = problem;
+        var statusKey = busy ? "oe.manager.status.busy" : catalog == null ? "oe.manager.status.none" : null;
+        if (sourceNote is { } shown && !failedNote)
+            ModCatalog.StatusKey = Compose("status", l => F(l, shown.Key, shown.Args));
         else
             ModCatalog.StatusKey = statusKey == null ? null : Compose("status", l => F(l, statusKey, catalog?.Count ?? 0, updates.Count));
 

@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"未添加：此来源已在列表中"},
 {"sid":"oe.manager.src.badGitHub","text":"未添加：GitHub 名称请写成 owner 或 owner/repo"},
 {"sid":"oe.manager.src.readFailed","text":"未添加：无法读取（{0}）"},
+{"sid":"oe.manager.src.checkFailed","text":"无法读取目录：{0}"},
 {"sid":"oe.manager.src.added","text":"已添加来源：{0}，{1} 个模组"},
 {"sid":"oe.manager.src.removed","text":"已移除来源：{0}"},
 {"sid":"oe.manager.src.note.failed","text":"无法读取"},

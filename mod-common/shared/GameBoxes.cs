@@ -27,6 +27,19 @@ internal static class GameBoxes
         ScMessageBox.Open(options);
     }
 
+    // A message with one button (the game's box without its second one).
+    public static void Tell(string caption, string text, string okLabel, Action onOk)
+    {
+        var options = new GameMessageBoxOptions();
+        options.Caption = caption;
+        options.Text = text;
+        var ok = new GameMessageBoxButton();
+        ok.Label = okLabel;
+        ok.Click = (Il2CppSystem.Action)(onOk ?? (() => { }));
+        options.Confirm = ok;
+        ScMessageBox.Open(options);
+    }
+
     // `onConfirm` gets the text typed as it is.
     public static void Ask(string caption, string placeholder, string confirmText, string cancelText, Action<string> onConfirm, Action onCancel)
     {

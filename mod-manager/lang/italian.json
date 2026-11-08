@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"Non aggiunta: questa fonte è già nell'elenco"},
 {"sid":"oe.manager.src.badGitHub","text":"Non aggiunta: scrivi un nome GitHub come owner oppure owner/repo"},
 {"sid":"oe.manager.src.readFailed","text":"Non aggiunta: non leggibile ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"Catalogo non letto: {0}"},
 {"sid":"oe.manager.src.added","text":"Fonte aggiunta: {0}, {1} mod"},
 {"sid":"oe.manager.src.removed","text":"Fonte rimossa: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"non leggibile"},
