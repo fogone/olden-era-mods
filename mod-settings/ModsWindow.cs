@@ -213,6 +213,16 @@ public partial class Plugin
         // their own nested canvas, took clicks (08.11). Every raycaster of the copy on.
         foreach (var raycaster in window.GetComponentsInChildren<GraphicRaycaster>(true))
             raycaster.enabled = true;
+        // So are its scrolling, its scrollbars, its controls and the dropdowns with their lists' templates (the list did
+        // not scroll, the dropdowns opened empty: fogone 08.11).
+        foreach (var scroll in window.GetComponentsInChildren<ScrollRect>(true))
+            scroll.enabled = true;
+        foreach (var control in window.GetComponentsInChildren<Selectable>(true))
+            control.enabled = true;
+        foreach (var dropdown in window.GetComponentsInChildren<BhDropdown>(true))
+            dropdown.enabled = true;
+        foreach (var layout in window.GetComponentsInChildren<LayoutGroup>(true))
+            layout.enabled = true;
         PlaceCanvas();
         if (window.GetComponent<CanvasGroup>() is { } rootGroup)
         {
