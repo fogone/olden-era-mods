@@ -275,6 +275,17 @@ public static class ModCatalog
     public static string TitleKey { get; private set; }
     // The outcome of the last thing done, or the catalog's state (a localization key composed by the manager).
     public static string StatusKey { get; set; }
+    // A failure to tell the player once, in the game's message box (a localization key composed by the manager): a
+    // source that does not read, an action that failed. ProblemRevision counts them, so the window shows each once.
+    public static string ProblemKey { get; private set; }
+    public static int ProblemRevision { get; private set; }
+
+    public static void Problem(string key)
+    {
+        ProblemKey = key;
+        ProblemRevision++;
+        ModMenu.Changed();
+    }
     // The mod manager's version (it sets it on load): the mods' version shown next to the game's in the main menu.
     public static string ManagerVersion { get; set; }
     // The manager itself on the Installed tab: its name, version and a note (its own update staged, failed...), its

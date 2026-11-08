@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"追加できません: このソースはすでにリストにあります"},
 {"sid":"oe.manager.src.badGitHub","text":"追加できません: GitHub 名は owner または owner/repo の形で入力してください"},
 {"sid":"oe.manager.src.readFailed","text":"追加できません: 読み込めません ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"カタログを読み込めません: {0}"},
 {"sid":"oe.manager.src.added","text":"ソースを追加しました: {0}、MOD {1} 件"},
 {"sid":"oe.manager.src.removed","text":"ソースを削除しました: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"読み込めません"},

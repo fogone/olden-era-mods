@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"作者"},
 {"sid":"oe.settings.w.requiresLabel","text":"需要"},
 {"sid":"oe.settings.w.pair","text":"{0}：{1}"},
+{"sid":"oe.settings.w.problem","text":"出现问题"},
+{"sid":"oe.settings.w.ok","text":"确定"},
 {"sid":"oe.settings.w.mods","text":"模组:{0}"},
 {"sid":"oe.settings.w.checked","text":"检查于 {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"尚未检查"},

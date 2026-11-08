@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"Non ajoutée : cette source est déjà dans la liste"},
 {"sid":"oe.manager.src.badGitHub","text":"Non ajoutée : écrivez un nom GitHub sous la forme owner ou owner/repo"},
 {"sid":"oe.manager.src.readFailed","text":"Non ajoutée : illisible ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"Catalogue non lu : {0}"},
 {"sid":"oe.manager.src.added","text":"Source ajoutée : {0}, {1} mods"},
 {"sid":"oe.manager.src.removed","text":"Source retirée : {0}"},
 {"sid":"oe.manager.src.note.failed","text":"illisible"},

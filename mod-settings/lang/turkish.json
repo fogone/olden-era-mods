@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"Yazar"},
 {"sid":"oe.settings.w.requiresLabel","text":"Gerektirir"},
 {"sid":"oe.settings.w.pair","text":"{0}: {1}"},
+{"sid":"oe.settings.w.problem","text":"Bir sorun oluştu"},
+{"sid":"oe.settings.w.ok","text":"OK"},
 {"sid":"oe.settings.w.mods","text":"Modlar: {0}"},
 {"sid":"oe.settings.w.checked","text":"Denetlendi {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"Henüz denetlenmedi"},

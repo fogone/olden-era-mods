@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"作者"},
 {"sid":"oe.settings.w.requiresLabel","text":"必要"},
 {"sid":"oe.settings.w.pair","text":"{0}: {1}"},
+{"sid":"oe.settings.w.problem","text":"問題が発生しました"},
+{"sid":"oe.settings.w.ok","text":"OK"},
 {"sid":"oe.settings.w.mods","text":"MOD: {0}"},
 {"sid":"oe.settings.w.checked","text":"確認日時 {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"まだ確認していません"},

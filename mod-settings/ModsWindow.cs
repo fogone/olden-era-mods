@@ -112,6 +112,11 @@ public partial class Plugin
         }
         if (!window.activeSelf)
             return;
+        if (ModCatalog.ProblemRevision != shownProblem && ModCatalog.ProblemKey != null && !GameBoxes.AnyShown())
+        {
+            TellProblem();
+            return;
+        }
         // The Escape that closed a game box over the window is not the window's (the box calls back in the same frame).
         if (Input.GetKeyDown(KeyCode.Escape) && Time.frameCount > resumedAt + 1)
         {
@@ -549,8 +554,9 @@ public partial class Plugin
             if (titleText != null)
                 SetText(titleText, Texts.Get(ModCatalog.TitleKey ?? TabKey));
             var status = ModCatalog.StatusKey != null ? Texts.Get(ModCatalog.StatusKey) : "";
-            if (ModCatalog.Busy)
-                status = status.Length > 0 ? $"{status} · {Texts.Get(W + "busy")}" : Texts.Get(W + "busy");
+            // The manager says itself that it works; the window's own word only when it says nothing.
+            if (ModCatalog.Busy && status.Length == 0)
+                status = Texts.Get(W + "busy");
             if (statusText != null)
                 SetText(statusText, status);
 

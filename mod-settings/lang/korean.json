@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"제작자"},
 {"sid":"oe.settings.w.requiresLabel","text":"필요"},
 {"sid":"oe.settings.w.pair","text":"{0}: {1}"},
+{"sid":"oe.settings.w.problem","text":"문제가 발생했습니다"},
+{"sid":"oe.settings.w.ok","text":"확인"},
 {"sid":"oe.settings.w.mods","text":"모드: {0}"},
 {"sid":"oe.settings.w.checked","text":"확인함 {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"아직 확인하지 않음"},

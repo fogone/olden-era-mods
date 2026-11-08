@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"Autor"},
 {"sid":"oe.settings.w.requiresLabel","text":"Requer"},
 {"sid":"oe.settings.w.pair","text":"{0}: {1}"},
+{"sid":"oe.settings.w.problem","text":"Algo deu errado"},
+{"sid":"oe.settings.w.ok","text":"OK"},
 {"sid":"oe.settings.w.mods","text":"Mods: {0}"},
 {"sid":"oe.settings.w.checked","text":"Verificado {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"Ainda não verificado"},

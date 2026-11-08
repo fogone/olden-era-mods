@@ -26,6 +26,7 @@
 {"sid":"oe.manager.src.duplicate","text":"Nepřidáno: tento zdroj už v seznamu je"},
 {"sid":"oe.manager.src.badGitHub","text":"Nepřidáno: jméno na GitHubu napište jako owner nebo owner/repo"},
 {"sid":"oe.manager.src.readFailed","text":"Nepřidáno: nelze přečíst ({0})"},
+{"sid":"oe.manager.src.checkFailed","text":"Katalog nelze načíst: {0}"},
 {"sid":"oe.manager.src.added","text":"Zdroj přidán: {0}, módů: {1}"},
 {"sid":"oe.manager.src.removed","text":"Zdroj odebrán: {0}"},
 {"sid":"oe.manager.src.note.failed","text":"nelze přečíst"},

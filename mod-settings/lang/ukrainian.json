@@ -38,6 +38,8 @@
 {"sid":"oe.settings.w.authorLabel","text":"Автор"},
 {"sid":"oe.settings.w.requiresLabel","text":"Потребує"},
 {"sid":"oe.settings.w.pair","text":"{0}: {1}"},
+{"sid":"oe.settings.w.problem","text":"Не вдалося"},
+{"sid":"oe.settings.w.ok","text":"ОК"},
 {"sid":"oe.settings.w.mods","text":"Моди: {0}"},
 {"sid":"oe.settings.w.checked","text":"Перевірено {0}"},
 {"sid":"oe.settings.w.checkedNever","text":"Ще не перевірялося"},
