@@ -69,7 +69,7 @@ internal static class ScreenCopy
 
     // The copy's canvas drawn as the game's screens are: with the UI camera of `screen` (the original screen's canvas;
     // else the message box's, else any camera canvas), on its layer, above the screens the game keeps switched on and
-    // just under the game's message box, so the game's message and input boxes come over it (`screenOrder`: the order
+    // just under the game's message and input boxes, so they come over it (`screenOrder`: the order
     // above which it goes when there is no message box). Its nested canvases with their own order move with it. Without
     // a camera: drawn over everything at `overlayOrder`. Returns the camera, or null.
     public static Camera Place(Canvas canvas, Canvas screen, int screenOrder, int overlayOrder)
@@ -92,7 +92,9 @@ internal static class ScreenCopy
             canvas.sortingLayerID = screen.sortingLayerID;
         }
         canvas.overrideSorting = true;
-        var order = messageBox != null ? messageBox.sortingOrder - 2 : (screen != null ? screen.sortingOrder : screenOrder) + 50;
+        // Under both boxes: the input box is drawn lower than the message box.
+        var boxes = new[] { messageBox, Scene.Find<ScInputBox>()?.GetComponent<Canvas>() }.Where(c => c != null).ToList();
+        var order = boxes.Count > 0 ? boxes.Min(c => c.sortingOrder) - 2 : (screen != null ? screen.sortingOrder : screenOrder) + 50;
         var old = canvas.sortingOrder;
         canvas.sortingOrder = order;
         foreach (var nested in canvas.GetComponentsInChildren<Canvas>(true))

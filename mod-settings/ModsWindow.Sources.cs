@@ -51,24 +51,27 @@ public partial class Plugin
         if (panelTitle != null)
             SetText(panelTitle, Texts.Get(source.TitleKey));
         ShowSquares();
-        InfoPair(W + "catalogLabel", Texts.Get(source.TitleKey), source.IconPath);
+        // The boxes: how many mods, and the catalog's icon by its last check (as the catalog's box of a mod).
         SetPair(versionLabel, versionValue, Texts.Get(W + "modsLabel"), source.Mods.ToString());
         SetPair(originLabel, originValue, Texts.Get(W + "checkedLabel"), source.LastChecked is { } when ? Moment(when) : Texts.Get(W + "checkedNever"));
-        InfoText($"<color=#A5A5A5>{source.Url}</color>");
-        if (source.BuiltIn)
-            InfoLine(Texts.Get(W + "builtIn"));
-        if (source.NoteKey != null)
-            InfoText(Texts.Get(source.NoteKey));
+        BoxIcon(Picture(source.IconPath));
+        InfoText(PairText(W + "url.caption", source.Url));
+        // What the source is and how its last reading went, on one muted line.
+        var state = new[] { source.BuiltIn ? Texts.Get(W + "builtIn") : null, source.NoteKey != null ? Texts.Get(source.NoteKey) : null }.Where(s => s != null).ToList();
+        if (state.Count > 0)
+            InfoText(Coloured(string.Join(" · ", state), versionLabel));
         if (source.SetCheckEvery is { } setEvery && dropdownSource != null)
         {
-            InfoLine(Texts.Get(W + "every"));
-            var holder = NewRect("OE_Every", infoContent);
-            Size(holder.gameObject, 440f, 40f);
-            // Laid out from the left by the holder (the dropdown's own anchors are its row's).
-            var everyRow = HRow(holder.gameObject, 0f, TextAnchor.MiddleLeft);
+            // "Check for updates:" and the game's dropdown on one row.
+            var holder = InfoRow("OE_Every", 44f);
+            var everyRow = HRow(holder.gameObject, 12f, TextAnchor.MiddleLeft);
             everyRow.childControlWidth = everyRow.childControlHeight = false;
+            var labelWidth = AddLine(holder, PairText(W + "every", ""));
             var dropdown = Copy(dropdownSource, holder).GetComponent<BhDropdown>();
             dropdown.gameObject.SetActive(true);
+            // The rest of the row (it would run past the panel's edge at its own width).
+            var dropdownRect = dropdown.transform.Cast<RectTransform>();
+            dropdownRect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Math.Min(dropdownRect.rect.width, holder.sizeDelta.x - labelWidth - 12f - 16f));
             BindDropdown(dropdown, i =>
             {
                 if (i >= 0 && i < CheckEveryValues.Length)

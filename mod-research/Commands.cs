@@ -195,7 +195,7 @@ internal sealed class Commands
                 {
                     var target = UnityEngine.Resources.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<UnityEngine.Transform>())
                         .Select(o => o.TryCast<UnityEngine.Transform>())
-                        .FirstOrDefault(t => t != null && t.gameObject.activeInHierarchy && (t.name == rest || PathOf(t).EndsWith("/" + rest)));
+                        .FirstOrDefault(t => t != null && t.gameObject.activeInHierarchy && (t.name == rest || PathOf(t) == rest || PathOf(t).EndsWith("/" + rest)));
                     if (target == null) { write($"no active object {rest}"); break; }
                     var go = target.gameObject;
                     var data = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current)
