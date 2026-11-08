@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Harita rozetleri"},
+{"sid":"oe.mapbadges.Shown","text":"Rozetleri göster"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Her zaman, yalnızca oyunun ek bilgi tuşu basılı tutulurken (değiştirilmediyse Alt), oyunun kendi ek bilgisiyle birlikte veya hiçbir zaman (o tuşla bile). Bu modun tüm rozetleri için."},
+{"sid":"oe.mapbadges.Shown.Always","text":"her zaman"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"ek bilgi tuşu basılıyken"},
+{"sid":"oe.mapbadges.Shown.Never","text":"hiçbir zaman"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Ziyaret edilmemiş yapıların ve başkalarının madenlerinin üstünde"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Seçili kahramanın hâlâ ziyaret edebileceği, keşfedilmiş her yapının ve sana ait olmayan madenlerin üstünde kehribar rengi rozet. Korunan yapının rozetinin köşesinde, muhafız orada durdukça, savaşın tehlikesine göre renkli bir kafatası veya kılıçlar."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Yapının rozeti"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Yalnızca işaret veya işaret ile yapının ne sıklıkla ziyaret edilebileceği, ipucundaki gibi."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"yalnızca işaret"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"tüm simgeler"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Yapıların muhafız tehlikesi"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"Korunan yapının rozetinin köşesinde, seçili kahraman için savaşın tehlikesine göre renkli bir kafatası, ipucundaki kafatasları gibi. Kapalı: çapraz kılıçlar, yalnızca “korunuyor”."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"Madenlerinin üstünde “Ele geçirildi”"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Seçili kahramanın tarafına ait madenlerin üstünde yeşil mücevher rozeti."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Toplanabilir nesnelerin üstünde"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Keşfedilmiş kaynakların (mücevher), eserlerin (kılıç) ve haritada hâlâ duran sandıkların üstünde küçük bir rozet."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Konutların üstünde birlik portreleri"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Konutun işe aldığı birliğin portresi: işe alınacak biri olduğu sürece parlak, kimse kalmadığında soluk."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Kaç tane alınabileceği, konutun portresinde"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Konutta şu anda işe alınabilecek kaç yaratık olduğu, portrenin köşesinde. Korunurken gösterilmez."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Birliklerin üstünde katılma ve kaçma rozetleri"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Keşfedilmiş birliklerin üstünde, seçili kahraman için: birlik katılacaksa Diplomasi simgesi, kaçmayı önerecekse oyunun kaçış simgesi. Sayı yok."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Birliklerin üstünde tehlike kafatası"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Ne katılacak ne de kaçacak keşfedilmiş bir birliğin üstünde: seçili kahraman için savaşın tehlikesine göre renkli bir kafatası, ipucundaki kafatasları gibi."}
+]
+}

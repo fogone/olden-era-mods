@@ -1,0 +1,41 @@
+<Project>
+
+  <!-- The generated names (docs/game-names.md): before a plugin that compiles mod-common\shared\GameNames.g.cs is
+       built, tools\game-names makes the file again from the game's files when any of its inputs is newer than it
+       (a game patch: GameAssembly.dll, the metadata, the interop BepInEx made; our searches; the pins). Nothing to do
+       otherwise; without the game's files (another machine) the file in git is used as it is. A search that finds
+       none or several stops the build with the candidates listed. -->
+  <PropertyGroup>
+    <GameNamesShared>$(MSBuildThisFileDirectory)mod-common\shared\</GameNamesShared>
+    <GameNamesFile>$(GameNamesShared)GameNames.g.cs</GameNamesFile>
+    <GameNamesGameDir Condition="'$(GameDir)' != ''">$(GameDir)</GameNamesGameDir>
+    <GameNamesGameDir Condition="'$(GameDir)' == ''">C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameNamesGameDir>
+  </PropertyGroup>
+
+  <Target Name="GenerateGameNames" BeforeTargets="CoreCompile"
+          Condition="'$(MSBuildProjectName)' != 'game-names' and '@(Compile->AnyHaveMetadataValue('Filename', 'GameNames.g'))' == 'true' and Exists('$(GameNamesGameDir)\GameAssembly.dll')"
+          Inputs="$(GameNamesGameDir)\GameAssembly.dll;$(GameNamesGameDir)\HeroesOldenEra_Data\globalgamemanagers;$(GameNamesGameDir)\HeroesOldenEra_Data\il2cpp_data\Metadata\global-metadata.dat;$(GameNamesGameDir)\BepInEx\interop\Hex.dll;$(GameNamesShared)GameNames.pins.txt;@(GameNamesSearches)"
+          Outputs="$(GameNamesFile)">
+    <Message Importance="high" Text="Game names: made again from the game's files (tools\game-names)" />
+    <Exec Command="&quot;$(DOTNET_HOST_PATH)&quot; run --project &quot;$(MSBuildThisFileDirectory)tools\game-names&quot; -c Release -- &quot;$(GameNamesGameDir)&quot;"
+          EnvironmentVariables="DOTNET_CLI_TELEMETRY_OPTOUT=1;DOTNET_NOLOGO=1" />
+  </Target>
+
+  <!-- The mods' version (version.txt): one version of the whole set, for one version of the game; written into every
+       assembly as AssemblyMetadata("ModsVersion"), shown next to the game's version in the main menu, the release's. -->
+  <PropertyGroup>
+    <ModsVersion>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)version.txt').Trim())</ModsVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>ModsVersion</_Parameter1>
+      <_Parameter2>$(ModsVersion)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The searches behind the names: a change in them can change the names. -->
+    <GameNamesSearches Include="$(GameNamesShared)search\*.cs;$(MSBuildThisFileDirectory)mod-research\NamesGenerator.cs;$(MSBuildThisFileDirectory)tools\game-names\*.cs"
+                       Exclude="$(GameNamesFile)" />
+  </ItemGroup>
+
+</Project>

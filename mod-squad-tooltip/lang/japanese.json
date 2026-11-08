@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"部隊ツールチップ"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"外交アイコン付きの「仲間になりたがっている」"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"部隊が選択中のヒーローに加わる場合、戦闘難易度の代わりに「仲間になりたがっている」と外交アイコンを表示します。"},
+{"sid":"oe.squadtooltip.ShowFlee","text":"「逃げたがっている」"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"部隊が逃走を申し出る場合、戦闘難易度の代わりに「逃げたがっている」を表示し、マップ上の部隊の上にあるゲーム標準の逃走アイコンをドクロの代わりに表示します。"},
+{"sid":"oe.squadtooltip.ShowIcon","text":"難易度のドクロの代わりにアイコン"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"「仲間になりたがっている」「逃げたがっている」のとき、ドクロの代わりに外交アイコンまたはゲーム標準の逃走アイコンを表示します。オフ：文字のみ。"},
+{"sid":"oe.squadtooltip.ShowDetails","text":"該当する場合は外交の詳細"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"該当する場合、隠された数値を表示します：ヒーローと部隊の外交ポイント、加わるクリーチャーの数、ヒーローの軍勢が何倍強い（弱い）か。ゲームの設定「戦闘難易度を非表示」では、比率は表示されません。"},
+{"sid":"oe.squadtooltip.text.Join","text":"仲間になりたがっている"},
+{"sid":"oe.squadtooltip.text.Flee","text":"逃げたがっている"},
+{"sid":"oe.squadtooltip.text.Points","text":"外交 {0:N0} / 必要 {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"{1:N0}体のうち約{0:N0}体のクリーチャーが加わる（{2:0%}）"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"軍勢：自軍が{0:0.#}倍強い"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"軍勢：部隊が{0:0.#}倍強い"}
+
+]
+}

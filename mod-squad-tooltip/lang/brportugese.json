@@ -1,0 +1,19 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Dica do grupo"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"\"Quer se juntar\" com o ícone de Diplomacia"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Quando o grupo se juntaria ao herói selecionado, \"Quer se juntar\" e o ícone de Diplomacia substituem a dificuldade da batalha."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"\"Quer fugir\""},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Quando o grupo se ofereceria para fugir, \"Quer fugir\" substitui a dificuldade da batalha, e o ícone de fuga do jogo, o que aparece sobre o grupo no mapa, substitui as caveiras."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Um ícone no lugar das caveiras de dificuldade"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Com \"Quer se juntar\" e \"Quer fugir\", o ícone de Diplomacia ou o de fuga do jogo no lugar das caveiras. Desligado: apenas as palavras."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Detalhes de Diplomacia quando houver"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Mostra os números ocultos quando houver: os pontos de Diplomacia do herói e do grupo, quantas criaturas se juntariam, quantas vezes o exército do herói é mais forte ou mais fraco. Com a configuração do jogo \"ocultar o perigo da batalha\", a proporção não é mostrada."},
+{"sid":"oe.squadtooltip.text.Join","text":"Quer se juntar"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Quer fugir"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomacia {0:N0} de {1:N0} necessários"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Cerca de {0:N0} de {1:N0} criaturas se juntam ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Exércitos: o seu é {0:0.#} vezes mais forte"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Exércitos: o grupo é {0:0.#} vezes mais forte"}
+]
+}

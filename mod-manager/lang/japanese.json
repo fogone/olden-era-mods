@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"MOD"},
+{"sid":"oe.manager.status.none","text":"カタログはまだ読み込まれていません"},
+{"sid":"oe.manager.status.busy","text":"カタログ: 処理中..."},
+{"sid":"oe.manager.status.read","text":"カタログ: MOD {0}件、更新 {1}件"},
+{"sid":"oe.manager.status.failed","text":"カタログ: 前回の操作に失敗しました。ログを確認してください"},
+{"sid":"oe.manager.check","text":"確認"},
+{"sid":"oe.manager.install","text":"インストール"},
+{"sid":"oe.manager.update","text":"更新"},
+{"sid":"oe.manager.updateAll","text":"すべて更新"},
+{"sid":"oe.manager.name","text":"MODマネージャー"},
+{"sid":"oe.manager.note.available","text":"{0} あり"},
+{"sid":"oe.manager.note.notInstalled","text":"未インストール"},
+{"sid":"oe.manager.note.required","text":"他のMODが必要としています"},
+{"sid":"oe.manager.note.restart","text":"次回起動時に変更されます"},
+{"sid":"oe.manager.note.removed","text":"削除済み、次回起動時に消えます"},
+{"sid":"oe.manager.note.noRelease","text":"このゲームバージョン向けのリリースなし"},
+{"sid":"oe.manager.note.staged","text":"{0} は次回起動時にインストールされます"},
+{"sid":"oe.manager.note.failed","text":"更新が開始されず、{0} に戻りました"}
+]
+}

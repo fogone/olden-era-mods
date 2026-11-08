@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Kartensymbole"},
+{"sid":"oe.mapbadges.Shown","text":"Symbole anzeigen"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Immer, nur solange die Zusatzinfo-Taste des Spiels gehalten wird (Alt, sofern nicht neu belegt), zusammen mit den eigenen Zusatzinfos des Spiels, oder nie (auch nicht mit dieser Taste). Für alle Symbole dieser Mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"immer"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"solange die Zusatzinfo-Taste gehalten wird"},
+{"sid":"oe.mapbadges.Shown.Never","text":"nie"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Über unbesuchten Gebäuden und fremden Minen"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Ein bernsteinfarbenes Symbol über jedem erkundeten Gebäude, das der ausgewählte Held noch besuchen kann, und über Minen, die nicht Euch gehören. In der Ecke des Symbols eines bewachten Gebäudes, solange die Wache dort steht: ein Totenkopf in der Farbe der Kampfgefahr oder Schwerter."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Symbol eines Gebäudes"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Nur das Zeichen, oder das Zeichen und wie oft das Gebäude besucht werden kann, wie im Tooltip."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"nur das Zeichen"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"alle Symbole"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Wächtergefahr bei Gebäuden"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"In der Ecke des Symbols eines bewachten Gebäudes ein Totenkopf in der Farbe der Kampfgefahr für den ausgewählten Helden, wie die Totenköpfe im Tooltip. Aus: gekreuzte Schwerter, nur „bewacht“."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"„Erobert“ über Euren Minen"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Ein grünes Edelstein-Symbol über den Minen der Seite des ausgewählten Helden."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Über Einsammelbarem"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Ein kleines Symbol über erkundeten Ressourcen (Edelstein), Artefakten (Schwert) und Truhen, die noch auf der Karte liegen."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Einheitenporträts über Behausungen"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Das Porträt der Einheit, die die Behausung anwirbt: hell, solange jemand angeworben werden kann, gedämpft, wenn niemand mehr übrig ist."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Wie viele anwerbbar sind, auf dem Porträt der Behausung"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Wie viele Kreaturen die Behausung jetzt zur Anwerbung bereithält, in der Ecke des Porträts. Wird nicht angezeigt, solange sie bewacht ist."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Anschluss- und Fluchtsymbole über Truppen"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Über erkundeten Truppen, für den ausgewählten Helden: das Diplomatie-Symbol, wenn sich die Truppe anschließen würde, das Fluchtsymbol des Spiels, wenn sie die Flucht anbieten würde. Keine Zahlen."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Gefahren-Totenkopf über Truppen"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Über einer erkundeten Truppe, die sich weder anschließen noch fliehen würde: ein Totenkopf in der Farbe der Kampfgefahr für den ausgewählten Helden, wie die Totenköpfe im Tooltip."}
+]
+}

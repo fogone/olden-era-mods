@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Моды"},
+{"sid":"oe.settings.defaults","text":"Настройки мода по умолчанию"},
+{"sid":"oe.settings.defaults.desc","text":"Вернуть все переключатели этого мода к значениям по умолчанию. Другие моды и настройки игры не меняются."},
+{"sid":"oe.settings.reset","text":"Сбросить"},
+{"sid":"oe.settings.version","text":"моды {0}"},
+{"sid":"oe.settings.mods","text":"Моды {0} · для игры {1}"},
+{"sid":"oe.settings.mods.other","text":"для версии {0}"},
+{"sid":"oe.settings.version.off","text":"моды {0} выключены"},
+{"sid":"oe.settings.close","text":"Закрыть"},
+{"sid":"oe.settings.col.mod","text":"Мод"},
+{"sid":"oe.settings.col.version","text":"Версия"},
+{"sid":"oe.settings.col.state","text":"Состояние"}
+]
+}

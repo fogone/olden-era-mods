@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Лічильник бою"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Шкода від контратаки та втрати в прогнозі"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Після чисел гри в прогнозі шкоди: мечі й контратака захисника, її шкода та істоти, яких вона вбиває. Лише коли сама гра вирішує, що контратака буде."},
+{"sid":"oe.battlecounter.HealthShown","text":"Здоров'я загонів у прогнозі"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Ще один рядок прогнозу: значок здоров'я і здоров'я захисника, а за контратаки — здоров'я нападника після мечів. Усе й одразу: здоров'я верхньої істоти і всього загону (350 · 12350). Розумно: здоров'я самотньої істоти; усього загону, а перед ним верхньої істоти, коли удар вбиває менше двох."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"вимкнено"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"усе й одразу"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"розумно"}
+]
+}

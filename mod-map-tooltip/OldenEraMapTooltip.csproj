@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>OldenEraMapTooltip</AssemblyName>
+    <RootNamespace>OldenEra.Modding.MapTooltip</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GameDir>C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+
+    <!-- Compile against the .NET 6 runtime BepInEx ships in <game>\dotnet instead of
+         downloading the net6.0 targeting pack from NuGet. -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDir)\dotnet\*.dll"
+               Exclude="$(GameDir)\dotnet\clretwrc.dll;$(GameDir)\dotnet\clrjit.dll;$(GameDir)\dotnet\coreclr.dll;$(GameDir)\dotnet\dbgshim.dll;$(GameDir)\dotnet\hostpolicy.dll;$(GameDir)\dotnet\Microsoft.DiaSymReader.Native.amd64.dll;$(GameDir)\dotnet\mscordaccore*.dll;$(GameDir)\dotnet\mscordbi.dll;$(GameDir)\dotnet\mscorrc.dll;$(GameDir)\dotnet\msquic.dll;$(GameDir)\dotnet\System.IO.Compression.Native.dll"
+               Private="false" />
+
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Unity.IL2CPP.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Iced.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" Private="false" />
+
+    <Reference Include="$(GameDir)\BepInEx\interop\*.dll" Private="false" />
+    <ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />
+    <EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />
+    <!-- Shared code that changes often, compiled into the plugin so it reloads with it (mod-common\shared). -->
+    <Compile Include="..\mod-common\shared\**\*.cs" Link="shared\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
+

@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Ricerca (sviluppo)"},
+{"sid":"oe.research.ShowFps","text":"Frequenza dei fotogrammi nell'angolo dello schermo"},
+{"sid":"oe.research.ShowFps.desc","text":"In alto a sinistra, in un disco: fotogrammi al secondo dell'ultimo secondo. Verde — fluido, ambra — un fotogramma oltre 33 ms, rosso — oltre 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Ultimi {0:0} s: {1:0} fps, fotogramma tipico {2:0.0} ms, peggiore {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Fotogrammi oltre 33 ms: {0}, oltre 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Le nostre mod: {0:0.0} ms al secondo ({1:0.0%} del tempo), fotogramma peggiore {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Le nostre mod non sono cronometrate (console: perf on)"}
+
+]
+}

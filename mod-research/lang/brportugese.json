@@ -1,0 +1,11 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Pesquisa (desenvolvimento)"},
+{"sid":"oe.research.ShowFps","text":"Taxa de quadros no canto da tela"},
+{"sid":"oe.research.ShowFps.desc","text":"No alto à esquerda, num disco: quadros por segundo do último segundo. Verde: fluido; âmbar: um quadro com mais de 33 ms; vermelho: com mais de 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Últimos {0:0} s: {1:0} fps, quadro típico {2:0.0} ms, pior {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Quadros com mais de 33 ms: {0}, com mais de 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Nossos mods: {0:0.0} ms por segundo ({1:0.0%} do tempo), pior quadro {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Nossos mods não estão sendo medidos (console: perf on)"}
+]
+}

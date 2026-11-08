@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Modok"},
+{"sid":"oe.settings.defaults","text":"A mod alapértékei"},
+{"sid":"oe.settings.defaults.desc","text":"A mod összes kapcsolóját visszaállítja az alapértékre. A többi mod és a játék beállításai változatlanok maradnak."},
+{"sid":"oe.settings.reset","text":"Alaphelyzetbe"},
+{"sid":"oe.settings.version","text":"modok {0}"},
+{"sid":"oe.settings.mods","text":"Modok {0} · a(z) {1} játékhoz"},
+{"sid":"oe.settings.mods.other","text":"ehhez: {0}"},
+{"sid":"oe.settings.version.off","text":"modok {0} kikapcsolva"},
+{"sid":"oe.settings.close","text":"Bezárás"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Verzió"},
+{"sid":"oe.settings.col.state","text":"Állapot"}
+]
+}

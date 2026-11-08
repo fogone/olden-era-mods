@@ -1,0 +1,121 @@
+﻿# Publishes our mods one by one into the catalog (issue #10): each mod its own GitHub release (tag <mod>-v<version>,
+# its DLL as the asset) and its meta file in catalog/mods/<id>.json; the mod manager its own package (the manager, the
+# library, the patcher). A mod whose version is released already is not released again: when its DLL is the same, the
+# running game's version is only added to that release in the catalog (it works on this game version too); when it is
+# not, it stops and says to raise the version.
+#   .\publish-mods.ps1                         -> builds every mod, writes the catalog into release\catalog-preview, publishes nothing
+#   .\publish-mods.ps1 -Mods battle-counter    -> only that one (the folder's name without mod-), still nothing published
+#   .\publish-mods.ps1 -Publish                -> the GitHub releases (gh, logged in) and catalog\ in the repository, committed and pushed
+# The builds need the game's files (BepInEx interop), so they are made here; nothing is installed into the game.
+param([string[]]$Mods, [switch]$Publish, [string]$GameDir = "C:\XboxGames\Heroes of Might and Magic- Olden Era\Content")
+
+$ErrorActionPreference = 'Stop'
+$root = $PSScriptRoot
+$repo = 'fogone/olden-era-mods'
+$bepinex = '6.0.0-be.788'
+$dotnet = Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet\dotnet.exe'
+if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }
+
+# What a player can install: folder -> its DLLs (the first holds the plugin) and what it requires. The library
+# (OldenEraCommon) and the Mods tab (OldenEraSettings, where the catalog is shown) go with the manager, not as mods of their own.
+$catalogParts = [ordered]@{
+    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings'); Requires = '' }
+    'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll'); Requires = '' }
+    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core' }
+    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core' }
+    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core' }
+    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core' }
+    'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll'); Requires = 'nobirds.oldenera.core' }
+    'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core' }
+    'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = '' }
+}
+if ($Mods) {
+    foreach ($m in $Mods) { if (-not $catalogParts.Contains($m)) { throw "No mod $m; one of: $($catalogParts.Keys -join ', ')" } }
+}
+$selected = if ($Mods) { $Mods } else { @($catalogParts.Keys) }
+
+# The game's version the builds are for: the generated names'.
+$names = Get-Content (Join-Path $root 'mod-common\shared\GameNames.g.cs') -Raw
+if ($names -notmatch 'GameVersion = "([^"]+)"') { throw "No GameVersion in GameNames.g.cs" }
+$gameVersion = $Matches[1]
+
+$catalog = if ($Publish) { Join-Path $root 'catalog' } else { Join-Path $root 'release\catalog-preview' }
+if (-not $Publish -and (Test-Path $catalog)) { Remove-Item $catalog -Recurse -Force }
+if (-not $Publish -and (Test-Path (Join-Path $root 'catalog'))) { Copy-Item (Join-Path $root 'catalog') $catalog -Recurse }
+$rootUrl = "https://raw.githubusercontent.com/$repo/main/catalog"
+
+& $dotnet build (Join-Path $root 'tools\catalog') -c Release -nologo -v:quiet | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "tools\catalog does not build" }
+$tool = Join-Path $root 'tools\catalog\bin\Release\net10.0\catalog.dll'
+
+foreach ($mod in $selected) {
+    $part = $catalogParts[$mod]
+    "== $mod"
+    $builds = if ($part.Builds) { $part.Builds } else { @("mod-$mod") }
+    foreach ($b in $builds) {
+        & (Join-Path $root "$b\build.ps1") -GameDir $GameDir | Select-Object -Last 1
+    }
+    $pluginFolder = Join-Path $root "mod-$mod"
+    $plugin = Get-ChildItem $pluginFolder -Filter *.cs | Select-String -Pattern 'BepInPlugin\("([^"]+)", "([^"]+)", "([^"]+)"\)' | Select-Object -First 1
+    if (-not $plugin) { throw "mod-${mod}: no [BepInPlugin]" }
+    $id = $plugin.Matches[0].Groups[1].Value
+    $title = $plugin.Matches[0].Groups[2].Value
+    $version = $plugin.Matches[0].Groups[3].Value
+    $tag = "$mod-v$version"
+    $files = @($part.Files | ForEach-Object { Join-Path $root $_ })
+
+    $released = $false
+    if ($Publish) {
+        $released = & { $ErrorActionPreference = 'Continue'; gh release view $tag --repo $repo *> $null; $LASTEXITCODE -eq 0 }
+    }
+    $fileArgs = @()
+    foreach ($f in $files) { $fileArgs += '--file'; $fileArgs += "$f=https://github.com/$repo/releases/download/$tag/$(Split-Path $f -Leaf)" }
+    $requiresArgs = @(); if ($part.Requires) { $requiresArgs = @('--requires', $part.Requires) }
+    $langArgs = @()
+    if (Test-Path (Join-Path $pluginFolder 'lang')) { $langArgs = @('--lang', (Join-Path $pluginFolder 'lang')) }
+    & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
+        @requiresArgs --author fogone --source "https://github.com/$repo" @langArgs @fileArgs
+    if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
+
+    # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the
+    # manager, the library and the Mods tab in BepInEx\plugins, its patcher in BepInEx\patchers. Not in the catalog.
+    $assets = $files
+    if ($mod -eq 'manager') {
+        Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
+        $zipPath = Join-Path $root "release\olden-era-mod-manager-$version-for-game-$gameVersion.zip"
+        New-Item -ItemType Directory -Force (Split-Path $zipPath) | Out-Null
+        if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+        $zip = [System.IO.Compression.ZipFile]::Open($zipPath, 'Create')
+        try {
+            foreach ($f in $files) {
+                $leaf = Split-Path $f -Leaf
+                $folder = if ($leaf -like '*.Patcher.dll') { 'patchers' } else { 'plugins' }
+                [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $f, "BepInEx/$folder/$leaf") | Out-Null
+            }
+        }
+        finally { $zip.Dispose() }
+        "First install: $zipPath"
+        $assets = @($files) + $zipPath
+    }
+
+    if ($Publish -and -not $released) {
+        $notes = "$title $version for Heroes of Might and Magic: Olden Era $gameVersion (BepInEx $bepinex). Installed by the mod manager; see the README."
+        if ($mod -eq 'manager') { $notes = "$title $version for Heroes of Might and Magic: Olden Era $gameVersion (BepInEx $bepinex). First install: unpack olden-era-mod-manager-$version-for-game-$gameVersion.zip into the game's folder (see the README); later updates come through the mod manager itself." }
+        gh release create $tag @assets --repo $repo --title "$title $version (game $gameVersion)" --notes $notes
+        if ($LASTEXITCODE -ne 0) { throw "gh release create $tag failed ($LASTEXITCODE)" }
+        "Published $tag"
+    }
+    elseif ($released) { "$tag is released already: the catalog says it works on $gameVersion too" }
+}
+
+if ($Publish) {
+    # git writes warnings (line endings) to stderr, which Windows PowerShell takes for errors under Stop.
+    & {
+        $ErrorActionPreference = 'Continue'
+        git -C $root add catalog 2>$null
+        git -C $root commit -q -m "Catalog: $($selected -join ', ') for the game $gameVersion" 2>$null
+        git -C $root push -q origin main 2>$null
+    }
+    "The catalog committed and pushed"
+}
+else { "The catalog (not published): $catalog" }

@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"啟用模組"},
+{"sid":"oe.common.enabled.desc","text":"關閉的模組不會對遊戲做任何改動。"},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — 已關閉：為遊戲版本 {2} 建置"},
+{"sid":"oe.common.versionOff","text":"模組已關閉：模組為遊戲版本 {0} 建置，而目前遊戲版本為 {1}。需要針對此版本重新建置。已關閉：{2}。"},
+{"sid":"oe.common.mode.title","text":"所有模組"},
+{"sid":"oe.common.mode","text":"模組何時生效"},
+{"sid":"oe.common.mode.desc","text":"始終、僅限單人遊戲或從不。非單人遊戲：連線、熱座、重播。不生效時，模組不會改變或顯示任何內容，就像沒有安裝一樣；各模組自己的設定保持不變。"},
+{"sid":"oe.common.mode.Always","text":"始終"},
+{"sid":"oe.common.mode.SinglePlayer","text":"僅限單人遊戲"},
+{"sid":"oe.common.mode.Off","text":"從不"}
+]
+}

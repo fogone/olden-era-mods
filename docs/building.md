@@ -1,0 +1,118 @@
+# Building the mods
+
+How to build the mods from this repository and how to make a release. Players do not need this: they install a ready
+release (see the [README](../README.md)).
+
+## Why the mods are built with the game at hand
+
+The game's code is obfuscated: the names of its classes and methods change with every patch. So the mods are built for
+one version of the game (now **0.82.07**), against the game's own files:
+- the assemblies in the game's folder (`<game>\dotnet`, `BepInEx\core`, `BepInEx\interop`: the wrappers BepInEx makes for
+  the game's code on its first start);
+- `GameAssembly.dll` and the game's metadata: the generator (`tools/game-names`, [game-names.md](game-names.md)) finds the
+  names the mods need in them, by the game's signatures and code, and writes `mod-common/shared/GameNames.g.cs`.
+
+These files are not in the repository and are not on GitHub's servers, so the mods are built on a computer with the game,
+and releases are made there too. A mod built for another version of the game does not switch on: a notice in the main
+menu and a line in the Mods tab say so.
+
+## What is needed
+
+- The game, with **BepInEx 6 (IL2CPP), build `6.0.0-be.788`**, started once to the main menu (see the README).
+- The **.NET SDK 10** ([dotnet.microsoft.com](https://dotnet.microsoft.com/download)). The plugins target `net6.0` and
+  are built against the assemblies in the game's folder, without NuGet.
+- PowerShell (Windows PowerShell 5.1 does). If it refuses to run the scripts: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+
+## Building and installing everything
+
+```powershell
+.\install.ps1                                   # the Game Pass folder
+.\install.ps1 -GameDir "D:\Games\Olden Era"     # another one: the folder with HeroesOldenEra.exe
+.\install.ps1 -Uninstall                        # take them all out again
+```
+
+`install.ps1` checks that BepInEx is there and the game is closed. Then it builds the common library, the core, the Mods
+tab and every mod, and puts them into `BepInEx\plugins`.
+
+After a game patch: start the game once to the main menu (BepInEx makes its wrappers again), close it and run
+`.\install.ps1` again. The build makes the game's names for the new version by itself.
+
+## Building piece by piece
+
+Each mod has its own `build.ps1`; the game's folder defaults to Game Pass
+(`C:\XboxGames\Heroes of Might and Magic- Olden Era\Content`), another one is passed with `-GameDir`.
+
+```powershell
+.\mod-common\build.ps1 -Install      # the common library into BepInEx\plugins (game closed)
+.\mod-core\build.ps1 -Dev            # a mod into BepInEx\devplugins (the game may run)
+.\mod-squad-tooltip\build.ps1        # build only
+```
+
+- **`-Install`**: into `BepInEx\plugins`, only while the game is closed.
+- **`-Dev`**: into `BepInEx\devplugins`. The dev loader (`mod-devloader`, itself in `BepInEx\plugins`) loads the mods from
+  there and reloads one when its DLL changes, with the game running. The common library cannot be updated this way: it
+  goes in with `-Install` only, and the mods built against a changed library need it installed first.
+- **`-Uninstall`**: out of `BepInEx\plugins`.
+
+The build makes the game's names again by itself when the game was updated or the searches changed. When a search finds
+no member of the game, or several, the build stops with error `GN0002` and the candidates listed; an ambiguity is pinned
+in `mod-common/shared/GameNames.pins.txt`. When BepInEx's wrappers are older than the game (a patch, the game not started
+since), the build stops with error `GN0001`: start the game once to the main menu.
+
+## Making a release
+
+```powershell
+.\release.ps1             # release\olden-era-mods-<version>-for-game-<game version>.zip, nothing published
+.\release.ps1 -Publish    # and a GitHub release with it (gh, logged in), tagged v<version>
+```
+
+`release.ps1` builds what a player needs (the common library, the core, the Mods tab and the mods; not the dev loader nor
+the research tools) and packs it laid out like the game's folder: `BepInEx/plugins/…`, with `OldenEraMods.txt` (the
+game's version, the mods' versions, how to install).
+
+### Versions
+
+- The set of mods has one version, in `version.txt` (semantic: `major.minor.patch`, from `0.1.0`). The build writes it
+  into every assembly (`AssemblyMetadata("ModsVersion")`, `Directory.Build.targets`); the main menu shows it next to the
+  game's version ("0.82.07 · mods 0.1.0"), with the game's version the set is built for in the mods table.
+- A version of the mods is for one version of the game. A new version of the game gets a new version of the mods: raise
+  `version.txt`, build, release. One version is never released twice: `release.ps1 -Publish` refuses a tag that exists.
+- Each mod keeps its own version in its `BepInPlugin` attribute (shown in the Mods tab): it says which build of that one
+  mod is loaded, the release says which set.
+
+## Publishing into the catalog (the mod manager, issue #10)
+
+`publish-mods.ps1` publishes the mods one by one, for the mod manager: each mod its own GitHub release (tag
+`<mod>-v<version>`, its DLL the asset) and its meta file in `catalog/mods/<id>.json`, listed in `catalog/catalog.json`;
+the manager's own package holds the manager, the library and its patcher. The meta files are written by `tools/catalog`
+with the manager's own models (`mod-manager/shared/Catalog.cs`), each file with its sha256.
+
+- `.\publish-mods.ps1` builds every mod and writes the catalog into `release\catalog-preview`; nothing is published.
+- `.\publish-mods.ps1 -Mods battle-counter` only that mod.
+- `.\publish-mods.ps1 -Publish` creates the releases (`gh`) and commits and pushes `catalog\`.
+
+A version is published once. Run again on another game version with the same DLL, the release only gets that game
+version added (it works there too); with another DLL it stops: raise the mod's version in its `[BepInPlugin]`.
+## How it is built
+
+- **`mod-common/`**: the common library `OldenEraCommon.dll`, one for every version of the game: `ModBase` (a mod's frame:
+  log, loading and unloading, the version check), `ModMenu` (a mod's menu), `Texts` (the mods' texts in the game's
+  localization), `ModEvents` (the core's events), `Ticker`, the wrong-version notice.
+- **`mod-common/shared/`**: code compiled into every mod: `search/` (the searches for the game's members, for the
+  generator), `GameNames.g.cs` (the generated names), `Game*.cs` (readable wrappers over them: `Game.MeetingOutcome`,
+  `Game.VisitFor`, `Game.Translate`…), `MapMarkers`, `Badges`, `BadgeIcons` (badges).
+- **`mod-*/`**: the mods. The strings seen in the game are in their `lang/<language>.json`, one file per language of the game (`Hex.UI.ELang` names: `english`, `russian`, `german`, `zhcn`…; the library's own in `mod-common/lang`). A language without a file falls back to English. The texts keep the game's own words for its terms (taken from its texts in `Core.zip`, `Lang/<language>/texts`).
+- **`tools/game-names`**: the game's names generator; **`tools/typedump`**, **`tools/disasm`**: looking into the game's
+  code without starting it.
+
+More: [process.md](process.md) (the work cycle, debugging, the research console), [game-names.md](game-names.md) (the
+generated names), [mod-framework.md](mod-framework.md) (the mods' frame and the core's events),
+[game-internals.md](game-internals.md) (what is known about the game's code and data).
+
+## Rules the mods keep
+
+- **Decisions and numbers are the game's.** Damage, danger, joining, fleeing, visits: its own functions. A mod writes
+  its own only when no function of the game was found.
+- **Hidden numbers are off by default.** The game does not show exact counts, Diplomacy points or the armies' ratio; the
+  mods do not either, until it is switched on in their settings.
+- **Visible strings go through the game's localization.** The Mods tab and the tooltips switch with the game's language.

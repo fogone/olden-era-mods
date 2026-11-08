@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "nobirds.oldenera.skipintro",
+  "name": {
+    "english": "Skip intro",
+    "russian": "Без заставок"
+  },
+  "description": {},
+  "author": "fogone",
+  "source": "https://github.com/fogone/olden-era-mods",
+  "releases": [
+    {
+      "version": "0.1.0",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraSkipIntro.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.1.0/OldenEraSkipIntro.dll",
+          "sha256": "98409dbc66a44eb7ca63558d95812e2b0e406cf4e4acd73da606b9d528b802ce"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Mods"},
+{"sid":"oe.settings.defaults","text":"Mod defaults"},
+{"sid":"oe.settings.defaults.desc","text":"Set all switches of this mod back to their defaults. Other mods and the game's settings stay as they are."},
+{"sid":"oe.settings.reset","text":"Reset"},
+{"sid":"oe.settings.version","text":"mods {0}"},
+{"sid":"oe.settings.mods","text":"Mods {0} · for the game {1}"},
+{"sid":"oe.settings.mods.other","text":"for {0}"},
+{"sid":"oe.settings.version.off","text":"mods {0} off"},
+{"sid":"oe.settings.close","text":"Close"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Version"},
+{"sid":"oe.settings.col.state","text":"State"}
+]
+}

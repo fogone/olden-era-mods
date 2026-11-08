@@ -1,0 +1,19 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Podpowiedź oddziału"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"„Chcą dołączyć” z ikoną Dyplomacji"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Gdy oddział by dołączył do wybranego bohatera, „Chcą dołączyć” i ikona Dyplomacji zastępują trudność walki."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"„Chcą uciec”"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Gdy oddział zaproponowałby ucieczkę, „Chcą uciec” zastępuje trudność walki, a ikona ucieczki z gry, ta nad oddziałem na mapie, zastępuje czaszki."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Ikona zamiast czaszek trudności"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Przy „Chcą dołączyć” i „Chcą uciec” ikona Dyplomacji lub ikona ucieczki z gry zamiast czaszek. Wyłączone: tylko słowa."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Szczegóły Dyplomacji, gdy są"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Pokazuje ukryte liczby, gdy są: punkty Dyplomacji bohatera i oddziału, ile stworzeń by dołączyło, ile razy armia bohatera jest silniejsza lub słabsza. Przy ustawieniu gry „ukryj niebezpieczeństwo walki” stosunek sił nie jest pokazywany."},
+{"sid":"oe.squadtooltip.text.Join","text":"Chcą dołączyć"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Chcą uciec"},
+{"sid":"oe.squadtooltip.text.Points","text":"Dyplomacja {0:N0} z potrzebnych {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Dołącza około {0:N0} z {1:N0} stworzeń ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Armie: twoja jest silniejsza {0:0.#} razy"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Armie: oddział jest silniejszy {0:0.#} razy"}
+]
+}

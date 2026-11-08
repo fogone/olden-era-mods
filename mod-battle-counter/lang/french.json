@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Compteur de combat"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Dégâts de contre-attaque et pertes dans les prévisions"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Après les chiffres du jeu dans les prévisions de dégâts : des épées et la contre-attaque du défenseur, ses dégâts et les créatures qu'il tue. Seulement quand le jeu décide lui-même qu'il y aura une contre-attaque."},
+{"sid":"oe.battlecounter.HealthShown","text":"Les points de vie des piles dans les prévisions"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Une ligne de prévision de plus : l'icône de points de vie et ceux du défenseur, et en cas de contre-attaque ceux de l'attaquant après les épées. Les deux : ceux de la créature du dessus et de toute la pile (350 · 12350). Intelligent : ceux d'une créature seule ; ceux de toute la pile, précédés de ceux de la créature du dessus quand le coup en tue moins de deux."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"désactivé"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"les deux"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"intelligent"}
+]
+}

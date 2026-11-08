@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"Mod attiva"},
+{"sid":"oe.common.enabled.desc","text":"Una mod disattivata non cambia nulla nel gioco."},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — disattivata: creata per la versione {2} del gioco"},
+{"sid":"oe.common.versionOff","text":"Le mod sono disattivate: create per la versione {0} del gioco, mentre il gioco è alla {1}. Vanno ricompilate per questa versione. Disattivate: {2}."},
+{"sid":"oe.common.mode.title","text":"Tutte le mod"},
+{"sid":"oe.common.mode","text":"Quando funzionano le mod"},
+{"sid":"oe.common.mode.desc","text":"Sempre, solo in partita singola o mai. Non è una partita singola: online, hotseat, un replay. Finché non funzionano, le mod non cambiano né mostrano nulla, come se non fossero installate; le impostazioni di ogni mod restano invariate."},
+{"sid":"oe.common.mode.Always","text":"sempre"},
+{"sid":"oe.common.mode.SinglePlayer","text":"in partita singola"},
+{"sid":"oe.common.mode.Off","text":"mai"}
+]
+}

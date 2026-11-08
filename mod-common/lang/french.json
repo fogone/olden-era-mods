@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"Mod activé"},
+{"sid":"oe.common.enabled.desc","text":"Un mod désactivé ne change rien dans le jeu."},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — désactivé : conçu pour la version {2} du jeu"},
+{"sid":"oe.common.versionOff","text":"Les mods sont désactivés : conçus pour la version {0} du jeu, alors que le jeu est en {1}. Ils doivent être recompilés pour cette version. Désactivés : {2}."},
+{"sid":"oe.common.mode.title","text":"Tous les mods"},
+{"sid":"oe.common.mode","text":"Quand les mods agissent"},
+{"sid":"oe.common.mode.desc","text":"Toujours, seulement en partie solo, ou jamais. Pas une partie solo : en ligne, hotseat, un replay. Tant qu'ils n'agissent pas, les mods ne changent et n'affichent rien, comme s'ils n'étaient pas installés ; les réglages propres à chaque mod sont conservés."},
+{"sid":"oe.common.mode.Always","text":"toujours"},
+{"sid":"oe.common.mode.SinglePlayer","text":"en partie solo"},
+{"sid":"oe.common.mode.Off","text":"jamais"}
+]
+}

@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"모드"},
+{"sid":"oe.settings.defaults","text":"모드 기본값"},
+{"sid":"oe.settings.defaults.desc","text":"이 모드의 모든 스위치를 기본값으로 되돌립니다. 다른 모드와 게임 설정은 그대로 유지됩니다."},
+{"sid":"oe.settings.reset","text":"초기화"},
+{"sid":"oe.settings.version","text":"모드 {0}"},
+{"sid":"oe.settings.mods","text":"모드 {0} · 게임 {1}용"},
+{"sid":"oe.settings.mods.other","text":"{0}용"},
+{"sid":"oe.settings.version.off","text":"모드 {0} 꺼짐"},
+{"sid":"oe.settings.close","text":"닫기"},
+{"sid":"oe.settings.col.mod","text":"모드"},
+{"sid":"oe.settings.col.version","text":"버전"},
+{"sid":"oe.settings.col.state","text":"상태"}
+]
+}

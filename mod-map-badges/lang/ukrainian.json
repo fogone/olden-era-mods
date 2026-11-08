@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Значки на мапі"},
+{"sid":"oe.mapbadges.Shown","text":"Показувати значки"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Завжди, лише поки утримується альт. клавіша інформації гри (Alt, якщо не змінено), разом із додатковою інформацією гри, або ніколи (навіть із цією клавішею). Для всіх значків цього мода."},
+{"sid":"oe.mapbadges.Shown.Always","text":"завжди"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"поки утримується альт. клавіша"},
+{"sid":"oe.mapbadges.Shown.Never","text":"ніколи"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Над невідвіданими будівлями та чужими шахтами"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Бурштиновий значок над кожною розвіданою будівлею, яку вибраний герой ще може відвідати, і над шахтами, що не ваші. У кутку значка охоронюваної будівлі, поки охорона на місці, — череп кольору небезпеки бою або мечі."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Значок будівлі"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Лише знак або знак і те, як часто будівлю можна відвідувати, як у її підказці."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"лише знак"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"усі значки"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Небезпека охорони будівель"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"У кутку значка охоронюваної будівлі — череп кольору небезпеки бою для вибраного героя, як черепи в підказці. Вимкнено: схрещені мечі, просто «охороняється»."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"«Захоплено» над вашими шахтами"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Зелений значок-самоцвіт над шахтами сторони вибраного героя."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Над здобиччю"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Малий значок над розвіданими ресурсами (самоцвіт), артефактами (меч) і скринями, що ще лежать на мапі."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Портрети істот над житлами"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Портрет істоти, яку наймають у житлі: яскравий, поки є кого наймати, тьмяний, коли нікого не лишилося."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Скільки можна найняти — на портреті житла"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Скільки істот у житлі зараз доступно для найму, у кутку портрета. Не показується, поки житло охороняється."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Значки приєднання й втечі над загонами"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Над розвіданими загонами, для вибраного героя: значок Дипломатії, якщо загін приєднається, значок втечі з гри, якщо запропонує втекти. Без чисел."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Череп небезпеки над загонами"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Над розвіданим загоном, який не приєднається і не втече: череп кольору небезпеки бою для вибраного героя, як черепи в підказці."}
+]
+}

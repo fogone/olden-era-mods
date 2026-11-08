@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Besuchte Gebäude"},
+{"sid":"oe.visited.ShowBadges","text":"Besuchssymbole am Gebäude-Tooltip"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Links vom Tooltip eines Gebäudes: besucht oder verfügbar und wie oft es besucht werden kann (einmal, pro Held, pro Spieler, wöchentlich oder täglich)."},
+{"sid":"oe.visited.ShowCaption","text":"Zeile „besucht · wöchentlich“"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Eine Zeile im Tooltip des Gebäudes: besucht oder verfügbar und die Besuchsregel in Worten."},
+{"sid":"oe.visited.HideGameVisited","text":"Zeile „Bereits besucht“ des Spiels ausblenden"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Die Zeile des Spiels wiederholt das Besuchssymbol und kann ausgeblendet werden."},
+{"sid":"oe.visited.Highlight","text":"Hervorhebung unbesuchter Objekte"},
+{"sid":"oe.visited.Highlight.desc","text":"Wie der Umriss noch nicht besuchter Objekte hervorsticht. Die Umrissfarbe wird in den Spieleinstellungen unter Sichtbarkeit gewählt."},
+{"sid":"oe.visited.Highlight.Game","text":"wie im Spiel"},
+{"sid":"oe.visited.Highlight.Bright","text":"heller"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsierend"},
+{"sid":"oe.visited.Highlight.Flash","text":"blinkend"},
+{"sid":"oe.visited.Highlight.Strobe","text":"Stroboskop"},
+{"sid":"oe.visited.ShowGuards","text":"Wächter im Tooltip bewachter Gebäude"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Wer eine Behausung oder einen anderen bewachten Ort bewacht und wie gefährlich der Kampf ist, dargestellt wie im Tooltip einer Truppe, ohne hinzugehen."},
+{"sid":"oe.visited.text.OneTime","text":"einmal für alle"},
+{"sid":"oe.visited.text.PerHero","text":"pro Held"},
+{"sid":"oe.visited.text.PerPlayer","text":"pro Spieler"},
+{"sid":"oe.visited.text.Unlimited","text":"unbegrenzt"},
+{"sid":"oe.visited.text.Weekly","text":"wird jede Woche zurückgesetzt"},
+{"sid":"oe.visited.text.Daily","text":"wird jeden Tag zurückgesetzt"},
+{"sid":"oe.visited.text.Visited","text":"besucht"},
+{"sid":"oe.visited.text.Available","text":"verfügbar"}
+
+]
+}

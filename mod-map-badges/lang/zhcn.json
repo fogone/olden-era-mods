@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"地图徽标"},
+{"sid":"oe.mapbadges.Shown","text":"显示徽标"},
+{"sid":"oe.mapbadges.Shown.desc","text":"始终显示、仅在按住游戏的 Alt 信息键时显示（未重新绑定时为 Alt，与游戏自带的额外信息一同显示），或从不显示（按住该键也不显示）。适用于本模组的所有徽标。"},
+{"sid":"oe.mapbadges.Shown.Always","text":"始终"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"按住 Alt 信息键时"},
+{"sid":"oe.mapbadges.Shown.Never","text":"从不"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"未造访的建筑与他人的矿场上方"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"在每座已探明且所选英雄仍可造访的建筑上方，以及不属于你的矿场上方，显示琥珀色徽标。有守卫的建筑，只要守卫还在，其徽标一角会显示按战斗危险程度着色的骷髅，或交叉的剑。"},
+{"sid":"oe.mapbadges.BuildingIcons","text":"建筑徽标"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"仅显示标志，或同时显示标志与建筑可造访的频率，与其提示框中一致。"},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"仅标志"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"所有图标"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"建筑守卫的危险程度"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"在有守卫的建筑徽标一角，显示按所选英雄面对该战斗的危险程度着色的骷髅，与提示框中的骷髅相同。关闭：显示交叉的剑，仅表示“有守卫”。"},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"己方矿场上方显示“已占领”"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"在所选英雄所属阵营的矿场上方显示绿色宝石徽标。"},
+{"sid":"oe.mapbadges.ShowPickups","text":"可拾取物上方"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"在仍留在地图上的已探明资源（宝石）、神器（剑）和宝箱上方显示小徽标。"},
+{"sid":"oe.mapbadges.ShowDwellings","text":"住所上方显示单位头像"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"显示该住所可招募单位的头像：有可招募单位时明亮，无人可招募时暗淡。"},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"住所头像上显示可招募数量"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"在头像一角显示住所当前可招募的生物数量。有守卫时不显示。"},
+{"sid":"oe.mapbadges.ShowSquads","text":"部队上方显示加入与逃跑徽标"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"针对所选英雄，在已探明的部队上方显示：若部队会加入，则显示外交图标；若部队会提出逃跑，则显示游戏自带的逃跑图标。不显示数字。"},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"部队上方显示危险骷髅"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"在既不会加入也不会逃跑的已探明部队上方：显示按所选英雄面对该战斗的危险程度着色的骷髅，与提示框中的骷髅相同。"}
+]
+}

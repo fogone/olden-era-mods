@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Contatore di battaglia"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Danno del contrattacco e perdite nella previsione"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Dopo i numeri del gioco nella previsione del danno: spade e il contrattacco del difensore, il suo danno e le creature che uccide. Solo quando è il gioco stesso a decidere che ci sarà un contrattacco."},
+{"sid":"oe.battlecounter.HealthShown","text":"La salute delle pile nella previsione"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Un'altra riga della previsione: l'icona della salute e la salute del difensore, e con un contrattacco quella dell'attaccante dopo le spade. Entrambe: quella della creatura in cima e dell'intera pila (350 · 12350). Intelligente: quella di una creatura singola; di una pila, la salute totale, preceduta da quella della creatura in cima quando il colpo ne uccide meno di due."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"disattivata"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"entrambe"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"intelligente"}
+]
+}

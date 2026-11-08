@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Посещения"},
+{"sid":"oe.visited.ShowBadges","text":"Значки посещения у подсказки постройки"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Слева от подсказки постройки: посещена она или доступна и как часто её можно посещать (один раз, на героя, на игрока, раз в неделю или день)."},
+{"sid":"oe.visited.ShowCaption","text":"Подпись «посещено · раз в неделю»"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Строка в подсказке постройки: посещено или доступно и правило посещения словами."},
+{"sid":"oe.visited.HideGameVisited","text":"Убирать строку игры «Уже посещено»"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Строка игры повторяет значок посещения, её можно убрать."},
+{"sid":"oe.visited.Highlight","text":"Подсветка непосещённых"},
+{"sid":"oe.visited.Highlight.desc","text":"Как выделяется контур объектов, которые ещё не посещены. Цвет контура выбирается в настройках игры, раздел «Видимость»."},
+{"sid":"oe.visited.Highlight.Game","text":"как в игре"},
+{"sid":"oe.visited.Highlight.Bright","text":"ярче"},
+{"sid":"oe.visited.Highlight.Pulse","text":"пульсирует"},
+{"sid":"oe.visited.Highlight.Flash","text":"вспышки"},
+{"sid":"oe.visited.Highlight.Strobe","text":"резкие вспышки"},
+{"sid":"oe.visited.ShowGuards","text":"Охрана в подсказке охраняемой постройки"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Кто охраняет дом юнитов или другое охраняемое место и насколько опасен бой с ними, как в подсказке отряда, без подхода к нему."},
+{"sid":"oe.visited.text.OneTime","text":"один раз на всех"},
+{"sid":"oe.visited.text.PerHero","text":"на героя"},
+{"sid":"oe.visited.text.PerPlayer","text":"на игрока"},
+{"sid":"oe.visited.text.Unlimited","text":"без ограничений"},
+{"sid":"oe.visited.text.Weekly","text":"сброс в начале недели"},
+{"sid":"oe.visited.text.Daily","text":"сброс каждый день"},
+{"sid":"oe.visited.text.Visited","text":"посещено"},
+{"sid":"oe.visited.text.Available","text":"доступно"}
+
+]
+}

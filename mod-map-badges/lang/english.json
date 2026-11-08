@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Map badges"},
+{"sid":"oe.mapbadges.Shown","text":"Show the badges"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Always, only while the game's alt info key is held (Alt unless rebound), along with the game's own extra info, or never (not even with that key). For all badges of this mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"always"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"while the alt info key is held"},
+{"sid":"oe.mapbadges.Shown.Never","text":"never"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Over unvisited buildings and others' mines"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"An amber badge over every scouted building the selected hero can still visit, and over mines that are not yours. In the corner of a guarded building's badge, while the guard stands there, a skull in the colour of the fight's danger, or swords."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"A building's badge"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"The sign only, or the sign and how often the building can be visited, as at its tooltip."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"the sign only"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"all icons"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Buildings' guard danger"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"In the corner of a guarded building's badge, a skull in the colour of the fight's danger for the selected hero, as the tooltip's skulls. Off: crossed swords, just \"guarded\"."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"\"Captured\" over your mines"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"A green gem badge over the mines of the selected hero's side."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Over pickups"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"A small badge over scouted resources (gem), artifacts (sword) and chests still lying on the map."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Unit portraits over dwellings"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"The portrait of the unit the dwelling hires: bright while there is someone to hire, dim when nobody is left."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"How many to hire, on the dwelling's portrait"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"How many creatures the dwelling has for hire now, in the portrait's corner. Not shown while it is guarded."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Join and flee badges over squads"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Over scouted squads, for the selected hero: the Diplomacy icon if the squad would join, the game's escape icon if it would offer to flee. No numbers."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Danger skull over squads"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Over a scouted squad that would neither join nor flee: a skull in the colour of the fight's danger for the selected hero, as the tooltip's skulls."}
+]
+}

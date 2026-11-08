@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Módy"},
+{"sid":"oe.settings.defaults","text":"Výchozí hodnoty modu"},
+{"sid":"oe.settings.defaults.desc","text":"Vrátí všechny volby tohoto modu na výchozí hodnoty. Ostatní módy a nastavení hry zůstanou beze změny."},
+{"sid":"oe.settings.reset","text":"Reset"},
+{"sid":"oe.settings.version","text":"módy {0}"},
+{"sid":"oe.settings.mods","text":"Módy {0} · pro hru {1}"},
+{"sid":"oe.settings.mods.other","text":"pro {0}"},
+{"sid":"oe.settings.version.off","text":"mody {0} vypnuty"},
+{"sid":"oe.settings.close","text":"Zavřít"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Verze"},
+{"sid":"oe.settings.col.state","text":"Stav"}
+]
+}

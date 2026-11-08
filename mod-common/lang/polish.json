@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"Mod włączony"},
+{"sid":"oe.common.enabled.desc","text":"Wyłączony mod niczego w grze nie zmienia."},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — wyłączony: zbudowany dla wersji gry {2}"},
+{"sid":"oe.common.versionOff","text":"Mody są wyłączone: zbudowane dla wersji gry {0}, a gra jest w wersji {1}. Trzeba je przebudować dla tej wersji. Wyłączone: {2}."},
+{"sid":"oe.common.mode.title","text":"Wszystkie mody"},
+{"sid":"oe.common.mode","text":"Kiedy mody działają"},
+{"sid":"oe.common.mode.desc","text":"Zawsze, tylko w grze jednoosobowej albo nigdy. Nie jednoosobowa: sieciowa, hotseat, powtórka. Dopóki nie działają, mody niczego nie zmieniają ani nie pokazują, jakby ich nie było; własne przełączniki każdego moda zostają bez zmian."},
+{"sid":"oe.common.mode.Always","text":"zawsze"},
+{"sid":"oe.common.mode.SinglePlayer","text":"w grze jednoosobowej"},
+{"sid":"oe.common.mode.Off","text":"nigdy"}
+]
+}

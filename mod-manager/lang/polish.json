@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"Mody"},
+{"sid":"oe.manager.status.none","text":"Katalog nie został jeszcze wczytany"},
+{"sid":"oe.manager.status.busy","text":"Katalog: trwa praca..."},
+{"sid":"oe.manager.status.read","text":"Katalog: modów {0}, aktualizacji {1}"},
+{"sid":"oe.manager.status.failed","text":"Katalog: ostatnia akcja się nie powiodła, zobacz log"},
+{"sid":"oe.manager.check","text":"Sprawdź"},
+{"sid":"oe.manager.install","text":"Zainstaluj"},
+{"sid":"oe.manager.update","text":"Aktualizuj"},
+{"sid":"oe.manager.updateAll","text":"Aktualizuj wszystko"},
+{"sid":"oe.manager.name","text":"Menedżer modów"},
+{"sid":"oe.manager.note.available","text":"dostępna {0}"},
+{"sid":"oe.manager.note.notInstalled","text":"nie zainstalowano"},
+{"sid":"oe.manager.note.required","text":"potrzebują go inne mody"},
+{"sid":"oe.manager.note.restart","text":"zmieni się przy następnym uruchomieniu"},
+{"sid":"oe.manager.note.removed","text":"usunięty, zniknie przy następnym uruchomieniu"},
+{"sid":"oe.manager.note.noRelease","text":"brak wydania dla tej wersji gry"},
+{"sid":"oe.manager.note.staged","text":"{0} zainstaluje się przy następnym uruchomieniu"},
+{"sid":"oe.manager.note.failed","text":"aktualizacja się nie uruchomiła, przywrócono {0}"}
+]
+}

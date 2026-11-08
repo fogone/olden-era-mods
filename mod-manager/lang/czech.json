@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"Módy"},
+{"sid":"oe.manager.status.none","text":"Katalog ještě nebyl načten"},
+{"sid":"oe.manager.status.busy","text":"Katalog: probíhá práce..."},
+{"sid":"oe.manager.status.read","text":"Katalog: módů {0}, aktualizací {1}"},
+{"sid":"oe.manager.status.failed","text":"Katalog: poslední akce selhala, viz log"},
+{"sid":"oe.manager.check","text":"Zkontrolovat"},
+{"sid":"oe.manager.install","text":"Nainstalovat"},
+{"sid":"oe.manager.update","text":"Aktualizovat"},
+{"sid":"oe.manager.updateAll","text":"Aktualizovat vše"},
+{"sid":"oe.manager.name","text":"Správce módů"},
+{"sid":"oe.manager.note.available","text":"k dispozici {0}"},
+{"sid":"oe.manager.note.notInstalled","text":"nenainstalováno"},
+{"sid":"oe.manager.note.required","text":"potřebují ho jiné módy"},
+{"sid":"oe.manager.note.restart","text":"změní se při příštím spuštění"},
+{"sid":"oe.manager.note.removed","text":"odstraněno, zmizí při příštím spuštění"},
+{"sid":"oe.manager.note.noRelease","text":"není vydání pro tuto verzi hry"},
+{"sid":"oe.manager.note.staged","text":"{0} se nainstaluje při příštím spuštění"},
+{"sid":"oe.manager.note.failed","text":"aktualizace se nespustila, vrácena {0}"}
+]
+}

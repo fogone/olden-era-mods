@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"戰鬥反擊"},
+{"sid":"oe.battlecounter.ShowCounter","text":"預測中顯示反擊傷害與損失"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"在傷害預測中遊戲內建的數字之後：顯示劍圖示和防禦方的反擊、其傷害以及擊殺的生物數量。僅在遊戲本身判定會發生反擊時顯示。"},
+{"sid":"oe.battlecounter.HealthShown","text":"預測中顯示部隊生命值"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"多一行預測：生命值圖示和防禦方的生命值，若有反擊，則在劍圖示之後顯示攻擊方的生命值。兩者：頂部生物與整個部隊的生命值（350 · 12350）。智慧：單一生物顯示其自身生命值；部隊顯示整體生命值，若這一擊殺死的生物不足兩個，則在前面加上頂部生物的生命值。"},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"關閉"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"兩者"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"智慧"}
+]
+}

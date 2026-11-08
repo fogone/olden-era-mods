@@ -1,0 +1,11 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Badania (rozwój)"},
+{"sid":"oe.research.ShowFps","text":"Liczba klatek w rogu ekranu"},
+{"sid":"oe.research.ShowFps.desc","text":"U góry po lewej, w kółku: klatki na sekundę z ostatniej sekundy. Zielony — płynnie, bursztynowy — klatka dłuższa niż 33 ms, czerwony — dłuższa niż 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Ostatnie {0:0} s: {1:0} fps, typowa klatka {2:0.0} ms, najgorsza {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Klatki dłuższe niż 33 ms: {0}, dłuższe niż 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Nasze mody: {0:0.0} ms na sekundę ({1:0.0%} czasu), najgorsza klatka {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Nasze mody nie są mierzone (konsola: perf on)"}
+]
+}

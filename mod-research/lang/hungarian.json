@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Kutatás (fejlesztés)"},
+{"sid":"oe.research.ShowFps","text":"Képkockasebesség a képernyő sarkában"},
+{"sid":"oe.research.ShowFps.desc","text":"Bal fent, egy korongban: az utolsó másodperc képkockái másodpercenként. Zöld — gördülékeny, borostyán — 33 ms feletti képkocka, piros — 100 ms felett."},
+{"sid":"oe.research.text.Frames","text":"Utolsó {0:0} mp: {1:0} fps, tipikus képkocka {2:0.0} ms, legrosszabb {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"33 ms feletti képkockák: {0}, 100 ms felett: {1}"},
+{"sid":"oe.research.text.Ours","text":"Moddjaink: {0:0.0} ms másodpercenként (az idő {1:0.0%}-a), legrosszabb képkocka {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"A moddjaink időzítése ki van kapcsolva (konzol: perf on)"}
+
+]
+}

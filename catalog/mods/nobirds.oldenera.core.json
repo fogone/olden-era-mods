@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "nobirds.oldenera.core",
+  "name": {
+    "brportugese": "Núcleo dos mods",
+    "czech": "Jádro modů",
+    "english": "Mods core",
+    "french": "Noyau des mods",
+    "german": "Mod-Kern",
+    "hungarian": "Modmag",
+    "italian": "Nucleo delle mod",
+    "japanese": "MODコア",
+    "korean": "모드 코어",
+    "polish": "Rdzeń modów",
+    "russian": "Ядро модов",
+    "spanish": "Núcleo de mods",
+    "turkish": "Mod çekirdeği",
+    "ukrainian": "Ядро модів",
+    "zhcn": "模组核心",
+    "zhtw": "模組核心"
+  },
+  "description": {},
+  "author": "fogone",
+  "source": "https://github.com/fogone/olden-era-mods",
+  "releases": [
+    {
+      "version": "0.7.2",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraCore.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.2/OldenEraCore.dll",
+          "sha256": "b955e8f293c9756d37ffefb5f97efaee7fe591121cbd6e06f33cf07366cdfca3"
+        }
+      ]
+    },
+    {
+      "version": "0.7.1",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [
+        {
+          "name": "OldenEraCore.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.1/OldenEraCore.dll",
+          "sha256": "89cbaa276cfbc3bab8c2004154c56b76d9e265d2c1ffad29231d8181b0306f38"
+        }
+      ]
+    }
+  ]
+}

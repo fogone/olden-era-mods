@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "name": "Olden Era mods",
+  "mods": [
+    {
+      "id": "nobirds.oldenera.battlecounter",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.battlecounter.json"
+    },
+    {
+      "id": "nobirds.oldenera.core",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.core.json"
+    },
+    {
+      "id": "nobirds.oldenera.fixes",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.fixes.json"
+    },
+    {
+      "id": "nobirds.oldenera.manager",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.manager.json"
+    },
+    {
+      "id": "nobirds.oldenera.mapbadges",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.mapbadges.json"
+    },
+    {
+      "id": "nobirds.oldenera.maptooltip",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.maptooltip.json"
+    },
+    {
+      "id": "nobirds.oldenera.skipintro",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.skipintro.json"
+    },
+    {
+      "id": "nobirds.oldenera.squadtooltip",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.squadtooltip.json"
+    },
+    {
+      "id": "nobirds.oldenera.visited",
+      "meta": "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/mods/nobirds.oldenera.visited.json"
+    }
+  ]
+}

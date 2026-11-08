@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Icônes de carte"},
+{"sid":"oe.mapbadges.Shown","text":"Afficher les icônes"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Toujours, seulement tant que la touche d'infos supplémentaires du jeu est maintenue (Alt sauf réaffectation), en même temps que les infos supplémentaires du jeu, ou jamais (pas même avec cette touche). Pour toutes les icônes de ce mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"toujours"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"tant que la touche d'infos est maintenue"},
+{"sid":"oe.mapbadges.Shown.Never","text":"jamais"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Sur les bâtiments non visités et les mines d'autrui"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Une icône ambre sur chaque bâtiment exploré que le héros sélectionné peut encore visiter, et sur les mines qui ne sont pas à vous. Dans le coin de l'icône d'un bâtiment gardé, tant que la garde est là : un crâne de la couleur du danger du combat, ou des épées."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Icône d'un bâtiment"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Le signe seul, ou le signe et la fréquence à laquelle le bâtiment peut être visité, comme dans son infobulle."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"le signe seul"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"toutes les icônes"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Danger de la garde des bâtiments"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"Dans le coin de l'icône d'un bâtiment gardé, un crâne de la couleur du danger du combat pour le héros sélectionné, comme les crânes de l'infobulle. Désactivé : épées croisées, simplement « gardé »."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"« Capturé » sur vos mines"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Une icône de gemme verte sur les mines du camp du héros sélectionné."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Sur les objets à ramasser"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Une petite icône sur les ressources explorées (gemme), les artefacts (épée) et les coffres encore sur la carte."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Portraits d'unités sur les habitations"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Le portrait de l'unité que l'habitation recrute : vif tant qu'il y a quelqu'un à recruter, terne quand il n'en reste plus."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Combien recruter, sur le portrait de l'habitation"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Combien de créatures l'habitation propose en ce moment au recrutement, dans le coin du portrait. Non affiché tant qu'elle est gardée."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Icônes de ralliement et de fuite sur les escouades"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Sur les escouades explorées, pour le héros sélectionné : l'icône de Diplomatie si l'escouade se joindrait à vous, l'icône de fuite du jeu si elle proposerait de fuir. Sans chiffres."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Crâne de danger sur les escouades"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sur une escouade explorée qui ne se joindrait pas à vous et ne fuirait pas : un crâne de la couleur du danger du combat pour le héros sélectionné, comme les crânes de l'infobulle."}
+]
+}

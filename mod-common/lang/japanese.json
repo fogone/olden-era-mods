@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"MODを有効にする"},
+{"sid":"oe.common.enabled.desc","text":"無効にしたMODは、ゲームに何も変更を加えません。"},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — 無効：ゲームのバージョン{2}向けにビルドされています"},
+{"sid":"oe.common.versionOff","text":"MODは無効です：ゲームのバージョン{0}向けにビルドされていますが、ゲームは{1}です。このバージョン向けに再ビルドが必要です。無効：{2}。"},
+{"sid":"oe.common.mode.title","text":"すべてのMOD"},
+{"sid":"oe.common.mode","text":"MODが動作するとき"},
+{"sid":"oe.common.mode.desc","text":"常に、シングルプレイのみ、または無効。シングルプレイ以外：オンライン、ホットシート、リプレイ。動作していない間、MODはインストールされていないのと同じく、何も変更せず何も表示しません。各MODの設定はそのまま残ります。"},
+{"sid":"oe.common.mode.Always","text":"常に"},
+{"sid":"oe.common.mode.SinglePlayer","text":"シングルプレイのみ"},
+{"sid":"oe.common.mode.Off","text":"無効"}
+]
+}

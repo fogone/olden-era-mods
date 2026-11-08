@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Popisek na mapě"},
+{"sid":"oe.maptooltip.PlaceFree","text":"Popisek nezakrývá objekt"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Když popisek objektu na mapě zakrývá samotný objekt, přesune se na volné místo: nahoru, doprava, doleva nebo dolů, i mimo panely rozhraní."}
+]
+}

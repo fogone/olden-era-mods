@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"지도 배지"},
+{"sid":"oe.mapbadges.Shown","text":"배지 표시"},
+{"sid":"oe.mapbadges.Shown.desc","text":"항상 표시, 게임의 대체 정보 키(변경하지 않았다면 Alt)를 누르고 있는 동안 게임의 추가 정보와 함께 표시, 또는 표시 안 함(그 키를 눌러도 표시 안 함). 이 모드의 모든 배지에 적용됩니다."},
+{"sid":"oe.mapbadges.Shown.Always","text":"항상"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"대체 정보 키를 누르는 동안"},
+{"sid":"oe.mapbadges.Shown.Never","text":"표시 안 함"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"미방문 건물과 타인의 광산 위"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"선택한 영웅이 아직 방문할 수 있는 정찰된 모든 건물과 내 것이 아닌 광산 위에 호박색 배지를 표시합니다. 경비되는 건물의 배지 모서리에는 경비대가 있는 동안 전투 위험도를 나타내는 색의 해골 또는 검을 표시합니다."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"건물 배지"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"표식만, 또는 표식과 건물을 방문할 수 있는 빈도(툴팁과 동일)."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"표식만"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"모든 아이콘"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"건물 경비대의 위험도"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"경비되는 건물의 배지 모서리에 툴팁의 해골과 같이, 선택한 영웅에게 전투가 얼마나 위험한지를 나타내는 색의 해골을 표시합니다. 끄면 교차한 검으로 그저 \"경비됨\"만 표시합니다."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"내 광산 위에 \"점령됨\""},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"선택한 영웅 진영의 광산 위에 초록색 보석 배지를 표시합니다."},
+{"sid":"oe.mapbadges.ShowPickups","text":"획득물 위"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"지도에 아직 놓여 있는 정찰된 자원(보석), 유물(검), 상자 위에 작은 배지를 표시합니다."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"서식지 위에 유닛 초상화"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"서식지에서 모집하는 유닛의 초상화: 모집할 수 있는 동안은 밝게, 아무도 남지 않으면 어둡게 표시합니다."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"모집 가능 수를 서식지 초상화에 표시"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"서식지에서 지금 모집할 수 있는 생물 수를 초상화 모서리에 표시합니다. 경비되는 동안은 표시하지 않습니다."},
+{"sid":"oe.mapbadges.ShowSquads","text":"분대 위에 합류·도주 배지"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"선택한 영웅 기준으로 정찰된 분대 위에 표시: 분대가 합류할 경우 외교 아이콘, 도주를 제안할 경우 게임의 도주 아이콘. 수치는 표시하지 않습니다."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"분대 위에 위험 해골"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"합류하지도 도주하지도 않는 정찰된 분대 위에 툴팁의 해골과 같이, 선택한 영웅에게 전투가 얼마나 위험한지를 나타내는 색의 해골을 표시합니다."}
+]
+}

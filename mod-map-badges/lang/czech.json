@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Značky na mapě"},
+{"sid":"oe.mapbadges.Shown","text":"Zobrazit značky"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Vždy, jen při držení herní klávesy doplňujících informací (Alt, pokud není změněna), spolu s herními doplňujícími informacemi, nebo nikdy (ani s touto klávesou). Pro všechny značky tohoto modu."},
+{"sid":"oe.mapbadges.Shown.Always","text":"vždy"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"při držení klávesy doplňujících informací"},
+{"sid":"oe.mapbadges.Shown.Never","text":"nikdy"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Nad nenavštívenými budovami a cizími doly"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Jantarová značka nad každou prozkoumanou budovou, kterou vybraný hrdina ještě může navštívit, a nad doly, které nejsou vaše. V rohu značky střežené budovy, dokud tam stráž stojí, lebka v barvě nebezpečnosti boje, nebo meče."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Značka budovy"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Jen znak, nebo znak a jak často lze budovu navštívit, jako u jejího popisku."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"jen znak"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"všechny ikony"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Nebezpečnost strážců budov"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"V rohu značky střežené budovy lebka v barvě nebezpečnosti boje pro vybraného hrdinu, jako lebky v popisku. Vypnuto: zkřížené meče, jen „střeženo“."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"„Dobyto“ nad vašimi doly"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Zelená značka s drahokamem nad doly strany vybraného hrdiny."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Nad předměty k sebrání"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Malá značka nad prozkoumanými surovinami (drahokam), artefakty (meč) a truhlami, které ještě leží na mapě."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Portréty jednotek nad obydlími"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Portrét jednotky, kterou obydlí najímá: jasný, dokud je koho najmout, ztlumený, když nezbyl nikdo."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Kolik lze najmout, na portrétu obydlí"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Kolik stvoření má obydlí nyní k najmutí, v rohu portrétu. Nezobrazuje se, dokud je střeženo."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Značky připojení a útěku nad oddíly"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Nad prozkoumanými oddíly, pro vybraného hrdinu: ikona Diplomacie, pokud by se oddíl připojil, herní ikona útěku, pokud by nabídl útěk. Bez čísel."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Lebka nebezpečnosti nad oddíly"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad prozkoumaným oddílem, který by se nepřipojil ani neutekl: lebka v barvě nebezpečnosti boje pro vybraného hrdinu, jako lebky v popisku."}
+]
+}

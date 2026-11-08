@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Mod"},
+{"sid":"oe.settings.defaults","text":"Valori predefiniti della mod"},
+{"sid":"oe.settings.defaults.desc","text":"Riporta tutti gli interruttori di questa mod ai valori predefiniti. Le altre mod e le impostazioni del gioco restano invariate."},
+{"sid":"oe.settings.reset","text":"Ripristina"},
+{"sid":"oe.settings.version","text":"mod {0}"},
+{"sid":"oe.settings.mods","text":"Mod {0} · per il gioco {1}"},
+{"sid":"oe.settings.mods.other","text":"per {0}"},
+{"sid":"oe.settings.version.off","text":"mod {0} disattivate"},
+{"sid":"oe.settings.close","text":"Chiudi"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Versione"},
+{"sid":"oe.settings.col.state","text":"Stato"}
+]
+}

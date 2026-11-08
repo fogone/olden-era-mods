@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Savaş sayacı"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Tahminde karşı saldırı hasarı ve kayıpları"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Hasar tahmininde oyunun sayılarından sonra: kılıçlar ve savunanın karşı saldırısı, verdiği hasar ve öldürdüğü yaratıklar. Yalnızca oyunun kendisi karşı saldırı olacağına karar verdiğinde."},
+{"sid":"oe.battlecounter.HealthShown","text":"Tahminde kümelerin sağlığı"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Tahmine bir satır daha: sağlık simgesi ve savunanın sağlığı, karşı saldırı varsa kılıçlardan sonra saldıranın sağlığı. Hem hem de: üstteki yaratığın ve tüm kümenin sağlığı (350 · 12350). Akıllı: tek yaratıkta kendi sağlığı; kümede tüm sağlık, vuruş ikiden az yaratık öldürüyorsa önünde üstteki yaratığınki."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"kapalı"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"hem hem de"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"akıllı"}
+]
+}

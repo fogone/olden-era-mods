@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Squad tooltip"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"\"Want to join\" with the Diplomacy icon"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"When the squad would join the selected hero, \"Want to join\" and the Diplomacy icon replace the battle difficulty."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"\"Want to flee\""},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"When the squad would offer to flee, \"Want to flee\" replaces the battle difficulty and the game's escape icon, the one over the squad on the map, replaces the skulls."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"An icon instead of the difficulty skulls"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"With \"Want to join\" and \"Want to flee\", the Diplomacy icon or the game's escape icon in place of the skulls. Off: only the words."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Diplomacy details where there are any"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Shows the hidden numbers where there are any: the hero's and the squad's Diplomacy points, how many creatures would join, how many times the hero's army is stronger or weaker. With the game's setting \"hide the battle danger\" the ratio is not shown."},
+{"sid":"oe.squadtooltip.text.Join","text":"Want to join"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Want to flee"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomacy {0:N0} of {1:N0} needed"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"About {0:N0} of {1:N0} creatures join ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Armies: yours is {0:0.#} times stronger"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Armies: the squad is {0:0.#} times stronger"}
+
+]
+}

@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"Mod bekapcsolva"},
+{"sid":"oe.common.enabled.desc","text":"A kikapcsolt mod semmit sem változtat a játékban."},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — kikapcsolva: a játék {2} verziójához készült"},
+{"sid":"oe.common.versionOff","text":"A modok ki vannak kapcsolva: a játék {0} verziójához készültek, a játék verziója {1}. Ehhez a verzióhoz újra kell őket fordítani. Kikapcsolva: {2}."},
+{"sid":"oe.common.mode.title","text":"Minden mod"},
+{"sid":"oe.common.mode","text":"Mikor működnek a modok"},
+{"sid":"oe.common.mode.desc","text":"Mindig, csak egyjátékos játékban, vagy soha. Nem egyjátékos: online, hotseat, visszajátszás. Amíg nem működnek, a modok semmit sem változtatnak és nem mutatnak, mintha nem lennének telepítve; az egyes modok saját kapcsolói megmaradnak."},
+{"sid":"oe.common.mode.Always","text":"mindig"},
+{"sid":"oe.common.mode.SinglePlayer","text":"egyjátékos játékban"},
+{"sid":"oe.common.mode.Off","text":"soha"}
+]
+}

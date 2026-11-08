@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Recherche (développement)"},
+{"sid":"oe.research.ShowFps","text":"Fréquence d'images dans le coin de l'écran"},
+{"sid":"oe.research.ShowFps.desc","text":"En haut à gauche, dans un disque : images par seconde de la dernière seconde. Vert — fluide, ambre — une image de plus de 33 ms, rouge — de plus de 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Dernières {0:0} s : {1:0} fps, image typique {2:0.0} ms, pire {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Images de plus de 33 ms : {0}, de plus de 100 ms : {1}"},
+{"sid":"oe.research.text.Ours","text":"Nos mods : {0:0.0} ms par seconde ({1:0.0%} du temps), pire image {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Nos mods ne sont pas chronométrés (console : perf on)"}
+
+]
+}

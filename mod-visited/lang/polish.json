@@ -1,0 +1,28 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Odwiedzone budowle"},
+{"sid":"oe.visited.ShowBadges","text":"Znaczki odwiedzin przy podpowiedzi budowli"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Po lewej od podpowiedzi budowli: odwiedzona lub dostępna oraz jak często można ją odwiedzać (raz, na bohatera, na gracza, co tydzień lub codziennie)."},
+{"sid":"oe.visited.ShowCaption","text":"Podpis „odwiedzona · co tydzień”"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Wiersz w podpowiedzi budowli: odwiedzona lub dostępna oraz zasada odwiedzin słowami."},
+{"sid":"oe.visited.HideGameVisited","text":"Ukryj wiersz „Odwiedzono” z gry"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Wiersz gry powtarza znaczek odwiedzin, można go ukryć."},
+{"sid":"oe.visited.Highlight","text":"Wyróżnienie nieodwiedzonych"},
+{"sid":"oe.visited.Highlight.desc","text":"Jak wyróżnia się kontur obiektów jeszcze nieodwiedzonych. Kolor konturu wybiera się w ustawieniach gry, Widoczność."},
+{"sid":"oe.visited.Highlight.Game","text":"jak w grze"},
+{"sid":"oe.visited.Highlight.Bright","text":"jaśniej"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsująco"},
+{"sid":"oe.visited.Highlight.Flash","text":"błyskami"},
+{"sid":"oe.visited.Highlight.Strobe","text":"stroboskop"},
+{"sid":"oe.visited.ShowGuards","text":"Strażnicy w podpowiedzi strzeżonej budowli"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Kto strzeże siedziby jednostek lub innego strzeżonego miejsca i jak niebezpieczna jest walka, pokazane jak w podpowiedzi oddziału, bez podchodzenia do niego."},
+{"sid":"oe.visited.text.OneTime","text":"raz dla wszystkich"},
+{"sid":"oe.visited.text.PerHero","text":"na bohatera"},
+{"sid":"oe.visited.text.PerPlayer","text":"na gracza"},
+{"sid":"oe.visited.text.Unlimited","text":"bez limitu"},
+{"sid":"oe.visited.text.Weekly","text":"odnawia się co tydzień"},
+{"sid":"oe.visited.text.Daily","text":"odnawia się codziennie"},
+{"sid":"oe.visited.text.Visited","text":"odwiedzona"},
+{"sid":"oe.visited.text.Available","text":"dostępna"}
+]
+}

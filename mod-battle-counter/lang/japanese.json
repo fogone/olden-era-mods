@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"戦闘カウンター"},
+{"sid":"oe.battlecounter.ShowCounter","text":"予測に反撃ダメージと損害を表示"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"ダメージ予測のゲーム標準の数値の後に、剣と防御側の反撃、そのダメージと倒されるクリーチャーを表示します。ゲーム自身が反撃があると判断したときのみ。"},
+{"sid":"oe.battlecounter.HealthShown","text":"予測にスタックのHPを表示"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"予測の行をもう一つ追加：HPアイコンと防御側のHP、反撃がある場合は剣の後に攻撃側のHP。「両方」：先頭のクリーチャーとスタック全体のHP（350 · 12350）。「スマート」：単独のクリーチャーはそのHP、スタックは全体のHPで、攻撃で倒されるのが2体未満の場合はその前に先頭のクリーチャーのHP。"},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"オフ"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"両方"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"スマート"}
+]
+}

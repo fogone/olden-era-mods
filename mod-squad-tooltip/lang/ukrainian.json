@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Підказка загону"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"«Бажає приєднатися» зі значком Дипломатії"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Коли загін приєднається до вибраного героя, «Бажає приєднатися» і значок Дипломатії замінюють складність битви."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"«Бажає втекти»"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Коли загін запропонує втекти, «Бажає втекти» замінює складність битви, а значок втечі з гри, той, що над загоном на мапі, замінює черепи."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Значок замість черепів складності"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Разом із «Бажає приєднатися» і «Бажає втекти»: значок Дипломатії або значок втечі з гри замість черепів. Вимкнено: лише слова."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Подробиці Дипломатії, де вони є"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Показує приховані числа, де вони є: очки Дипломатії героя і загону, скільки істот приєднається, у скільки разів військо героя сильніше чи слабше. Якщо ввімкнено налаштування гри «приховати складність битви», співвідношення не показується."},
+{"sid":"oe.squadtooltip.text.Join","text":"Бажає приєднатися"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Бажає втекти"},
+{"sid":"oe.squadtooltip.text.Points","text":"Дипломатія {0:N0} з потрібних {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Приєднається близько {0:N0} з {1:N0} істот ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Війська: ваше сильніше в {0:0.#} раза"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Війська: загін сильніший в {0:0.#} раза"}
+
+]
+}

@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Dica do mapa"},
+{"sid":"oe.maptooltip.PlaceFree","text":"A dica não cobre o objeto"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Quando a dica de um objeto do mapa cobre o próprio objeto, ela vai para um lugar livre: acima, à direita, à esquerda ou abaixo, também fora dos painéis da interface."}
+]
+}

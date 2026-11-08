@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"전투 카운터"},
+{"sid":"oe.battlecounter.ShowCounter","text":"예측에 반격 피해와 손실 표시"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"피해 예측의 게임 수치 뒤에 검과 방어자의 반격, 그 피해와 처치하는 생물 수를 표시합니다. 게임 자체가 반격이 있다고 판단할 때만 표시합니다."},
+{"sid":"oe.battlecounter.HealthShown","text":"예측에 부대의 체력 표시"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"예측에 한 줄 추가: 체력 아이콘과 방어자의 체력, 반격이 있으면 검 뒤에 공격자의 체력. 전부: 맨 위 생물과 부대 전체의 체력(350 · 12350). 스마트: 단독 생물은 그 생물의 체력, 부대는 전체 체력이며 공격으로 두 마리 미만이 죽으면 그 앞에 맨 위 생물의 체력."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"끔"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"전부"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"스마트"}
+]
+}

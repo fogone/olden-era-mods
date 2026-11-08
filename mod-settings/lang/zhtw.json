@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"模組"},
+{"sid":"oe.settings.defaults","text":"模組預設值"},
+{"sid":"oe.settings.defaults.desc","text":"將此模組的所有開關恢復為預設值。其他模組和遊戲設定保持不變。"},
+{"sid":"oe.settings.reset","text":"重設"},
+{"sid":"oe.settings.version","text":"模組 {0}"},
+{"sid":"oe.settings.mods","text":"模組 {0} · 適用於遊戲 {1}"},
+{"sid":"oe.settings.mods.other","text":"適用於 {0}"},
+{"sid":"oe.settings.version.off","text":"模組 {0} 已關閉"},
+{"sid":"oe.settings.close","text":"關閉"},
+{"sid":"oe.settings.col.mod","text":"模組"},
+{"sid":"oe.settings.col.version","text":"版本"},
+{"sid":"oe.settings.col.state","text":"狀態"}
+]
+}

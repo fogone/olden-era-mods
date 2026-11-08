@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Descripción del mapa"},
+{"sid":"oe.maptooltip.PlaceFree","text":"La descripción no tapa el objeto"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Cuando la descripción emergente de un objeto del mapa tapa el propio objeto, pasa a un sitio libre: arriba, a la derecha, a la izquierda o abajo, también fuera de los paneles de la interfaz."}
+]
+}

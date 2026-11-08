@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Navštívené budovy"},
+{"sid":"oe.visited.ShowBadges","text":"Značky návštěv u popisku budovy"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Vlevo od popisku budovy: navštíveno nebo dostupné a jak často lze budovu navštívit (jednou, za hrdinu, za hráče, týdně nebo denně)."},
+{"sid":"oe.visited.ShowCaption","text":"Popisek „navštíveno · týdně“"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Řádek v popisku budovy: navštíveno nebo dostupné a pravidlo návštěv slovy."},
+{"sid":"oe.visited.HideGameVisited","text":"Skrýt herní řádek „Návštěva už proběhla“"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Herní řádek opakuje značku návštěvy, lze ho skrýt."},
+{"sid":"oe.visited.Highlight","text":"Zvýraznění nenavštívených"},
+{"sid":"oe.visited.Highlight.desc","text":"Jak vyniká obrys objektů, které ještě nebyly navštíveny. Barva obrysu se volí v nastavení hry, Viditelnost."},
+{"sid":"oe.visited.Highlight.Game","text":"jako ve hře"},
+{"sid":"oe.visited.Highlight.Bright","text":"jasněji"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulzující"},
+{"sid":"oe.visited.Highlight.Flash","text":"blikající"},
+{"sid":"oe.visited.Highlight.Strobe","text":"stroboskop"},
+{"sid":"oe.visited.ShowGuards","text":"Strážci v popisku střežené budovy"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Kdo střeží obydlí jednotek nebo jiné střežené místo a jak nebezpečná je bitva, zobrazeno jako v popisku oddílu, bez nutnosti k němu dojít."},
+{"sid":"oe.visited.text.OneTime","text":"jednou pro všechny"},
+{"sid":"oe.visited.text.PerHero","text":"za hrdinu"},
+{"sid":"oe.visited.text.PerPlayer","text":"za hráče"},
+{"sid":"oe.visited.text.Unlimited","text":"bez omezení"},
+{"sid":"oe.visited.text.Weekly","text":"obnoví se každý týden"},
+{"sid":"oe.visited.text.Daily","text":"obnoví se každý den"},
+{"sid":"oe.visited.text.Visited","text":"navštíveno"},
+{"sid":"oe.visited.text.Available","text":"dostupné"}
+
+]
+}

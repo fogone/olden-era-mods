@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Csataszámláló"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Visszatámadás sebzése és veszteségei az előrejelzésben"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"A játék számai után a sebzés előrejelzésében: kardok és a védő visszatámadása, annak sebzése és az általa megölt lények. Csak akkor, ha maga a játék dönt úgy, hogy lesz visszatámadás."},
+{"sid":"oe.battlecounter.HealthShown","text":"Az egységek életereje az előrejelzésben"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Még egy sor az előrejelzésben: az életerő ikonja és a védő életereje, visszatámadás esetén pedig a támadóé a kardok után. Mindkettő: a felső lény és az egész egység életereje (350 · 12350). Okos: magányos lénynél a sajátja; egységnél az egész életereje, és előtte a felső lényé, ha a találat kettőnél kevesebbet öl meg."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"ki"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"mindkettő"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"okos"}
+]
+}

@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Znaczki na mapie"},
+{"sid":"oe.mapbadges.Shown","text":"Pokazuj znaczki"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Zawsze, tylko po przytrzymaniu klawisza dodatkowych informacji gry (Alt, o ile go nie zmieniono), razem z dodatkowymi informacjami samej gry, albo nigdy (nawet z tym klawiszem). Dla wszystkich znaczków tego modu."},
+{"sid":"oe.mapbadges.Shown.Always","text":"zawsze"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"po przytrzymaniu klawisza informacji"},
+{"sid":"oe.mapbadges.Shown.Never","text":"nigdy"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Nad nieodwiedzonymi budowlami i cudzymi kopalniami"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Bursztynowy znaczek nad każdą zwiadowaną budowlą, którą wybrany bohater może jeszcze odwiedzić, i nad kopalniami, które nie są twoje. W rogu znaczka strzeżonej budowli, dopóki strażnicy tam stoją, czaszka w kolorze niebezpieczeństwa walki albo miecze."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Znaczek budowli"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Sam znak albo znak i informacja, jak często można odwiedzać budowlę, tak jak w jej podpowiedzi."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"sam znak"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"wszystkie ikony"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Niebezpieczeństwo strażników budowli"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"W rogu znaczka strzeżonej budowli czaszka w kolorze niebezpieczeństwa walki dla wybranego bohatera, jak czaszki w podpowiedzi. Wyłączone: skrzyżowane miecze, samo „strzeżone”."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"„Zdobyta” nad twoimi kopalniami"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Zielony znaczek z klejnotem nad kopalniami strony wybranego bohatera."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Nad przedmiotami do zebrania"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Mały znaczek nad zwiadowanymi surowcami (klejnot), artefaktami (miecz) i skrzyniami, które wciąż leżą na mapie."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Portrety jednostek nad siedzibami"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Portret jednostki, którą werbuje siedziba: jasny, dopóki jest kogo werbować, przygaszony, gdy nikogo nie zostało."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Ilu można zwerbować, na portrecie siedziby"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Ile stworzeń siedziba ma teraz do werbunku, w rogu portretu. Nie pokazuje się, dopóki jest strzeżona."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Znaczki dołączenia i ucieczki nad oddziałami"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Nad zwiadowanymi oddziałami, dla wybranego bohatera: ikona Dyplomacji, jeśli oddział by dołączył, ikona ucieczki z gry, jeśli zaproponowałby ucieczkę. Bez liczb."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Czaszka niebezpieczeństwa nad oddziałami"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Nad zwiadowanym oddziałem, który by ani nie dołączył, ani nie uciekł: czaszka w kolorze niebezpieczeństwa walki dla wybranego bohatera, jak czaszki w podpowiedzi."}
+]
+}

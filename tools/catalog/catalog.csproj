@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Writes the catalog's meta files (catalog/catalog.json, catalog/mods/ID.json) for a release, with the same models
+       the mod manager reads (mod-manager/shared/Catalog.cs). Run by publish-mods.ps1. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\mod-manager\shared\*.cs" Link="shared\%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

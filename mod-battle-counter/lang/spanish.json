@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Contador de batalla"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Daño y bajas del contraataque en la previsión"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Tras las cifras del juego en la previsión de daño: espadas y el contraataque del defensor, su daño y las criaturas que mata. Solo cuando el propio juego decide que habrá contraataque."},
+{"sid":"oe.battlecounter.HealthShown","text":"Vida de las formaciones en la previsión"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Una fila más en la previsión: el icono de vida y la vida del defensor y, si hay contraataque, la del atacante tras las espadas. Ambas: la de la criatura superior y la de toda la formación (350 · 12350). Inteligente: la de una criatura sola; la de toda la formación, precedida de la de la criatura superior cuando el golpe mata a menos de dos."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"no"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"ambas"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligente"}
+]
+}

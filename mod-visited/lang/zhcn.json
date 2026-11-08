@@ -1,0 +1,28 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"已造访的建筑"},
+{"sid":"oe.visited.ShowBadges","text":"建筑提示框旁显示造访徽标"},
+{"sid":"oe.visited.ShowBadges.desc","text":"在建筑提示框左侧显示：已造访或可造访，以及可造访的频率（一次、每英雄、每玩家、每周或每日）。"},
+{"sid":"oe.visited.ShowCaption","text":"标注“已造访 · 每周”"},
+{"sid":"oe.visited.ShowCaption.desc","text":"建筑提示框中的一行：已造访或可造访，并以文字说明造访规则。"},
+{"sid":"oe.visited.HideGameVisited","text":"隐藏游戏的“已造访”一行"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"游戏的这一行与造访徽标重复，可以隐藏。"},
+{"sid":"oe.visited.Highlight","text":"未造访对象高亮"},
+{"sid":"oe.visited.Highlight.desc","text":"尚未造访对象的轮廓如何凸显。轮廓颜色在游戏设置的“可见性”中选择。"},
+{"sid":"oe.visited.Highlight.Game","text":"游戏默认"},
+{"sid":"oe.visited.Highlight.Bright","text":"更亮"},
+{"sid":"oe.visited.Highlight.Pulse","text":"脉动"},
+{"sid":"oe.visited.Highlight.Flash","text":"闪烁"},
+{"sid":"oe.visited.Highlight.Strobe","text":"频闪"},
+{"sid":"oe.visited.ShowGuards","text":"有守卫建筑的提示框中显示守卫"},
+{"sid":"oe.visited.ShowGuards.desc","text":"无需走近，即可显示谁在守卫单位住所或其他有守卫的地点，以及战斗的危险程度，显示方式与部队提示框相同。"},
+{"sid":"oe.visited.text.OneTime","text":"所有人仅一次"},
+{"sid":"oe.visited.text.PerHero","text":"每英雄"},
+{"sid":"oe.visited.text.PerPlayer","text":"每玩家"},
+{"sid":"oe.visited.text.Unlimited","text":"无限制"},
+{"sid":"oe.visited.text.Weekly","text":"每周重置"},
+{"sid":"oe.visited.text.Daily","text":"每日重置"},
+{"sid":"oe.visited.text.Visited","text":"已造访"},
+{"sid":"oe.visited.text.Available","text":"可造访"}
+]
+}

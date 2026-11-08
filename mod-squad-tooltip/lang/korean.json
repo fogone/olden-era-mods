@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"분대 툴팁"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"외교 아이콘이 있는 \"합류하고 싶어함\""},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"분대가 선택한 영웅에게 합류할 경우, 전투 난이도 대신 \"합류하고 싶어함\"과 외교 아이콘을 표시합니다."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"\"도주하고 싶어함\""},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"분대가 도주를 제안할 경우, 전투 난이도 대신 \"도주하고 싶어함\"을 표시하고, 지도에서 분대 위에 보이는 게임의 도주 아이콘을 해골 대신 표시합니다."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"난이도 해골 대신 아이콘"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"\"합류하고 싶어함\"과 \"도주하고 싶어함\"일 때 해골 대신 외교 아이콘 또는 게임의 도주 아이콘을 표시합니다. 끄면 글자만 표시합니다."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"해당하는 경우 외교 상세 정보"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"해당하는 경우 숨겨진 수치를 표시합니다: 영웅과 분대의 외교 점수, 합류할 생물 수, 영웅의 군대가 몇 배 더 강하거나 약한지. 게임 설정 \"전투 난이도 숨김\"에서는 비율을 표시하지 않습니다."},
+{"sid":"oe.squadtooltip.text.Join","text":"합류하고 싶어함"},
+{"sid":"oe.squadtooltip.text.Flee","text":"도주하고 싶어함"},
+{"sid":"oe.squadtooltip.text.Points","text":"외교 {0:N0} / 필요 {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"생물 {1:N0}마리 중 약 {0:N0}마리 합류 ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"군대: 아군이 {0:0.#}배 더 강함"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"군대: 분대가 {0:0.#}배 더 강함"}
+
+]
+}

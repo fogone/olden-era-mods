@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Відвідані будівлі"},
+{"sid":"oe.visited.ShowBadges","text":"Значки відвідування біля підказки будівлі"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Ліворуч від підказки будівлі: відвідано чи доступно, і як часто її можна відвідувати (раз, на героя, на гравця, щотижня чи щодня)."},
+{"sid":"oe.visited.ShowCaption","text":"Підпис «відвідано · щотижня»"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Рядок у підказці будівлі: відвідано чи доступно, і правило відвідування словами."},
+{"sid":"oe.visited.HideGameVisited","text":"Сховати рядок гри «Уже відвідано»"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Рядок гри повторює значок відвідування, його можна сховати."},
+{"sid":"oe.visited.Highlight","text":"Підсвітка невідвіданих"},
+{"sid":"oe.visited.Highlight.desc","text":"Як виділяється контур ще не відвіданих об'єктів. Колір контуру вибирається в налаштуваннях гри, «Видимість»."},
+{"sid":"oe.visited.Highlight.Game","text":"як у грі"},
+{"sid":"oe.visited.Highlight.Bright","text":"яскравіше"},
+{"sid":"oe.visited.Highlight.Pulse","text":"пульсація"},
+{"sid":"oe.visited.Highlight.Flash","text":"спалахи"},
+{"sid":"oe.visited.Highlight.Strobe","text":"стробоскоп"},
+{"sid":"oe.visited.ShowGuards","text":"Охорона в підказці охоронюваної будівлі"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Хто охороняє житло істот чи інше охоронюване місце і наскільки небезпечна битва: так само, як у підказці загону, не підходячи до нього."},
+{"sid":"oe.visited.text.OneTime","text":"раз для всіх"},
+{"sid":"oe.visited.text.PerHero","text":"на героя"},
+{"sid":"oe.visited.text.PerPlayer","text":"на гравця"},
+{"sid":"oe.visited.text.Unlimited","text":"без обмежень"},
+{"sid":"oe.visited.text.Weekly","text":"оновлюється щотижня"},
+{"sid":"oe.visited.text.Daily","text":"оновлюється щодня"},
+{"sid":"oe.visited.text.Visited","text":"відвідано"},
+{"sid":"oe.visited.text.Available","text":"доступно"}
+
+]
+}

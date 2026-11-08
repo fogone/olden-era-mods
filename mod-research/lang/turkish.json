@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Araştırma (geliştirme)"},
+{"sid":"oe.research.ShowFps","text":"Ekranın köşesinde kare hızı"},
+{"sid":"oe.research.ShowFps.desc","text":"Sol üstte, bir diskin içinde: son saniyenin saniyedeki kare sayısı. Yeşil — akıcı, kehribar — 33 ms üzeri kare, kırmızı — 100 ms üzeri."},
+{"sid":"oe.research.text.Frames","text":"Son {0:0} sn: {1:0} fps, tipik kare {2:0.0} ms, en kötü {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"33 ms üzeri kareler: {0}, 100 ms üzeri: {1}"},
+{"sid":"oe.research.text.Ours","text":"Modlarımız: saniyede {0:0.0} ms (zamanın {1:0.0%}), en kötü kare {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Modlarımızın süresi ölçülmüyor (konsol: perf on)"}
+
+]
+}

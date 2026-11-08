@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"模组"},
+{"sid":"oe.settings.defaults","text":"模组默认值"},
+{"sid":"oe.settings.defaults.desc","text":"将此模组的所有开关恢复为默认值。其他模组和游戏设置保持不变。"},
+{"sid":"oe.settings.reset","text":"重设"},
+{"sid":"oe.settings.version","text":"模组 {0}"},
+{"sid":"oe.settings.mods","text":"模组 {0} · 适用于游戏 {1}"},
+{"sid":"oe.settings.mods.other","text":"适用于 {0}"},
+{"sid":"oe.settings.version.off","text":"模组 {0} 已关闭"},
+{"sid":"oe.settings.close","text":"关闭"},
+{"sid":"oe.settings.col.mod","text":"模组"},
+{"sid":"oe.settings.col.version","text":"版本"},
+{"sid":"oe.settings.col.state","text":"状态"}
+]
+}

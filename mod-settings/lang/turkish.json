@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Modlar"},
+{"sid":"oe.settings.defaults","text":"Mod varsayılanları"},
+{"sid":"oe.settings.defaults.desc","text":"Bu modun tüm anahtarlarını varsayılanlarına döndürür. Diğer modlar ve oyunun ayarları olduğu gibi kalır."},
+{"sid":"oe.settings.reset","text":"Sıfırla"},
+{"sid":"oe.settings.version","text":"modlar {0}"},
+{"sid":"oe.settings.mods","text":"Modlar {0} · oyun {1} için"},
+{"sid":"oe.settings.mods.other","text":"{0} için"},
+{"sid":"oe.settings.version.off","text":"modlar {0} kapalı"},
+{"sid":"oe.settings.close","text":"Kapat"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Sürüm"},
+{"sid":"oe.settings.col.state","text":"Durum"}
+]
+}

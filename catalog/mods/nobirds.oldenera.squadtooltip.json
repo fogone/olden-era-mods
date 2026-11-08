@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "nobirds.oldenera.squadtooltip",
+  "name": {
+    "brportugese": "Dica do grupo",
+    "czech": "Popisek oddílu",
+    "english": "Squad tooltip",
+    "french": "Infobulle d'escouade",
+    "german": "Truppen-Tooltip",
+    "hungarian": "Csapat súgója",
+    "italian": "Descrizione della squadra",
+    "japanese": "部隊ツールチップ",
+    "korean": "분대 툴팁",
+    "polish": "Podpowiedź oddziału",
+    "russian": "Подсказка отряда",
+    "spanish": "Descripción de formación",
+    "turkish": "Birlik ipucu",
+    "ukrainian": "Підказка загону",
+    "zhcn": "部队提示框",
+    "zhtw": "部隊提示框"
+  },
+  "description": {},
+  "author": "fogone",
+  "source": "https://github.com/fogone/olden-era-mods",
+  "releases": [
+    {
+      "version": "1.31.0",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraSquadTooltip.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.31.0/OldenEraSquadTooltip.dll",
+          "sha256": "92f55a9d8d8883fa8c3ae2445b4504acff19f4dfacb879151759ec584aca6211"
+        }
+      ]
+    }
+  ]
+}

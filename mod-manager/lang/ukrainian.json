@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"Моди"},
+{"sid":"oe.manager.status.none","text":"Каталог ще не прочитано"},
+{"sid":"oe.manager.status.busy","text":"Каталог: триває робота..."},
+{"sid":"oe.manager.status.read","text":"Каталог: модів {0}, оновлень {1}"},
+{"sid":"oe.manager.status.failed","text":"Каталог: остання дія не вдалася, подробиці в журналі"},
+{"sid":"oe.manager.check","text":"Перевірити"},
+{"sid":"oe.manager.install","text":"Встановити"},
+{"sid":"oe.manager.update","text":"Оновити"},
+{"sid":"oe.manager.updateAll","text":"Оновити всі"},
+{"sid":"oe.manager.name","text":"Мод-менеджер"},
+{"sid":"oe.manager.note.available","text":"є {0}"},
+{"sid":"oe.manager.note.notInstalled","text":"не встановлено"},
+{"sid":"oe.manager.note.required","text":"потрібен іншим модам"},
+{"sid":"oe.manager.note.restart","text":"зміниться при наступному запуску"},
+{"sid":"oe.manager.note.removed","text":"видалено, вивантажиться при наступному запуску"},
+{"sid":"oe.manager.note.noRelease","text":"немає випуску для цієї версії гри"},
+{"sid":"oe.manager.note.staged","text":"{0} встановиться при наступному запуску"},
+{"sid":"oe.manager.note.failed","text":"оновлення не запустилося, повернено {0}"}
+]
+}

@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.skipintro.title","text":"Skip intro"},
+{"sid":"oe.skipintro.SkipVideos","text":"Skip the videos on start"},
+{"sid":"oe.skipintro.SkipVideos.desc","text":"The studios' logos and the trailer are not shown when the game starts: it goes straight on to the main menu. Takes effect at the next start."}
+]
+}

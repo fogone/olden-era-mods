@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Podpowiedź na mapie"},
+{"sid":"oe.maptooltip.PlaceFree","text":"Podpowiedź nie zasłania obiektu"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Gdy podpowiedź obiektu na mapie zasłania sam obiekt, przesuwa się na wolne miejsce: nad niego, na prawo, na lewo lub pod niego, także poza panelami interfejsu."}
+]
+}

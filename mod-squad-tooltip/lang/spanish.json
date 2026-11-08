@@ -1,0 +1,19 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Descripción de formación"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"\"Quieren unirse\" con el icono de Diplomacia"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Cuando la formación se uniría al héroe seleccionado, \"Quieren unirse\" y el icono de Diplomacia sustituyen a la dificultad del combate."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"\"Quieren huir\""},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Cuando la formación se ofrecería a huir, \"Quieren huir\" sustituye a la dificultad del combate, y el icono de huida del juego, el que aparece sobre la formación en el mapa, sustituye a las calaveras."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Un icono en vez de las calaveras de dificultad"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Con \"Quieren unirse\" y \"Quieren huir\", el icono de Diplomacia o el de huida del juego en lugar de las calaveras. Desactivado: solo las palabras."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Detalles de Diplomacia cuando los hay"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Muestra las cifras ocultas cuando las hay: los puntos de Diplomacia del héroe y de la formación, cuántas criaturas se unirían, cuántas veces es más fuerte o más débil el ejército del héroe. Con el ajuste del juego \"ocultar el peligro de la batalla\" no se muestra la proporción."},
+{"sid":"oe.squadtooltip.text.Join","text":"Quieren unirse"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Quieren huir"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomacia {0:N0} de {1:N0} necesarios"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Se unen unas {0:N0} de {1:N0} criaturas ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Ejércitos: el tuyo es {0:0.#} veces más fuerte"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Ejércitos: la formación es {0:0.#} veces más fuerte"}
+]
+}

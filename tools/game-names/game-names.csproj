@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The generated names from the game's files (Program.cs, docs/game-names.md). The searches are the plugins' own
+       (mod-common\shared), compiled in; the game's libraries are referenced where BepInEx keeps them. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>OldenEra.Modding.GameNamesTool</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GameDir>C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243;CS0169;CS0414;CS0649</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Unity.IL2CPP.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\Iced.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\LibCpp2IL.dll" />
+    <Reference Include="$(GameDir)\BepInEx\core\AssetRipper.Primitives.dll" />
+    <Reference Include="$(GameDir)\BepInEx\interop\*.dll" />
+    <Reference Include="..\..\mod-common\bin\Release\net6.0\OldenEraCommon.dll" />
+    <!-- Only the search side: the rest of mod-common\shared uses the names this makes. -->
+    <Compile Include="..\..\mod-common\shared\search\*.cs" Link="search\%(Filename)%(Extension)" />
+    <Compile Include="..\..\mod-research\NamesGenerator.cs" Link="shared\NamesGenerator.cs" />
+  </ItemGroup>
+
+</Project>

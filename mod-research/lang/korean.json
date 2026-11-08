@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"리서치 (개발용)"},
+{"sid":"oe.research.ShowFps","text":"화면 모서리에 프레임 속도"},
+{"sid":"oe.research.ShowFps.desc","text":"왼쪽 위의 원 안에 최근 1초간의 초당 프레임 수를 표시합니다. 초록: 부드러움, 호박색: 33ms를 넘는 프레임 있음, 빨강: 100ms를 넘는 프레임 있음."},
+{"sid":"oe.research.text.Frames","text":"최근 {0:0}초: {1:0} fps, 일반 프레임 {2:0.0} ms, 최악 {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"33ms 초과 프레임: {0}, 100ms 초과: {1}"},
+{"sid":"oe.research.text.Ours","text":"우리 모드: 초당 {0:0.0} ms (시간의 {1:0.0%}), 최악의 프레임 {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"우리 모드의 시간은 측정하지 않습니다 (콘솔: perf on)"}
+
+]
+}

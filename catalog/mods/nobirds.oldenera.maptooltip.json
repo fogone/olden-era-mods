@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "nobirds.oldenera.maptooltip",
+  "name": {
+    "brportugese": "Dica do mapa",
+    "czech": "Popisek na mapě",
+    "english": "Map tooltip",
+    "french": "Infobulle de carte",
+    "german": "Karten-Tooltip",
+    "hungarian": "Térkép súgója",
+    "italian": "Descrizione sulla mappa",
+    "japanese": "マップツールチップ",
+    "korean": "지도 툴팁",
+    "polish": "Podpowiedź na mapie",
+    "russian": "Подсказка на карте",
+    "spanish": "Descripción del mapa",
+    "turkish": "Harita ipucu",
+    "ukrainian": "Підказка мапи",
+    "zhcn": "地图提示框",
+    "zhtw": "地圖提示框"
+  },
+  "description": {},
+  "author": "fogone",
+  "source": "https://github.com/fogone/olden-era-mods",
+  "releases": [
+    {
+      "version": "0.9.2",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraMapTooltip.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/map-tooltip-v0.9.2/OldenEraMapTooltip.dll",
+          "sha256": "281f3f54c9ab995b4f81828e44b69b1d836f1b8e7f2661af5e4a8f746eb91717"
+        }
+      ]
+    }
+  ]
+}

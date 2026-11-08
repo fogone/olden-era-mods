@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Výzkum (vývoj)"},
+{"sid":"oe.research.ShowFps","text":"Snímková frekvence v rohu obrazovky"},
+{"sid":"oe.research.ShowFps.desc","text":"Vlevo nahoře v kotouči: snímky za sekundu za poslední sekundu. Zelená — plynule, jantarová — snímek přes 33 ms, červená — přes 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Posledních {0:0} s: {1:0} fps, typický snímek {2:0.0} ms, nejhorší {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Snímky přes 33 ms: {0}, přes 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Naše módy: {0:0.0} ms za sekundu ({1:0.0%} času), nejhorší snímek {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Naše módy se neměří (konzole: perf on)"}
+
+]
+}

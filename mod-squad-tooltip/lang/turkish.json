@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Birlik ipucu"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"Diplomasi simgesiyle “Katılmak istiyor”"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Birlik seçili kahramana katılacaksa, savaş zorluğunun yerine “Katılmak istiyor” yazısı ve Diplomasi simgesi gösterilir."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"“Kaçmak istiyor”"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Birlik kaçmayı önerecekse, savaş zorluğunun yerine “Kaçmak istiyor” yazılır; haritada birliğin üstünde görünen oyunun kaçış simgesi de kafataslarının yerine geçer."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Zorluk kafataslarının yerine simge"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"“Katılmak istiyor” ve “Kaçmak istiyor” ile birlikte, kafataslarının yerine Diplomasi simgesi veya oyunun kaçış simgesi. Kapalı: yalnızca yazı."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Varsa Diplomasi ayrıntıları"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Varsa gizli sayıları gösterir: kahramanın ve birliğin Diplomasi puanları, kaç yaratığın katılacağı, kahramanın ordusunun kaç kat daha güçlü veya zayıf olduğu. Oyunun “savaş tehlikesini gizle” ayarı açıkken oran gösterilmez."},
+{"sid":"oe.squadtooltip.text.Join","text":"Katılmak istiyor"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Kaçmak istiyor"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomasi {0:N0} / gereken {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"{1:N0} yaratığın yaklaşık {0:N0} kadarı katılır ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Ordular: seninki {0:0.#} kat daha güçlü"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Ordular: birlik {0:0.#} kat daha güçlü"}
+
+]
+}

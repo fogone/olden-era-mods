@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Visited buildings"},
+{"sid":"oe.visited.ShowBadges","text":"Visit badges by the building tooltip"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Left of a building's tooltip: visited or available, and how often it can be visited (once, per hero, per player, weekly or daily)."},
+{"sid":"oe.visited.ShowCaption","text":"Caption \"visited · weekly\""},
+{"sid":"oe.visited.ShowCaption.desc","text":"A line in the building's tooltip: visited or available and the visit rule in words."},
+{"sid":"oe.visited.HideGameVisited","text":"Hide the game's \"Already visited\" line"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"The game's line repeats the visit badge, it can be hidden."},
+{"sid":"oe.visited.Highlight","text":"Unvisited highlight"},
+{"sid":"oe.visited.Highlight.desc","text":"How the outline of objects not visited yet stands out. The outline color is chosen in the game's settings, Visibility."},
+{"sid":"oe.visited.Highlight.Game","text":"as the game does"},
+{"sid":"oe.visited.Highlight.Bright","text":"brighter"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsing"},
+{"sid":"oe.visited.Highlight.Flash","text":"flashes"},
+{"sid":"oe.visited.Highlight.Strobe","text":"strobe"},
+{"sid":"oe.visited.ShowGuards","text":"Guards in the tooltip of a guarded building"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Who guards a unit dwelling or another guarded place and how dangerous the battle is, shown as in a squad's tooltip, without walking up to it."},
+{"sid":"oe.visited.text.OneTime","text":"once for everyone"},
+{"sid":"oe.visited.text.PerHero","text":"per hero"},
+{"sid":"oe.visited.text.PerPlayer","text":"per player"},
+{"sid":"oe.visited.text.Unlimited","text":"no limit"},
+{"sid":"oe.visited.text.Weekly","text":"resets each week"},
+{"sid":"oe.visited.text.Daily","text":"resets each day"},
+{"sid":"oe.visited.text.Visited","text":"visited"},
+{"sid":"oe.visited.text.Available","text":"available"}
+
+]
+}

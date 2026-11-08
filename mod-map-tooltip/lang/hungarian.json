@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Térkép súgója"},
+{"sid":"oe.maptooltip.PlaceFree","text":"A súgó nem takarja az objektumot"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Ha egy térképobjektum súgója magát az objektumot takarja, szabad helyre kerül: fölé, jobbra, balra vagy alá, a kezelőfelület paneljeit is kikerülve."}
+]
+}

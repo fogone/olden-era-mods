@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"地圖提示框"},
+{"sid":"oe.maptooltip.PlaceFree","text":"提示框不遮擋物件"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"當地圖物件的提示框遮擋了該物件本身時，會移到空閒位置：上方、右側、左側或下方，同時避開介面面板。"}
+]
+}

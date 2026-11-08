@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Emblemas do mapa"},
+{"sid":"oe.mapbadges.Shown","text":"Mostrar os emblemas"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Sempre, somente enquanto a tecla de informações alternativas do jogo está pressionada (Alt, a menos que seja redefinida), junto com as informações extras do próprio jogo, ou nunca (nem com essa tecla). Para todos os emblemas deste mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"sempre"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"com a tecla de informações alternativas"},
+{"sid":"oe.mapbadges.Shown.Never","text":"nunca"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Sobre construções não visitadas e minas alheias"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Um emblema âmbar sobre cada construção explorada que o herói selecionado ainda pode visitar, e sobre as minas que não são suas. No canto do emblema de uma construção protegida, enquanto a guarda estiver lá, uma caveira da cor do perigo da luta, ou espadas."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Emblema de uma construção"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Somente o sinal, ou o sinal e a frequência com que a construção pode ser visitada, como na sua dica."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"somente o sinal"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"todos os ícones"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Perigo da guarda das construções"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"No canto do emblema de uma construção protegida, uma caveira da cor do perigo da luta para o herói selecionado, como as caveiras da dica. Desligado: espadas cruzadas, apenas \"protegida\"."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"\"Capturada\" sobre suas minas"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Um emblema de gema verde sobre as minas do lado do herói selecionado."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Sobre itens coletáveis"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Um pequeno emblema sobre recursos explorados (gema), artefatos (espada) e baús que ainda estão no mapa."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Retratos de unidades sobre as moradias"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"O retrato da unidade que a moradia recruta: brilhante enquanto há quem recrutar, esmaecido quando não resta ninguém."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Quantos recrutar, no retrato da moradia"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Quantas criaturas a moradia tem agora para recrutar, no canto do retrato. Não aparece enquanto ela estiver protegida."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Emblemas de adesão e fuga sobre os grupos"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Sobre grupos explorados, para o herói selecionado: o ícone de Diplomacia se o grupo se juntaria, o ícone de fuga do jogo se ele se ofereceria para fugir. Sem números."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Caveira de perigo sobre os grupos"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre um grupo explorado que nem se juntaria nem fugiria: uma caveira da cor do perigo da luta para o herói selecionado, como as caveiras da dica."}
+]
+}

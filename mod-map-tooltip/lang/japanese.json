@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"マップツールチップ"},
+{"sid":"oe.maptooltip.PlaceFree","text":"ツールチップをオブジェクトに重ねない"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"マップ上のオブジェクトのツールチップがそのオブジェクト自体に重なる場合、空いている場所（上、右、左、下）に移動します。インターフェースのパネルにも重なりません。"}
+]
+}

@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"訪問済みの建物"},
+{"sid":"oe.visited.ShowBadges","text":"建物のツールチップに訪問バッジ"},
+{"sid":"oe.visited.ShowBadges.desc","text":"建物のツールチップの左に表示：訪問済みか訪問可能か、および訪問できる頻度（一度きり、ヒーローごと、プレイヤーごと、毎週、毎日）。"},
+{"sid":"oe.visited.ShowCaption","text":"キャプション「訪問済み · 毎週」"},
+{"sid":"oe.visited.ShowCaption.desc","text":"建物のツールチップに一行追加：訪問済みか訪問可能か、および訪問のルールを文章で表示します。"},
+{"sid":"oe.visited.HideGameVisited","text":"ゲームの「訪問済み」の行を隠す"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"ゲームの行は訪問バッジと同じ内容なので、隠すことができます。"},
+{"sid":"oe.visited.Highlight","text":"未訪問のハイライト"},
+{"sid":"oe.visited.Highlight.desc","text":"まだ訪問していないオブジェクトの輪郭の目立たせ方。輪郭の色はゲームの設定の「表示／非表示」で選びます。"},
+{"sid":"oe.visited.Highlight.Game","text":"ゲーム標準"},
+{"sid":"oe.visited.Highlight.Bright","text":"より明るく"},
+{"sid":"oe.visited.Highlight.Pulse","text":"脈動"},
+{"sid":"oe.visited.Highlight.Flash","text":"点滅"},
+{"sid":"oe.visited.Highlight.Strobe","text":"ストロボ"},
+{"sid":"oe.visited.ShowGuards","text":"守られた建物のツールチップに番人"},
+{"sid":"oe.visited.ShowGuards.desc","text":"クリーチャーの住居やその他の守られた場所を誰が守っているか、戦闘の危険度はどれほどかを、近づかなくても部隊のツールチップと同じ形式で表示します。"},
+{"sid":"oe.visited.text.OneTime","text":"全員で一度きり"},
+{"sid":"oe.visited.text.PerHero","text":"ヒーローごと"},
+{"sid":"oe.visited.text.PerPlayer","text":"プレイヤーごと"},
+{"sid":"oe.visited.text.Unlimited","text":"無制限"},
+{"sid":"oe.visited.text.Weekly","text":"毎週リセット"},
+{"sid":"oe.visited.text.Daily","text":"毎日リセット"},
+{"sid":"oe.visited.text.Visited","text":"訪問済み"},
+{"sid":"oe.visited.text.Available","text":"訪問可能"}
+
+]
+}

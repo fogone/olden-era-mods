@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Truppen-Tooltip"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"„Will sich anschließen“ mit dem Diplomatie-Symbol"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Wenn sich die Truppe dem ausgewählten Helden anschließen würde, ersetzen „Will sich anschließen“ und das Diplomatie-Symbol die Kampfschwierigkeit."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"„Will fliehen“"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Wenn die Truppe die Flucht anbieten würde, ersetzt „Will fliehen“ die Kampfschwierigkeit, und das Fluchtsymbol des Spiels, das über der Truppe auf der Karte, ersetzt die Totenköpfe."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Ein Symbol statt der Schwierigkeits-Totenköpfe"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Bei „Will sich anschließen“ und „Will fliehen“ das Diplomatie-Symbol oder das Fluchtsymbol des Spiels anstelle der Totenköpfe. Aus: nur die Worte."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Diplomatie-Details, wo vorhanden"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Zeigt die verborgenen Zahlen, wo es welche gibt: die Diplomatiepunkte des Helden und der Truppe, wie viele Kreaturen sich anschließen würden, wie viel stärker oder schwächer die Armee des Helden ist. Bei der Spieleinstellung „Kampfgefahr verbergen“ wird das Verhältnis nicht angezeigt."},
+{"sid":"oe.squadtooltip.text.Join","text":"Will sich anschließen"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Will fliehen"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomatie {0:N0} von {1:N0} nötig"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Etwa {0:N0} von {1:N0} Kreaturen schließen sich an ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Armeen: Eure ist {0:0.#}-mal stärker"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Armeen: die Truppe ist {0:0.#}-mal stärker"}
+
+]
+}

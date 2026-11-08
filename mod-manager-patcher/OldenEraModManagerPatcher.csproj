@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>OldenEraModManager.Patcher</AssemblyName>
+    <RootNamespace>OldenEra.Modding.Manager</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <GameDir>C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+
+    <!-- Compile against the .NET 6 runtime BepInEx ships in <game>\dotnet (no NuGet). -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDir)\dotnet\*.dll"
+               Exclude="$(GameDir)\dotnet\clretwrc.dll;$(GameDir)\dotnet\clrjit.dll;$(GameDir)\dotnet\coreclr.dll;$(GameDir)\dotnet\dbgshim.dll;$(GameDir)\dotnet\hostpolicy.dll;$(GameDir)\dotnet\Microsoft.DiaSymReader.Native.amd64.dll;$(GameDir)\dotnet\mscordaccore*.dll;$(GameDir)\dotnet\mscordbi.dll;$(GameDir)\dotnet\mscorrc.dll;$(GameDir)\dotnet\msquic.dll;$(GameDir)\dotnet\System.IO.Compression.Native.dll"
+               Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Preloader.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Mono.Cecil.dll" Private="false" />
+    <!-- Only the file logic of the update, shared with the manager and the tests; nothing of the game. -->
+    <Compile Include="..\mod-manager\shared\Updater.cs" Link="shared\Updater.cs" />
+  </ItemGroup>
+
+</Project>

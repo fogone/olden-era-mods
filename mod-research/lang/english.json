@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Research (development)"},
+{"sid":"oe.research.ShowFps","text":"Frame rate in the screen's corner"},
+{"sid":"oe.research.ShowFps.desc","text":"Top left, in a disc: frames per second of the last second. Green — smooth, amber — a frame over 33 ms, red — over 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Last {0:0} s: {1:0} fps, typical frame {2:0.0} ms, worst {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Frames over 33 ms: {0}, over 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Our mods: {0:0.0} ms per second ({1:0.0%} of the time), worst frame {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Our mods are not timed (console: perf on)"}
+
+]
+}

@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Infobulle d'escouade"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"« Veut se joindre à vous » avec l'icône de Diplomatie"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Quand l'escouade se joindrait au héros sélectionné, « Veut se joindre à vous » et l'icône de Diplomatie remplacent la difficulté du combat."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"« Veut fuir »"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Quand l'escouade proposerait de fuir, « Veut fuir » remplace la difficulté du combat et l'icône de fuite du jeu, celle placée au-dessus de l'escouade sur la carte, remplace les crânes."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Une icône à la place des crânes de difficulté"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Avec « Veut se joindre à vous » et « Veut fuir », l'icône de Diplomatie ou l'icône de fuite du jeu à la place des crânes. Désactivé : seulement les mots."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Détails de Diplomatie quand il y en a"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Affiche les chiffres cachés quand il y en a : les points de Diplomatie du héros et de l'escouade, combien de créatures se joindraient, combien de fois l'armée du héros est plus forte ou plus faible. Avec le paramètre du jeu « masquer le danger du combat », le rapport n'est pas affiché."},
+{"sid":"oe.squadtooltip.text.Join","text":"Veut se joindre à vous"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Veut fuir"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomatie {0:N0} sur {1:N0} requis"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Environ {0:N0} créatures sur {1:N0} se joignent à vous ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Armées : la vôtre est {0:0.#} fois plus forte"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Armées : l'escouade est {0:0.#} fois plus forte"}
+
+]
+}

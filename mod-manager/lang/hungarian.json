@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"Modok"},
+{"sid":"oe.manager.status.none","text":"A katalógus még nincs beolvasva"},
+{"sid":"oe.manager.status.busy","text":"Katalógus: munka folyamatban..."},
+{"sid":"oe.manager.status.read","text":"Katalógus: {0} mod, {1} frissítés"},
+{"sid":"oe.manager.status.failed","text":"Katalógus: az utolsó művelet sikertelen, lásd a naplót"},
+{"sid":"oe.manager.check","text":"Ellenőrzés"},
+{"sid":"oe.manager.install","text":"Telepítés"},
+{"sid":"oe.manager.update","text":"Frissítés"},
+{"sid":"oe.manager.updateAll","text":"Összes frissítése"},
+{"sid":"oe.manager.name","text":"Modkezelő"},
+{"sid":"oe.manager.note.available","text":"{0} elérhető"},
+{"sid":"oe.manager.note.notInstalled","text":"nincs telepítve"},
+{"sid":"oe.manager.note.required","text":"más modoknak szükségük van rá"},
+{"sid":"oe.manager.note.restart","text":"a következő indításkor változik"},
+{"sid":"oe.manager.note.removed","text":"eltávolítva, a következő indításkor eltűnik"},
+{"sid":"oe.manager.note.noRelease","text":"nincs kiadás ehhez a játékverzióhoz"},
+{"sid":"oe.manager.note.staged","text":"{0} a következő indításkor települ"},
+{"sid":"oe.manager.note.failed","text":"a frissítés nem indult el, {0} visszaállt"}
+]
+}

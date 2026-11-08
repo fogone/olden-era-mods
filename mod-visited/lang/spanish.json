@@ -1,0 +1,28 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Edificios visitados"},
+{"sid":"oe.visited.ShowBadges","text":"Insignias de visita junto a la descripción del edificio"},
+{"sid":"oe.visited.ShowBadges.desc","text":"A la izquierda de la descripción de un edificio: visitado o disponible, y con qué frecuencia se puede visitar (una vez, por héroe, por jugador, semanal o diaria)."},
+{"sid":"oe.visited.ShowCaption","text":"Rótulo \"visitado · semanal\""},
+{"sid":"oe.visited.ShowCaption.desc","text":"Una línea en la descripción del edificio: visitado o disponible y la regla de visita con palabras."},
+{"sid":"oe.visited.HideGameVisited","text":"Ocultar la línea \"Ya visitado\" del juego"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"La línea del juego repite la insignia de visita, se puede ocultar."},
+{"sid":"oe.visited.Highlight","text":"Resaltado de lo no visitado"},
+{"sid":"oe.visited.Highlight.desc","text":"Cómo destaca el contorno de los objetos aún no visitados. El color del contorno se elige en los ajustes del juego, Visibilidad."},
+{"sid":"oe.visited.Highlight.Game","text":"como hace el juego"},
+{"sid":"oe.visited.Highlight.Bright","text":"más brillante"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsante"},
+{"sid":"oe.visited.Highlight.Flash","text":"destellos"},
+{"sid":"oe.visited.Highlight.Strobe","text":"estroboscópico"},
+{"sid":"oe.visited.ShowGuards","text":"Guardias en la descripción de un edificio custodiado"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Quién custodia una vivienda de unidades u otro lugar custodiado y qué peligro tiene la batalla, como en la descripción de una formación, sin acercarse a él."},
+{"sid":"oe.visited.text.OneTime","text":"una vez para todos"},
+{"sid":"oe.visited.text.PerHero","text":"por héroe"},
+{"sid":"oe.visited.text.PerPlayer","text":"por jugador"},
+{"sid":"oe.visited.text.Unlimited","text":"sin límite"},
+{"sid":"oe.visited.text.Weekly","text":"se restablece cada semana"},
+{"sid":"oe.visited.text.Daily","text":"se restablece cada día"},
+{"sid":"oe.visited.text.Visited","text":"visitado"},
+{"sid":"oe.visited.text.Available","text":"disponible"}
+]
+}

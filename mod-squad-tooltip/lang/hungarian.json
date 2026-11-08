@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Csapat súgója"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"„Csatlakozni akarnak” a Diplomácia ikonjával"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Ha a csapat csatlakozna a kijelölt hőshöz, a „Csatlakozni akarnak” felirat és a Diplomácia ikonja váltja fel a csata nehézségét."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"„Menekülni akarnak”"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Ha a csapat menekülést ajánlana fel, a „Menekülni akarnak” felirat váltja fel a csata nehézségét, a játék menekülés ikonja, amely a térképen a csapat fölött látszik, pedig a koponyákat."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Ikon a nehézség koponyái helyett"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"A „Csatlakozni akarnak” és a „Menekülni akarnak” mellett a Diplomácia ikonja vagy a játék menekülés ikonja a koponyák helyett. Kikapcsolva: csak a szavak."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Diplomácia részletei, ahol vannak"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Megmutatja a rejtett számokat, ahol vannak: a hős és a csapat Diplomácia pontjait, hány lény csatlakozna, a hős serege hányszor erősebb vagy gyengébb. A játék „csata veszélyének elrejtése” beállításával az arány nem látszik."},
+{"sid":"oe.squadtooltip.text.Join","text":"Csatlakozni akarnak"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Menekülni akarnak"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomácia {0:N0} a szükséges {1:N0}-ból"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Kb. {0:N0} a(z) {1:N0} lényből csatlakozik ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Seregek: a tiéd {0:0.#}-szor erősebb"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Seregek: a csapat {0:0.#}-szor erősebb"}
+
+]
+}

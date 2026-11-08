@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"リサーチ（開発用）"},
+{"sid":"oe.research.ShowFps","text":"画面の隅にフレームレート"},
+{"sid":"oe.research.ShowFps.desc","text":"左上の円の中に、直近1秒間の毎秒フレーム数を表示します。緑：滑らか、琥珀：33msを超えるフレームあり、赤：100msを超えるフレームあり。"},
+{"sid":"oe.research.text.Frames","text":"直近{0:0}秒：{1:0} fps、標準的なフレーム {2:0.0} ms、最悪 {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"33msを超えるフレーム：{0}、100msを超えるフレーム：{1}"},
+{"sid":"oe.research.text.Ours","text":"当MOD：毎秒 {0:0.0} ms（時間の{1:0.0%}）、最悪のフレーム {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"当MODの時間は計測していません（コンソール：perf on）"}
+
+]
+}

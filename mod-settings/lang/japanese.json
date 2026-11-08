@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"MOD"},
+{"sid":"oe.settings.defaults","text":"MODのデフォルト"},
+{"sid":"oe.settings.defaults.desc","text":"このMODのすべてのスイッチをデフォルトに戻します。他のMODとゲームの設定は変わりません。"},
+{"sid":"oe.settings.reset","text":"リセット"},
+{"sid":"oe.settings.version","text":"MOD {0}"},
+{"sid":"oe.settings.mods","text":"MOD {0} · ゲーム{1}向け"},
+{"sid":"oe.settings.mods.other","text":"{0}向け"},
+{"sid":"oe.settings.version.off","text":"MOD {0} 無効"},
+{"sid":"oe.settings.close","text":"閉じる"},
+{"sid":"oe.settings.col.mod","text":"MOD"},
+{"sid":"oe.settings.col.version","text":"バージョン"},
+{"sid":"oe.settings.col.state","text":"状態"}
+]
+}

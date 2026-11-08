@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "nobirds.oldenera.visited",
+  "name": {
+    "brportugese": "Construções visitadas",
+    "czech": "Navštívené budovy",
+    "english": "Visited buildings",
+    "french": "Bâtiments visités",
+    "german": "Besuchte Gebäude",
+    "hungarian": "Meglátogatott épületek",
+    "italian": "Edifici visitati",
+    "japanese": "訪問済みの建物",
+    "korean": "방문한 건물",
+    "polish": "Odwiedzone budowle",
+    "russian": "Посещения",
+    "spanish": "Edificios visitados",
+    "turkish": "Ziyaret edilen yapılar",
+    "ukrainian": "Відвідані будівлі",
+    "zhcn": "已造访的建筑",
+    "zhtw": "已造訪的建築"
+  },
+  "description": {},
+  "author": "fogone",
+  "source": "https://github.com/fogone/olden-era-mods",
+  "releases": [
+    {
+      "version": "0.35.1",
+      "games": [
+        "0.82.07"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [
+        {
+          "name": "OldenEraVisited.dll",
+          "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.35.1/OldenEraVisited.dll",
+          "sha256": "346deda51a9a0a7d37c1ea4a29aba5e27fb24be0411e86fb8ebfbdd52ba92d27"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"部隊提示框"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"以外交圖示顯示「希望加入」"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"當部隊會加入所選英雄時，「希望加入」和外交圖示會取代戰鬥難度。"},
+{"sid":"oe.squadtooltip.ShowFlee","text":"「希望逃跑」"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"當部隊會提出逃跑時，「希望逃跑」取代戰鬥難度，遊戲內建的逃跑圖示（即地圖上部隊上方的那個）取代骷髏。"},
+{"sid":"oe.squadtooltip.ShowIcon","text":"以圖示取代難度骷髏"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"在「希望加入」和「希望逃跑」時，以外交圖示或遊戲內建的逃跑圖示取代骷髏。關閉：僅顯示文字。"},
+{"sid":"oe.squadtooltip.ShowDetails","text":"有外交時顯示外交詳情"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"在有外交的情況下顯示隱藏的數字：英雄和部隊的外交點數、會加入的生物數量，以及英雄軍隊比對方強或弱多少倍。若啟用遊戲設定「隱藏戰鬥危險程度」，則不顯示強弱比。"},
+{"sid":"oe.squadtooltip.text.Join","text":"希望加入"},
+{"sid":"oe.squadtooltip.text.Flee","text":"希望逃跑"},
+{"sid":"oe.squadtooltip.text.Points","text":"外交 {0:N0}，需要 {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"約 {0:N0} / {1:N0} 個生物加入（{2:0%}）"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"軍隊：你的軍隊強 {0:0.#} 倍"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"軍隊：該部隊強 {0:0.#} 倍"}
+]
+}

@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Meglátogatott épületek"},
+{"sid":"oe.visited.ShowBadges","text":"Látogatás jelvények az épület súgója mellett"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Az épület súgójától balra: meglátogatva vagy elérhető, és milyen gyakran látogatható (egyszer, hősönként, játékosonként, hetente vagy naponta)."},
+{"sid":"oe.visited.ShowCaption","text":"„meglátogatva · hetente” felirat"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Egy sor az épület súgójában: meglátogatva vagy elérhető, és a látogatás szabálya szavakkal."},
+{"sid":"oe.visited.HideGameVisited","text":"A játék „Már jártál itt” sorának elrejtése"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"A játék sora megismétli a látogatás jelvényt, elrejthető."},
+{"sid":"oe.visited.Highlight","text":"Meg nem látogatottak kiemelése"},
+{"sid":"oe.visited.Highlight.desc","text":"Hogyan válik ki a még meg nem látogatott objektumok körvonala. A körvonal színét a játék beállításaiban, a Láthatóság alatt lehet megadni."},
+{"sid":"oe.visited.Highlight.Game","text":"mint a játékban"},
+{"sid":"oe.visited.Highlight.Bright","text":"fényesebb"},
+{"sid":"oe.visited.Highlight.Pulse","text":"lüktető"},
+{"sid":"oe.visited.Highlight.Flash","text":"villogó"},
+{"sid":"oe.visited.Highlight.Strobe","text":"stroboszkóp"},
+{"sid":"oe.visited.ShowGuards","text":"Őrök az őrzött épület súgójában"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Ki őrzi a lények lakhelyét vagy más őrzött helyet, és mennyire veszélyes a csata, a csapat súgójához hasonlóan, anélkül, hogy odamennél."},
+{"sid":"oe.visited.text.OneTime","text":"egyszer mindenkinek"},
+{"sid":"oe.visited.text.PerHero","text":"hősönként"},
+{"sid":"oe.visited.text.PerPlayer","text":"játékosonként"},
+{"sid":"oe.visited.text.Unlimited","text":"korlátlan"},
+{"sid":"oe.visited.text.Weekly","text":"hetente újra elérhető"},
+{"sid":"oe.visited.text.Daily","text":"naponta újra elérhető"},
+{"sid":"oe.visited.text.Visited","text":"meglátogatva"},
+{"sid":"oe.visited.text.Available","text":"elérhető"}
+
+]
+}

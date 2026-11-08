@@ -1,0 +1,22 @@
+{
+"tokens": [
+{"sid":"oe.manager.catalog","text":"Mods"},
+{"sid":"oe.manager.status.none","text":"Der Katalog wurde noch nicht gelesen"},
+{"sid":"oe.manager.status.busy","text":"Katalog: in Arbeit..."},
+{"sid":"oe.manager.status.read","text":"Katalog: {0} Mods, {1} Updates"},
+{"sid":"oe.manager.status.failed","text":"Katalog: die letzte Aktion ist fehlgeschlagen, siehe Log"},
+{"sid":"oe.manager.check","text":"Prüfen"},
+{"sid":"oe.manager.install","text":"Installieren"},
+{"sid":"oe.manager.update","text":"Aktualisieren"},
+{"sid":"oe.manager.updateAll","text":"Alle aktualisieren"},
+{"sid":"oe.manager.name","text":"Mod-Manager"},
+{"sid":"oe.manager.note.available","text":"{0} verfügbar"},
+{"sid":"oe.manager.note.notInstalled","text":"nicht installiert"},
+{"sid":"oe.manager.note.required","text":"andere Mods brauchen ihn"},
+{"sid":"oe.manager.note.restart","text":"ändert sich beim nächsten Start"},
+{"sid":"oe.manager.note.removed","text":"entfernt, verschwindet beim nächsten Start"},
+{"sid":"oe.manager.note.noRelease","text":"keine Version für diese Spielversion"},
+{"sid":"oe.manager.note.staged","text":"{0} wird beim nächsten Start installiert"},
+{"sid":"oe.manager.note.failed","text":"das Update ist nicht gestartet, {0} ist zurück"}
+]
+}

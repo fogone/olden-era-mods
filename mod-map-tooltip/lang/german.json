@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Karten-Tooltip"},
+{"sid":"oe.maptooltip.PlaceFree","text":"Tooltip verdeckt das Objekt nicht"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"Verdeckt der Tooltip eines Kartenobjekts das Objekt selbst, wandert er an einen freien Platz: nach oben, rechts, links oder unten, auch abseits der Oberflächenleisten."}
+]
+}

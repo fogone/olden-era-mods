@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"지도 툴팁"},
+{"sid":"oe.maptooltip.PlaceFree","text":"툴팁이 대상을 가리지 않음"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"지도 대상의 툴팁이 그 대상 자체를 가리면 빈 자리(위, 오른쪽, 왼쪽, 아래)로 옮겨 갑니다. 인터페이스 패널도 가리지 않습니다."}
+]
+}

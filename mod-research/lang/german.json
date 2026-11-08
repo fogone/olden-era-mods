@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Forschung (Entwicklung)"},
+{"sid":"oe.research.ShowFps","text":"Bildrate in der Bildschirmecke"},
+{"sid":"oe.research.ShowFps.desc","text":"Oben links, in einer Scheibe: Bilder pro Sekunde der letzten Sekunde. Grün — flüssig, bernsteinfarben — ein Bild über 33 ms, rot — über 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Letzte {0:0} s: {1:0} fps, typisches Bild {2:0.0} ms, schlechtestes {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Bilder über 33 ms: {0}, über 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Unsere Mods: {0:0.0} ms pro Sekunde ({1:0.0%} der Zeit), schlechtestes Bild {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Unsere Mods werden nicht gemessen (Konsole: perf on)"}
+
+]
+}

@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.maptooltip.title","text":"Map tooltip"},
+{"sid":"oe.maptooltip.PlaceFree","text":"Tooltip does not cover the object"},
+{"sid":"oe.maptooltip.PlaceFree.desc","text":"When a map object's tooltip covers the object itself, it moves to a free place: above, to the right, to the left or below, off the interface panels too."}
+]
+}

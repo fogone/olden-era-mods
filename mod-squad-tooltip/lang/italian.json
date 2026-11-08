@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Descrizione della squadra"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"«Vuole unirsi» con l'icona di Diplomazia"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Quando la squadra si unirebbe all'eroe selezionato, «Vuole unirsi» e l'icona di Diplomazia sostituiscono la difficoltà dello scontro."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"«Vuole fuggire»"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Quando la squadra proporrebbe di fuggire, «Vuole fuggire» sostituisce la difficoltà dello scontro e l'icona di fuga del gioco, quella sopra la squadra sulla mappa, sostituisce i teschi."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Un'icona al posto dei teschi di difficoltà"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"Con «Vuole unirsi» e «Vuole fuggire», l'icona di Diplomazia o l'icona di fuga del gioco al posto dei teschi. Disattivato: solo le parole."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Dettagli di Diplomazia dove disponibili"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Mostra i numeri nascosti dove ce ne sono: i punti Diplomazia dell'eroe e della squadra, quante creature si unirebbero, quante volte l'esercito dell'eroe è più forte o più debole. Con l'impostazione del gioco «nascondi il pericolo dello scontro» il rapporto non viene mostrato."},
+{"sid":"oe.squadtooltip.text.Join","text":"Vuole unirsi"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Vuole fuggire"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomazia {0:N0} su {1:N0} necessari"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Circa {0:N0} creature su {1:N0} si uniscono ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Eserciti: il tuo è {0:0.#} volte più forte"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Eserciti: la squadra è {0:0.#} volte più forte"}
+
+]
+}

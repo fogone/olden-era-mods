@@ -1,0 +1,12 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Licznik walki"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Obrażenia i straty z kontrataku w prognozie"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"Po liczbach gry w prognozie obrażeń: miecze i kontratak obrońcy, jego obrażenia i zabite stworzenia. Tylko gdy sama gra uzna, że będzie kontratak."},
+{"sid":"oe.battlecounter.HealthShown","text":"Zdrowie oddziałów w prognozie"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"Jeszcze jeden wiersz prognozy: ikona zdrowia i zdrowie obrońcy, a przy kontrataku zdrowie atakującego po mieczach. Oba: górnego stworzenia i całego oddziału (350 · 12350). Inteligentnie: pojedynczego stworzenia; całego oddziału, a przed nim górnego stworzenia, gdy cios zabija mniej niż dwa."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"wyłączone"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"oba"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"inteligentnie"}
+]
+}

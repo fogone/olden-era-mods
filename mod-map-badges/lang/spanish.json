@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Insignias del mapa"},
+{"sid":"oe.mapbadges.Shown","text":"Mostrar las insignias"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Siempre, solo mientras se mantiene la tecla de información alternativa del juego (Alt, salvo que se cambie), junto con la información adicional del propio juego, o nunca (ni con esa tecla). Para todas las insignias de este mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"siempre"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"con la tecla de información alternativa"},
+{"sid":"oe.mapbadges.Shown.Never","text":"nunca"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Sobre edificios sin visitar y minas ajenas"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Una insignia ámbar sobre cada edificio explorado que el héroe seleccionado aún puede visitar, y sobre las minas que no son tuyas. En la esquina de la insignia de un edificio custodiado, mientras la guardia siga allí, una calavera del color del peligro del combate, o espadas."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Insignia de un edificio"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Solo el signo, o el signo y con qué frecuencia se puede visitar el edificio, como en su descripción emergente."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"solo el signo"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"todos los iconos"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Peligro de la guardia de los edificios"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"En la esquina de la insignia de un edificio custodiado, una calavera del color del peligro del combate para el héroe seleccionado, como las calaveras de la descripción emergente. Desactivado: espadas cruzadas, solo \"custodiado\"."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"\"Capturada\" sobre tus minas"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Una insignia de gema verde sobre las minas del bando del héroe seleccionado."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Sobre objetos recogibles"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Una pequeña insignia sobre los recursos explorados (gema), artefactos (espada) y cofres que aún están en el mapa."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Retratos de unidades sobre las viviendas"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"El retrato de la unidad que recluta la vivienda: brillante mientras queda alguien por reclutar, apagado cuando no queda nadie."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Cuántos reclutar, en el retrato de la vivienda"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Cuántas criaturas tiene ahora la vivienda para reclutar, en la esquina del retrato. No se muestra mientras está custodiada."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Insignias de unión y huida sobre las formaciones"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Sobre las formaciones exploradas, para el héroe seleccionado: el icono de Diplomacia si la formación se uniría, el icono de huida del juego si se ofrecería a huir. Sin cifras."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Calavera de peligro sobre las formaciones"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sobre una formación explorada que ni se uniría ni huiría: una calavera del color del peligro del combate para el héroe seleccionado, como las calaveras de la descripción emergente."}
+]
+}

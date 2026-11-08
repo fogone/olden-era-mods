@@ -1,0 +1,19 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"部队提示框"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"以外交图标显示“希望加入”"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"当部队会加入所选英雄时，“希望加入”和外交图标会取代战斗难度。"},
+{"sid":"oe.squadtooltip.ShowFlee","text":"“希望逃跑”"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"当部队会提出逃跑时，“希望逃跑”取代战斗难度，游戏自带的逃跑图标（即地图上部队上方的那个）取代骷髅。"},
+{"sid":"oe.squadtooltip.ShowIcon","text":"以图标取代难度骷髅"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"在“希望加入”和“希望逃跑”时，以外交图标或游戏自带的逃跑图标取代骷髅。关闭：仅显示文字。"},
+{"sid":"oe.squadtooltip.ShowDetails","text":"有外交时显示外交详情"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"在有外交的情况下显示隐藏的数字：英雄和部队的外交点数、会加入的生物数量，以及英雄军队比对方强或弱多少倍。若启用游戏设置“隐藏战斗危险程度”，则不显示强弱比。"},
+{"sid":"oe.squadtooltip.text.Join","text":"希望加入"},
+{"sid":"oe.squadtooltip.text.Flee","text":"希望逃跑"},
+{"sid":"oe.squadtooltip.text.Points","text":"外交 {0:N0}，需要 {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"约 {0:N0} / {1:N0} 个生物加入（{2:0%}）"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"军队：你的军队强 {0:0.#} 倍"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"军队：该部队强 {0:0.#} 倍"}
+]
+}

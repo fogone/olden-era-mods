@@ -1,0 +1,17 @@
+{
+"tokens": [
+{"sid":"oe.battlecounter.title","text":"Battle counter"},
+{"sid":"oe.battlecounter.ShowCounter","text":"Counterattack damage and losses in the forecast"},
+{"sid":"oe.battlecounter.ShowCounter.desc","text":"The damage forecast in the order things happen, left to right: a counterattack before the strike, the strike, a counterattack after it. A counterattack is swords and amber numbers: its damage and the creatures it kills. Only when the game itself decides there will be one; both for a creature that counterattacks twice."},
+{"sid":"oe.battlecounter.SecondStrike","text":"Double Strike's second strike"},
+{"sid":"oe.battlecounter.SecondStrike.desc","text":"A creature with Double Strike strikes, takes the counterattack, then strikes again. Added to the strike: the forecast's numbers say both strikes. A column: after the counterattack, the row's icon and the second strike's damage and losses, and in the health row (when it is on) the defender's health it hits. Each hit is worked out for the health the stacks have left after the ones before it, wounded top creature and all."},
+{"sid":"oe.battlecounter.SecondStrike.Off","text":"off"},
+{"sid":"oe.battlecounter.SecondStrike.InStrike","text":"added to the strike"},
+{"sid":"oe.battlecounter.SecondStrike.Column","text":"a column"},
+{"sid":"oe.battlecounter.HealthShown","text":"The stacks' health in the forecast"},
+{"sid":"oe.battlecounter.HealthShown.desc","text":"One more forecast row: the health icon and the defender's health, and with a counterattack the attacker's after the swords. One and all: the top creature's and the whole stack's health (350 · 12350). Smart: a lone creature's own; a stack's whole health, with the top creature's before it when the hit kills fewer than two."},
+{"sid":"oe.battlecounter.HealthShown.Off","text":"off"},
+{"sid":"oe.battlecounter.HealthShown.Both","text":"one and all"},
+{"sid":"oe.battlecounter.HealthShown.Smart","text":"smart"}
+]
+}

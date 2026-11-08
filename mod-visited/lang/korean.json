@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"방문한 건물"},
+{"sid":"oe.visited.ShowBadges","text":"건물 툴팁 옆에 방문 배지"},
+{"sid":"oe.visited.ShowBadges.desc","text":"건물 툴팁의 왼쪽에 표시: 방문함 또는 방문 가능 여부, 그리고 방문할 수 있는 빈도(한 번, 영웅별, 플레이어별, 주간, 일간)."},
+{"sid":"oe.visited.ShowCaption","text":"설명 \"방문함 · 주간\""},
+{"sid":"oe.visited.ShowCaption.desc","text":"건물 툴팁의 한 줄: 방문함 또는 방문 가능 여부와 방문 규칙을 글로 표시합니다."},
+{"sid":"oe.visited.HideGameVisited","text":"게임의 \"이미 방문한 곳\" 줄 숨기기"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"게임의 줄은 방문 배지와 내용이 겹치므로 숨길 수 있습니다."},
+{"sid":"oe.visited.Highlight","text":"미방문 강조"},
+{"sid":"oe.visited.Highlight.desc","text":"아직 방문하지 않은 대상의 윤곽선을 강조하는 방식. 윤곽선 색은 게임 설정의 \"가시성\"에서 고릅니다."},
+{"sid":"oe.visited.Highlight.Game","text":"게임 기본"},
+{"sid":"oe.visited.Highlight.Bright","text":"더 밝게"},
+{"sid":"oe.visited.Highlight.Pulse","text":"맥동"},
+{"sid":"oe.visited.Highlight.Flash","text":"번쩍임"},
+{"sid":"oe.visited.Highlight.Strobe","text":"스트로브"},
+{"sid":"oe.visited.ShowGuards","text":"경비되는 건물 툴팁에 경비대"},
+{"sid":"oe.visited.ShowGuards.desc","text":"생물 서식지나 다른 경비되는 장소를 누가 지키는지, 전투가 얼마나 위험한지를 다가가지 않고도 분대 툴팁과 같은 방식으로 표시합니다."},
+{"sid":"oe.visited.text.OneTime","text":"모두에게 한 번"},
+{"sid":"oe.visited.text.PerHero","text":"영웅별"},
+{"sid":"oe.visited.text.PerPlayer","text":"플레이어별"},
+{"sid":"oe.visited.text.Unlimited","text":"제한 없음"},
+{"sid":"oe.visited.text.Weekly","text":"매주 초기화"},
+{"sid":"oe.visited.text.Daily","text":"매일 초기화"},
+{"sid":"oe.visited.text.Visited","text":"방문함"},
+{"sid":"oe.visited.text.Available","text":"방문 가능"}
+
+]
+}

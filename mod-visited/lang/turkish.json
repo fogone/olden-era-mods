@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Ziyaret edilen yapılar"},
+{"sid":"oe.visited.ShowBadges","text":"Yapı ipucunun yanında ziyaret rozetleri"},
+{"sid":"oe.visited.ShowBadges.desc","text":"Yapı ipucunun solunda: ziyaret edildi veya uygun ve ne sıklıkla ziyaret edilebileceği (bir kez, kahraman başına, oyuncu başına, haftalık veya günlük)."},
+{"sid":"oe.visited.ShowCaption","text":"“ziyaret edildi · haftalık” yazısı"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Yapı ipucunda bir satır: ziyaret edildi veya uygun ve ziyaret kuralı yazıyla."},
+{"sid":"oe.visited.HideGameVisited","text":"Oyunun “Önceden ziyaret edildi” satırını gizle"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"Oyunun satırı ziyaret rozetini tekrarlar, gizlenebilir."},
+{"sid":"oe.visited.Highlight","text":"Ziyaret edilmeyenleri vurgula"},
+{"sid":"oe.visited.Highlight.desc","text":"Henüz ziyaret edilmemiş nesnelerin ana hattının nasıl öne çıkacağı. Ana hat rengi oyunun ayarlarında, Görünürlük bölümünde seçilir."},
+{"sid":"oe.visited.Highlight.Game","text":"oyundaki gibi"},
+{"sid":"oe.visited.Highlight.Bright","text":"daha parlak"},
+{"sid":"oe.visited.Highlight.Pulse","text":"nabız gibi atan"},
+{"sid":"oe.visited.Highlight.Flash","text":"yanıp sönen"},
+{"sid":"oe.visited.Highlight.Strobe","text":"strobo"},
+{"sid":"oe.visited.ShowGuards","text":"Korunan yapının ipucunda muhafızlar"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Bir birlik konutunu veya korunan başka bir yeri kimin koruduğu ve savaşın ne kadar tehlikeli olduğu, yanına gitmeden, birlik ipucundaki gibi gösterilir."},
+{"sid":"oe.visited.text.OneTime","text":"herkes için bir kez"},
+{"sid":"oe.visited.text.PerHero","text":"kahraman başına"},
+{"sid":"oe.visited.text.PerPlayer","text":"oyuncu başına"},
+{"sid":"oe.visited.text.Unlimited","text":"sınırsız"},
+{"sid":"oe.visited.text.Weekly","text":"her hafta sıfırlanır"},
+{"sid":"oe.visited.text.Daily","text":"her gün sıfırlanır"},
+{"sid":"oe.visited.text.Visited","text":"ziyaret edildi"},
+{"sid":"oe.visited.text.Available","text":"uygun"}
+
+]
+}

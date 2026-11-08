@@ -1,0 +1,11 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"Investigación (desarrollo)"},
+{"sid":"oe.research.ShowFps","text":"Tasa de fotogramas en la esquina de la pantalla"},
+{"sid":"oe.research.ShowFps.desc","text":"Arriba a la izquierda, en un disco: fotogramas por segundo del último segundo. Verde: fluido; ámbar: un fotograma de más de 33 ms; rojo: de más de 100 ms."},
+{"sid":"oe.research.text.Frames","text":"Últimos {0:0} s: {1:0} fps, fotograma típico {2:0.0} ms, peor {3:0} ms"},
+{"sid":"oe.research.text.Slow","text":"Fotogramas de más de 33 ms: {0}, de más de 100 ms: {1}"},
+{"sid":"oe.research.text.Ours","text":"Nuestros mods: {0:0.0} ms por segundo ({1:0.0%} del tiempo), peor fotograma {2:0.0} ms"},
+{"sid":"oe.research.text.NotTimed","text":"Nuestros mods no se miden (consola: perf on)"}
+]
+}

@@ -1,0 +1,14 @@
+{
+"tokens": [
+{"sid":"oe.common.enabled","text":"Mod etkin"},
+{"sid":"oe.common.enabled.desc","text":"Kapalı bir mod oyunda hiçbir şeyi değiştirmez."},
+{"sid":"oe.common.offHeading","text":"{0} · {1} — kapalı: oyunun {2} sürümü için derlendi"},
+{"sid":"oe.common.versionOff","text":"Modlar kapalı: oyunun {0} sürümü için derlendiler, oyun ise {1}. Bu sürüm için yeniden derlenmeleri gerekir. Kapalı: {2}."},
+{"sid":"oe.common.mode.title","text":"Tüm modlar"},
+{"sid":"oe.common.mode","text":"Modlar ne zaman çalışır"},
+{"sid":"oe.common.mode.desc","text":"Her zaman, yalnızca tek oyunculu oyunda ya da hiçbir zaman. Tek oyunculu olmayan: çevrimiçi, hotseat, tekrar izleme. Çalışmadıkları sürece modlar, sanki yüklü değillermiş gibi hiçbir şeyi değiştirmez ve göstermez; her modun kendi ayarları olduğu gibi kalır."},
+{"sid":"oe.common.mode.Always","text":"her zaman"},
+{"sid":"oe.common.mode.SinglePlayer","text":"tek oyunculu oyunda"},
+{"sid":"oe.common.mode.Off","text":"hiçbir zaman"}
+]
+}

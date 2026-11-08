@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Térkép jelvények"},
+{"sid":"oe.mapbadges.Shown","text":"Jelvények megjelenítése"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Mindig, csak a játék extra info gombjának nyomva tartása alatt (Alt, ha nincs átállítva), a játék saját extra infójával együtt, vagy soha (még a gombbal sem). A mod összes jelvényére vonatkozik."},
+{"sid":"oe.mapbadges.Shown.Always","text":"mindig"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"az extra info gomb nyomva tartása alatt"},
+{"sid":"oe.mapbadges.Shown.Never","text":"soha"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Meg nem látogatott épületek és idegen bányák felett"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Borostyánszínű jelvény minden felderített épület felett, amelyet a kijelölt hős még meglátogathat, és a nem a tiéd bányák felett. Az őrzött épület jelvényének sarkában, amíg az őr ott áll, a csata veszélyének színével koponya, vagy kardok."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Az épület jelvénye"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Csak a jel, vagy a jel és az, hogy milyen gyakran látogatható az épület, mint a súgójában."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"csak a jel"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"minden ikon"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Az épületek őreinek veszélye"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"Az őrzött épület jelvényének sarkában a csata veszélyének színével koponya a kijelölt hősnek, mint a súgó koponyái. Kikapcsolva: keresztezett kardok, csak „őrzött”."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"„Elfoglalva” a bányáid felett"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Zöld drágakő jelvény a kijelölt hős oldalához tartozó bányák felett."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Felvehető tárgyak felett"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Kis jelvény a felderített nyersanyagok (drágakő), varázstárgyak (kard) és a még a térképen fekvő ládák felett."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Lényportrék a lakhelyek felett"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"A lakhely által toborzott lény portréja: fényes, amíg van kit toborozni, halvány, ha nem maradt senki."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Hányat lehet toborozni, a lakhely portréján"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Hány lény áll most toborzásra a lakhelyen, a portré sarkában. Nem látszik, amíg őrzik."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Csatlakozás és menekülés jelvények a csapatok felett"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"A felderített csapatok felett, a kijelölt hősnek: a Diplomácia ikonja, ha a csapat csatlakozna, a játék menekülés ikonja, ha menekülést ajánlana fel. Számok nélkül."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Veszélykoponya a csapatok felett"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Egy felderített csapat felett, amely nem csatlakozna és nem menekülne: a csata veszélyének színével koponya a kijelölt hősnek, mint a súgó koponyái."}
+]
+}

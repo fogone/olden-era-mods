@@ -1,0 +1,7 @@
+{
+"tokens": [
+{"sid":"oe.fixes.title","text":"Game fixes"},
+{"sid":"oe.fixes.DwellingGrowth","text":"Dwellings' growth after a load"},
+{"sid":"oe.fixes.DwellingGrowth.desc","text":"A unit dwelling on the map adds weekly growth of its unit in its owner's towns. After loading a save the game forgets it for the dwellings captured before the save; the fix gives it back, the way the game does on a capture."}
+]
+}

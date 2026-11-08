@@ -1,0 +1,402 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using HarmonyLib;
+using OldenEra.Modding.Common;
+using UnityEngine;
+
+namespace OldenEra.Modding.Research;
+
+// The research commands, one per line, run on the game's main thread, from the file (research.txt) and the local
+// console (127.0.0.1:8766). The tools are GameCode, Members, Probe in mod-common/shared, and Eval (live reflection).
+internal sealed class Commands
+{
+    public const string Help =
+@"# Research of the game's code and live state. A method is Type.method (all its overloads); Type.* is all of the
+# type's own methods. Obfuscated names are fine here: this is for finding what a member does.
+#
+# Live state (Eval: hero, $var, $ = last result, Type.static, .member, .method(args), [i], .as(Type)):
+#   eval hero.cqei.cwfa           the value of an expression
+#   inspect hero                  the object's properties with their values (and its elements, for a list)
+#   methods hero                  the same and its methods' signatures
+#   set $h hero.cqei              keep a value in a variable
+# Code:
+#   members Type                  the type's properties and methods with their signatures
+#   code Type.method              the method's instructions, calls named (CodeResearch.Disassemble)
+#   calls Type.method             the methods it calls directly
+#   callers <regex>               the game's methods calling one whose signature matches, e.g. callers ^Shader\.SetGlobal
+#   shared Type.method            the methods sharing its native code (a patch would hit them all)
+#   aliases [file]                the generated names (docs/game-names.md): the Lookup.Generate lookups run, written as
+#                                 C# (default BepInEx\GameNames.g.cs); nothing written while one finds nothing
+#   types <regex>               the game's types whose name matches (at most 100)
+#   click <path end>              a mouse click on the active UI object whose path ends so (enter, down, up, click, exit),
+#                                 e.g. click OE_Row_nobirds.oldenera.visited/Remove
+#   objects Type                  the live Unity objects of that type (at most 80): name, active, scene, path; each kept as $o0, $o1...
+#   holders Type              the game's properties of that type (who holds a config, a service)
+#   fields Type                 the class's fields with their offsets (code reading [obj+0xB8] reads the one at +0xB8)
+#   slot Type 0x238             the method in the class's virtual slot (code calling [klass+0x238])
+#   string qfz                    the game's hidden string constant <PrivateImplementationDetails>.a.qfz()
+#   probe Type.method [seconds]   watch its calls for a while (default 10 s, at most 200 lines), not on shared code
+#   probed                        the calls seen since the last time (also in the log)
+#   fps [seconds]                 frame rate of the last 10 s (or the seconds given); with perf on, our code by time
+#   perf on | perf off            time our mods' per-frame callbacks and patch methods (fps shows them)
+#   perf add <regex>              also time our plugins' methods whose Type.method matches, e.g. perf add Plugin\.(Describe|GuardDanger); can break them: reload the plugins after
+#   unprobe                     remove the probes
+#   growth [dump]                 the selected hero's side: its towns' hiring (weekly growth, for hire now) and its dwellings;
+#                                 dump: every value of its towns' map objects and of the side, to compare before a save and after a load
+#                                 (issue #7: the growth from dwellings lost after a load)
+";
+
+    readonly Harmony harmony;
+    readonly Action<string> log;
+    readonly ConcurrentQueue<string> probed = new();
+    float probeUntil;
+
+    // The probes are the harmony's patches; what they see also goes to `log`.
+    public Commands(Harmony harmony, Action<string> log)
+    {
+        this.harmony = harmony;
+        this.log = log;
+        perfHarmony = new Harmony(harmony.Id + ".perf");
+        Perf.Log = log;
+    }
+
+    // The timing patches (Perf), apart from the probes: `unprobe` keeps them, `perf off` removes them.
+    readonly Harmony perfHarmony;
+
+    public void Unload() => Perf.Off();
+
+    // Timing on, as the command does (the research plugin's TimeFromStart).
+    public string StartTiming() => Perf.On(perfHarmony);
+
+    // One command; an error is written as its result.
+    public void Run(string line, Action<string> write)
+    {
+        try { Execute(line, write); }
+        catch (Exception e)
+        {
+            var inner = e is TargetInvocationException { InnerException: { } i } ? i : e;
+            write($"{line}: {inner.GetType().Name}: {inner.Message}");
+        }
+    }
+
+    void Execute(string line, Action<string> write)
+    {
+        var words = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var argument = words.Length > 1 ? words[1] : "";
+        var rest = line.Length > words[0].Length ? line[words[0].Length..].Trim() : "";
+        write($"> {line}");
+        switch (words[0])
+        {
+            case "help":
+                write(Help);
+                break;
+            case "eval":
+                write(Eval.Show(Eval.Run(rest)));
+                break;
+            case "inspect":
+            case "methods":
+                write(Eval.Inspect(Eval.Run(rest), words[0] == "methods"));
+                break;
+            case "set":
+                var name = argument.TrimStart('$');
+                var value = Eval.Run(rest[argument.Length..]);
+                Eval.Variables[name] = value;
+                write($"${name} = {Eval.Show(value)}");
+                break;
+            case "members":
+                foreach (var type in Eval.TypesNamed(argument))
+                {
+                    write($"{type.FullName} : {type.BaseType?.Name}");
+                    if (type.IsEnum)
+                        write($"  values {string.Join(", ", Enum.GetNames(type).Select(n => $"{n}=0x{Convert.ToInt64(Enum.Parse(type, n)):X}"))}");
+                    foreach (var p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
+                        write($"  prop {p.PropertyType.Name} {p.Name}");
+                    foreach (var m in type.Methods())
+                        write($"  {(m.IsStatic ? "static " : "")}{m.ReturnType.Name} {GameCode.Signature(m)}");
+                }
+                break;
+            case "code":
+                foreach (var m in MethodsNamed(argument))
+                    CodeResearch.DumpDisassembly(m, write);
+                break;
+            case "calls":
+                foreach (var m in MethodsNamed(argument))
+                    write($"{GameCode.Signature(m)}: {string.Join(", ", GameCode.Calls(m).Select(c => $"+0x{c.offset:X} {GameCode.NameAt(c.target)}"))}");
+                break;
+            case "callers":
+                var pattern = new Regex(rest);
+                foreach (var (caller, offset, target) in GameCode.CallersOf(pattern.IsMatch).Take(300))
+                    write($"{GameCode.Signature(caller)} +0x{offset:X} -> {target}");
+                break;
+            case "shared":
+                foreach (var m in MethodsNamed(argument))
+                    write($"{GameCode.Signature(m)}: {string.Join(", ", GameCode.SharedWith(m).Select(GameCode.Signature))}");
+                break;
+            case "readers":
+                // Which game methods read the static fields of a class (`readers cny`): constants kept in statics, e.g.
+                // the names of the sequence effects, are found by who reads them.
+                var readTypes = Eval.TypesNamed(argument).ToHashSet();
+                var fieldNames = readTypes.SelectMany(t => GameCode.Fields(t).Where(f => f.isStatic).Select(f => (t, f.offset, f.name)))
+                    .ToDictionary(x => (x.t, x.offset), x => x.name);
+                var readerCount = 0;
+                foreach (var reader in Game.Types.SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
+                             .Where(m => !m.IsGenericMethodDefinition))
+                {
+                    List<(Type type, int offset)> reads;
+                    try { reads = GameCode.At(Game.NativeAddress(reader).ToInt64()).FirstOrDefault() == reader ? GameCode.StaticReads(reader) : null; }
+                    catch (Exception) { continue; }
+                    var mine = reads?.Where(r => readTypes.Contains(r.type)).Select(r => fieldNames.GetValueOrDefault((r.type, r.offset), $"+0x{r.offset:X}")).Distinct().ToList();
+                    if (mine is not { Count: > 0 })
+                        continue;
+                    write($"{GameCode.Signature(reader)}: {string.Join(", ", mine)}");
+                    if (++readerCount >= 200)
+                        break;
+                }
+                break;
+            case "aliases":
+                foreach (var report in NamesGenerator.Generate(argument.Length > 0 ? string.Join(" ", words.Skip(1)) : System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GameNames.g.cs"), Application.version))
+                    write(report);
+                break;
+            case "types":
+                var namePattern = new System.Text.RegularExpressions.Regex(argument, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                foreach (var type in Game.Types.Where(t => namePattern.IsMatch(t.FullName ?? t.Name)).Take(100))
+                    write($"  {type.FullName} : {type.BaseType?.Name}");
+                break;
+            case "objects":
+                foreach (var type in Eval.TypesNamed(argument).Where(t => typeof(UnityEngine.Object).IsAssignableFrom(t)))
+                {
+                    var il2cppType = Il2CppInterop.Runtime.Il2CppType.From(type);
+                    var number = 0;
+                    foreach (var o in UnityEngine.Resources.FindObjectsOfTypeAll(il2cppType).Take(80))
+                    {
+                        var go = o.TryCast<UnityEngine.Component>()?.gameObject;
+                        var canvas = o.TryCast<UnityEngine.Canvas>();
+                        // Each one kept as $o<n>, as the type it was asked for, for eval and inspect.
+                        Eval.Variables[$"o{number}"] = ((object)o).CastTo(type);
+                        write($"  $o{number++} {type.Name} '{o.name}'{(canvas != null ? $" order={canvas.sortingOrder} layer={canvas.sortingLayerName} mode={canvas.renderMode} root={canvas.isRootCanvas} scale={canvas.scaleFactor}" : "")}{(go != null ? $" active={go.activeInHierarchy} scene='{go.scene.name}' path={PathOf(go.transform)}" : "")}");
+                    }
+                }
+                break;
+            case "click":
+                // click <path end>: the pointer events of a real click, sent to the object (its handlers up the hierarchy).
+                {
+                    var target = UnityEngine.Resources.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<UnityEngine.Transform>())
+                        .Select(o => o.TryCast<UnityEngine.Transform>())
+                        .FirstOrDefault(t => t != null && t.gameObject.activeInHierarchy && (t.name == rest || PathOf(t).EndsWith("/" + rest)));
+                    if (target == null) { write($"no active object {rest}"); break; }
+                    var go = target.gameObject;
+                    var data = new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current)
+                    {
+                        button = UnityEngine.EventSystems.PointerEventData.InputButton.Left,
+                        position = UnityEngine.RectTransformUtility.WorldToScreenPoint(null, target.position),
+                        clickCount = 1,
+                    };
+                    data.pointerPress = go;
+                    data.rawPointerPress = go;
+                    UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(go, data, UnityEngine.EventSystems.ExecuteEvents.pointerEnterHandler);
+                    UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(go, data, UnityEngine.EventSystems.ExecuteEvents.pointerDownHandler);
+                    UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(go, data, UnityEngine.EventSystems.ExecuteEvents.pointerUpHandler);
+                    var handler = UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(go, data, UnityEngine.EventSystems.ExecuteEvents.pointerClickHandler);
+                    UnityEngine.EventSystems.ExecuteEvents.ExecuteHierarchy(go, data, UnityEngine.EventSystems.ExecuteEvents.pointerExitHandler);
+                    write(handler != null ? $"clicked {PathOf(target)}: handled by {PathOf(handler.transform)}" : $"clicked {PathOf(target)}: nobody handles a click there");
+                }
+                break;
+            case "shot":
+                // shot <file.png>: the game's screen into a file (at the end of this frame), at half size.
+                {
+                    var shot = UnityEngine.ScreenCapture.CaptureScreenshotAsTexture();
+                    var png = UnityEngine.ImageConversion.EncodeToPNG(shot);
+                    UnityEngine.Object.Destroy(shot);
+                    System.IO.File.WriteAllBytes(argument, png);
+                    write($"screenshot {png.Length} bytes into {argument}");
+                }
+                break;
+            case "tree":
+                // tree <object name or path end> [depth]: the objects under it with their components and texts.
+                {
+                    var parts = argument.Split(' ');
+                    var depthLimit = words.Length > 2 && int.TryParse(words[^1], out var d) ? d : 4;
+                    var target = UnityEngine.Resources.FindObjectsOfTypeAll(Il2CppInterop.Runtime.Il2CppType.Of<UnityEngine.Transform>())
+                        .Select(o => o.TryCast<UnityEngine.Transform>()).Where(t => t != null && t.gameObject.scene.IsValid())
+                        .FirstOrDefault(t => t.name == parts[0] || PathOf(t).EndsWith(parts[0]));
+                    if (target == null) { write($"no object {parts[0]}"); break; }
+                    void Tree(UnityEngine.Transform t, int depth)
+                    {
+                        var components = string.Join(",", t.GetComponents<UnityEngine.Component>().Select(c => c.GetIl2CppType().Name).Where(n => n != "Transform" && n != "RectTransform"));
+                        var text = t.GetComponent<TMPro.TMP_Text>() is { } tmp ? $" \"{tmp.text?.Replace("\n", " ")}\"" : "";
+                        var rect = t.TryCast<UnityEngine.RectTransform>() is { } r ? $" {r.rect.width:0}x{r.rect.height:0}" : "";
+                        write($"{new string(' ', depth * 2)}{(t.gameObject.activeSelf ? "" : "-")}{t.name}{rect} [{components}]{text}");
+                        if (depth < depthLimit)
+                            for (var i = 0; i < t.childCount; i++)
+                                Tree(t.GetChild(i), depth + 1);
+                    }
+                    Tree(target, 0);
+                }
+                break;
+            case "holders":
+                foreach (var type in Eval.TypesNamed(argument))
+                    foreach (var p in Game.Types.SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
+                                 .Where(p => p.PropertyType == type))
+                        write($"  {(p.GetMethod?.IsStatic == true ? "static " : "")}{p.DeclaringType?.FullName}.{p.Name} : {type.Name}");
+                break;
+            case "fields":
+                foreach (var type in Eval.TypesNamed(argument))
+                {
+                    write($"{type.FullName}:");
+                    foreach (var f in GameCode.Fields(type))
+                        write($"  {(f.isStatic ? "static " : "")}+0x{f.offset:X} {f.type} {f.name}");
+                }
+                break;
+            case "slot":
+                foreach (var type in Eval.TypesNamed(argument))
+                    write(CodeResearch.VirtualSlot(type, Convert.ToInt32(words[2], 16)));
+                break;
+            case "string":
+                write($"a.{argument}() = {(CodeResearch.HiddenString(argument) is { } s ? $"\"{s}\"" : "no such method")}");
+                break;
+            case "strings":
+                var valuePattern = new Regex(rest);
+                foreach (var (method, text) in CodeResearch.HiddenStrings().Where(h => valuePattern.IsMatch(h.value)).Take(100))
+                    write($"a.{method}() = \"{text}\"");
+                break;
+            case "probe":
+                var seconds = words.Length > 2 ? float.Parse(words[2], CultureInfo.InvariantCulture) : 10f;
+                probeUntil = Time.unscaledTime + seconds;
+                var patched = Probe.Calls(harmony, MethodsNamed(argument), () => Time.unscaledTime < probeUntil, text =>
+                {
+                    probed.Enqueue(text);
+                    log(text);
+                });
+                write($"probing {seconds} s: {Members.Names(patched)}");
+                break;
+            case "probed":
+                while (probed.TryDequeue(out var call))
+                    write(call);
+                break;
+            case "growth":
+                foreach (var growthLine in words.Length > 1 && words[1] == "dump" ? GrowthDump() : Growth())
+                    write(growthLine);
+                break;
+            case "fps":
+                foreach (var report in Perf.Report(words.Length > 1 && float.TryParse(words[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var perfSeconds) ? perfSeconds : 10f))
+                    write(report);
+                break;
+            case "perf":
+                write(argument == "off" ? Perf.Off() : argument == "add" && words.Length > 2 ? Perf.Add(string.Join(" ", words.Skip(2))) : Perf.On(perfHarmony));
+                break;
+            case "unprobe":
+                harmony.UnpatchSelf();
+                write("probes removed");
+                break;
+            default:
+                write($"unknown command {words[0]} (help: the list)");
+                break;
+        }
+    }
+
+    // Type.method: the method's overloads; Type.*: the type's own methods.
+    static string PathOf(UnityEngine.Transform t) => t.parent != null ? $"{PathOf(t.parent)}/{t.name}" : t.name;
+
+    static IEnumerable<MethodInfo> MethodsNamed(string name)
+    {
+        var dot = name.LastIndexOf('.');
+        if (dot < 0)
+            throw new FormatException($"Type.method expected, not {name}");
+        var (type, method) = (name[..dot], name[(dot + 1)..]);
+        return Eval.TypesNamed(type).SelectMany(t => t.Methods()).Where(m => method == "*" || m.Name == method);
+    }
+
+    // The selected hero's side's towns (their hiring buildings: per unit, the weekly growth and how many to hire now) and
+    // its unit dwellings on the map (their units and weekly growth, the bonus they give a town): to compare before a save
+    // and after loading it (issue #7).
+    static IEnumerable<string> Growth()
+    {
+        if (Game.SelectedHero?.HeroSide is not { } side || Game.MapObjects() is not { } objects)
+        {
+            yield return "no selected hero or no map";
+            yield break;
+        }
+        yield return $"side {side.index}";
+        foreach (var mapObject in objects)
+        {
+            if (mapObject?.ObjectData is not { } data || data.ownerSide != side.index)
+                continue;
+            if (data.TryCast<Hex.Session.Data.ObjCity>() is { } city)
+            {
+                yield return $"TOWN {city.cityName} ({data.sidConfig} #{data.idMapObject})";
+                var hires = city.buildings?.hires;
+                for (var i = 0; hires != null && i < hires.Count; i++)
+                {
+                    var hire = hires[i];
+                    var sets = hire?.assortment?.unitSets;
+                    for (var j = 0; sets != null && j < sets.Count; j++)
+                        if (sets[j] is { } set)
+                            yield return $"  {hire.sid} lvl {hire.level} built={hire.isConstructed}: {(set.sids?.Count > 0 ? set.sids[0] : "?")} weekly {set.weeklyIncrement}, to hire {set.currentAmount}";
+                }
+            }
+            else if (data.TryCast<Hex.Session.Data.ObjHire>() is { } dwelling)
+            {
+                var sets = dwelling.assortmentData?.unitSets;
+                var units = sets == null ? "" : string.Join(", ", Enumerable.Range(0, sets.Count).Select(k => sets[k]).Where(s => s != null)
+                    .Select(s => $"{(s.sids?.Count > 0 ? s.sids[0] : "?")} weekly {s.weeklyIncrement}, to hire {s.currentAmount}"));
+                yield return $"DWELLING {data.sidConfig} #{data.idMapObject}: {units}";
+            }
+        }
+    }
+
+    // Every value of the selected hero's side's towns (their map objects, the game's live logic with the data under it)
+    // and of the side wrapper, two levels deep: numbers, flags, strings, the counts of lists and dictionaries. To diff a
+    // dump before a save with one after the load (issue #7).
+    static IEnumerable<string> GrowthDump()
+    {
+        if (Game.MapObjects() is not { } objects)
+            yield break;
+        // The selected hero's side, else the first player's (0): after a load no hero is selected yet.
+        var hero = Game.SelectedHero;
+        var sideIndex = hero?.HeroSide?.index ?? 0;
+        var lines = new List<string>();
+        if (hero != null)
+            Dump("side", hero.SideOwner, 0, lines, new HashSet<IntPtr>());
+        foreach (var mapObject in objects)
+            if (mapObject?.ObjectData is { } data && data.ownerSide == sideIndex && data.TryCast<Hex.Session.Data.ObjCity>() != null)
+                Dump($"town#{data.idMapObject}", mapObject, 0, lines, new HashSet<IntPtr>());
+        foreach (var line in lines)
+            yield return line;
+    }
+
+    static void Dump(string path, object value, int depth, List<string> lines, HashSet<IntPtr> seen)
+    {
+        if (value is not Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase obj || obj.Pointer == IntPtr.Zero || !seen.Add(obj.Pointer))
+            return;
+        foreach (var property in obj.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (property.GetIndexParameters().Length > 0 || property.Name is "Pointer" or "ObjectClass" or "WasCollected" || property.Name.StartsWith("_"))
+                continue;
+            object v;
+            try { v = property.GetValue(obj); }
+            catch { continue; }
+            var name = $"{path}.{property.Name}";
+            switch (v)
+            {
+                case null:
+                    lines.Add($"{name} = null");
+                    break;
+                case int or float or bool or string or Enum:
+                    lines.Add($"{name} = {v}");
+                    break;
+                case Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase child:
+                    var count = child.GetType().GetProperty("Count")?.GetValue(child);
+                    if (count != null)
+                        lines.Add($"{name} : {child.GetType().Name} count {count}");
+                    else if (depth < 2 && child.GetType().Assembly == typeof(Hex.UI.ELang).Assembly)
+                        Dump(name, child, depth + 1, lines, seen);
+                    break;
+            }
+        }
+    }
+}

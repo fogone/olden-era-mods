@@ -1,0 +1,20 @@
+{
+"tokens": [
+{"sid":"oe.squadtooltip.title","text":"Popisek oddílu"},
+{"sid":"oe.squadtooltip.ShowJoin","text":"„Chtějí se připojit“ s ikonou Diplomacie"},
+{"sid":"oe.squadtooltip.ShowJoin.desc","text":"Když by se oddíl připojil k vybranému hrdinovi, „Chtějí se připojit“ a ikona Diplomacie nahradí obtížnost bitvy."},
+{"sid":"oe.squadtooltip.ShowFlee","text":"„Chtějí uprchnout“"},
+{"sid":"oe.squadtooltip.ShowFlee.desc","text":"Když by oddíl nabídl útěk, „Chtějí uprchnout“ nahradí obtížnost bitvy a herní ikona útěku, ta nad oddílem na mapě, nahradí lebky."},
+{"sid":"oe.squadtooltip.ShowIcon","text":"Ikona místo lebek obtížnosti"},
+{"sid":"oe.squadtooltip.ShowIcon.desc","text":"U „Chtějí se připojit“ a „Chtějí uprchnout“ ikona Diplomacie nebo herní ikona útěku místo lebek. Vypnuto: jen slova."},
+{"sid":"oe.squadtooltip.ShowDetails","text":"Podrobnosti o Diplomacii, kde jsou"},
+{"sid":"oe.squadtooltip.ShowDetails.desc","text":"Ukáže skrytá čísla, kde jsou: body Diplomacie hrdiny a oddílu, kolik stvoření by se připojilo, kolikrát je armáda hrdiny silnější nebo slabší. Při herním nastavení „skrýt nebezpečnost bitvy“ se poměr nezobrazuje."},
+{"sid":"oe.squadtooltip.text.Join","text":"Chtějí se připojit"},
+{"sid":"oe.squadtooltip.text.Flee","text":"Chtějí uprchnout"},
+{"sid":"oe.squadtooltip.text.Points","text":"Diplomacie {0:N0} z potřebných {1:N0}"},
+{"sid":"oe.squadtooltip.text.JoinCount","text":"Připojí se asi {0:N0} z {1:N0} stvoření ({2:0%})"},
+{"sid":"oe.squadtooltip.text.HeroStronger","text":"Armády: ta vaše je {0:0.#}krát silnější"},
+{"sid":"oe.squadtooltip.text.SquadStronger","text":"Armády: oddíl je {0:0.#}krát silnější"}
+
+]
+}

@@ -1,0 +1,28 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Construções visitadas"},
+{"sid":"oe.visited.ShowBadges","text":"Emblemas de visita junto à dica da construção"},
+{"sid":"oe.visited.ShowBadges.desc","text":"À esquerda da dica de uma construção: visitada ou disponível, e com que frequência ela pode ser visitada (uma vez, por herói, por jogador, semanal ou diária)."},
+{"sid":"oe.visited.ShowCaption","text":"Legenda \"visitada · semanal\""},
+{"sid":"oe.visited.ShowCaption.desc","text":"Uma linha na dica da construção: visitada ou disponível e a regra de visita em palavras."},
+{"sid":"oe.visited.HideGameVisited","text":"Ocultar a linha \"Já visitado\" do jogo"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"A linha do jogo repete o emblema de visita, e pode ser ocultada."},
+{"sid":"oe.visited.Highlight","text":"Destaque do não visitado"},
+{"sid":"oe.visited.Highlight.desc","text":"Como o contorno dos objetos ainda não visitados se destaca. A cor do contorno é escolhida nas configurações do jogo, Visibilidade."},
+{"sid":"oe.visited.Highlight.Game","text":"como o jogo faz"},
+{"sid":"oe.visited.Highlight.Bright","text":"mais brilhante"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsante"},
+{"sid":"oe.visited.Highlight.Flash","text":"piscante"},
+{"sid":"oe.visited.Highlight.Strobe","text":"estroboscópico"},
+{"sid":"oe.visited.ShowGuards","text":"Guardas na dica de uma construção protegida"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Quem protege uma moradia de unidades ou outro local protegido e quão perigosa é a batalha, mostrado como na dica de um grupo, sem precisar chegar perto."},
+{"sid":"oe.visited.text.OneTime","text":"uma vez para todos"},
+{"sid":"oe.visited.text.PerHero","text":"por herói"},
+{"sid":"oe.visited.text.PerPlayer","text":"por jogador"},
+{"sid":"oe.visited.text.Unlimited","text":"sem limite"},
+{"sid":"oe.visited.text.Weekly","text":"reinicia toda semana"},
+{"sid":"oe.visited.text.Daily","text":"reinicia todo dia"},
+{"sid":"oe.visited.text.Visited","text":"visitada"},
+{"sid":"oe.visited.text.Available","text":"disponível"}
+]
+}

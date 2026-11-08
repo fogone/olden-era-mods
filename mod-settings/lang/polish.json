@@ -1,0 +1,16 @@
+{
+"tokens": [
+{"sid":"oe.settings.tab","text":"Mody"},
+{"sid":"oe.settings.defaults","text":"Ustawienia domyślne modu"},
+{"sid":"oe.settings.defaults.desc","text":"Przywraca wszystkie przełączniki tego modu do wartości domyślnych. Inne mody i ustawienia gry pozostają bez zmian."},
+{"sid":"oe.settings.reset","text":"Resetuj"},
+{"sid":"oe.settings.version","text":"mody {0}"},
+{"sid":"oe.settings.mods","text":"Mody {0} · do gry {1}"},
+{"sid":"oe.settings.mods.other","text":"do {0}"},
+{"sid":"oe.settings.version.off","text":"mody {0} wyłączone"},
+{"sid":"oe.settings.close","text":"Zamknij"},
+{"sid":"oe.settings.col.mod","text":"Mod"},
+{"sid":"oe.settings.col.version","text":"Wersja"},
+{"sid":"oe.settings.col.state","text":"Stan"}
+]
+}

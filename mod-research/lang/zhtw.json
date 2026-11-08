@@ -1,0 +1,11 @@
+{
+"tokens": [
+{"sid":"oe.research.title","text":"研究（開發用）"},
+{"sid":"oe.research.ShowFps","text":"螢幕角落顯示影格率"},
+{"sid":"oe.research.ShowFps.desc","text":"左上角圓盤中顯示最近一秒的每秒影格數。綠色——流暢，琥珀色——有影格超過 33 毫秒，紅色——超過 100 毫秒。"},
+{"sid":"oe.research.text.Frames","text":"最近 {0:0} 秒：{1:0} fps，典型影格 {2:0.0} 毫秒，最慢 {3:0} 毫秒"},
+{"sid":"oe.research.text.Slow","text":"超過 33 毫秒的影格：{0}，超過 100 毫秒的影格：{1}"},
+{"sid":"oe.research.text.Ours","text":"我們的模組：每秒 {0:0.0} 毫秒（佔 {1:0.0%} 的時間），最慢影格 {2:0.0} 毫秒"},
+{"sid":"oe.research.text.NotTimed","text":"我們的模組未計時（主控台：perf on）"}
+]
+}

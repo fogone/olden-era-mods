@@ -1,0 +1,29 @@
+{
+"tokens": [
+{"sid":"oe.visited.title","text":"Edifici visitati"},
+{"sid":"oe.visited.ShowBadges","text":"Icone di visita accanto alla descrizione dell'edificio"},
+{"sid":"oe.visited.ShowBadges.desc","text":"A sinistra della descrizione di un edificio: visitato o disponibile, e quanto spesso può essere visitato (una volta, per eroe, per giocatore, ogni settimana o ogni giorno)."},
+{"sid":"oe.visited.ShowCaption","text":"Didascalia «visitato · settimanale»"},
+{"sid":"oe.visited.ShowCaption.desc","text":"Una riga nella descrizione dell'edificio: visitato o disponibile e la regola di visita a parole."},
+{"sid":"oe.visited.HideGameVisited","text":"Nascondi la riga «Visita già avvenuta» del gioco"},
+{"sid":"oe.visited.HideGameVisited.desc","text":"La riga del gioco ripete l'icona di visita, può essere nascosta."},
+{"sid":"oe.visited.Highlight","text":"Evidenziazione dei luoghi non visitati"},
+{"sid":"oe.visited.Highlight.desc","text":"Come risalta il contorno degli oggetti non ancora visitati. Il colore del contorno si sceglie nelle impostazioni del gioco, Visibilità."},
+{"sid":"oe.visited.Highlight.Game","text":"come nel gioco"},
+{"sid":"oe.visited.Highlight.Bright","text":"più luminoso"},
+{"sid":"oe.visited.Highlight.Pulse","text":"pulsante"},
+{"sid":"oe.visited.Highlight.Flash","text":"lampeggiante"},
+{"sid":"oe.visited.Highlight.Strobe","text":"stroboscopico"},
+{"sid":"oe.visited.ShowGuards","text":"Guardie nella descrizione di un edificio sorvegliato"},
+{"sid":"oe.visited.ShowGuards.desc","text":"Chi sorveglia una dimora di unità o un altro luogo sorvegliato e quanto è pericoloso lo scontro, mostrati come nella descrizione di una squadra, senza avvicinarsi."},
+{"sid":"oe.visited.text.OneTime","text":"una volta per tutti"},
+{"sid":"oe.visited.text.PerHero","text":"per eroe"},
+{"sid":"oe.visited.text.PerPlayer","text":"per giocatore"},
+{"sid":"oe.visited.text.Unlimited","text":"senza limiti"},
+{"sid":"oe.visited.text.Weekly","text":"si azzera ogni settimana"},
+{"sid":"oe.visited.text.Daily","text":"si azzera ogni giorno"},
+{"sid":"oe.visited.text.Visited","text":"visitato"},
+{"sid":"oe.visited.text.Available","text":"disponibile"}
+
+]
+}

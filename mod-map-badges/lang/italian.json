@@ -1,0 +1,30 @@
+{
+"tokens": [
+{"sid":"oe.mapbadges.title","text":"Icone sulla mappa"},
+{"sid":"oe.mapbadges.Shown","text":"Mostra le icone"},
+{"sid":"oe.mapbadges.Shown.desc","text":"Sempre, solo mentre è premuto il tasto info extra del gioco (Alt se non riassegnato), insieme alle info extra del gioco, oppure mai (nemmeno con quel tasto). Per tutte le icone di questa mod."},
+{"sid":"oe.mapbadges.Shown.Always","text":"sempre"},
+{"sid":"oe.mapbadges.Shown.Alt","text":"mentre è premuto il tasto info extra"},
+{"sid":"oe.mapbadges.Shown.Never","text":"mai"},
+{"sid":"oe.mapbadges.ShowBuildings","text":"Sopra gli edifici non visitati e le miniere altrui"},
+{"sid":"oe.mapbadges.ShowBuildings.desc","text":"Un'icona ambra sopra ogni edificio esplorato che l'eroe selezionato può ancora visitare, e sopra le miniere che non sono tue. Nell'angolo dell'icona di un edificio sorvegliato, finché la guardia è lì: un teschio del colore del pericolo dello scontro, oppure spade."},
+{"sid":"oe.mapbadges.BuildingIcons","text":"Icona di un edificio"},
+{"sid":"oe.mapbadges.BuildingIcons.desc","text":"Solo il segno, oppure il segno e quanto spesso l'edificio può essere visitato, come nella sua descrizione."},
+{"sid":"oe.mapbadges.BuildingIcons.Sign","text":"solo il segno"},
+{"sid":"oe.mapbadges.BuildingIcons.All","text":"tutte le icone"},
+{"sid":"oe.mapbadges.ShowGuardDanger","text":"Pericolo della guardia degli edifici"},
+{"sid":"oe.mapbadges.ShowGuardDanger.desc","text":"Nell'angolo dell'icona di un edificio sorvegliato, un teschio del colore del pericolo dello scontro per l'eroe selezionato, come i teschi della descrizione. Disattivato: spade incrociate, solo «sorvegliato»."},
+{"sid":"oe.mapbadges.ShowOwnMines","text":"«Conquistata» sopra le tue miniere"},
+{"sid":"oe.mapbadges.ShowOwnMines.desc","text":"Un'icona a forma di gemma verde sopra le miniere dello schieramento dell'eroe selezionato."},
+{"sid":"oe.mapbadges.ShowPickups","text":"Sopra gli oggetti da raccogliere"},
+{"sid":"oe.mapbadges.ShowPickups.desc","text":"Una piccola icona sopra le risorse esplorate (gemma), gli artefatti (spada) e i forzieri ancora sulla mappa."},
+{"sid":"oe.mapbadges.ShowDwellings","text":"Ritratti delle unità sopra le dimore"},
+{"sid":"oe.mapbadges.ShowDwellings.desc","text":"Il ritratto dell'unità che la dimora recluta: luminoso finché c'è qualcuno da reclutare, spento quando non è rimasto nessuno."},
+{"sid":"oe.mapbadges.ShowDwellingCount","text":"Quante reclutare, sul ritratto della dimora"},
+{"sid":"oe.mapbadges.ShowDwellingCount.desc","text":"Quante creature la dimora ha ora da reclutare, nell'angolo del ritratto. Non mostrato finché è sorvegliata."},
+{"sid":"oe.mapbadges.ShowSquads","text":"Icone di unione e fuga sopra le squadre"},
+{"sid":"oe.mapbadges.ShowSquads.desc","text":"Sopra le squadre esplorate, per l'eroe selezionato: l'icona di Diplomazia se la squadra si unirebbe, l'icona di fuga del gioco se proporrebbe di fuggire. Senza numeri."},
+{"sid":"oe.mapbadges.ShowSquadDanger","text":"Teschio di pericolo sopra le squadre"},
+{"sid":"oe.mapbadges.ShowSquadDanger.desc","text":"Sopra una squadra esplorata che non si unirebbe né fuggirebbe: un teschio del colore del pericolo dello scontro per l'eroe selezionato, come i teschi della descrizione."}
+]
+}
