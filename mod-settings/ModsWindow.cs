@@ -673,7 +673,7 @@ public partial class Plugin
             // The catalog it comes from on top (fogone 08.11), "by hand" when none; the version; the note ("by hand" once).
             var origin = mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand");
             var note = mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "";
-            RowInfo(row, origin, mod.Installed ?? "", note == origin ? "" : note);
+            RowInfo(row, origin, mod.Installed ?? "", string.Equals(note, origin, StringComparison.CurrentCultureIgnoreCase) ? "" : note);
         }
         if (catalog)
             return;
