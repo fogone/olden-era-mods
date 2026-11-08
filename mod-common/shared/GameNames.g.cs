@@ -16,6 +16,7 @@ global using GameDwelling = global::fpq;
 global using GameEntity = global::fhf;
 global using GameForecast = global::exv;
 global using GameHero = global::fgd;
+global using GameInputBoxOptions = global::dck;
 global using GameIntroStep = global::ccj;
 global using GameLocalization = global::cav;
 global using GameLocalizedText = global::cpz;
@@ -23,6 +24,8 @@ global using GameMapGameSession = global::dcz;
 global using GameMapObject = global::fql;
 global using GameMapObjectStore = global::fqm;
 global using GameMapSession = global::feh;
+global using GameMessageBoxButton = global::dcm;
+global using GameMessageBoxOptions = global::dcl;
 global using GameModelHolder = global::bye;
 global using GameParty = global::eco;
 global using GameSession = global::dkd;
@@ -36,6 +39,7 @@ global using GameSquad = global::frc;
 global using GameSquadEntity = global::fgy;
 global using GameSquadStore = global::fre;
 global using GameSquadView = global::fno;
+global using GameTabItem = global::cia;
 global using GameTooltipOptions = global::crv;
 global using GameTooltipPositioner = global::cxg;
 global using GameUnitBase = global::eon;
@@ -194,6 +198,27 @@ internal static class GameNames
         public GameSide SideOwner => hero.cqej;
     }
 
+    extension(GameInputBoxOptions inputBoxOptions)
+    {
+        // input box cancel text: dck.chgc : String
+        public string CancelText { get => inputBoxOptions.chgc; set => inputBoxOptions.chgc = value; }
+
+        // input box caption: dck.chfz : String
+        public string Caption { get => inputBoxOptions.chfz; set => inputBoxOptions.chfz = value; }
+
+        // input box confirm text: dck.chgb : String
+        public string ConfirmText { get => inputBoxOptions.chgb; set => inputBoxOptions.chgb = value; }
+
+        // input box on cancel: dck.chgh : Action
+        public global::Il2CppSystem.Action OnCancel { get => inputBoxOptions.chgh; set => inputBoxOptions.chgh = value; }
+
+        // input box on confirm: dck.chgi : Action`1
+        public global::Il2CppSystem.Action<string> OnConfirm { get => inputBoxOptions.chgi; set => inputBoxOptions.chgi = value; }
+
+        // input box placeholder: dck.chga : String
+        public string Placeholder { get => inputBoxOptions.chga; set => inputBoxOptions.chga = value; }
+    }
+
     extension(GameIntroStep introStep)
     {
         // intro videos step done: ccj.ccgc : Boolean
@@ -243,6 +268,30 @@ internal static class GameNames
 
         // map session -> squads: feh.cpyf : fre
         public GameSquadStore Squads => mapSession.cpyf;
+    }
+
+    extension(GameMessageBoxButton messageBoxButton)
+    {
+        // message box button click: dcm.chgw : Action
+        public global::Il2CppSystem.Action Click { get => messageBoxButton.chgw; set => messageBoxButton.chgw = value; }
+
+        // message box button label: dcm.chgv : String
+        public string Label { get => messageBoxButton.chgv; set => messageBoxButton.chgv = value; }
+    }
+
+    extension(GameMessageBoxOptions messageBoxOptions)
+    {
+        // message box cancel button: dcl.chgq : dcm
+        public GameMessageBoxButton Cancel { get => messageBoxOptions.chgq; set => messageBoxOptions.chgq = value; }
+
+        // message box caption: dcl.chgl : String
+        public string Caption { get => messageBoxOptions.chgl; set => messageBoxOptions.chgl = value; }
+
+        // message box confirm button: dcl.chgp : dcm
+        public GameMessageBoxButton Confirm { get => messageBoxOptions.chgp; set => messageBoxOptions.chgp = value; }
+
+        // message box text: dcl.chgm : String
+        public string Text { get => messageBoxOptions.chgm; set => messageBoxOptions.chgm = value; }
     }
 
     extension(GameModelHolder modelHolder)
@@ -344,6 +393,18 @@ internal static class GameNames
         public global::System.Collections.Generic.IEnumerable<global::Hex.Configs.BuffData> BuffDatas => GameNames.Each<global::Hex.Configs.BuffData>(() => it.data);
     }
 
+    extension(global::Hex.GameHub.UICommon.BhTab it)
+    {
+        // hub tab click: BhTab.ccmi : Action`1
+        public global::Il2CppSystem.Action<GameTabItem> Click { get => it.ccmi; set => it.ccmi = value; }
+
+        // hub tab available: BhTab.jiu(Boolean) : Void
+        public void SetAvailable(bool a0) => it.jiu(a0);
+
+        // hub tab selected look: BhTab.jiv(Boolean) : Void
+        public void ShowSelected(bool a0) => it.jiv(a0);
+    }
+
     extension(global::Hex.Session.Battle.Unit it)
     {
         // Unit -> UnitData: Unit.cpgw : UnitData
@@ -422,6 +483,12 @@ internal static class GameNames
         public global::Hex.Settings.UI.BhSettingsSection ShownSection => it.bwrx;
     }
 
+    extension(global::Hex.UI.BhGenericButton it)
+    {
+        // button available: BhGenericButton.uhb(Boolean) : Void
+        public void SetAvailable(bool a0) => it.uhb(a0);
+    }
+
     extension(global::Hex.UI.BhSkulls it)
     {
         // BhSkulls level colour: BhSkulls.umq(Int32) : Color
@@ -453,6 +520,12 @@ internal static class GameNames
     {
         // menu button click: BhNavigationButton.chbk : Action
         public global::Il2CppSystem.Action MenuClick { get => it.chbk; set => it.chbk = value; }
+    }
+
+    extension(global::Hex.UI.GeneralKit.BhToggle it)
+    {
+        // check mark show value: BhToggle.yes(Boolean) : Void
+        public void ShowValue(bool a0) => it.yes(a0);
     }
 
     extension(global::Hex.UI.Tooltips.BhTooltip it)
