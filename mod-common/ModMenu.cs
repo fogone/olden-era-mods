@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
@@ -255,7 +255,8 @@ public sealed record ModEntry(
     bool RequiredByOthers,                  // installed mods need it: no switch, no remove
     IReadOnlyList<string> RequiresKeys,     // the names of the mods it needs
     IReadOnlyList<ModScreenshot> Screenshots,
-    string NoteKey);                        // a note on its state (restart needed, removed, no release...), or null
+    string NoteKey,                         // a note on its state (restart needed, removed, no release...), or null
+    bool ByHand = false);                   // loaded by BepInEx itself (plugins, devplugins): its switch works, no update nor remove
 
 // A screenshot of a mod: its file on disk once downloaded (checked by sha256, cached), else null; its caption key or null.
 public sealed record ModScreenshot(string Path, string CaptionKey);

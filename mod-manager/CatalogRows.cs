@@ -23,7 +23,7 @@ public static class CatalogRows
         var catalog = ManagerService.Catalog;
         var signature = string.Join("|", ManagerService.Busy, ManagerService.LastFailed, catalog?.Count ?? -1, ManagerService.Updates.Count,
             status.State, status.Version, string.Join(",", ModLoader.State.Mods.Select(m => m.Id + m.Version + m.Enabled)), string.Join(",", ModLoader.Pending.Keys),
-            ManagerService.ScreensRevision, SourcesSignature());
+            ManagerService.ScreensRevision, SourcesSignature(), ByHandSignature());
         if (signature == shown)
             return;
         shown = signature;
@@ -33,6 +33,11 @@ public static class CatalogRows
     // What the sources show: their URLs, names, counts, states, check settings, and the last note on adding or removing one.
     static string SourcesSignature() => string.Join(";", ManagerService.Sources.Select(s => s + "," + ManagerService.SourceSettings(s)?.Name + "," + ManagerService.SourceSettings(s)?.CheckEvery + "," + ManagerService.SourceSettings(s)?.LastChecked?.Ticks)) + "/" +
         string.Join(";", ManagerService.SourceResults.Select(r => $"{r.Url},{r.Name},{r.Mods},{r.State}")) + "/" + ManagerService.SourceNote?.Key + ManagerService.SourceNote?.Args.FirstOrDefault();
+
+    // The mods with a menu that the manager did not install: their set, versions, switches and state.
+    static IEnumerable<ModMenu> ByHand() => ModMenu.All.Where(m => m.Guid != ManagerService.ManagerId && ModLoader.State.Find(m.Guid) == null);
+
+    static string ByHandSignature() => ModMenu.Revision + ":" + string.Join(",", ByHand().Select(m => m.Guid + m.Version + m.Enabled.Value + m.IsOff));
 
     static string Compose(string key, Func<ELang, string> text) => Texts.Compose(Prefix + key, text);
 
@@ -166,6 +171,19 @@ public static class CatalogRows
                 mods.Add(Entry(id, meta, null, removed ? null : release?.Version, false, null, false,
                     release?.Requires.Select(r => r.Id) ?? Array.Empty<string>(), Note(id, note)));
             }
+        }
+        // Mods BepInEx loaded by itself (plugins, devplugins): shown with their menu's version and switch; the catalog's
+        // release is only information (the manager does not replace files it did not put there).
+        foreach (var menu in ByHand())
+        {
+            var guid = menu.Guid;
+            var meta = MetaOf(guid);
+            var release = meta == null ? null : CatalogClient.ReleaseFor(meta, gameVersion);
+            var entry = Entry(guid, meta, menu.Version, release?.Version, false, menu.IsOff ? null : menu.Enabled.Value, false, Array.Empty<string>(),
+                Note(guid, menu.IsOff ? "oe.manager.note.byHandOff" : "oe.manager.note.byHand"));
+            // The name from the mod's own title (not the meta file's).
+            mods.RemoveAll(m => Same(m.Id, guid));
+            mods.Add(entry with { NameKey = Compose(guid + ".name", l => Texts.GetIn(l, $"oe.{menu.Id}.title")), ByHand = true });
         }
         mods = mods.OrderBy(m => Texts.GetIn(Texts.Language, m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
         ModCatalog.Set("oe.manager.catalog", manager, mods, sources);
