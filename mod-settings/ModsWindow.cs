@@ -221,6 +221,14 @@ public partial class Plugin
 
         var root = window.transform;
         var sar = root.Find("ShowAnimationRoot");
+        // The screen as it is when shown: its show animation (taken off) starts it a little smaller and lower (0.98,
+        // 58 lower on 0.82.7) and ends at its own size, 18.6 lower than the middle (measured on screen against a copy of
+        // the shown screen, 08.11).
+        sar.localScale = Vector3.one;
+        sar.localPosition = new Vector3(0f, -18.6f, 0f);
+        // Its backdrop opaque: the Load screen hides the menu under it, our copy does not.
+        if (root.Find("WindowBack")?.GetComponent<Image>() is { } backdrop)
+            backdrop.color = new Color(backdrop.color.r, backdrop.color.g, backdrop.color.b, 1f);
         titleText = root.Find("MainHeader")?.GetComponent<TMP_Text>();
         Hide(root, "ButtonBack", "BackToSaving", "ExampleImage");
         if (root.Find("ButtonClose")?.GetComponent<BhGenericButton>() is { } close)
@@ -251,6 +259,7 @@ public partial class Plugin
         // The list: its rows' layout ours (the game's virtualized list placed them itself), its scrollbar kept.
         var list = sar.Find("VirtualizedList");
         listContent = list.Find("Viewport/Content");
+        FitViewport(list, 24f);
         var firstRow = listContent.childCount > 0 ? listContent.GetChild(0).gameObject : null;
         if (firstRow == null)
         {
@@ -304,6 +313,7 @@ public partial class Plugin
         panelPicture = back.Find("TemplatePreview")?.GetComponent<RawImage>();
         var info = panel.Find("InfoScrollView");
         infoContent = info.Find("Viewport/Content");
+        FitViewport(info, 20f);
         lineTemplate = infoContent.Find("DifficultyLine")?.gameObject;
         wrapTemplate = infoContent.Find("Description")?.gameObject;
         foreach (var part in new[] { lineTemplate, wrapTemplate })
@@ -447,6 +457,23 @@ public partial class Plugin
         Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, dropdown {(tagDropdown != null)}, " +
                   $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
         return true;
+    }
+
+    // A scroll view's viewport over the whole view but its scrollbar's strip on the right. The Load screen sizes it
+    // itself when it shows (its list script, taken off): a copy made while the screen was never shown had it 0x0, and
+    // nothing in it was drawn (08.11).
+    static void FitViewport(Transform view, float scrollbar)
+    {
+        if (view?.Find("Viewport") is not { } viewport)
+            return;
+        var rect = viewport.Cast<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0f, 1f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = new Vector2(-scrollbar, 0f);
+        if (view.GetComponent<ScrollRect>() is { } scroll)
+            scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
     }
 
     static void Hide(Transform parent, params string[] names)
@@ -635,14 +662,19 @@ public partial class Plugin
                 })));
             }
         }
-        RowPicture(row, mod.Screenshots?.FirstOrDefault(s => s?.Path != null)?.Path ?? CatalogIcon(mod.SourceNameKey), Texts.Get(mod.NameKey));
+        // The row's picture is its catalog's icon (fogone 08.11; screenshots are the details'), else its first letter.
+        RowPicture(row, CatalogIcon(mod.SourceNameKey), Texts.Get(mod.NameKey));
         RowName(row, Texts.Get(mod.NameKey), mod.TagKeys);
         if (catalog)
             RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : "", mod.Available ?? mod.Installed ?? "",
                 mod.Installed != null ? Texts.Get(W + "installed") : mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
         else
-            // The catalog it comes from on top (fogone 08.11), "by hand" when none; the version; the note.
-            RowInfo(row, mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"), mod.Installed ?? "", mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
+        {
+            // The catalog it comes from on top (fogone 08.11), "by hand" when none; the version; the note ("by hand" once).
+            var origin = mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand");
+            var note = mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "";
+            RowInfo(row, origin, mod.Installed ?? "", note == origin ? "" : note);
+        }
         if (catalog)
             return;
 
@@ -732,8 +764,18 @@ public partial class Plugin
             var key = tagKeys != null && i < tagKeys.Count ? tagKeys[i] : null;
             chips[i].gameObject.SetActive(key != null);
             if (key != null)
-                chips[i].ShowText(Texts.Get(key));
+                ShowChip(chips[i], key);
         }
+    }
+
+    // A tag chip: its text, sized by the game (BhTag.ShowText), in the colours of the save list's "Template" chip (the
+    // row prefab's own chip is a bare pink one the save list recolours by the session's tag).
+    static void ShowChip(BhTag chip, string key)
+    {
+        chip.ShowText(Texts.Get(key));
+        chip.ShowColor(new Color(0.33f, 0.19f, 0.40f, 1f));
+        if (chip.label != null)
+            chip.label.color = new Color(0.92f, 0.88f, 0.80f, 1f);
     }
 
     static void RowInfo(GameObject row, string header, string value, string note)
@@ -1042,7 +1084,7 @@ public partial class Plugin
             }
             var chip = Copy(chipTemplate, row).GetComponent<BhTag>();
             chip.gameObject.SetActive(true);
-            chip.ShowText(Texts.Get(key));
+            ShowChip(chip, key);
             width += (chip.layoutElement != null ? chip.layoutElement.preferredWidth : 80f) + 6f;
         }
     }

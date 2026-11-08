@@ -1,5 +1,5 @@
-# Draws the catalog's icon (catalog/icon.png, 256x256): a gold hexagon on the game's dark blue with three small
-# hexagons inside, the mods as pieces. Run it again after a change; publish-mods.ps1 puts it into catalog.json (--icon).
+# Draws the catalog's icon (catalog/icon.png, 256x256): a gold hexagon on the game's dark blue with the nobirds sign
+# (fogone's own logo, nobirds.org) inside. Run it again after a change; publish-mods.ps1 puts it into catalog.json (--icon).
 Add-Type -AssemblyName System.Drawing
 $size = 256
 $bmp = New-Object System.Drawing.Bitmap($size, $size)
@@ -25,15 +25,11 @@ $g.FillPolygon((New-Object System.Drawing.SolidBrush($navy)), $outer)
 $g.DrawPolygon((New-Object System.Drawing.Pen($goldDark, 14)), $outer)
 $g.DrawPolygon((New-Object System.Drawing.Pen($gold, 7)), $outer)
 
-# Three hexagons, two below one, like cells of the battle grid.
-$r = 33
-$dx = $r * [Math]::Sqrt(3) / 2 + 3
-foreach ($c in @(@(128, 92), @((128 - $dx), (92 + 1.5 * $r + 4)), @((128 + $dx), (92 + 1.5 * $r + 4)))) {
-    $h = Hex $c[0] $c[1] $r
-    $g.FillPolygon((New-Object System.Drawing.SolidBrush($navyLight)), $h)
-    $g.DrawPolygon((New-Object System.Drawing.Pen($gold, 6)), $h)
-}
-
+# The nobirds sign (nobirds-sign.png: the bird in the red "no" circle of nobirds.org's logo) on a light disc.
+$sign = [System.Drawing.Image]::FromFile((Join-Path $PSScriptRoot 'nobirds-sign.png'))
+$g.FillEllipse((New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(255, 240, 233, 218))), 46, 46, 164, 164)
+$g.DrawImage($sign, 44, 44, 168, 168)
+$sign.Dispose()
 $out = Join-Path $PSScriptRoot 'icon.png'
 $bmp.Save($out, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
