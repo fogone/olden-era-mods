@@ -15,7 +15,7 @@ namespace OldenEra.Modding.Manager;
 // for a development source); every file checked by its hash before it is kept. Only files and HTTP through `fetch`:
 // no BepInEx, no game (the manager gives the fetching and the game's version; the tests a fake).
 //
-//   catalog.json:   { "schema": 1, "name": "...", "mods": [ { "id": "...", "meta": "<URL of the mod's meta file>" } ] }
+//   catalog.json:   { "schema": 1, "name": "...", "icon": { "url": "https://...png", "sha256": "..." }, "mods": [ { "id": "...", "meta": "<URL of the mod's meta file>" } ] }
 //   <mod>.json:     { "schema": 1, "id": "...", "name": { "english": "...", "russian": "..." }, "author": "...",
 //                     "source": "<repository>", "description": { ... },
 //                     "tags": [ "map", "tooltip" ],
@@ -28,7 +28,15 @@ public sealed class CatalogRoot
     [JsonPropertyName("schema")] public int Schema { get; set; } = 1;
     // The catalog's name, shown everywhere (required: a root file without it is shown by its URL, with a note).
     [JsonPropertyName("name")] public string Name { get; set; }
+    // The catalog's icon (optional): a PNG or JPG up to 512 KB, checked by sha256 and cached (CatalogClient.LoadIcon).
+    [JsonPropertyName("icon")] public IconFile Icon { get; set; }
     [JsonPropertyName("mods")] public List<CatalogEntry> Mods { get; set; } = new();
+}
+
+public sealed class IconFile
+{
+    [JsonPropertyName("url")] public string Url { get; set; }
+    [JsonPropertyName("sha256")] public string Sha256 { get; set; }
 }
 
 public sealed class CatalogEntry
@@ -103,7 +111,7 @@ public enum SourceState { Read, Failed, Cached, NotChecked }
 
 // How one source's root file read: its name (null when the file has none), how many mods it lists, its state and why
 // when it failed.
-public sealed record SourceResult(string Url, string Name, int Mods, SourceState State, string Error)
+public sealed record SourceResult(string Url, string Name, int Mods, SourceState State, string Error, IconFile Icon = null)
 {
     // Read, but the root file has no name (it is required): shown by its URL.
     public bool NoName => (State == SourceState.Read || State == SourceState.Cached) && string.IsNullOrWhiteSpace(Name);
@@ -243,7 +251,7 @@ public sealed class CatalogClient
             }
             catch (Exception e) { log($"{entry.Id} ({entry.Meta}): {e.Message}"); }
         }
-        return (new SourceResult(source, root.Name, listed.Count, cached ? SourceState.Cached : SourceState.Read, null), metas);
+        return (new SourceResult(source, root.Name, listed.Count, cached ? SourceState.Cached : SourceState.Read, null, root.Icon), metas);
     }
 
     // ---------- screenshots (issue #14) ----------
@@ -281,28 +289,54 @@ public sealed class CatalogClient
 
     // One screenshot into the cache and its path (already there: no download). Refused with an exception, nothing kept:
     // not https, no sha256, more than 2 MB, not the file the sha256 names, not a PNG or a JPG.
-    public async Task<string> LoadScreenshot(ScreenshotFile shot)
+    public async Task<string> LoadScreenshot(ScreenshotFile shot) =>
+        ScreenshotPath(shot) ?? await LoadPicture(shot?.Url, shot?.Sha256, MaxScreenshotSize, ScreensFolder, "a screenshot");
+
+    async Task<string> LoadPicture(string url, string sha256, long maxSize, string folder, string what)
     {
-        if (ScreenshotPath(shot) is { } there)
-            return there;
-        if (!IsSha256(shot?.Sha256))
-            throw new InvalidOperationException($"{shot?.Url}: no valid sha256; refused");
-        if (!Uri.TryCreate(shot.Url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
-            throw new InvalidOperationException($"{shot.Url}: a screenshot must come over https");
-        var bytes = await fetch(shot.Url) ?? throw new IOException($"{shot.Url}: nothing came");
-        if (bytes.LongLength > MaxScreenshotSize)
-            throw new IOException($"{shot.Url}: {bytes.LongLength} bytes, more than the {MaxScreenshotSize} allowed for a screenshot");
+        if (!IsSha256(sha256))
+            throw new InvalidOperationException($"{url}: no valid sha256; refused");
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            throw new InvalidOperationException($"{url}: {what} must come over https");
+        var bytes = await fetch(url) ?? throw new IOException($"{url}: nothing came");
+        if (bytes.LongLength > maxSize)
+            throw new IOException($"{url}: {bytes.LongLength} bytes, more than the {maxSize} allowed for {what}");
         var hash = Hex(SHA256.HashData(bytes));
-        if (!string.Equals(hash, shot.Sha256, StringComparison.OrdinalIgnoreCase))
-            throw new InvalidOperationException($"{shot.Url}: not the file the catalog names (sha256 {hash}, expected {shot.Sha256}); refused");
-        var type = PictureType(bytes) ?? throw new InvalidOperationException($"{shot.Url}: neither a PNG nor a JPG; refused");
-        Directory.CreateDirectory(ScreensFolder);
-        var path = Path.Combine(ScreensFolder, hash + "." + type);
+        if (!string.Equals(hash, sha256, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"{url}: not the file the catalog names (sha256 {hash}, expected {sha256}); refused");
+        var type = PictureType(bytes) ?? throw new InvalidOperationException($"{url}: neither a PNG nor a JPG; refused");
+        Directory.CreateDirectory(folder);
+        var path = Path.Combine(folder, hash + "." + type);
         var temporary = path + ".tmp";
         File.WriteAllBytes(temporary, bytes);
         File.Move(temporary, path, true);
         return path;
     }
+
+    // ---------- the catalog's icon ----------
+
+    public const long MaxIconSize = 512L * 1024;
+
+    string IconsFolder => Path.Combine(cacheFolder, "icons");
+
+    // The cached file of a catalog's icon (<sha256>.png or .jpg in .cache\icons), or null while it is not downloaded.
+    public string IconPath(IconFile icon)
+    {
+        if (!IsSha256(icon?.Sha256))
+            return null;
+        var name = icon.Sha256.ToLowerInvariant();
+        foreach (var extension in new[] { ".png", ".jpg" })
+        {
+            var path = Path.Combine(IconsFolder, name + extension);
+            if (File.Exists(path))
+                return path;
+        }
+        return null;
+    }
+
+    // The icon into the cache and its path (already there: no download). Refused like a screenshot, 512 KB at most.
+    public async Task<string> LoadIcon(IconFile icon) =>
+        IconPath(icon) ?? await LoadPicture(icon?.Url, icon?.Sha256, MaxIconSize, IconsFolder, "an icon");
 
     // A mod's screenshots into the cache; a refused or failed one is logged and left out. How many came now.
     public async Task<int> LoadScreenshots(ModMeta meta)

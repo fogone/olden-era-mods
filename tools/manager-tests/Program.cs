@@ -530,6 +530,58 @@ Case("screenshots: downloaded, checked by sha256 and signature, cached; a bad on
     Check(client2.LoadScreenshots(meta).Result == 2 && client2.ScreenshotPath(meta.Screenshots[1]) != null && client2.ScreenshotPath(meta.Screenshots[2]) != null, "LoadScreenshots");
 });
 
+Case("icon: root file round-trips it, an old root without one reads, the source result carries it", root =>
+{
+    var opts = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    var rootFile = System.Text.Json.JsonSerializer.Deserialize<CatalogRoot>("""{ "schema": 1, "name": "N", "icon": { "url": "https://x.test/i.png", "sha256": "ab" }, "mods": [] }""", opts);
+    Check(rootFile.Icon?.Url == "https://x.test/i.png" && rootFile.Icon.Sha256 == "ab", "icon read");
+    var again = System.Text.Json.JsonSerializer.Deserialize<CatalogRoot>(System.Text.Json.JsonSerializer.Serialize(rootFile), opts);
+    Check(again.Icon?.Sha256 == "ab" && again.Icon.Url == "https://x.test/i.png", "icon lost on a round trip");
+    Check(System.Text.Json.JsonSerializer.Deserialize<CatalogRoot>("""{ "schema": 1, "name": "N", "mods": [] }""", opts).Icon == null, "an old root has no icon");
+    var png = Png();
+    var (client, net, _) = Net(root);
+    net[Source] = Bytes("{ \"schema\": 1, \"name\": \"N\", \"icon\": { \"url\": \"https://x.test/i.png\", \"sha256\": \"" + Sha(png) + "\" }, \"mods\": [] }");
+    net[OtherSource] = Bytes("""{ "schema": 1, "name": "Old", "mods": [] }""");
+    var reading = client.ReadAll(new[] { Source, OtherSource }).Result;
+    Check(reading.Sources[0].Icon?.Sha256 == Sha(png) && reading.Sources[1].Icon == null, "SourceResult.Icon");
+});
+
+Case("icon: downloaded into .cache\\icons, checked by sha256, signature, https and 512 KB; a bad one leaves nothing", root =>
+{
+    var (client, net, asked) = Net(root);
+    var png = Png();
+    net["https://x.test/i.png"] = png;
+    var icon = new IconFile { Url = "https://x.test/i.png", Sha256 = Sha(png) };
+    Check(client.IconPath(icon) == null, "cached before downloading");
+    var path = client.LoadIcon(icon).Result;
+    Check(path.EndsWith(Sha(png) + ".png") && path.Contains(Path.Combine(".cache", "icons")) && File.ReadAllBytes(path).SequenceEqual(png), "the cached file");
+    Check(client.IconPath(icon) == path, "IconPath does not find it");
+    asked.Clear();
+    Check(client.LoadIcon(icon).Result == path && asked.Count == 0, "downloaded again");
+    void Refused(IconFile bad, string what)
+    {
+        var refused = false;
+        try { client.LoadIcon(bad).Wait(); }
+        catch (AggregateException) { refused = true; }
+        Check(refused, what + " was not refused");
+        Check(client.IconPath(bad) == null, what + " left a file");
+    }
+    net["https://x.test/other.png"] = Png(80);
+    Refused(new IconFile { Url = "https://x.test/other.png", Sha256 = Sha(Png(33)) }, "a sha256 mismatch");
+    var big = Png(512 * 1024 + 1);
+    net["https://x.test/big.png"] = big;
+    Refused(new IconFile { Url = "https://x.test/big.png", Sha256 = Sha(big) }, "an icon over 512 KB");
+    var exactly = Png(512 * 1024);
+    net["https://x.test/max.png"] = exactly;
+    Check(client.LoadIcon(new IconFile { Url = "https://x.test/max.png", Sha256 = Sha(exactly) }).Result.EndsWith(".png"), "an icon of exactly 512 KB was refused");
+    var text = Bytes("not a picture");
+    net["https://x.test/t.png"] = text;
+    Refused(new IconFile { Url = "https://x.test/t.png", Sha256 = Sha(text) }, "not a picture");
+    net["http://x.test/h.png"] = Png(41);
+    Refused(new IconFile { Url = "http://x.test/h.png", Sha256 = Sha(Png(41)) }, "an http address");
+    Refused(new IconFile { Url = "https://x.test/i.png" }, "no sha256");
+});
+
 Case("batches: dependents first when removing or switching off, what a mod needs first when switching on; a needed mod stays", root =>
 {
     InstalledMod M(string id, params string[] requires) => new() { Id = id, Version = "1", Requires = requires.ToList() };

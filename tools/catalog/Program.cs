@@ -11,6 +11,7 @@ using OldenEra.Modding.Manager;
 //               [--name <catalog name>]   (the root file's name, shown everywhere; required while the root file has none)
 //               [--screenshot <path>=<url>[|<english caption>] ...]   (replaces the mod's screenshots; PNG or JPG, up to
 //                                                                      2 MB each; the sha256 is computed)
+//               [--icon <path>=<url>]   (the catalog's icon in the root file; PNG or JPG, up to 512 KB; https; sha256 computed)
 //               --file <path>=<download URL> [--file ...]
 // The same version again with the same files: the game version is added to it (a build that works on another game
 // version too); with other files: refused (a version is never published twice with other content).
@@ -44,6 +45,24 @@ if (One("name") is { } rootName && !string.IsNullOrWhiteSpace(rootName))
     root.Name = rootName.Trim();
 if (string.IsNullOrWhiteSpace(root.Name))
     return Fail("the catalog's root file has no name: give one with --name <catalog name> (it is shown everywhere)");
+if (One("icon") is { } iconArg)
+{
+    var at = iconArg.IndexOf('=');
+    if (at <= 0)
+        return Fail($"--icon {iconArg}: <path>=<url>");
+    var path = iconArg[..at];
+    var url = iconArg[(at + 1)..];
+    if (!File.Exists(path))
+        return Fail($"--icon {path}: no such file");
+    var bytes = File.ReadAllBytes(path);
+    if (bytes.LongLength > CatalogClient.MaxIconSize)
+        return Fail($"--icon {path}: {bytes.LongLength} bytes, more than the {CatalogClient.MaxIconSize} allowed");
+    if (CatalogClient.PictureType(bytes) == null)
+        return Fail($"--icon {path}: neither a PNG nor a JPG");
+    if (!url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        return Fail($"--icon {path}: the URL must be https");
+    root.Icon = new IconFile { Url = url, Sha256 = Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() };
+}
 
 var metaPath = Path.Combine(catalogDir, "mods", id + ".json");
 var meta = File.Exists(metaPath) ? JsonSerializer.Deserialize<ModMeta>(File.ReadAllText(metaPath), json) : new ModMeta { Id = id };
