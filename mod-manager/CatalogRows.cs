@@ -77,7 +77,8 @@ public static class CatalogRows
             list.Add(new CatalogSource(titleKey, url, result?.Mods ?? 0, note, builtIn, settings?.LastChecked, CheckSchedule.Normalize(settings?.CheckEvery),
                 busy ? null : () => ManagerService.Check(source),
                 every => ManagerService.SetCheckEvery(source, every),
-                builtIn || busy ? null : () => ManagerService.RemoveSource(source)));
+                builtIn || busy ? null : () => ManagerService.RemoveSource(source),
+                ManagerService.IconPath(result?.Icon)));
             index++;
         }
         return titles;

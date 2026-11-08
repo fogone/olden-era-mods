@@ -34,6 +34,7 @@ Nothing is installed or updated without the player's click; installing a mod fir
 |---|---|---|---|
 | `schema` | int | no | Format version, `1`. Not checked by the manager yet. |
 | `name` | string | yes | Name of the catalog, shown everywhere the source is. A root file without it still works, but the Mods window shows the source by its URL, with a note. `tools/catalog add` refuses to write a root file that has none (`--name`). |
+| `icon` | object | no | The catalog's icon, shown with the source in the Mods window: `url` (https) and `sha256` of a PNG or JPG, at most 512 KB (524288 bytes); checked like a screenshot and cached in `.cache\icons\<sha256>.png|jpg`, downloaded in the background when the source is read. Roots without it still read. |
 | `mods[].id` | string | yes | The mod's id (see "The mod id"). Must equal `id` inside the meta file, compared ignoring case. |
 | `mods[].meta` | string | yes | URL of the mod's meta file (https or a local `file:` URL). An entry without it is skipped. |
 
@@ -199,7 +200,7 @@ dotnet run --project tools/catalog -- add --catalog catalog --root-url https://r
 Options: `--catalog <dir>` (holds `catalog.json` and `mods\`), `--root-url`, `--id`, `--version`, `--game`, `--file
 <path>=<URL>` (repeatable; the name is the path's file name) are required (`--file` at least once); `--bepinex`,
 `--requires id[@version],...`, `--author`, `--source` are optional; `--name <catalog name>` sets the root file's name
-and is required while the root file has none (the tool refuses otherwise); `--screenshot <path>=<url>[|<english
+and is required while the root file has none (the tool refuses otherwise); `--icon <path>=<url>` sets the root file's icon (sha256 computed; refused: no such file, over 512 KB, not a PNG or JPG, URL not https); `--screenshot <path>=<url>[|<english
 caption>]` (repeatable) computes the sha256 of the local picture and writes the list, replacing the mod's screenshots
 (refused: no such file, over 2 MB, not a PNG or JPG, URL not https; the caption is written as `english`; split at the
 last `|`); `--lang <folder>` takes the mod's names from every

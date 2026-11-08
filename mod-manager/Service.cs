@@ -81,6 +81,34 @@ public static class ManagerService
     public static int ScreensRevision { get; private set; }
     public static string ScreenshotPath(ScreenshotFile shot) => client.ScreenshotPath(shot);
     static readonly HashSet<string> screenshotsLoading = new(StringComparer.OrdinalIgnoreCase);
+    public static string IconPath(IconFile icon) => client.IconPath(icon);
+    static readonly HashSet<string> iconsLoading = new(StringComparer.OrdinalIgnoreCase);
+
+    // The sources' icons not cached yet, loaded in the background; when one came the rows are made again.
+    static void LoadIcons(IEnumerable<SourceResult> results)
+    {
+        foreach (var result in results)
+        {
+            var icon = result.Icon;
+            if (icon == null || client.IconPath(icon) != null)
+                continue;
+            var key = icon.Sha256 ?? icon.Url ?? "";
+            lock (iconsLoading)
+                if (!iconsLoading.Add(key))
+                    continue;
+            var url = result.Url;
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await client.LoadIcon(icon);
+                    mainThread.Enqueue(() => ScreensRevision++);
+                }
+                catch (Exception e) { log.LogWarning($"icon of {url}: {e.Message}"); }
+                finally { lock (iconsLoading) iconsLoading.Remove(key); }
+            });
+        }
+    }
 
     // Every frame on the main thread: what the background work left to do here (loading mods, the results).
     public static void Pump()
@@ -135,6 +163,7 @@ public static class ManagerService
         {
             Catalog = catalog;
             SourceResults = reading.Sources;
+            LoadIcons(reading.Sources);
             var now = DateTime.Now;
             foreach (var result in reading.Sources)
             {
