@@ -20,7 +20,7 @@ namespace OldenEra.Modding.Settings;
 // (a title with the version, the master switch, switches, choices as one row per option).
 // The switches are copies of the game's own settings rows; flipping one writes the entry, which the plugin reads
 // when it needs it.
-[BepInPlugin("nobirds.oldenera.settings", "Olden Era Mod Settings", "0.16.3")]
+[BepInPlugin("nobirds.oldenera.settings", "Olden Era Mod Settings", "0.17.0")]
 public partial class Plugin : ModBase
 {
     const string RowPrefix = "OE_Mod_", TabKey = "oe.settings.tab", DefaultsKey = "oe.settings.defaults", ResetKey = "oe.settings.reset";
