@@ -15,8 +15,6 @@ namespace OldenEra.Modding.Settings;
 // and sorting, the bottom left group.
 public partial class Plugin
 {
-    const float ModRowHeight = 96f;
-
     // The mods installed (the manager is apart, on top) and the catalog's (from a source), as the window lists them.
     static List<ModEntry> Installed() => ModCatalog.Mods.Where(m => m.Installed != null)
         .OrderBy(m => Texts.Get(m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
@@ -92,16 +90,12 @@ public partial class Plugin
         }
     }
 
-    // A row made from the game's save row: check box, picture, name, tag chips; on the right the catalog, the version,
+    // A row of the game's save list (SaveRow): check box, picture, name, tag chips; on the right the catalog, the version,
     // the note; on the Installed tab the update (to the new version), the switch and the remove cross. The manager: its
     // update only.
     void ModRow(ModEntry mod, bool isManager, bool catalog = false)
     {
-        var row = Copy(rowSource, listContent);
-        row.name = "OE_Row_" + mod.Id;
-        row.SetActive(true);
-        var picked = (catalog ? catalogPick : installedPick) == mod.Id;
-        RowBase(row, picked, () =>
+        var row = NewRow("OE_Row_" + mod.Id, (catalog ? catalogPick : installedPick) == mod.Id, () =>
         {
             if (catalog)
                 catalogPick = mod.Id;
@@ -109,18 +103,15 @@ public partial class Plugin
                 installedPick = mod.Id;
             shotIndex = 0;
         });
-        var checkable = !catalog && !isManager;
-        if (row.transform.Find("Toggle")?.GetComponent<BhToggle>() is { } check)
+        if (row == null)
+            return;
+        if (!catalog && !isManager)
         {
-            check.gameObject.SetActive(checkable);
-            if (checkable)
+            row.Check(selected.Contains(mod.Id), value => Guard("check", () =>
             {
-                GameUi.Check(check, selected.Contains(mod.Id), value => Guard("check", () =>
-                {
-                    if (!filling)
-                        Redraw(() => Select(mod.Id, value));
-                }));
-            }
+                if (!filling)
+                    Redraw(() => Select(mod.Id, value));
+            }));
         }
         // The row's picture is its catalog's icon (the screenshots are the details'), else its first letter.
         RowPicture(row, CatalogIcon(mod.SourceNameKey), Texts.Get(mod.NameKey));
@@ -137,7 +128,7 @@ public partial class Plugin
         RowInfo(row, origin, mod.Installed ?? "", string.Equals(note, origin, StringComparison.CurrentCultureIgnoreCase) ? "" : note);
 
         // The controls in one group, vertically centred, just left of the information on the right.
-        var controls = NewRect("OE_Controls", row.transform);
+        var controls = NewRect("OE_Controls", row.Root.transform);
         controls.anchorMin = controls.anchorMax = controls.pivot = new Vector2(1f, 0.5f);
         controls.anchoredPosition = new Vector2(InfoLeft(row) - 24f, 0f);
         controls.sizeDelta = new Vector2(330f, 60f);
@@ -151,116 +142,44 @@ public partial class Plugin
             NewCross(controls, () => ModCatalog.Remove?.Invoke(new[] { mod.Id }));
     }
 
-    // The row's own parts laid out for a mod: as high as it needs, the check box and the picture vertically centred at
-    // the left, the name above the middle (the tags under it, RowName), the three lines of information on the right
-    // around the middle; its selected look, the cloud and the map's icons off, a click picks it.
-    void RowBase(GameObject row, bool picked, Action pick)
+    // A row of the list, picked or not; a click picks it.
+    SaveRow NewRow(string name, bool picked, Action pick)
     {
-        var t = row.transform;
-        Hide(t, "CloudOn", "CloudOff", "InfoIcons", "CampaignInfo");
-        Hide(t.Find("HeaderGroup"), "RenameBtn");
-        Size(row, -1f, ModRowHeight);
-        var rowRect = row.transform.Cast<RectTransform>();
-        PinLeft(t.Find("Toggle"), rowRect, 0f);
-        PinLeft(t.Find("IconFrame"), rowRect, 0f);
-        PinLeft(t.Find("HeaderGroup"), rowRect, 15f);
-        PinRight(t.Find("LastSaveHeader"), rowRect, 27f);
-        PinRight(t.Find("LastSaveTime"), rowRect, 0f);
-        PinRight(t.Find("LastSaveGameTime"), rowRect, -27f);
-        // The row's backs (default, hovered, selected) are the save row's fixed 122 for its 110 (6 over each edge, their
-        // pictures' own margins making the gaps between rows): as much over ours, centred, or the rows run together.
-        foreach (var backName in new[] { "DefaultBack", "HoveredBack", "SelectedBack" })
-            if (t.Find(backName) is { } back)
-            {
-                var rect = back.Cast<RectTransform>();
-                var width = rect.rect.width;
-                rect.anchorMin = new Vector2(rect.anchorMin.x, 0.5f);
-                rect.anchorMax = new Vector2(rect.anchorMax.x, 0.5f);
-                rect.pivot = new Vector2(rect.pivot.x, 0.5f);
-                rect.sizeDelta = new Vector2(rect.anchorMin.x == rect.anchorMax.x ? width : rect.sizeDelta.x, ModRowHeight + 12f);
-                rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, 0f);
-                // The selected back's frame: 5 over the save row's 110.
-                if (back.Find("Frame") is { } frame)
-                {
-                    var frameRect = frame.Cast<RectTransform>();
-                    if (frameRect.anchorMin.y == frameRect.anchorMax.y)
-                        frameRect.sizeDelta = new Vector2(frameRect.sizeDelta.x, ModRowHeight + 5f);
-                }
-            }
-        // The row's check box drawn as the bottom group's (the save row's is a faint outline until hovered).
-        if (t.Find("Toggle/Background")?.GetComponent<Image>() is { } box && selectAll?.transform.Find("Background")?.GetComponent<Image>() is { } shown)
-            box.color = shown.color;
-        if (t.Find("SelectedBack") is { } selectedBack)
-            selectedBack.gameObject.SetActive(picked);
-        if (t.Find("HoveredBack")?.GetComponent<CanvasGroup>() is { } hovered)
-            hovered.alpha = 0f;
-        if (row.GetComponent<CanvasGroup>() is { } group)
-        {
-            group.alpha = 1f;
-            group.interactable = group.blocksRaycasts = true;
-        }
-        Clickable(row, () => Redraw(pick));
-    }
-
-    // A part of the row kept where it is across, pinned to the row's left (or right) edge at a height from its middle
-    // (anchors and pivot middle; the row's own anchors are the save row's, for its 110).
-    static void PinLeft(Transform part, RectTransform row, float y)
-    {
-        if (part == null)
-            return;
-        var rect = part.Cast<RectTransform>();
-        var size = rect.rect.size;
-        var left = rect.localPosition.x + rect.rect.xMin - row.rect.xMin;
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
-        rect.sizeDelta = size;
-        rect.anchoredPosition = new Vector2(left, y);
-    }
-
-    static void PinRight(Transform part, RectTransform row, float y)
-    {
-        if (part == null)
-            return;
-        var rect = part.Cast<RectTransform>();
-        var size = rect.rect.size;
-        var right = row.rect.xMax - (rect.localPosition.x + rect.rect.xMax);
-        rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = size;
-        rect.anchoredPosition = new Vector2(-right, y);
+        var row = SaveRow.Make(listContent, name);
+        if (row == null)
+            return null;
+        row.Selected(picked);
+        row.OnClick(() => Guard("click", () => Redraw(pick)));
+        return row;
     }
 
     // Where the information on the right begins (from the row's right edge, negative): its widest line's text.
-    static float InfoLeft(GameObject row)
+    static float InfoLeft(SaveRow row)
     {
+        var rowRect = row.Root.transform.Cast<RectTransform>();
         var left = 0f;
-        foreach (var name in new[] { "LastSaveHeader", "LastSaveTime", "LastSaveGameTime" })
-            if (row.transform.Find(name)?.GetComponent<TMP_Text>() is { } text && !string.IsNullOrEmpty(text.text))
-                left = Math.Min(left, text.rectTransform.anchoredPosition.x - text.GetPreferredValues(text.text).x);
+        foreach (var text in new TMP_Text[] { row.View.lastSaveHeader, row.View.lastSaveTime, row.View.lastSaveGameTime })
+            if (text != null && text.gameObject.activeSelf && !string.IsNullOrEmpty(text.text))
+            {
+                // The lines are the row's children, their text aligned to their right edge.
+                var right = text.rectTransform.localPosition.x + text.rectTransform.rect.xMax - rowRect.rect.xMax;
+                left = Math.Min(left, right - text.GetPreferredValues(text.text).x);
+            }
         return left;
     }
 
-    // The row's picture: the catalog's icon whole in the save's icon frame; with none, the name's first letter in the
-    // frame, in the name's own font and colour (as the game's campaign rows show their act's numeral).
-    void RowPicture(GameObject row, string iconPath, string name)
+    // The row's picture: the catalog's icon; with none, the name's first letter in the icon frame, in the name's own font
+    // and colour (as the game's campaign rows show their act's numeral).
+    void RowPicture(SaveRow row, string iconPath, string name)
     {
-        var icon = row.transform.Find("IconFrame/Icon");
-        if (icon == null)
-            return;
-        // The save's icon is not ours.
-        if (icon.GetComponent<Image>() is { } image)
-            image.enabled = false;
-        if (Picture(iconPath) is { } texture)
-        {
-            var picture = NewRect("OE_Shot", icon).gameObject.AddComponent<RawImage>();
-            picture.raycastTarget = false;
-            picture.texture = texture;
-            Pictures.FitInside(picture.rectTransform, texture, icon.Cast<RectTransform>().rect.size);
-            return;
-        }
-        var title = row.transform.Find("HeaderGroup/SessionName")?.GetComponent<TMP_Text>();
+        var texture = Picture(iconPath);
+        row.Icon(texture);
+        var icon = row.View.sessionIcon;
+        var title = row.View.sessionName;
         var letter = string.IsNullOrWhiteSpace(name) ? "" : name.Trim().Substring(0, 1).ToUpperInvariant();
-        if (title == null || letter.Length == 0)
+        if (texture != null || icon == null || title == null || letter.Length == 0)
             return;
-        var text = NewRect("OE_Letter", icon).gameObject.AddComponent<TextMeshProUGUI>();
+        var text = NewRect("OE_Letter", icon.transform).gameObject.AddComponent<TextMeshProUGUI>();
         Stretch(text.rectTransform);
         text.font = title.font;
         text.fontSharedMaterial = title.fontSharedMaterial;
@@ -277,56 +196,23 @@ public partial class Plugin
     static string CatalogIcon(string sourceNameKey) =>
         sourceNameKey == null ? null : ModCatalog.Sources.FirstOrDefault(s => s.TitleKey == sourceNameKey)?.IconPath;
 
-    void RowName(GameObject row, string name, IReadOnlyList<string> tagKeys)
+    // The name and the game's chips for the first four tags (in the colour of the save list's "Template" chip), on their
+    // own line under the name.
+    static void RowName(SaveRow row, string name, IReadOnlyList<string> tagKeys)
     {
-        var group = row.transform.Find("HeaderGroup");
-        if (group == null)
-            return;
-        if (group.Find("SessionName")?.GetComponent<TMP_Text>() is { } title)
-            SetText(title, name);
-        // The game's chips: the first four tags, on their own line under the name (the save row has them after its
-        // name; ours read better under it).
-        var chips = group.GetComponentsInChildren<BhTag>(true).ToList();
-        var line = row.transform.Find("OE_Tags");
-        if (line == null)
-        {
-            var rect = NewRect("OE_Tags", row.transform);
-            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0f, 0.5f);
-            rect.sizeDelta = new Vector2(560f, 24f);
-            rect.anchoredPosition = new Vector2(group.Cast<RectTransform>().anchoredPosition.x, -17f);
-            HRow(rect.gameObject, 6f, TextAnchor.MiddleLeft);
-            line = rect;
-        }
-        // The row has two chips; more are copies of the first, up to four tags.
-        while (chips.Count > 0 && chips.Count < 4)
-            chips.Add(UnityEngine.Object.Instantiate(chips[0].gameObject, line, false).GetComponent<BhTag>());
-        foreach (var chip in chips)
-            chip.transform.SetParent(line, false);
-        for (var i = 0; i < chips.Count; i++)
-        {
-            var key = tagKeys != null && i < tagKeys.Count ? tagKeys[i] : null;
-            chips[i].gameObject.SetActive(key != null);
-            if (key != null)
-                ShowChip(chips[i], key);
-        }
+        row.Name(name);
+        row.Tags(tagKeys?.Where(k => k != null).Take(4).Select(k => (Texts.Get(k), ChipColor)).ToList());
+        row.TagsUnderName();
     }
 
-    // A tag chip: its text, sized by the game (BhTag.ShowText), in the colours of the save list's "Template" chip (the
-    // row prefab's own chip is a bare pink one the save list recolours by the session's tag).
+    static readonly Color ChipColor = new(0.33f, 0.19f, 0.40f, 1f);
+
+    // A tag chip of the details panel: its text, sized by the game (BhTag.ShowText), in the chips' colours.
     static void ShowChip(BhTag chip, string key) =>
-        GameUi.ShowChip(chip, Texts.Get(key), new Color(0.33f, 0.19f, 0.40f, 1f), new Color(0.92f, 0.88f, 0.80f, 1f));
+        GameUi.ShowChip(chip, Texts.Get(key), ChipColor, new Color(0.92f, 0.88f, 0.80f, 1f));
 
-    static void RowInfo(GameObject row, string header, string value, string note)
-    {
-        var t = row.transform;
-        if (t.Find("LastSaveHeader")?.GetComponent<TMP_Text>() is { } h)
-            SetText(h, $"<color=#A5A5A5>{header}</color>");
-        if (t.Find("LastSaveTime")?.GetComponent<TMP_Text>() is { } v)
-            SetText(v, value);
-        if (t.Find("LastSaveGameTime")?.GetComponent<TMP_Text>() is { } n)
-            SetText(n, note);
-    }
-
+    static void RowInfo(SaveRow row, string header, string value, string note) =>
+        row.Info(string.IsNullOrEmpty(header) ? "" : $"<color=#A5A5A5>{header}</color>", value, note);
     // ---------- Catalog ----------
 
     // The tags and the sources of the catalog's mods, in the order of their names: the filters' options.

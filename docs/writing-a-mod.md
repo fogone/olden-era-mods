@@ -224,6 +224,10 @@ Mods window, a copy of the game's Load screen) uses all of them.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
   off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts);
   `ModScreen.Adopt` makes the built copy a screen of the game's registry; `DrawOnTop` puts a part over the rest.
+- `SaveRow` — a row of the game's save list for data of yours: `Make(parent, name)` instantiates the row prefab the
+  Load screen's list makes its rows of, with its own script (the game lays it out and plays its hover and selected
+  looks); `Name`, `Icon`, `Tags` (and `TagsUnderName`), `Info` (the three lines on the right), `Selected`, `Check` /
+  `NoCheck`, `OnClick`. `SaveRow.Spacing` is the list's gap between rows.
 - `GameBoxes` — the game's message box (`Confirm`: a question with two buttons) and input box (`Ask`: a line of text),
   one call each with callbacks; `AnyShown` tells whether one is on screen.
 - `Pictures`, `PictureCache` — PNG or JPG files loaded once into textures; shown filling a frame (`Cover`, cut) or whole
