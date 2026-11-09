@@ -31,6 +31,8 @@ public static class ManagerService
 
     // What the last reading of the catalog found; null until it has been read.
     public static IReadOnlyList<ModMeta> Catalog { get; private set; }
+    // Every source's meta files of that reading (a mod listed by two sources is here twice), each with its source.
+    static IReadOnlyList<ModMeta> allMetas = Array.Empty<ModMeta>();
     public static IReadOnlyList<Update> Updates { get; private set; } = Array.Empty<Update>();
     public static bool Busy { get; private set; }
     // The last thing done or failed, for the log.
@@ -159,6 +161,7 @@ public static class ManagerService
         mainThread.Enqueue(() =>
         {
             Catalog = catalog;
+            allMetas = reading.All;
             SourceResults = reading.Sources;
             LoadIcons(reading.Sources);
             var now = DateTime.Now;
@@ -239,13 +242,22 @@ public static class ManagerService
             AddSource(url);
     }
 
-    // The mods of the source stay installed (no updates from it then: they update only from their own source).
-    public static void RemoveSource(string url)
+    // The installed mods that came from the source (an installed mod's Source is the meta file it was installed from).
+    public static List<string> InstalledFrom(string url) =>
+        ModLoader.State.Mods.Where(m => !string.IsNullOrEmpty(m.Source) && allMetas.Any(meta =>
+                string.Equals(meta.Url, m.Source, StringComparison.OrdinalIgnoreCase) && string.Equals(meta.SourceUrl, url, StringComparison.OrdinalIgnoreCase)))
+            .Select(m => m.Id).ToList();
+
+    // `withMods`: its installed mods are removed first (as Remove: one another mod needs stays). Otherwise they stay
+    // installed, without updates (a mod updates only from its own source).
+    public static void RemoveSource(string url, bool withMods)
     {
         if (Busy)
             return;
         if (string.Equals(url, BuiltInSource, StringComparison.OrdinalIgnoreCase))
             return;
+        if (withMods)
+            Remove(InstalledFrom(url));
         var name = store.Entries.FirstOrDefault(e => string.Equals(e.Url, url, StringComparison.OrdinalIgnoreCase))?.Name;
         if (!store.Remove(url))
             return;

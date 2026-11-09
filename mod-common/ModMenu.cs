@@ -264,10 +264,11 @@ public sealed record ModScreenshot(string Path, string CaptionKey);
 // A source of the catalog: its name (the root file's name; the URL when it has none), its URL, how many mods it gave,
 // a note on its state (read, failed, from the cache), when it was last checked (local time, or null), how often it is
 // checked ("start", "daily", "weekly", "manual") and the actions (null when not allowed: the built-in source cannot be
-// removed).
+// removed). Remove(true) removes the mods installed from it too; Remove(false) leaves them, without updates.
 public sealed record CatalogSource(string TitleKey, string Url, int Mods, string NoteKey, bool BuiltIn, DateTime? LastChecked,
-    string CheckEvery, Action Check, Action<string> SetCheckEvery, Action Remove,
-    string IconPath = null);   // the catalog's icon on disk once downloaded (the root file's icon, checked and cached), or null
+    string CheckEvery, Action Check, Action<string> SetCheckEvery, Action<bool> Remove,
+    string IconPath = null,    // the catalog's icon on disk once downloaded (the root file's icon, checked and cached), or null
+    int Installed = 0);        // how many installed mods came from it
 
 public static class ModCatalog
 {

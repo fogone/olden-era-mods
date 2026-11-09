@@ -81,7 +81,7 @@ public partial class Plugin
                 Math.Max(0, Array.IndexOf(CheckEveryValues, source.CheckEvery)));
         }
         PanelButton(primaryButton, W + "check", source.Check != null, () => source.Check?.Invoke());
-        PanelButton(deleteButton, null, source.Remove != null && !source.BuiltIn, () => source.Remove?.Invoke());
+        PanelButton(deleteButton, null, source.Remove != null && !source.BuiltIn, () => RemoveSource(source));
         PanelButton(secondaryButton, null, false, null);
     }
 
@@ -126,6 +126,24 @@ public partial class Plugin
         SuspendWindow();
         GameBoxes.Tell(Texts.Get(W + "problem"), Texts.Get(ModCatalog.ProblemKey), GameText("button_ok", W + "ok"),
             () => Guard("problem told", ResumeWindow));
+    }
+
+    // A source with installed mods: the game's message box asks whether they go with it; kept, they stay installed
+    // ("source removed", no updates).
+    void RemoveSource(CatalogSource source)
+    {
+        if (source.Remove == null)
+            return;
+        if (source.Installed == 0)
+        {
+            source.Remove(false);
+            return;
+        }
+        SuspendWindow();
+        GameBoxes.Confirm(Texts.Get(W + "srcRemove.title"), string.Format(Texts.Get(W + "srcRemove.text"), source.Installed),
+            Texts.Get(W + "srcRemove.withMods"), Texts.Get(W + "srcRemove.keepMods"),
+            () => Guard("source removed with its mods", () => { source.Remove(true); ResumeWindow(); }),
+            () => Guard("source removed, its mods kept", () => { source.Remove(false); ResumeWindow(); }));
     }
 
     // A game box is open over the window: the window stays (drawn under it), its Escape and filling wait.
