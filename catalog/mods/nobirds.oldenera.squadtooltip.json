@@ -75,7 +75,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.31.1/OldenEraSquadTooltip.dll",
           "sha256": "fbdbd3425720a0c045ab4b4b0000197e0f2d8fa1ecf94ede6c8b25e53924eddf"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "1.31.0",
@@ -95,7 +96,29 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.31.0/OldenEraSquadTooltip.dll",
           "sha256": "92f55a9d8d8883fa8c3ae2445b4504acff19f4dfacb879151759ec584aca6211"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "1.32.0",
+      "games": [
+        "0.82.08"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.squadtooltip-1.32.0.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.32.0/nobirds.oldenera.squadtooltip-1.32.0.zip",
+        "sha256": "6d92b51d4b5b34c817aa8f64cb823798de35591713999afc4e190345e652264d"
+      }
     }
   ]
 }
