@@ -217,6 +217,10 @@ Mods window, a copy of the game's Load screen) uses all of them.
   (its canvas is `Content`), `Open`/`Hide`, `Escape` (hides by default) and `Closed`; the game puts it on its stack of
   open screens, gives it the UI camera, the input and Escape, and takes the clicks from the screen below. It registers
   again after a mode change emptied the registry. `Destroy` it in `OnUnload`. Prefer it to a window of your own.
+- `MainMenu` — a button of your own in the game's main menu: `AddButton(name, labelKey, click, view => view.someButton)`
+  copies the menu's Load button under the given one (below its sub-menu), labels it by your key and clicks it as the
+  game's own top-level buttons (selection cleared, an open sub-menu closed). A new main menu (after a game) has none:
+  add it again when the returned button is gone; `Remove` it in `OnUnload`.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
   off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts);
   `ModScreen.Adopt` makes the built copy a screen of the game's registry; `DrawOnTop` puts a part over the rest.
