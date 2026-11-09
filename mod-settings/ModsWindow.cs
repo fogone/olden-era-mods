@@ -15,8 +15,9 @@ using UnityEngine.UI;
 namespace OldenEra.Modding.Settings;
 
 // The mods' own window (issues #6, #13, #14). A "Mods" button in the main menu under Additional (a copy of the game's
-// Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad) on a canvas of its own, its scripts
-// taken off and its parts filled with ours:
+// Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad), a screen of ours in the game's screen
+// registry (ModScreen: the game opens and hides it, gives it the camera, the input and Escape), its scripts taken off and
+// its parts filled with ours:
 //   its title and close cross; its tabs (BhSimpleTabs: Installed / Catalog / Sources, a third tab copied); its filter row
 //   (a text field from the game's input box, its sorting dropdown, its filter for the tags and a copy for the sources);
 //   its list with the scrollbar, rows made from its save rows; its bottom left group (select all, the actions on the
@@ -33,10 +34,6 @@ namespace OldenEra.Modding.Settings;
 public partial class Plugin
 {
     const string ModsButtonName = "OE_ModsButton", WindowName = "OE_ModsWindow", W = "oe.settings.w.";
-    // Drawn as the game's screens are, over its Load screen (PlaceCanvas); without a UI camera over everything, under the
-    // 30000 of Unity's dropdown lists.
-    const int WindowOrder = 29000, ScreenOrder = 1600;
-
     // The Load screen's scripts that run it (taken off the copy: it shows our data, not saves).
     static readonly HashSet<string> ScreenScripts = new()
     {
@@ -49,6 +46,9 @@ public partial class Plugin
     static readonly WindowTab[] WindowTabs = { WindowTab.Installed, WindowTab.Catalog, WindowTab.Sources };
 
     BhNavigationButton modsButton;
+    // The window is a screen of ours in the game's screen registry (ModScreen): the game opens and hides it, gives it the
+    // UI camera, the input and Escape; drawn just under the game's message and input boxes.
+    ModScreen screen;
     GameObject window, staging;
     int windowRevision = -1, nextButtonSearch;
     bool windowDirty, filling;
@@ -110,22 +110,14 @@ public partial class Plugin
             WatchGameBoxes();
             return;
         }
-        if (!window.activeSelf)
+        if (!screen.IsOpen)
             return;
         if (ModCatalog.ProblemRevision != shownProblem && ModCatalog.ProblemKey != null && !GameBoxes.AnyShown())
         {
             TellProblem();
             return;
         }
-        // The Escape that closed a game box over the window is not the window's (the box calls back in the same frame).
-        if (Input.GetKeyDown(KeyCode.Escape) && Time.frameCount > resumedAt + 1)
-        {
-            if (bigShotIndex >= 0)
-                Redraw(() => bigShotIndex = -1);
-            else
-                window.SetActive(false);
-        }
-        else if (bigShotIndex >= 0 && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
+        if (bigShotIndex >= 0 && (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
             Redraw(() => StepBigShot(Input.GetKeyDown(KeyCode.LeftArrow) ? -1 : 1));
         // Not while the mouse button is held: a press on a row and the release on its redrawn copy would lose the click.
         else if ((windowDirty || windowRevision != ModMenu.Revision) && !Input.GetMouseButton(0))
@@ -177,14 +169,25 @@ public partial class Plugin
         {
             if (window == null && !BuildWindow())
                 return;
-            PlaceCanvas();
-            window.SetActive(true);
             suspended = false;
+            screen.Open();
             screenshotsAsked.Clear();
             windowRevision = -1;
             FillWindow();
         }
         catch (Exception e) { Log.LogError($"mods window: {e}"); }
+    }
+
+    // Escape while the window is the game's top screen: the big screenshot closes first, then the window. Not the one
+    // that closed a game box over it (the box calls back in the same frame).
+    void Escape()
+    {
+        if (suspended || Time.frameCount <= resumedAt + 1)
+            return;
+        if (bigShotIndex >= 0)
+            Redraw(() => bigShotIndex = -1);
+        else
+            screen.Hide();
     }
 
     // ---------- building ----------
@@ -200,8 +203,9 @@ public partial class Plugin
         }
         if (GameObject.Find(WindowName) is { } old)
             UnityEngine.Object.DestroyImmediate(old);
+        // Built shown, as the Load screen is laid out (its tabs' frames are placed by their layout), then made a screen of
+        // the game's registry, which hides it until it opens.
         window = ScreenCopy.Make(load.gameObject, WindowName, ScreenScripts);
-        PlaceCanvas();
         staging = new GameObject("OE_Staging", Il2CppInterop.Runtime.Il2CppType.Of<RectTransform>());
         staging.transform.SetParent(window.transform, false);
         staging.SetActive(false);
@@ -234,6 +238,8 @@ public partial class Plugin
         switchSource = switchTemplate != null ? switchTemplate.GetComponentInChildren<BhSettingsCheckbox>(true) : null;
         Logs.Info($"Mods window: built from the game's Load screen; tabs {tabList.Count}, input {(inputTemplate != null)}, sorting {(sortDropdown != null)}, filters {(tagBox != null)}, " +
                   $"chip {(chipTemplate != null)}, text {(lineTemplate != null)}, buttons {(textButtonTemplate != null)}, switch {(switchSource != null)}");
+        screen = ModScreen.Adopt(window, ModScreen.UnderGameBoxes());
+        screen.Escape = () => Guard("escape", Escape);
         return true;
     }
 
@@ -246,7 +252,7 @@ public partial class Plugin
         titleText = root.Find("MainHeader")?.GetComponent<TMP_Text>();
         Hide(root, "ButtonBack", "BackToSaving", "ExampleImage");
         if (root.Find("ButtonClose")?.GetComponent<BhGenericButton>() is { } close)
-            Bind(close, null, () => window.SetActive(false), false);
+            Bind(close, null, () => screen.Hide(), false);
         // The cloud quota and the autosaves' header and switch are not ours.
         Hide(sar, "CloudQuota", "AutosaveShow", "AutosavesHeader");
         if (titleText == null)
@@ -511,17 +517,6 @@ public partial class Plugin
             scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
     }
 
-    // The window drawn as the game's screens are, with the Load screen's camera and layer, so the game's message and
-    // input boxes come over it; without a camera to share, over everything (and hidden while a box is open). Above every
-    // screen the game keeps switched on (settings ~2000, profile 1000, the Load screen 1600: one with a
-    // raycast target would take the player's clicks) and just under the game's message box (ScreenCopy.Place).
-    void PlaceCanvas()
-    {
-        var canvas = window.GetComponent<Canvas>();
-        var camera = ScreenCopy.Place(canvas, Scene.Find<Hex.UI.SaveLoad.ScLoad>()?.GetComponent<Canvas>(), ScreenOrder, WindowOrder);
-        Logs.Once(camera == null ? "Mods window: no UI camera, drawn over everything" : $"Mods window: drawn with the camera {camera.name}, order {canvas.sortingOrder}");
-    }
-
     // ---------- filling ----------
 
     void Redraw(Action change)
@@ -607,8 +602,8 @@ public partial class Plugin
     void HideModsWindow()
     {
         // At once: the reloaded build looks for them in the same frame.
-        if (window != null)
-            UnityEngine.Object.DestroyImmediate(window);
+        screen?.Destroy();
+        screen = null;
         if (modsButton != null)
             UnityEngine.Object.DestroyImmediate(modsButton.gameObject);
         pictures?.Clear();

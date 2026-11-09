@@ -7,12 +7,14 @@ using UnityEngine.UI;
 namespace OldenEra.Modding.Common;
 
 // A game screen copied as a window of our own: the copy's scripts that run the screen taken off, its parts filled with
-// ours. The copy keeps the screen's look (canvas, scaler, frames, fonts) and is drawn like the game's screens.
+// ours. The copy keeps the screen's look (canvas, scaler, frames, fonts); a screen of ours in the game's registry
+// shows it (ModScreen.Adopt).
 //
-//   window = ScreenCopy.Make(Scene.Find<ScLoad>().gameObject, "OE_MyWindow", new HashSet<string> { "ScLoad", ... });
-//   ScreenCopy.Place(window.GetComponent<Canvas>(), loadCanvas, 1600, 29000);
+//   var copy = ScreenCopy.Make(Scene.Find<ScLoad>().gameObject, "OE_MyWindow", new HashSet<string> { "ScLoad", ... });
+//   Build(copy);                        // while shown: the game's layouts place its parts
+//   screen = ModScreen.Adopt(copy, ModScreen.UnderGameBoxes());
 //   ...
-//   Object.DestroyImmediate(window);   // on unload: at once, a reloaded build looks for it in the same frame
+//   screen.Destroy();   // on unload
 internal static class ScreenCopy
 {
     // A copy of `screen` with the scripts named in `scripts` (by their Il2Cpp type name) taken off, not under any
@@ -65,42 +67,6 @@ internal static class ScreenCopy
             dropdown.enabled = true;
         foreach (var layout in copy.GetComponentsInChildren<LayoutGroup>(true))
             layout.enabled = true;
-    }
-
-    // The copy's canvas drawn as the game's screens are: with the UI camera of `screen` (the original screen's canvas;
-    // else the message box's, else any camera canvas), on its layer, above the screens the game keeps switched on and
-    // just under the game's message and input boxes, so they come over it (`screenOrder`: the order
-    // above which it goes when there is no message box). Its nested canvases with their own order move with it. Without
-    // a camera: drawn over everything at `overlayOrder`. Returns the camera, or null.
-    public static Camera Place(Canvas canvas, Canvas screen, int screenOrder, int overlayOrder)
-    {
-        var box = Scene.Find<ScMessageBox>();
-        var messageBox = box?.GetComponent<Canvas>();
-        var camera = screen?.worldCamera ?? box?.canvas?.worldCamera
-                     ?? Object.FindObjectsOfType<Canvas>().FirstOrDefault(c => c != null && c.renderMode == RenderMode.ScreenSpaceCamera && c.worldCamera != null)?.worldCamera;
-        if (camera == null)
-        {
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = overlayOrder;
-            return null;
-        }
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = camera;
-        if (screen != null)
-        {
-            canvas.planeDistance = screen.planeDistance;
-            canvas.sortingLayerID = screen.sortingLayerID;
-        }
-        canvas.overrideSorting = true;
-        // Under both boxes: the input box is drawn lower than the message box.
-        var boxes = new[] { messageBox, Scene.Find<ScInputBox>()?.GetComponent<Canvas>() }.Where(c => c != null).ToList();
-        var order = boxes.Count > 0 ? boxes.Min(c => c.sortingOrder) - 2 : (screen != null ? screen.sortingOrder : screenOrder) + 50;
-        var old = canvas.sortingOrder;
-        canvas.sortingOrder = order;
-        foreach (var nested in canvas.GetComponentsInChildren<Canvas>(true))
-            if (nested != canvas && nested.overrideSorting)
-                nested.sortingOrder = order + (nested.sortingOrder - old);
-        return camera;
     }
 
     // A part of the copy drawn over all of it: a canvas of its own sorted above the copy's other canvases (a part under

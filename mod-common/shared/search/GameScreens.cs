@@ -128,6 +128,14 @@ internal static partial class Game
             : null,
         Name, onlyOne: true).Generate("IsOpen");
 
+    // A screen in the hidden state at once, no tween (BhScreen.udm): off the input stack, focus popped, transparent, off;
+    // what the registry's register calls.
+    static readonly Lookup<MethodInfo> screenHideAtOnce = Lookup<MethodInfo>.Among("screen hidden at once",
+        () => registerScreen.Value is { } register
+            ? CalledBy(register).Where(m => m.DeclaringType == typeof(BhScreen) && !m.IsStatic).Returns(typeof(void)).Takes().DistinctCode()
+            : null,
+        Members.Name, onlyOne: true).Generate("HideAtOnce");
+
     // What to call once when the screen hides (BhScreen.cekl: its Hide calls it and clears it).
     static readonly Lookup<PropertyInfo> screenWhenClosed = Lookup<PropertyInfo>.Among("screen when closed",
         () => DeclaredProperties(typeof(BhScreen)).Where(p => p.PropertyType == typeof(Il2CppSystem.Action) && !p.Name.EndsWith("k__BackingField")),

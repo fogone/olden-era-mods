@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Hex.InputSys;
 using Hex.UI;
 using Hex.UI.GeneralKit;
@@ -11,13 +12,14 @@ namespace OldenEra.Modding.Common;
 // registry puts it on its stack of open screens, gives it the UI camera and the input (Escape included), takes the
 // clicks from the screen below and gives them back on hide, hides the tooltips, plays the game's appear and disappear.
 //
-//   screen = ModScreen.Create("OE_ModsScreen", sortingOrder: 1998);
+//   screen = ModScreen.Create("OE_MyScreen", ModScreen.UnderGameBoxes());
 //   Build(screen.Content);                    // our content under its canvas (layer UI)
 //   screen.Closed = () => ...;                // after each hide: Escape, screen.Hide(), the game's
 //   screen.Open();
 //   ...
 //   screen.Destroy();                         // on the plugin's unload
 //
+// A copy of a game screen (ScreenCopy.Make), built, becomes one with ModScreen.Adopt(copy, order).
 // The registry is emptied on a mode change (cqp.Clear, refilled by cqp.Init from the scenes); the screen registers
 // again when it is opened next. Its object outlives the scenes (DontDestroyOnLoad).
 internal sealed class ModScreen
@@ -40,33 +42,40 @@ internal sealed class ModScreen
         Escape = Hide;
     }
 
-    // Makes the screen (hidden) and registers it; one registered under the same name before (a reloaded plugin's) is
-    // taken out and destroyed. `sortingOrder` is the canvas's place among the game's screens: the game keeps each
-    // screen's own (its message box is at 5002, its input box at 2000).
+    // Makes an empty screen (hidden) and registers it; see Adopt.
     public static ModScreen Create(string name, int sortingOrder)
     {
+        var root = new GameObject(name);
+        root.SetActive(false);
+        root.AddComponent<RectTransform>();
+        root.AddComponent<Canvas>();
+        ScaleAsGame(root.AddComponent<CanvasScaler>());
+        return Adopt(root, sortingOrder);
+    }
+
+    // Makes an object with a Canvas (a built copy of a game screen, its own scripts off) a screen of ours under its
+    // object's name, and registers it (hidden); one registered under the same name before (a reloaded plugin's) is taken
+    // out and destroyed. `sortingOrder` is the canvas's place among the game's screens (the game keeps each screen's
+    // own: UnderGameBoxes); its nested canvases with their own order move with it.
+    public static ModScreen Adopt(GameObject root, int sortingOrder)
+    {
+        var name = root.name;
         var registry = GameNames.ScreenRegistry();
         if (registry.Screens.TryGetValue(name, out var old))
         {
-            if (old != null)
-            {
-                if (old.IsOpen)
-                    registry.Hide(name);
-                UnityEngine.Object.Destroy(old.gameObject);
-            }
             registry.Screens.Remove(name);
+            if (old != null && old.gameObject != root)
+                Gone(old);
         }
 
-        var root = new GameObject(name);
         root.SetActive(false);   // BhScreen's Awake waits until its fields are set
         root.layer = 5;          // UI: the only layer the game's UI camera draws
-        UnityEngine.Object.DontDestroyOnLoad(root);
-        root.AddComponent<RectTransform>();
-        var canvas = root.AddComponent<Canvas>();
-        canvas.sortingOrder = sortingOrder;
-        ScaleAsGame(root.AddComponent<CanvasScaler>());
-        var raycaster = root.AddComponent<GraphicRaycaster>();
-        var group = root.AddComponent<CanvasGroup>();
+        if (root.transform.parent == null)
+            UnityEngine.Object.DontDestroyOnLoad(root);
+        var canvas = root.GetComponent<Canvas>();
+        SetOrder(canvas, sortingOrder);
+        var raycaster = root.GetComponent<GraphicRaycaster>() ?? root.AddComponent<GraphicRaycaster>();
+        var group = root.GetComponent<CanvasGroup>() ?? root.AddComponent<CanvasGroup>();
 
         var screen = root.AddComponent<BhScreen>();
         screen.canvas = canvas;
@@ -81,6 +90,34 @@ internal sealed class ModScreen
         screen.SetUpOnce();     // its input receiver (the registry's Init did it for the game's screens)
         screen.Input.Bind(EInputAction.Escape, EInputState.Down, (Il2CppSystem.Action)(() => made.Escape?.Invoke()));
         return made;
+    }
+
+    // The order just under the game's message and input boxes (the input box is drawn lower), so they come over the
+    // screen; above the screens the game keeps on (its settings ~2000 are hidden while ours is open).
+    public static int UnderGameBoxes(int fallback = 1998)
+    {
+        var orders = new[] { Scene.Find<ScMessageBox>()?.GetComponent<Canvas>(), Scene.Find<ScInputBox>()?.GetComponent<Canvas>() }
+            .Where(c => c != null).Select(c => c.sortingOrder).ToList();
+        return orders.Count > 0 ? orders.Min() - 2 : fallback;
+    }
+
+    static void SetOrder(Canvas canvas, int order)
+    {
+        var old = canvas.sortingOrder;
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = order;
+        foreach (var nested in canvas.GetComponentsInChildren<Canvas>(true))
+            if (nested != canvas && nested.overrideSorting)
+                nested.sortingOrder = order + (nested.sortingOrder - old);
+    }
+
+    // A screen out of the game's stacks at once and destroyed at once (a reloaded build makes its own in the same frame).
+    static void Gone(BhScreen screen)
+    {
+        var registry = GameNames.ScreenRegistry();
+        registry.OpenScreens.Remove(screen);
+        screen.HideAtOnce();   // off the input stack, focus popped (as on registering)
+        UnityEngine.Object.DestroyImmediate(screen.gameObject);
     }
 
     // The same scaling as the game's screens (its message box's canvas), so sizes in our content are the game's.
@@ -129,15 +166,18 @@ internal sealed class ModScreen
         }
     }
 
-    // Out of the registry and gone (the plugin unloads).
+    // Out of the registry and gone at once (the plugin unloads; its reloaded build makes the screen again in the same
+    // frame). Open, it is hidden by the registry first: the screen below gets the clicks back.
     public void Destroy()
     {
         if (screen == null)
             return;
-        Hide();
         var registry = GameNames.ScreenRegistry();
-        if (registry.Screens.TryGetValue(Name, out var registered) && registered == screen)
+        var registered = registry.Screens.TryGetValue(Name, out var found) && found == screen;
+        if (registered && IsOpen)
+            registry.Hide(Name);
+        if (registered)
             registry.Screens.Remove(Name);
-        UnityEngine.Object.Destroy(screen.gameObject);
+        Gone(screen);
     }
 }
