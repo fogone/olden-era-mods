@@ -24,10 +24,10 @@ if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }
 $catalogParts = [ordered]@{
     'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings'); Requires = ''; Tags = 'ui,library' }
     'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll'); Requires = ''; Tags = 'library' }
-    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip,info,squads,battle' }
-    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip,info,buildings' }
-    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,info,squads,buildings,qol' }
-    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'battle,info,squads' }
+    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,tooltip,info,squads,battle' }
+    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,tooltip,info,buildings' }
+    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,info,squads,buildings,qol' }
+    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,battle,info,squads' }
     'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip,ui,qol' }
     'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'fix,qol' }
     'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = ''; Tags = 'ui,qol' }
