@@ -118,6 +118,19 @@ deleted; when it did not, the pull request stays open and the script warns. The 
 A version is published once. Run again on another game version with the same DLL, the release only gets that game
 version added (it works there too); with another DLL it stops: raise the mod's `Version` in its csproj.
 
+## The SDK on nuget.org
+
+The mods' SDK (`sdk/Nobirds.OldenEra.Modding.Sdk`, with the library inside) is built here, where the game is, and pushed
+to nuget.org by a workflow that nuget.org trusts (Trusted Publishing: no API key is kept anywhere).
+
+- `.\publish-sdk.ps1` builds the library and the package (`sdk\Nobirds.OldenEra.Modding.Sdk\bin\Release\*.nupkg`).
+- `.\publish-sdk.ps1 -Publish` also makes the GitHub release `sdk-v<version>` with the package and runs the workflow
+  `.github/workflows/publish-sdk.yml`, which takes the package from that release, gets a key for an hour from nuget.org
+  (`NuGet/login`) and pushes it. A version is published once: raise `<Version>` in the SDK's csproj.
+- Once, on nuget.org: the account's **Trusted Publishing** page, a policy with owner `fogone`, repository
+  `olden-era-mods`, workflow file `publish-sdk.yml`; and in the repository's secrets, `NUGET_USER`: the nuget.org
+  profile name (not the e-mail).
+
 ## How it is built
 
 - **`mod-common/`**: the common library `OldenEraCommon.dll`, one for every version of the game: `ModBase` (a mod's frame:
