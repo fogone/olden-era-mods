@@ -33,8 +33,10 @@ for (var i = 1; i + 1 < args.Length; i += 2)
     list.Add(args[i + 1]);
 }
 if (args.Length == 0 || args[0] is not ("add" or "meta"))
-    return Fail("usage: catalog add --catalog <dir> --root-url <url> --id <id> --version <v> --game <g> --bepinex <v> --file <path>=<url> ...\n" +
-                "       catalog meta --catalog <dir> --root-url <url> --id <id> [--tags ...] [--lang ...] [--screenshot ...]");
+    return Fail("usage: oe-catalog add --catalog <dir> --root-url <url> --package <the mod's zip>=<its download url> [--name <catalog name>]\n" +
+                "       oe-catalog add --catalog <dir> --root-url <url> --id <id> --version <v> --game <g> --bepinex <v> --file <path>=<url> ...\n" +
+                "       oe-catalog meta --catalog <dir> --root-url <url> --id <id> [--tags ...] [--lang ...] [--screenshot ...]\n" +
+                "       (https://github.com/fogone/olden-era-mods/blob/main/tools/catalog/README.md)");
 var metaOnly = args[0] == "meta";
 
 string One(string key) => options.TryGetValue(key, out var v) ? v[^1] : null;
