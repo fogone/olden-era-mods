@@ -50,7 +50,7 @@ public partial class Plugin
     // UI camera, the input and Escape; drawn just under the game's message and input boxes.
     ModScreen screen;
     GameObject window, staging;
-    int windowRevision = -1, nextButtonSearch;
+    int windowRevision = -1;
     bool windowDirty, filling;
 
     // The parts of the copied screen.
@@ -90,12 +90,12 @@ public partial class Plugin
             return;
         }
         Logs.Once($"Mods window: the catalog has {ModCatalog.Mods.Count} mods, {ModCatalog.Sources.Count} sources");
-        // Looked for every two seconds, only in the main menu.
-        if (modsButton == null && Time.frameCount >= nextButtonSearch)
+        // In the main menu, under "Additional" and its sub-menu (the Options / Exit group is laid out by the game); a new
+        // main menu (back from a game) gets it again.
+        if (modsButton == null && MainMenu.AddButton(ModsButtonName, TabKey, OpenWindow, view => view.additionallyButton) is { } added)
         {
-            nextButtonSearch = Time.frameCount + 120;
-            if (InMainMenu())
-                AddModsButton();
+            modsButton = added;
+            Logs.Info("Mods button: in the main menu");
         }
         if (window == null)
             return;
@@ -123,44 +123,6 @@ public partial class Plugin
         else if ((windowDirty || windowRevision != ModMenu.Revision) && !Input.GetMouseButton(0))
             Guard("fill", FillWindow);
         GreyLater();
-    }
-
-    void AddModsButton()
-    {
-        var options = MainMenuButton("OptionsButton");
-        if (options == null)
-            return;
-        // In the main column under "Additional" (and its submenu), where there is room: the Options / Exit group is laid
-        // out by the game, which puts it back whenever the menu shows.
-        var additional = MainMenuButton("AdditionallyButton");
-        if (additional == null)
-            return;
-        var column = additional.transform.parent;
-        // Buttons left by an earlier build of the plugin (hot reload), in this column or under Options: gone first.
-        foreach (var parent in new[] { column, options.transform.parent })
-            for (var i = parent.childCount - 1; i >= 0; i--)
-                if (parent.GetChild(i).name == ModsButtonName)
-                    UnityEngine.Object.DestroyImmediate(parent.GetChild(i).gameObject);
-        var place = additional.transform.GetSiblingIndex() + 1;
-        if (place < column.childCount && column.GetChild(place).GetComponent<Hex.MainMenu.MainMenuSubNavView>() != null)
-            place++;
-        var copy = UnityEngine.Object.Instantiate(options.gameObject, column, false);
-        copy.name = ModsButtonName;
-        copy.transform.SetSiblingIndex(place);
-        modsButton = copy.GetComponent<BhNavigationButton>();
-        SetKey(modsButton.label, TabKey);
-        modsButton.MenuClick = (Il2CppSystem.Action)(Action)OpenWindow;
-        Logs.Info($"Mods button: under {additional.name} in {column.name}");
-    }
-
-    // A shown button of the main menu by its object's name.
-    BhNavigationButton MainMenuButton(string name)
-    {
-        var button = UnityEngine.Object.FindObjectsOfType<BhNavigationButton>()
-            .FirstOrDefault(b => b != null && b.name == name && b.gameObject.activeInHierarchy);
-        if (button == null)
-            Logs.Once($"Mods window: no {name} in the main menu yet");
-        return button;
     }
 
     void OpenWindow()
@@ -604,8 +566,7 @@ public partial class Plugin
         // At once: the reloaded build looks for them in the same frame.
         screen?.Destroy();
         screen = null;
-        if (modsButton != null)
-            UnityEngine.Object.DestroyImmediate(modsButton.gameObject);
+        MainMenu.Remove(modsButton);
         pictures?.Clear();
         window = staging = null;
         modsButton = null;

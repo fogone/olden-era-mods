@@ -25,6 +25,7 @@ global using GameMapGameSession = global::dcz;
 global using GameMapObject = global::fql;
 global using GameMapObjectStore = global::fqm;
 global using GameMapSession = global::feh;
+global using GameMenuSelectable = global::cab;
 global using GameMessageBoxButton = global::dcm;
 global using GameMessageBoxOptions = global::dcl;
 global using GameModelHolder = global::bye;
@@ -448,6 +449,15 @@ internal static class GameNames
 
         // hub tab selected look: BhTab.jiv(Boolean) : Void
         public void ShowSelected(bool a0) => it.jiv(a0);
+    }
+
+    extension(global::Hex.MainMenu.MainMenuNavigationView it)
+    {
+        // main menu open sub-menu: MainMenuNavigationView.ccbs : MainMenuSubNavView
+        public global::Hex.MainMenu.MainMenuSubNavView OpenSubMenu => it.ccbs;
+
+        // main menu select: MainMenuNavigationView.qjp(cab) : Boolean
+        public bool Select(GameMenuSelectable a0) => it.qjp(a0);
     }
 
     extension(global::Hex.Session.Battle.Unit it)
