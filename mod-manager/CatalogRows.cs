@@ -129,8 +129,12 @@ public static class CatalogRows
         var metas = catalog ?? Array.Empty<ModMeta>();
         ModMeta MetaOf(string id) => metas.FirstOrDefault(m => Same(m.Id, id));
 
-        // A mod's name in each language (its meta file's; its id when nothing names it), one key per id.
-        string NameKey(string id) => Compose(id + ".name", l => Same(id, ManagerService.ManagerId) ? Texts.GetIn(l, "oe.manager.name") : MetaOf(id)?.NameIn(l.ToString()) ?? id);
+        // A mod's name in each language: its meta file's; without one (its source removed), the loaded mod's own title;
+        // its id when nothing names it. One key per id.
+        string OwnTitle(string id, ELang l) =>
+            ModMenu.All.FirstOrDefault(m => Same(m.Guid, id)) is { } menu ? Texts.GetIn(l, $"oe.{menu.Id}.title") : id;
+        string NameKey(string id) => Compose(id + ".name", l => Same(id, ManagerService.ManagerId) ? Texts.GetIn(l, "oe.manager.name")
+            : MetaOf(id)?.NameIn(l.ToString()) ?? OwnTitle(id, l));
 
         // The fields every entry has from its meta file: description, author, source, tags, screenshots.
         ModEntry Entry(string id, ModMeta meta, string installed, string available, bool hasUpdate, bool? enabled, bool required,
