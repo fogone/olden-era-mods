@@ -17,6 +17,7 @@ global using GameEntity = global::fhf;
 global using GameForecast = global::exv;
 global using GameHero = global::fgd;
 global using GameInputBoxOptions = global::dck;
+global using GameInputReceiver = global::cbe;
 global using GameIntroStep = global::ccj;
 global using GameLocalization = global::cav;
 global using GameLocalizedText = global::cpz;
@@ -28,6 +29,7 @@ global using GameMessageBoxButton = global::dcm;
 global using GameMessageBoxOptions = global::dcl;
 global using GameModelHolder = global::bye;
 global using GameParty = global::eco;
+global using GameScreenRegistry = global::cqp;
 global using GameSession = global::dkd;
 global using GameSettingsService = global::bak;
 global using GameSide = global::fqu;
@@ -93,6 +95,9 @@ internal static class GameNames
 
     // map session: feh.me : feh
     public static GameMapSession MapSession => global::feh.me;
+
+    // screen registry instance: cqp.ujg() : cqp
+    public static GameScreenRegistry ScreenRegistry() => global::cqp.ujg();
 
     // session: dkd.Me : dkd
     public static GameSession Session => global::dkd.Me;
@@ -220,6 +225,12 @@ internal static class GameNames
         public string Placeholder { get => inputBoxOptions.chga; set => inputBoxOptions.chga = value; }
     }
 
+    extension(GameInputReceiver inputReceiver)
+    {
+        // bind key: cbe.qpo(EInputAction, EInputState, Action) : Void
+        public void Bind(global::Hex.InputSys.EInputAction a0, global::Hex.InputSys.EInputState a1, global::Il2CppSystem.Action a2) => inputReceiver.qpo(a0, a1, a2);
+    }
+
     extension(GameIntroStep introStep)
     {
         // intro videos step done: ccj.ccgc : Boolean
@@ -299,6 +310,30 @@ internal static class GameNames
     {
         // map object model -> GameObjects: bye._cbor_k__BackingField, bye.cbou, bye.cbor
         public global::System.Collections.Generic.IEnumerable<global::UnityEngine.GameObject> SceneObjects => GameNames.Each<global::UnityEngine.GameObject>(() => modelHolder._cbor_k__BackingField, () => modelHolder.cbou, () => modelHolder.cbor);
+    }
+
+    extension(GameScreenRegistry screenRegistry)
+    {
+        // hide screen by name: cqp.ujr(String) : Void
+        public void Hide(string a0) => screenRegistry.ujr(a0);
+
+        // open screen by name: cqp.bjv(String) : BhScreen
+        public global::Hex.UI.BhScreen Open(string a0) => screenRegistry.bjv(a0);
+
+        // open screen: cqp.ujn(BhScreen) : BhScreen
+        public global::Hex.UI.BhScreen OpenScreen(global::Hex.UI.BhScreen a0) => screenRegistry.ujn(a0);
+
+        // open screens: cqp.cepa : List`1
+        public global::Il2CppSystem.Collections.Generic.List<global::Hex.UI.BhScreen> OpenScreens => screenRegistry.cepa;
+
+        // register screen: cqp.efg(BhScreen) : Void
+        public void Register(global::Hex.UI.BhScreen a0) => screenRegistry.efg(a0);
+
+        // screen by name: cqp.ujk(String) : BhScreen
+        public global::Hex.UI.BhScreen Screen(string a0) => screenRegistry.ujk(a0);
+
+        // registered screens: cqp.ceoz : Dictionary`2
+        public global::Il2CppSystem.Collections.Generic.Dictionary<string, global::Hex.UI.BhScreen> Screens => screenRegistry.ceoz;
     }
 
     extension(GameSession session)
@@ -499,6 +534,21 @@ internal static class GameNames
         public void SetAvailable(bool a0) => it.uhb(a0);
     }
 
+    extension(global::Hex.UI.BhScreen it)
+    {
+        // screen input: BhScreen.cekt : cbe
+        public GameInputReceiver Input => it.cekt;
+
+        // screen is open: BhScreen.cekq : Boolean
+        public bool IsOpen => it.cekq;
+
+        // screen one-time init: BhScreen.hbq() : Void
+        public void SetUpOnce() => it.hbq();
+
+        // screen when closed: BhScreen.cekl : Action
+        public global::Il2CppSystem.Action WhenClosed { get => it.cekl; set => it.cekl = value; }
+    }
+
     extension(global::Hex.UI.BhSkulls it)
     {
         // BhSkulls level colour: BhSkulls.umq(Int32) : Color
@@ -656,6 +706,9 @@ internal static class GameTargets
         M(typeof(global::bei), nameof(global::bei.cfk), typeof(global::UnityEngine.Rendering.CommandBuffer), typeof(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>), typeof(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<global::UnityEngine.Color>)),
         M(typeof(global::bei), nameof(global::bei.dhb), typeof(global::UnityEngine.Rendering.CommandBuffer), typeof(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<int>), typeof(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<global::UnityEngine.Color>)),
     };
+
+    // screen registry init: cqp.Init() : Void
+    public static readonly global::System.Reflection.MethodInfo ScreenRegistryInit = M(typeof(GameScreenRegistry), nameof(GameScreenRegistry.Init));
 
     // settings section fills: BhSettingsSection.Start() : Void, BhSettingsSection.Show(SettingsData) : Void, BhSettingsSection.kpm(SettingsData) : Void, BhSettingsSection.kpn(SettingsData) : Void
     public static readonly global::System.Reflection.MethodInfo[] SettingsSectionFills =
