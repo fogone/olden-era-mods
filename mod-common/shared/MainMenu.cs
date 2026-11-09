@@ -44,7 +44,7 @@ internal static class MainMenu
         copy.name = name;
         copy.transform.SetSiblingIndex(place);
         var button = copy.GetComponent<BhNavigationButton>();
-        Label(button.label, labelKey);
+        GameUi.Label(button.label, labelKey);
         button.MenuClick = (Il2CppSystem.Action)(() =>
         {
             if (View is { } menu)
@@ -62,22 +62,5 @@ internal static class MainMenu
     {
         if (button != null)
             UnityEngine.Object.DestroyImmediate(button.gameObject);   // at once: a reloaded build adds its own in the same frame
-    }
-
-    // The label as the game's own: its localized text with our key (it follows a language change).
-    static void Label(Component text, string key)
-    {
-        if (text == null)
-            return;
-        var value = Texts.Get(key);
-        if (text.GetComponent<GameLocalizedText>() is { } localized)
-        {
-            localized.textSid = "";
-            try { localized.HardSetText(value); }   // its own text element, the one it draws from
-            catch (Exception) { }
-            localized.textSid = key;
-        }
-        if (text.GetComponent<TMPro.TMP_Text>() is { } tmp)
-            tmp.text = value;
     }
 }

@@ -546,6 +546,9 @@ internal static class GameNames
     {
         // shown section: SettingsSectionsView.bwrx : BhSettingsSection
         public global::Hex.Settings.UI.BhSettingsSection ShownSection => it.bwrx;
+
+        // settings show section: SettingsSectionsView.ktn(ESettingsType) : Void
+        public void ShowSection(global::Hex.Settings.UI.ESettingsType a0) => it.ktn(a0);
     }
 
     extension(global::Hex.UI.BhGenericButton it)
@@ -768,6 +771,9 @@ internal static class GameTargets
         M(typeof(global::Hex.Settings.UI.BhSettingsSection), nameof(global::Hex.Settings.UI.BhSettingsSection.kpm), typeof(global::Hex.Settings.Data.SettingsData)),
         M(typeof(global::Hex.Settings.UI.BhSettingsSection), nameof(global::Hex.Settings.UI.BhSettingsSection.kpn), typeof(global::Hex.Settings.Data.SettingsData)),
     };
+
+    // settings show section: SettingsSectionsView.ktn(ESettingsType) : Void
+    public static readonly global::System.Reflection.MethodInfo SettingsShowSection = M(typeof(global::Hex.Settings.UI.SettingsSectionsView), nameof(global::Hex.Settings.UI.SettingsSectionsView.ktn), typeof(global::Hex.Settings.UI.ESettingsType));
 
     // BhSkulls fill for a party: BhSkulls.umo(DataParty) : Int32
     public static readonly global::System.Reflection.MethodInfo SkullsForParty = M(typeof(global::Hex.UI.BhSkulls), nameof(global::Hex.UI.BhSkulls.umo), typeof(global::Hex.Session.Data.DataParty));

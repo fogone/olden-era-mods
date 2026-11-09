@@ -22,6 +22,13 @@ internal static partial class Game
     static readonly GameProperty<SettingsSectionsView, BhSettingsSection> shownSection =
         new GameProperty<SettingsSectionsView, BhSettingsSection>("shown section", _ => true).Generate("ShownSection");
 
+    // Shows the section of a type (SettingsSectionsView.ktn): the shown one hidden, the type looked for among the
+    // sections (ktt), the one found filled with the settings data and shown. The screen's opening, its tab clicks and
+    // the controller all switch through it.
+    static readonly Lookup<MethodInfo> showSection = Lookup<MethodInfo>.Among("settings show section",
+        () => typeof(SettingsSectionsView).Methods().Instance().Returns(typeof(void)).Takes(typeof(ESettingsType)).DistinctCode(),
+        Members.Name, onlyOne: true).Generate("ShowSection").GenerateTarget("SettingsShowSection");
+
     // A tab's click action, set by the screen when it opens (BhSettingsTab.bwrb); our tab takes another tab's.
     static readonly GameProperty<BhSettingsTab, Il2CppSystem.Action<ESettingsType>> tabAction =
         new GameProperty<BhSettingsTab, Il2CppSystem.Action<ESettingsType>>("tab click action", _ => true).Generate("ClickAction", writable: true);
