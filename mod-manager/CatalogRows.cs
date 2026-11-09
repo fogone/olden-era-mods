@@ -153,8 +153,10 @@ public static class CatalogRows
         var managerRelease = managerMeta == null ? null : CatalogClient.ReleaseFor(managerMeta, gameVersion);
         var managerNote = status.State == UpdateStatus.Staged ? Note("manager", "oe.manager.note.staged", status.Version)
             : status.State == UpdateStatus.RolledBack ? Note("manager", "oe.manager.note.failed", status.PreviousVersion) : null;
+        // No update to offer once that very version waits for the next start.
+        var selfStaged = self != null && status.State == UpdateStatus.Staged && VersionComparer.Instance.Compare(status.Version, self.Release.Version) >= 0;
         var manager = Entry(ManagerService.ManagerId, managerMeta, managerVersion, self?.Release.Version ?? managerRelease?.Version,
-            self != null, null, true, Array.Empty<string>(), managerNote);
+            self != null && !selfStaged, null, true, Array.Empty<string>(), managerNote);
 
         // Every mod: the installed ones (even when the catalog does not list them any more) and the catalog's.
         // Not what BepInEx loads by itself from BepInEx\plugins (those are not the manager's).
@@ -175,7 +177,9 @@ public static class CatalogRows
                 var release = sameSource ? CatalogClient.ReleaseFor(meta, gameVersion) : null;
                 var needed = ModLoader.RequiredBy(id).Count > 0;
                 var note = ModLoader.Pending.ContainsKey(id) ? "oe.manager.note.restart" : null;
-                mods.Add(Entry(id, meta, installed.Version, update?.Release.Version ?? release?.Version, update != null, needed ? null : installed.Enabled, needed,
+                // The updates are those of the last catalog reading: one put in place since (the state has its version) is none.
+                var hasUpdate = update != null && VersionComparer.Instance.Compare(update.Release.Version, installed.Version) > 0;
+                mods.Add(Entry(id, meta, installed.Version, update?.Release.Version ?? release?.Version, hasUpdate, needed ? null : installed.Enabled, needed,
                     installed.Requires, Note(id, note)));
             }
             else
