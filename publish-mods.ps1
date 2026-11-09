@@ -131,7 +131,7 @@ foreach ($mod in $selected) {
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the
     # manager, the library and the Mods tab in BepInEx\plugins, its patcher in BepInEx\patchers. Not in the catalog.
-    $assets = if ($asPackage) { @($package) } else { $files }
+    $assets = @(if ($asPackage) { $package } else { $files })   # an array even of one: a lone string would splat as its letters
     if ($mod -eq 'manager') {
         Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
         $zipPath = Join-Path $root "release\olden-era-mod-manager-$version-for-game-$gameVersion.zip"
