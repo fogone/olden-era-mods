@@ -2,7 +2,7 @@
 # publish-sdk.ps1 made its GitHub release (sdk-v<version>, catalog-tool-v<version>) with the .nupkg (built where the game
 # is: the library inside the SDK builds against the game's files, which a runner does not have). nuget.org trusts this workflow (Trusted Publishing: owner fogone, repository
 # olden-era-mods, workflow file publish-sdk.yml) and gives it a key for an hour; no key is stored anywhere.
-#   gh workflow run publish-sdk.yml -f tag=sdk-v0.1.0
+#   gh workflow run publish-sdk.yml -f tag=sdk-v0.1.1
 name: publish-sdk
 on:
   workflow_dispatch:

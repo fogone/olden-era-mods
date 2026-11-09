@@ -4,7 +4,7 @@ An MSBuild SDK for mods of Heroes of Might and Magic: Olden Era on BepInEx 6 (IL
 publishers.
 
 ```xml
-<Project Sdk="Nobirds.OldenEra.Modding.Sdk/0.1.0">
+<Project Sdk="Nobirds.OldenEra.Modding.Sdk/0.1.1">
   <PropertyGroup>
     <AssemblyName>MyMod</AssemblyName>
     <RootNamespace>MyName.MyMod</RootNamespace>
