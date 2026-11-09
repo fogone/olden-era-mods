@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The bytes at a catalog URL, over HTTPS (CatalogClient's fetch). For a private GitHub repository (debugging the whole
 // way before the repository is public, fogone 07.11) a token reads it: raw files with the token in the header, release

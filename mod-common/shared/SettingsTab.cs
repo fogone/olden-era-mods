@@ -10,7 +10,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A tab of our own in the game's settings screen (issue #24), switched by the game itself. The screen keeps its tabs
 // and its sections in arrays (ScSettings.tabs, SettingsSectionsView.sections) and switches by a section's settings type
@@ -19,16 +19,16 @@ namespace OldenEra.Modding.Common;
 // and hides the section as its own. Titles come from the game's row factory (the section's prefabs, as the hotkeys
 // section makes its titles); switch, choice and button rows have no prefab: copies of the General section's rows.
 //
-//   tab = SettingsTab.Add(Harmony, "OE_ModsTab", "oe.settings.tab");   // null until the settings screen is loaded
+//   tab = SettingsTab.Add("OE_ModsTab", "oe.settings.tab");   // null until the settings screen is loaded
 //   tab.Shown = () => Fill(tab.List);
 //   var title = tab.NewTitle("OE_Title");   var row = Instantiate(tab.SwitchRow, tab.List)...
 //   tab.Remove();   // on unload
-internal sealed class SettingsTab
+public sealed class SettingsTab
 {
     // Our sections' types: values the game does not declare, one per tab.
     const int FirstType = 100;
     static readonly List<SettingsTab> all = new();
-    static Harmony patchedWith;
+    static bool patched;
 
     public readonly string Name;
     public readonly ESettingsType Type;
@@ -54,14 +54,14 @@ internal sealed class SettingsTab
     }
 
     // The tab with its label (a localization key) after the game's tabs; null while the settings screen is not loaded.
-    // The plugin's Harmony patches the game's switch once (ModBase removes its patches on unload).
-    public static SettingsTab Add(Harmony harmony, string name, string labelKey)
+    // The library patches the game's switch once, for every tab of every mod.
+    public static SettingsTab Add(string name, string labelKey)
     {
         if (Screen is not { } screen ||
             screen.sectionsController?.sectionsView is not { } view || view == null || screen.tabs == null || screen.tabs.Length == 0 ||
             view.sections.FirstOrDefault(s => s != null && s.TryCast<BhGeneralSection>() != null)?.TryCast<BhGeneralSection>() is not { } general)
             return null;
-        Patch(harmony);
+        Patch();
         var type = (ESettingsType)(FirstType + Enumerable.Range(0, all.Count + 1).First(i => all.All(t => t.Type != (ESettingsType)(FirstType + i))));
         var tab = new SettingsTab(name, type) { screen = screen, view = view };
         if (!tab.Build(general, labelKey))
@@ -75,11 +75,12 @@ internal sealed class SettingsTab
 
     public static bool ScreenLoaded => Screen != null;
 
-    static void Patch(Harmony harmony)
+    static void Patch()
     {
-        if (patchedWith == harmony)
+        if (patched)
             return;
-        patchedWith = harmony;
+        patched = true;
+        var harmony = new Harmony("nobirds.oldenera.common.settings-tab");
         harmony.PatchOne(GameTargets.SettingsShowSection, "the settings sections' switch", postfix: new HarmonyMethod(typeof(SettingsTab), nameof(SwitchedPostfix)));
         harmony.PatchOne(AccessTools.Method(typeof(BhSettingsSection), nameof(BhSettingsSection.Start)), "a settings section's start",
             postfix: new HarmonyMethod(typeof(SettingsTab), nameof(StartPostfix)));

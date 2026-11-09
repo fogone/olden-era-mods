@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The manager's work with the catalog: reading the sources, the updates for this game version, installing and updating
 // mods. The network on background threads; the results and the loading on the main thread (Pump, every frame).

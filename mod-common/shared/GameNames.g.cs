@@ -1,57 +1,11 @@
 // Generated for the game 0.82.07 (tools/game-names from the game's files, or the research plugin's `aliases`). Do not edit:
 // make it again (docs/game-names.md). The lookups behind each name are the Lookup.Generate ones in Game*.cs,
-// the choices among several candidates are in GameNames.pins.txt.
+// the choices among several candidates are in GameNames.pins.txt. A name is public when it shows no obfuscated class
+// (GameTypes.g.cs): it then stays the same on the next version of the game; the others are the library's own.
 
-global using GameAbilities = global::ejh;
-global using GameAbility = global::eji;
-global using GameBattleLogic = global::eqe;
-global using GameBonus = global::dwa;
-global using GameBonusReceiver = global::dwc;
-global using GameBuff = global::ele;
-global using GameBuffs = global::elg;
-global using GameCaster = global::elm;
-global using GameCastSource = global::eln;
-global using GameCastTarget = global::elq;
-global using GameDwelling = global::fpq;
-global using GameEntity = global::fhf;
-global using GameForecast = global::exv;
-global using GameHero = global::fgd;
-global using GameInputBoxOptions = global::dck;
-global using GameInputReceiver = global::cbe;
-global using GameIntroStep = global::ccj;
-global using GameLocalization = global::cav;
-global using GameLocalizedText = global::cpz;
-global using GameMapGameSession = global::dcz;
-global using GameMapObject = global::fql;
-global using GameMapObjectStore = global::fqm;
-global using GameMapSession = global::feh;
-global using GameMenuSelectable = global::cab;
-global using GameMessageBoxButton = global::dcm;
-global using GameMessageBoxOptions = global::dcl;
-global using GameModelHolder = global::bye;
-global using GameParty = global::eco;
-global using GameSaveRowPresenter = global::cum;
-global using GameScreenRegistry = global::cqp;
-global using GameSession = global::dkd;
-global using GameSettingsService = global::bak;
-global using GameSide = global::fqu;
-global using GameSideAi = global::fzh;
-global using GameSideBonusReceiver = global::dyj;
-global using GameSideLogic = global::edc;
-global using GameSideState = global::fmr;
-global using GameSimpleTabData = global::dcs;
-global using GameSquad = global::frc;
-global using GameSquadEntity = global::fgy;
-global using GameSquadStore = global::fre;
-global using GameSquadView = global::fno;
-global using GameTabItem = global::cia;
-global using GameTooltipOptions = global::crv;
-global using GameTooltipPositioner = global::cxg;
-global using GameUnitBase = global::eon;
+namespace Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Common;
-
-internal static class GameNames
+public static class GameNames
 {
     public const string GameVersion = "0.82.07";
 
@@ -75,37 +29,37 @@ internal static class GameNames
     public static bool AlwaysBattle => global::lh.bvdw;
 
     // forecast builder: exw.bkg(DamageUiParams, Boolean) : exv
-    public static GameForecast BuildForecast(global::Hex.Session.Battle.DamageUiParams a0, bool a1) => global::exw.bkg(a0, a1);
+    internal static GameForecast BuildForecast(global::Hex.Session.Battle.DamageUiParams a0, bool a1) => global::exw.bkg(a0, a1);
 
     // encounter: dkw.zki(fgd, frc) : Void
-    public static void Encounter(GameHero a0, GameSquad a1) => global::dkw.zki(a0, a1);
+    internal static void Encounter(GameHero a0, GameSquad a1) => global::dkw.zki(a0, a1);
 
     // HUD hero panel: BhHeroHUDPanel.me : BhHeroHUDPanel
     public static global::Hex.Session.Hud.BhHeroHUDPanel HudPanel => global::Hex.Session.Hud.BhHeroHUDPanel.me;
 
     // diplomacy check: ffd.bloq(fgd, frc) : Boolean
-    public static bool JoinsByDiplomacy(GameHero a0, GameSquad a1) => global::ffd.bloq(a0, a1);
+    internal static bool JoinsByDiplomacy(GameHero a0, GameSquad a1) => global::ffd.bloq(a0, a1);
 
     // diplomacy check explained: ffd.blop(fgd, frc, String&) : Boolean
-    public static bool JoinsByDiplomacyExplained(GameHero a0, GameSquad a1, out string a2) => global::ffd.blop(a0, a1, out a2);
+    internal static bool JoinsByDiplomacyExplained(GameHero a0, GameSquad a1, out string a2) => global::ffd.blop(a0, a1, out a2);
 
     // join share: ffd.blor(frc, fgd) : Single
-    public static float JoinShare(GameSquad a0, GameHero a1) => global::ffd.blor(a0, a1);
+    internal static float JoinShare(GameSquad a0, GameHero a1) => global::ffd.blor(a0, a1);
 
     // localization service: iv.buvy : cav
-    public static GameLocalization Localization => global::iv.buvy;
+    internal static GameLocalization Localization => global::iv.buvy;
 
     // map session: feh.me : feh
-    public static GameMapSession MapSession => global::feh.me;
+    internal static GameMapSession MapSession => global::feh.me;
 
     // screen registry instance: cqp.ujg() : cqp
-    public static GameScreenRegistry ScreenRegistry() => global::cqp.ujg();
+    internal static GameScreenRegistry ScreenRegistry() => global::cqp.ujg();
 
     // session: dkd.Me : dkd
-    public static GameSession Session => global::dkd.Me;
+    internal static GameSession Session => global::dkd.Me;
 
     // settings service: bak.bwsf : bak
-    public static GameSettingsService SettingsService => global::bak.bwsf;
+    internal static GameSettingsService SettingsService => global::bak.bwsf;
 
     // tooltips holder: BhTooltips.cftf : BhTooltips
     public static global::Hex.UI.Tooltips.BhTooltips Tooltips => global::Hex.UI.Tooltips.BhTooltips.cftf;
@@ -116,331 +70,331 @@ internal static class GameNames
     extension(GameAbilities abilities)
     {
         // ability container -> ability (EAbilityType): ejh.beth(EAbilityType) : eji
-        public GameAbility Ability(global::Hex.Configs.EAbilityType a0) => abilities.beth(a0);
+        internal GameAbility Ability(global::Hex.Configs.EAbilityType a0) => abilities.beth(a0);
     }
 
     extension(GameAbility ability)
     {
         // ability -> buff configs: eji.clyl.cvmh, eji.clyl.cvmi, eji.clyl.cvmj
-        public global::System.Collections.Generic.IEnumerable<global::Hex.Configs.BuffConfig> BuffConfigs => GameNames.Each<global::Hex.Configs.BuffConfig>(() => ability.clyl?.cvmh, () => ability.clyl?.cvmi, () => ability.clyl?.cvmj);
+        internal global::System.Collections.Generic.IEnumerable<global::Hex.Configs.BuffConfig> BuffConfigs => GameNames.Each<global::Hex.Configs.BuffConfig>(() => ability.clyl?.cvmh, () => ability.clyl?.cvmi, () => ability.clyl?.cvmj);
 
         // ability -> cast configs: eji.bevb().config, eji.bevb().data, eji.beva().config, eji.beva().data, eji.clyh.config, eji.clyh.data, eji.clyi.config, eji.clyi.data, eji.clyj.config, eji.clyj.data, eji.clyl.damageDealer, eji.clyl.selfDealer, eji.clyl.allyDealer
-        public global::System.Collections.Generic.IEnumerable<global::Hex.Configs.CastDealerConfig> CastConfigs => GameNames.Each<global::Hex.Configs.CastDealerConfig>(() => ability.bevb()?.config, () => ability.bevb()?.data, () => ability.beva()?.config, () => ability.beva()?.data, () => ability.clyh?.config, () => ability.clyh?.data, () => ability.clyi?.config, () => ability.clyi?.data, () => ability.clyj?.config, () => ability.clyj?.data, () => ability.clyl?.damageDealer, () => ability.clyl?.selfDealer, () => ability.clyl?.allyDealer);
+        internal global::System.Collections.Generic.IEnumerable<global::Hex.Configs.CastDealerConfig> CastConfigs => GameNames.Each<global::Hex.Configs.CastDealerConfig>(() => ability.bevb()?.config, () => ability.bevb()?.data, () => ability.beva()?.config, () => ability.beva()?.data, () => ability.clyh?.config, () => ability.clyh?.data, () => ability.clyi?.config, () => ability.clyi?.data, () => ability.clyj?.config, () => ability.clyj?.data, () => ability.clyl?.damageDealer, () => ability.clyl?.selfDealer, () => ability.clyl?.allyDealer);
 
         // ability -> AbilityLogicConfig: eji.clyl : AbilityLogicConfig
-        public global::Hex.Configs.AbilityLogicConfig LogicConfig => ability.clyl;
+        internal global::Hex.Configs.AbilityLogicConfig LogicConfig => ability.clyl;
     }
 
     extension(GameBattleLogic battleLogic)
     {
         // battle logic: the defender answers before the strike: eqe.bhpz(Unit) : Boolean
-        public bool AnswersBeforeStrike(global::Hex.Session.Battle.Unit a0) => battleLogic.bhpz(a0);
+        internal bool AnswersBeforeStrike(global::Hex.Session.Battle.Unit a0) => battleLogic.bhpz(a0);
 
         // battle logic: a second strike after the counter: eqe.bhqa(Unit, eji) : Boolean
-        public bool StrikesAgainAfterCounter(global::Hex.Session.Battle.Unit a0, GameAbility a1) => battleLogic.bhqa(a0, a1);
+        internal bool StrikesAgainAfterCounter(global::Hex.Session.Battle.Unit a0, GameAbility a1) => battleLogic.bhqa(a0, a1);
     }
 
     extension(GameBonus bonus)
     {
         // bonus -> receiver: dwa.cjes : dwc
-        public GameBonusReceiver Receiver => bonus.cjes;
+        internal GameBonusReceiver Receiver => bonus.cjes;
     }
 
     extension(GameBonusReceiver bonusReceiver)
     {
         // bonus receiver add: dwc.bavk(dwa, Boolean) : Void
-        public void Add(GameBonus a0, bool a1) => bonusReceiver.bavk(a0, a1);
+        internal void Add(GameBonus a0, bool a1) => bonusReceiver.bavk(a0, a1);
     }
 
     extension(GameBuffs buffs)
     {
         // buffs -> lists: elg.cmgb, elg.cmgc, elg.cmgd
-        public global::System.Collections.Generic.IEnumerable<global::Il2CppSystem.Collections.Generic.List<GameBuff>> Lists => GameNames.Each<global::Il2CppSystem.Collections.Generic.List<GameBuff>>(() => buffs.cmgb, () => buffs.cmgc, () => buffs.cmgd);
+        internal global::System.Collections.Generic.IEnumerable<global::Il2CppSystem.Collections.Generic.List<GameBuff>> Lists => GameNames.Each<global::Il2CppSystem.Collections.Generic.List<GameBuff>>(() => buffs.cmgb, () => buffs.cmgc, () => buffs.cmgd);
     }
 
     extension(GameDwelling dwelling)
     {
         // dwelling -> bonuses: fpq.crih : List`1
-        public global::Il2CppSystem.Collections.Generic.List<GameBonus> Bonuses => dwelling.crih;
+        internal global::Il2CppSystem.Collections.Generic.List<GameBonus> Bonuses => dwelling.crih;
     }
 
     extension(GameEntity entity)
     {
         // meeting check: fhf.bmdt(fhf) : Boolean
-        public bool Meets(GameEntity a0) => entity.bmdt(a0);
+        internal bool Meets(GameEntity a0) => entity.bmdt(a0);
     }
 
     extension(GameForecast forecast)
     {
         // forecast: damage max: exv.cozv : Int32
-        public int DamageMax { get => forecast.cozv; set => forecast.cozv = value; }
+        internal int DamageMax { get => forecast.cozv; set => forecast.cozv = value; }
 
         // forecast: damage min: exv.cozu : Int32
-        public int DamageMin { get => forecast.cozu; set => forecast.cozu = value; }
+        internal int DamageMin { get => forecast.cozu; set => forecast.cozu = value; }
 
         // forecast: killed max: exv.cpaa : Int32
-        public int KilledMax { get => forecast.cpaa; set => forecast.cpaa = value; }
+        internal int KilledMax { get => forecast.cpaa; set => forecast.cpaa = value; }
 
         // forecast: killed min: exv.cozz : Int32
-        public int KilledMin { get => forecast.cozz; set => forecast.cozz = value; }
+        internal int KilledMin { get => forecast.cozz; set => forecast.cozz = value; }
     }
 
     extension(GameHero hero)
     {
         // hero strength: fgd.blwd(Boolean) : Int32
-        public int ArmyStrength(bool a0) => hero.blwd(a0);
+        internal int ArmyStrength(bool a0) => hero.blwd(a0);
 
         // hero -> its data (Hex.Session.Data.Hero, with the party): fgd.cwtl : Hero
-        public global::Hex.Session.Data.Hero Data => hero.cwtl;
+        internal global::Hex.Session.Data.Hero Data => hero.cwtl;
 
         // hero -> entity: fgd.cqer : fhf
-        public GameEntity Entity => hero.cqer;
+        internal GameEntity Entity => hero.cqer;
 
         // hero -> HeroStat paths: fgd.cqei.cjqu, fgd.cqei.cjqv, fgd.cwtl.statsByLevel, fgd.cwtl.additionalStats, fgd.cwtm, fgd.cwtn
-        public global::System.Collections.Generic.IEnumerable<global::Hex.Session.Data.HeroStat> HeroStats => GameNames.Each<global::Hex.Session.Data.HeroStat>(() => hero.cqei?.cjqu, () => hero.cqei?.cjqv, () => hero.cwtl?.statsByLevel, () => hero.cwtl?.additionalStats, () => hero.cwtm, () => hero.cwtn);
+        internal global::System.Collections.Generic.IEnumerable<global::Hex.Session.Data.HeroStat> HeroStats => GameNames.Each<global::Hex.Session.Data.HeroStat>(() => hero.cqei?.cjqu, () => hero.cqei?.cjqv, () => hero.cwtl?.statsByLevel, () => hero.cwtl?.additionalStats, () => hero.cwtm, () => hero.cwtn);
 
         // hero -> Logic.Hero: fgd.cqei : Hero
-        public global::Hex.Session.Logic.Hero Logic => hero.cqei;
+        internal global::Hex.Session.Logic.Hero Logic => hero.cqei;
 
         // hero -> side wrapper: fgd.cqej : fqu
-        public GameSide SideOwner => hero.cqej;
+        internal GameSide SideOwner => hero.cqej;
     }
 
     extension(GameInputBoxOptions inputBoxOptions)
     {
         // input box cancel text: dck.chgc : String
-        public string CancelText { get => inputBoxOptions.chgc; set => inputBoxOptions.chgc = value; }
+        internal string CancelText { get => inputBoxOptions.chgc; set => inputBoxOptions.chgc = value; }
 
         // input box caption: dck.chfz : String
-        public string Caption { get => inputBoxOptions.chfz; set => inputBoxOptions.chfz = value; }
+        internal string Caption { get => inputBoxOptions.chfz; set => inputBoxOptions.chfz = value; }
 
         // input box confirm text: dck.chgb : String
-        public string ConfirmText { get => inputBoxOptions.chgb; set => inputBoxOptions.chgb = value; }
+        internal string ConfirmText { get => inputBoxOptions.chgb; set => inputBoxOptions.chgb = value; }
 
         // input box on cancel: dck.chgh : Action
-        public global::Il2CppSystem.Action OnCancel { get => inputBoxOptions.chgh; set => inputBoxOptions.chgh = value; }
+        internal global::Il2CppSystem.Action OnCancel { get => inputBoxOptions.chgh; set => inputBoxOptions.chgh = value; }
 
         // input box on confirm: dck.chgi : Action`1
-        public global::Il2CppSystem.Action<string> OnConfirm { get => inputBoxOptions.chgi; set => inputBoxOptions.chgi = value; }
+        internal global::Il2CppSystem.Action<string> OnConfirm { get => inputBoxOptions.chgi; set => inputBoxOptions.chgi = value; }
 
         // input box placeholder: dck.chga : String
-        public string Placeholder { get => inputBoxOptions.chga; set => inputBoxOptions.chga = value; }
+        internal string Placeholder { get => inputBoxOptions.chga; set => inputBoxOptions.chga = value; }
     }
 
     extension(GameInputReceiver inputReceiver)
     {
         // bind key: cbe.qpo(EInputAction, EInputState, Action) : Void
-        public void Bind(global::Hex.InputSys.EInputAction a0, global::Hex.InputSys.EInputState a1, global::Il2CppSystem.Action a2) => inputReceiver.qpo(a0, a1, a2);
+        internal void Bind(global::Hex.InputSys.EInputAction a0, global::Hex.InputSys.EInputState a1, global::Il2CppSystem.Action a2) => inputReceiver.qpo(a0, a1, a2);
     }
 
     extension(GameIntroStep introStep)
     {
         // intro videos step done: ccj.ccgc : Boolean
-        public bool Done { get => introStep.ccgc; set => introStep.ccgc = value; }
+        internal bool Done { get => introStep.ccgc; set => introStep.ccgc = value; }
     }
 
     extension(GameLocalization localization)
     {
         // text of a key: cav.qmk(String) : String
-        public string Translate(string a0) => localization.qmk(a0);
+        internal string Translate(string a0) => localization.qmk(a0);
     }
 
     extension(GameMapGameSession mapGameSession)
     {
         // session -> map data: dcz.chmi : Data
-        public global::Hex.Session.Data.Data MapData => mapGameSession.chmi;
+        internal global::Hex.Session.Data.Data MapData => mapGameSession.chmi;
     }
 
     extension(GameMapObject mapObject)
     {
         // map object -> model: fql.crko : bye
-        public GameModelHolder Model => mapObject.crko;
+        internal GameModelHolder Model => mapObject.crko;
 
         // map object -> DataObject: fql.crkp : DataObject
-        public global::Hex.Session.Data.DataObject ObjectData => mapObject.crkp;
+        internal global::Hex.Session.Data.DataObject ObjectData => mapObject.crkp;
 
         // map object -> owner side: fql.crkr : fqu
-        public GameSide Owner => mapObject.crkr;
+        internal GameSide Owner => mapObject.crkr;
 
         // map object -> party: fql.crkq : eco
-        public GameParty Party => mapObject.crkq;
+        internal GameParty Party => mapObject.crkq;
 
         // map object visited by side: fql.bnpc(fqu) : Boolean
-        public bool VisitedBy(GameSide a0) => mapObject.bnpc(a0);
+        internal bool VisitedBy(GameSide a0) => mapObject.bnpc(a0);
     }
 
     extension(GameMapObjectStore mapObjectStore)
     {
         // map objects by id: fqm.crlf : Dictionary`2
-        public global::Il2CppSystem.Collections.Generic.Dictionary<int, GameMapObject> ById => mapObjectStore.crlf;
+        internal global::Il2CppSystem.Collections.Generic.Dictionary<int, GameMapObject> ById => mapObjectStore.crlf;
     }
 
     extension(GameMapSession mapSession)
     {
         // map session -> map objects: feh.cpyd : fqm
-        public GameMapObjectStore MapObjects => mapSession.cpyd;
+        internal GameMapObjectStore MapObjects => mapSession.cpyd;
 
         // map session -> squads: feh.cpyf : fre
-        public GameSquadStore Squads => mapSession.cpyf;
+        internal GameSquadStore Squads => mapSession.cpyf;
     }
 
     extension(GameMessageBoxButton messageBoxButton)
     {
         // message box button click: dcm.chgw : Action
-        public global::Il2CppSystem.Action Click { get => messageBoxButton.chgw; set => messageBoxButton.chgw = value; }
+        internal global::Il2CppSystem.Action Click { get => messageBoxButton.chgw; set => messageBoxButton.chgw = value; }
 
         // message box button label: dcm.chgv : String
-        public string Label { get => messageBoxButton.chgv; set => messageBoxButton.chgv = value; }
+        internal string Label { get => messageBoxButton.chgv; set => messageBoxButton.chgv = value; }
     }
 
     extension(GameMessageBoxOptions messageBoxOptions)
     {
         // message box cancel button: dcl.chgq : dcm
-        public GameMessageBoxButton Cancel { get => messageBoxOptions.chgq; set => messageBoxOptions.chgq = value; }
+        internal GameMessageBoxButton Cancel { get => messageBoxOptions.chgq; set => messageBoxOptions.chgq = value; }
 
         // message box caption: dcl.chgl : String
-        public string Caption { get => messageBoxOptions.chgl; set => messageBoxOptions.chgl = value; }
+        internal string Caption { get => messageBoxOptions.chgl; set => messageBoxOptions.chgl = value; }
 
         // message box confirm button: dcl.chgp : dcm
-        public GameMessageBoxButton Confirm { get => messageBoxOptions.chgp; set => messageBoxOptions.chgp = value; }
+        internal GameMessageBoxButton Confirm { get => messageBoxOptions.chgp; set => messageBoxOptions.chgp = value; }
 
         // message box text: dcl.chgm : String
-        public string Text { get => messageBoxOptions.chgm; set => messageBoxOptions.chgm = value; }
+        internal string Text { get => messageBoxOptions.chgm; set => messageBoxOptions.chgm = value; }
     }
 
     extension(GameModelHolder modelHolder)
     {
         // map object model -> GameObjects: bye._cbor_k__BackingField, bye.cbou, bye.cbor
-        public global::System.Collections.Generic.IEnumerable<global::UnityEngine.GameObject> SceneObjects => GameNames.Each<global::UnityEngine.GameObject>(() => modelHolder._cbor_k__BackingField, () => modelHolder.cbou, () => modelHolder.cbor);
+        internal global::System.Collections.Generic.IEnumerable<global::UnityEngine.GameObject> SceneObjects => GameNames.Each<global::UnityEngine.GameObject>(() => modelHolder._cbor_k__BackingField, () => modelHolder.cbou, () => modelHolder.cbor);
     }
 
     extension(GameSaveRowPresenter saveRowPresenter)
     {
         // save row on click: cum.fkf(Action) : Void
-        public void OnClick(global::Il2CppSystem.Action a0) => saveRowPresenter.fkf(a0);
+        internal void OnClick(global::Il2CppSystem.Action a0) => saveRowPresenter.fkf(a0);
 
         // save row name: cum.ifs(String, String) : Void
-        public void ShowName(string a0, string a1) => saveRowPresenter.ifs(a0, a1);
+        internal void ShowName(string a0, string a1) => saveRowPresenter.ifs(a0, a1);
     }
 
     extension(GameScreenRegistry screenRegistry)
     {
         // hide screen by name: cqp.ujr(String) : Void
-        public void Hide(string a0) => screenRegistry.ujr(a0);
+        internal void Hide(string a0) => screenRegistry.ujr(a0);
 
         // open screen by name: cqp.bjv(String) : BhScreen
-        public global::Hex.UI.BhScreen Open(string a0) => screenRegistry.bjv(a0);
+        internal global::Hex.UI.BhScreen Open(string a0) => screenRegistry.bjv(a0);
 
         // open screen: cqp.ujn(BhScreen) : BhScreen
-        public global::Hex.UI.BhScreen OpenScreen(global::Hex.UI.BhScreen a0) => screenRegistry.ujn(a0);
+        internal global::Hex.UI.BhScreen OpenScreen(global::Hex.UI.BhScreen a0) => screenRegistry.ujn(a0);
 
         // open screens: cqp.cepa : List`1
-        public global::Il2CppSystem.Collections.Generic.List<global::Hex.UI.BhScreen> OpenScreens => screenRegistry.cepa;
+        internal global::Il2CppSystem.Collections.Generic.List<global::Hex.UI.BhScreen> OpenScreens => screenRegistry.cepa;
 
         // register screen: cqp.efg(BhScreen) : Void
-        public void Register(global::Hex.UI.BhScreen a0) => screenRegistry.efg(a0);
+        internal void Register(global::Hex.UI.BhScreen a0) => screenRegistry.efg(a0);
 
         // screen by name: cqp.ujk(String) : BhScreen
-        public global::Hex.UI.BhScreen Screen(string a0) => screenRegistry.ujk(a0);
+        internal global::Hex.UI.BhScreen Screen(string a0) => screenRegistry.ujk(a0);
 
         // registered screens: cqp.ceoz : Dictionary`2
-        public global::Il2CppSystem.Collections.Generic.Dictionary<string, global::Hex.UI.BhScreen> Screens => screenRegistry.ceoz;
+        internal global::Il2CppSystem.Collections.Generic.Dictionary<string, global::Hex.UI.BhScreen> Screens => screenRegistry.ceoz;
     }
 
     extension(GameSession session)
     {
         // session -> how it is played (EPlay): dkd.cwbi : EPlay
-        public global::Hex.EPlay Play => session.cwbi;
+        internal global::Hex.EPlay Play => session.cwbi;
     }
 
     extension(GameSettingsService settingsService)
     {
         // settings: bak.bwsg : SettingsData
-        public global::Hex.Settings.Data.SettingsData Settings => settingsService.bwsg;
+        internal global::Hex.Settings.Data.SettingsData Settings => settingsService.bwsg;
     }
 
     extension(GameSide side)
     {
         // side -> AI: fqu.crmt : fzh
-        public GameSideAi Ai => side.crmt;
+        internal GameSideAi Ai => side.crmt;
 
         // side is a person's: fqu.bnyp() : Boolean
-        public bool IsPerson() => side.cwyd;
+        internal bool IsPerson() => side.cwyd;
 
         // side -> logic with the bonus receiver: fqu.crly : edc
-        public GameSideLogic Logic => side.crly;
+        internal GameSideLogic Logic => side.crly;
 
         // side wrapper -> Side: fqu.cwxl : Side
-        public global::Hex.Session.Data.Side Side => side.cwxl;
+        internal global::Hex.Session.Data.Side Side => side.cwxl;
 
         // side -> state: fqu.crmh : fmr
-        public GameSideState State => side.crmh;
+        internal GameSideState State => side.crmh;
     }
 
     extension(GameSideLogic sideLogic)
     {
         // side logic -> bonus receiver: edc.cjyr : dyj
-        public GameSideBonusReceiver BonusReceiver => sideLogic.cjyr;
+        internal GameSideBonusReceiver BonusReceiver => sideLogic.cjyr;
     }
 
     extension(GameSideState sideState)
     {
         // side state: no flee offers: fmr.cqyh : Boolean
-        public bool NoFleeOffers => sideState.cqyh;
+        internal bool NoFleeOffers => sideState.cqyh;
     }
 
     extension(GameSimpleTabData simpleTabData)
     {
         // simple tab click: dcs.chiy : Action
-        public global::Il2CppSystem.Action Click { get => simpleTabData.chiy; set => simpleTabData.chiy = value; }
+        internal global::Il2CppSystem.Action Click { get => simpleTabData.chiy; set => simpleTabData.chiy = value; }
 
         // simple tab label: dcs.chix : String
-        public string Label { get => simpleTabData.chix; set => simpleTabData.chix = value; }
+        internal string Label { get => simpleTabData.chix; set => simpleTabData.chix = value; }
     }
 
     extension(GameSquad squad)
     {
         // squad -> entity: frc.crom : fhf
-        public GameEntity Entity => squad.crom;
+        internal GameEntity Entity => squad.crom;
 
         // squad -> DataSquad: frc.crob : DataSquad
-        public global::Hex.Session.Data.DataSquad SquadData => squad.crob;
+        internal global::Hex.Session.Data.DataSquad SquadData => squad.crob;
 
         // squad -> hero-like owners: frc.croq, frc.cwyj
-        public global::System.Collections.Generic.IEnumerable<GameHero> SquadOwners => GameNames.Each<GameHero>(() => squad.croq, () => squad.cwyj);
+        internal global::System.Collections.Generic.IEnumerable<GameHero> SquadOwners => GameNames.Each<GameHero>(() => squad.croq, () => squad.cwyj);
 
         // squad strength: frc.bc() : Int32
-        public int SquadStrength() => squad.bc();
+        internal int SquadStrength() => squad.bc();
 
         // squad -> view: frc.croh : fno
-        public GameSquadView View => squad.croh;
+        internal GameSquadView View => squad.croh;
     }
 
     extension(GameSquadEntity squadEntity)
     {
         // squad entity -> squad: fgy.cqhe : frc
-        public GameSquad Squad => squadEntity.cqhe;
+        internal GameSquad Squad => squadEntity.cqhe;
     }
 
     extension(GameSquadStore squadStore)
     {
         // squads by id: fre.crox : Dictionary`2
-        public global::Il2CppSystem.Collections.Generic.Dictionary<int, GameSquad> ById => squadStore.crox;
+        internal global::Il2CppSystem.Collections.Generic.Dictionary<int, GameSquad> ById => squadStore.crox;
     }
 
     extension(GameSquadView squadView)
     {
         // squad view -> GameObject: fno.crcj : GameObject
-        public global::UnityEngine.GameObject Model => squadView.crcj;
+        internal global::UnityEngine.GameObject Model => squadView.crcj;
     }
 
     extension(GameUnitBase unitBase)
     {
         // Unit -> ability container: eon.bgxs() : ejh
-        public GameAbilities Abilities() => unitBase.cncn;
+        internal GameAbilities Abilities() => unitBase.cncn;
 
         // Unit -> buffs: eon.cwnv : elg
-        public GameBuffs Buffs => unitBase.cwnv;
+        internal GameBuffs Buffs => unitBase.cwnv;
     }
 
     extension(global::Hex.Configs.UnitPassiveConfig it)
@@ -452,7 +406,7 @@ internal static class GameNames
     extension(global::Hex.GameHub.UICommon.BhTab it)
     {
         // hub tab click: BhTab.ccmi : Action`1
-        public global::Il2CppSystem.Action<GameTabItem> Click { get => it.ccmi; set => it.ccmi = value; }
+        internal global::Il2CppSystem.Action<GameTabItem> Click { get => it.ccmi; set => it.ccmi = value; }
 
         // hub tab available: BhTab.jiu(Boolean) : Void
         public void SetAvailable(bool a0) => it.jiu(a0);
@@ -467,7 +421,7 @@ internal static class GameNames
         public global::Hex.MainMenu.MainMenuSubNavView OpenSubMenu => it.ccbs;
 
         // main menu select: MainMenuNavigationView.qjp(cab) : Boolean
-        public bool Select(GameMenuSelectable a0) => it.qjp(a0);
+        internal bool Select(GameMenuSelectable a0) => it.qjp(a0);
     }
 
     extension(global::Hex.Session.Battle.Unit it)
@@ -509,7 +463,7 @@ internal static class GameNames
     extension(global::Hex.Session.Hud.BhHeroHUDPanel it)
     {
         // HUD hero panel -> hero: BhHeroHUDPanel.ciku : fgd
-        public GameHero Hero => it.ciku;
+        internal GameHero Hero => it.ciku;
     }
 
     extension(global::Hex.Session.Logic.Hero it)
@@ -563,7 +517,7 @@ internal static class GameNames
         public void HideAtOnce() => it.udm();
 
         // screen input: BhScreen.cekt : cbe
-        public GameInputReceiver Input => it.cekt;
+        internal GameInputReceiver Input => it.cekt;
 
         // screen is open: BhScreen.cekq : Boolean
         public bool IsOpen => it.cekq;
@@ -587,13 +541,13 @@ internal static class GameNames
         public int ShowDangerOfParty(global::Hex.Session.Data.DataParty a0) => it.umo(a0);
 
         // BhSkulls fill for a squad: BhSkulls.umn(frc) : Int32
-        public int ShowDangerOfSquad(GameSquad a0) => it.umn(a0);
+        internal int ShowDangerOfSquad(GameSquad a0) => it.umn(a0);
     }
 
     extension(global::Hex.UI.BhTooltipGarnison it)
     {
         // BhTooltipGarnison fill (party, bool): BhTooltipGarnison.unj(eco, Boolean) : Void
-        public void FillWith(GameParty a0, bool a1) => it.unj(a0, a1);
+        internal void FillWith(GameParty a0, bool a1) => it.unj(a0, a1);
     }
 
     extension(global::Hex.UI.GeneralKit.BhCheckbox it)
@@ -641,7 +595,7 @@ internal static class GameNames
     extension(global::Hex.UI.SaveLoad.BhSessionInfoElement it)
     {
         // save row presenter: BhSessionInfoElement.vfc() : cum
-        public GameSaveRowPresenter Presenter() => it.vfc();
+        internal GameSaveRowPresenter Presenter() => it.vfc();
 
         // save row campaign shown: BhSessionInfoElement.vfk(Boolean) : Void
         public void ShowCampaign(bool a0) => it.vfk(a0);
@@ -668,22 +622,22 @@ internal static class GameNames
     extension(global::Hex.UI.Tooltips.BhTooltip it)
     {
         // tooltip -> positioner: BhTooltip.cfsf : cxg
-        public GameTooltipPositioner Positioner => it.cfsf;
+        internal GameTooltipPositioner Positioner => it.cfsf;
 
         // tooltip set texts: BhTooltip.vzp(BasicTooltip, crv) : Void
-        public void SetTexts(global::Hex.UI.BasicTooltip a0, GameTooltipOptions a1) => it.vzp(a0, a1);
+        internal void SetTexts(global::Hex.UI.BasicTooltip a0, GameTooltipOptions a1) => it.vzp(a0, a1);
     }
 
     extension(global::Hex.UI.Tooltips.BhTooltipHire it)
     {
         // BhTooltipHire fill (map object): BhTooltipHire.wae(fpq) : Void
-        public void FillFor(GameDwelling a0) => it.wae(a0);
+        internal void FillFor(GameDwelling a0) => it.wae(a0);
     }
 
     extension(global::Hex.UI.Tooltips.BhTooltips it)
     {
         // text tooltip: BhTooltips.wbt(String, String, String, RectTransform, crv, ESnapDirection, Boolean) : Void
-        public void ShowTexts(string a0, string a1, string a2, global::UnityEngine.RectTransform a3, GameTooltipOptions a4, global::Hex.UI.Tooltips.ESnapDirection a5, bool a6) => it.wbt(a0, a1, a2, a3, a4, a5, a6);
+        internal void ShowTexts(string a0, string a1, string a2, global::UnityEngine.RectTransform a3, GameTooltipOptions a4, global::Hex.UI.Tooltips.ESnapDirection a5, bool a6) => it.wbt(a0, a1, a2, a3, a4, a5, a6);
     }
 
     extension(global::Hex.UI.Tooltips.BhTooltipSquad it)

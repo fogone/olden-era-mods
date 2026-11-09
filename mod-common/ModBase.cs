@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,7 +10,7 @@ using HarmonyLib;
 using UnityEngine;
 using Logger = BepInEx.Logging.Logger;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Base of our plugins: owns the plugin's Harmony patches, its menu in the "Моды" tab, its per-frame callbacks and
 // the scene objects it creates (by name prefix), and removes them all on Unload, so the dev loader can swap in a
@@ -79,22 +79,24 @@ public abstract class ModBase : BasePlugin
         }
     }
 
-    // The game's names a mod is built with are for one version (GameNames.GameVersion in its assembly): on another one
-    // the obfuscated names are other ones, and the mod stays off, and says so on screen (VersionNotice). Null when it fits
-    // (or the mod has no generated names). The debug flag PretendOtherGameVersion takes the game for another version, to
-    // see the notice without a patch of the game.
+    // The game's names are for one version of the game: the library's (GameNames, made for the version it is released
+    // for), and those of a mod that works on the game's code itself (it compiles GameTypes.g.cs, which stamps it with
+    // the version: AssemblyMetadata "Nobirds.OldenEra.GameVersion"). On another version the obfuscated names are other ones: the
+    // mod stays off and says so on screen (VersionNotice). Null when it fits. The debug flag PretendOtherGameVersion
+    // takes the game for another version, to see the notice without a patch of the game.
     (string built, string game, string message)? WrongGameVersion()
     {
-        var names = GetType().Assembly.GetType("OldenEra.Modding.Common.GameNames");
-        if (names?.GetField("GameVersion", BindingFlags.Public | BindingFlags.Static)?.GetRawConstantValue() is not string built)
-            return null;
+        var own = GetType().Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(a => a.Key == "Nobirds.OldenEra.GameVersion")?.Value;
         var game = UnityEngine.Application.version;
         if (Config.Bind("Debug", "PretendOtherGameVersion", false, "Take the game for another version: the mod stays off and the notice shows.").Value)
             game += "-pretend";
-        return built == game
+        if (GameNames.GameVersion != game)
+            return (GameNames.GameVersion, game, $"The mod library (OldenEraCommon) is for the game {GameNames.GameVersion}, the game is {game}: the mod is " +
+                                                 "off until the library for this version of the game is installed.");
+        return own == null || own == game
             ? null
-            : (built, game, $"Built for the game {built}, the game is {game}: the mod is off. Rebuild it on this version of the game " +
-                            "(the build makes the game's names for it, docs/game-names.md) and install it.");
+            : (own, game, $"Built for the game {own}, the game is {game}: the mod is off. Rebuild it on this version of the game " +
+                          "(the build makes the game's names for it, docs/game-names.md) and install it.");
     }
 
     protected abstract void OnLoad();

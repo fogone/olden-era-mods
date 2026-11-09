@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,36 +9,36 @@ using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 // The game's code as the plugins use it: readable names over the generated ones (GameNames.g.cs), typed, with the
 // game's own types (GameHero, GameSquad, GameMapObject, ...). The searches behind the generated names are in
 // search/Game.cs; this side is compiled by the plugins only (the generator, tools/game-names, makes the names it uses).
 //
 //   var hero = Game.SelectedHero;              // the hero selected in the HUD (GameHero)
 //   var side = hero?.HeroSide;                 // its player's Hex.Session.Data.Side
-internal static partial class Game
+public static partial class Game
 {
     extension(GameMapObject mapObject)
     {
         // The map object's scene GameObject: the one of its model holder's GameObjects that is set.
-        public GameObject ObjectModel => mapObject.Model?.SceneObjects.FirstOrDefault(go => go != null);
+        internal GameObject ObjectModel => mapObject.Model?.SceneObjects.FirstOrDefault(go => go != null);
     }
 
     extension(Il2CppObjectBase value)
     {
         // An object of the game as the map's map object (a building's wrapper as fql), its hero (fgd), its squad (frc),
         // the squad entity under the cursor (fgy); null when it is none.
-        public GameMapObject AsMapObject() => value?.TryCast<GameMapObject>();
-        public GameHero AsHero() => value?.TryCast<GameHero>();
-        public GameSquad AsSquad() => value?.TryCast<GameSquad>();
-        public GameSquadEntity AsSquadEntity() => value?.TryCast<GameSquadEntity>();
+        internal GameMapObject AsMapObject() => value?.TryCast<GameMapObject>();
+        internal GameHero AsHero() => value?.TryCast<GameHero>();
+        internal GameSquad AsSquad() => value?.TryCast<GameSquad>();
+        internal GameSquadEntity AsSquadEntity() => value?.TryCast<GameSquadEntity>();
     }
 
     // Whether the game played now is a single player one (fogone 07.11: the mods' mode "only in a single player game"):
     // its session played here (EPlay.Local, not Net nor Replay) and, on a map, at most one side played by a person at this
     // computer (the map data's hotseat sides). No session (the main menu): single player. Read once per session and
     // map data (the core caches it by their objects).
-    public static bool SinglePlayer(GameSession session)
+    internal static bool SinglePlayer(GameSession session)
     {
         if (session == null)
             return true;
@@ -50,15 +50,15 @@ internal static partial class Game
 
     // Whether the game played now is a hotseat one: played here (EPlay.Local) with more than one side played by people
     // at this computer (the map data's hotseat sides). Not online nor a replay.
-    public static bool Hotseat(GameSession session) =>
+    internal static bool Hotseat(GameSession session) =>
         session != null && session.Play == Hex.EPlay.Local &&
         (session.TryCast<GameMapGameSession>()?.MapData?.sides?.hotseatSides?.Length ?? 0) > 1;
 
     // Every map object (null entries possible); null when there is no map session now.
-    public static IEnumerable<GameMapObject> MapObjects() => GameNames.MapSession?.MapObjects?.ById is { } byId ? ValuesOf(byId) : null;
+    internal static IEnumerable<GameMapObject> MapObjects() => GameNames.MapSession?.MapObjects?.ById is { } byId ? ValuesOf(byId) : null;
 
     // Every squad (null entries possible); null when there is no map session now.
-    public static IEnumerable<GameSquad> Squads() => GameNames.MapSession?.Squads?.ById is { } byId ? ValuesOf(byId) : null;
+    internal static IEnumerable<GameSquad> Squads() => GameNames.MapSession?.Squads?.ById is { } byId ? ValuesOf(byId) : null;
 
     // The values of a store's dictionary (null entries possible).
     static IEnumerable<V> ValuesOf<V>(Il2CppSystem.Collections.Generic.Dictionary<int, V> byId)
@@ -67,7 +67,7 @@ internal static partial class Game
             yield return value;
     }
 
-    public static GameHero SelectedHero => GameNames.HudPanel is { } panel && panel != null ? panel.Hero : null;
+    internal static GameHero SelectedHero => GameNames.HudPanel is { } panel && panel != null ? panel.Hero : null;
 
 
     public static Hex.Settings.Data.SettingsData Settings => GameNames.SettingsService?.Settings;
@@ -83,26 +83,26 @@ internal static partial class Game
     extension(GameHero hero)
     {
         // The hero's player: Hex.Session.Data.Side (index, fogData, ...).
-        public Side HeroSide => hero.SideOwner?.Side;
+        internal Side HeroSide => hero.SideOwner?.Side;
 
         // The hero's army (DataParty).
-        public DataParty HeroArmy => hero.Data?.Army;
+        internal DataParty HeroArmy => hero.Data?.Army;
 
 
         // Would the squad join the hero, and the game's explanation ("hero points: N squad points: M"): the game's
         // explained Diplomacy check (ffd.blop, the one its encounter's check calls).
-        public (bool joins, string reason) WouldJoin(GameSquad squad) =>
+        internal (bool joins, string reason) WouldJoin(GameSquad squad) =>
             (GameNames.JoinsByDiplomacyExplained(hero, squad, out var reason), reason);
 
         // The share of the squad's creatures that would join (ffd.blor, what the encounter's joining counts with).
-        public float JoinShare(GameSquad squad) => GameNames.JoinShare(squad, hero);
+        internal float JoinShare(GameSquad squad) => GameNames.JoinShare(squad, hero);
     }
 
     extension(GameSquad squad)
     {
 
         // The squad's scene GameObject.
-        public GameObject SquadModel => squad.View?.Model;
+        internal GameObject SquadModel => squad.View?.Model;
     }
 
     // A hidden copy of the game's skulls widget named `name`, to fill for a danger level without repainting an open

@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // The console: the same commands answered at once, on this computer only (loopback), for local development.
 //   http://127.0.0.1:8766/?c=<command>        one command

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Hex.Configs;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Bonuses on the map (a dwelling's "+N weekly growth in the town" and the like) and who receives them: readable names
 // for the game's members (the generator's side, docs/game-names.md). The comments name each member as it is on 0.82.7.
@@ -15,7 +15,7 @@ namespace OldenEra.Modding.Common;
 // (fpq) keeps its bonuses (fpq.crih); when it changes hands (fpq.bnox(new side, old side)) the old side's receiver lets
 // them go and the new side's (fqu.crly.cjyr) takes them. A loaded game makes the dwelling's bonuses anew (fpq.Init) and
 // gives it its owner without that step: the bonuses of a dwelling captured before the save have no receiver.
-internal static partial class Game
+public static partial class Game
 {
     static bool IsListOf(Type list, Type item) =>
         list.IsGenericType && list.GetGenericTypeDefinition() == typeof(Il2CppSystem.Collections.Generic.List<>) && list.GetGenericArguments()[0] == item;

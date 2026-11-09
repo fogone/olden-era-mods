@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using BepInEx;
 using BepInEx.Logging;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // Development only (BepInEx\devplugins): research of the game's code and live state without rebuilding a plugin.
 // The commands (Commands.cs) run on the game's main thread, from two places:
@@ -39,7 +39,6 @@ public partial class Plugin : ModBase
     {
         logger = Log;
         log = Logs;
-        Game.Log = log.Info;
         showFps = Menu.Toggle("ShowFps", false);
         // Timing from the game's start (the first showing of something after a cold start is measured too); the
         // per-frame callbacks of every mod are timed through Ticker, also of the mods loaded after this one.

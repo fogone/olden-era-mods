@@ -1,8 +1,8 @@
 ﻿using Hex.Session.Data;
 using Hex.UI;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Visited;
+namespace Nobirds.OldenEra.Modding.Visited;
 
 // How dangerous the fight for a guarded building is, all done by the game's skulls widget (BhSkulls): its
 // int M(DataParty) (umo on 0.82.7, skulls.FillFor(party)) fills the widget for an enemy party, against the selected

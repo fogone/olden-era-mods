@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Hex.UI;
 using Hex.UI.GeneralKit;
-using OldenEra.Modding.Common;
-using static OldenEra.Modding.Common.UiLayout;
+using Nobirds.OldenEra.Modding.Common;
+using static Nobirds.OldenEra.Modding.Common.UiLayout;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
 // The Mods window's right panel (the Load screen's information panel): a mod's details, its screenshots in the panel's
 // picture squares, the big screenshot over the window.

@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.MapBadges;
+namespace Nobirds.OldenEra.Modding.MapBadges;
 
 // Badges over squads, for the hero selected in the HUD: the Diplomacy icon over a squad that would join, the game's
 // escape icon over one that would offer to flee (the game's encounter decides: Game.MeetingOutcome, as the squad

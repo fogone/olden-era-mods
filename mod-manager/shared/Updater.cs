@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // Updating what cannot be reloaded while the game runs: the manager itself and the library (and the patcher), in
 // BepInEx\plugins and BepInEx\patchers (issue #10). Compiled into the manager (it stages an update and confirms a

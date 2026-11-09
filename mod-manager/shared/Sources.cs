@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The player's own mod sources (issue #6): BepInEx\oldenera-mods\sources.json, besides the built-in catalog.
 //   { "schema": 1,

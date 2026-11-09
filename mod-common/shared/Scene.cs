@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Finding the game's live objects and where they are on screen, the same way in every mod.
 //
@@ -11,7 +11,7 @@ namespace OldenEra.Modding.Common;
 //   Scene.Shown<BhDayPanel>("sessionHUD")           // shown objects of a type in the HUD's scene
 //   Scene.OnScreen(rect, Scene.UiCamera(canvas))    // a UI rect's place on screen, in pixels
 //   Scene.Tree(transform, log)                      // a debug dump of an object tree
-internal static class Scene
+public static class Scene
 {
     // The live object of a type, one in a loaded scene (not a prefab nor an asset); null when none. Goes through every
     // loaded object: for what is looked for once, not every frame.

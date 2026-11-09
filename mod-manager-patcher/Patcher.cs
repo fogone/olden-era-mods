@@ -1,7 +1,7 @@
 using BepInEx;
 using BepInEx.Preloader.Core.Patching;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The mod manager's preloader patcher (BepInEx\patchers, issue #10): BepInEx runs it at the start, before it loads any
 // plugin, so it can replace the files a running game holds: the manager and the library in BepInEx\plugins (Updater:

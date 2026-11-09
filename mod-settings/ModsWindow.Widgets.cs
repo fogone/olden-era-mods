@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using Hex.Settings.UI;
 using Hex.UI;
 using Hex.UI.GeneralKit;
-using OldenEra.Modding.Common;
-using static OldenEra.Modding.Common.UiLayout;
+using Nobirds.OldenEra.Modding.Common;
+using static Nobirds.OldenEra.Modding.Common.UiLayout;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
 // The Mods window's widgets: copies of the game's (a text field, a dropdown, the switch, the cross, a text button) with
 // our texts and actions. The general layout helpers are mod-common/shared/UiLayout.cs.

@@ -7,13 +7,13 @@ using Hex.Settings.UI;
 using Hex.UI;
 using Hex.UI.GeneralKit;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's screen registry (issue #24): every screen (a BhScreen) is registered under its object's name, opened and
 // hidden by name; the registry keeps the stack of open screens, gives the top one the input and the UI camera. A screen
 // of ours registers there too (ModScreen). The searches start from what the game's own screens call: the settings
 // screen's static Open/Hide, the message box's one-time init. The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     static IEnumerable<MethodInfo> CalledBy(MethodInfo method) => GameCode.Calls(method).SelectMany(c => GameCode.At(c.target));
 

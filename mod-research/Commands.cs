@@ -6,10 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // The research commands, one per line, run on the game's main thread, from the file (research.txt) and the local
 // console (127.0.0.1:8766). The tools are GameCode, Members, Probe in mod-common/shared, and Eval (live reflection).

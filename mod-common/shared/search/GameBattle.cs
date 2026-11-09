@@ -5,13 +5,13 @@ using System.Reflection;
 using Hex.Configs;
 using Hex.Session.Battle;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The searches for the game's battle members (see search/Game.cs): a unit's data, config, abilities and buffs, an
 // attack's forecast and the counter decision. Used through the generated names (GameNames.g.cs): unit.Data,
 // unit.LogicConfig, unit.Abilities()?.Ability(type), ability.LogicConfig, ability.CastConfigs, ability.BuffConfigs,
 // unit.Buffs?.Lists, forecast.DamageMin...KilledMax, GameNames.BuildForecast(params, flag).
-internal static partial class Game
+public static partial class Game
 {
     static Type[] BattleTypes => SafeTypes(typeof(BhHealDamageForecastPanel).Assembly);
 

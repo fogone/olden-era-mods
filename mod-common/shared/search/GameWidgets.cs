@@ -6,12 +6,12 @@ using Hex.GameHub.UICommon;
 using Hex.UI;
 using Hex.UI.GeneralKit;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's widgets the Mods window (mod-settings) is built from (issue #14): its message and input boxes, opened with
 // the game's own options objects, its tabs, buttons and check marks. Used through the generated names (GameNames.g.cs).
 // The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // The properties of a game class of one type, by the place of their field in the object (the order the game's code
     // fills them in); `count` of them or none (the class changed: the build stops on it).

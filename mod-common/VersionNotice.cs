@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A mod built for another version of the game stays off (ModBase); this says so on screen, not only in the log
 // (fogone 05.11): while the main menu is up (no map, no battle loaded), a line at the top of the screen with the version

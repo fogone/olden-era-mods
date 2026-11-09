@@ -1,9 +1,9 @@
 ﻿using Hex.Render;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Visited;
+namespace Nobirds.OldenEra.Modding.Visited;
 
 // The unvisited buildings' outline: the game's own, in a color that stands out (the Highlight option).
 //

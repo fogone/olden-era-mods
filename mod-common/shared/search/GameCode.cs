@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's machine code, for the searches: which methods share one native code, what a method calls and reads.
 // Nothing here runs unless called. The research console's own tools (disassembly, virtual slots, hidden strings) are in

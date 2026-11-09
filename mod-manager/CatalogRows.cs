@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using Hex.UI;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The Mods window's data (mod-settings draws it from ModCatalog): the manager's own entry, every mod (installed and the
 // catalog's), the sources and the actions.

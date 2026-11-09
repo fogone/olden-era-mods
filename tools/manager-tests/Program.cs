@@ -1,5 +1,5 @@
 using System.Text;
-using OldenEra.Modding.Manager;
+using Nobirds.OldenEra.Modding.Manager;
 
 // Each case on a fresh temporary BepInEx folder; a failed check says which and the exit code is 1.
 var failures = 0;

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using Hex.Configs;
 using Hex.Session.Data;
 using Hex.UI.Tooltips;
@@ -13,7 +13,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Visited;
+namespace Nobirds.OldenEra.Modding.Visited;
 
 // Map buildings remember who visited them (once, once per hero, once per player, reset daily or weekly), but the
 // tooltip often doesn't say so. This plugin adds a row to the map object tooltip: a big status mark (green check =
@@ -38,7 +38,6 @@ public partial class Plugin : ModBase
     protected override void OnLoad()
     {
         instance = this;
-        Game.Log = Logs.Info;
         // The "Моды" tab of the game's settings (mod-settings plugin).
         var menu = Menu;
         showBadges = menu.Toggle("ShowBadges", true);

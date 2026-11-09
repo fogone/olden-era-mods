@@ -4,12 +4,12 @@ using System.Linq;
 using BepInEx;
 using Hex.Configs;
 using Hex.Session.Battle;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.BattleCounter;
+namespace Nobirds.OldenEra.Modding.BattleCounter;
 
 // The battle's damage forecast as the attack's sequence, left to right (fogone 06.11, issue #8): the defender's counter
 // before the strike, the strike, the counter after it, Double Strike's second strike (SecondStrike.cs: what happens and
@@ -30,7 +30,6 @@ public partial class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         showCounter = Menu.Toggle("ShowCounter", true);
         secondShown = Menu.Choose("SecondStrike", SecondStrikeShown.Column);
         healthShown = Menu.Choose("HealthShown", HealthShown.Off);

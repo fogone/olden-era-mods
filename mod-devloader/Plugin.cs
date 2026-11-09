@@ -6,9 +6,9 @@ using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.DevLoader;
+namespace Nobirds.OldenEra.Modding.DevLoader;
 
 // Development only: loads our plugins from BepInEx\devplugins instead of BepInEx\plugins and reloads one when its
 // DLL changes (build.ps1 -Dev copies it there while the game runs). The old build is unloaded first (its Unload:

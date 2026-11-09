@@ -3,12 +3,12 @@ using System.Reflection;
 using Hex.UI.SaveLoad;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The Load screen's save row (BhSessionInfoElement, issue #24): its prefab is the asset the screen's list makes rows of
 // (BhVirtualizedList.sessionPrefab). The row shows what it is given through setters of its own; its presenter (made in
 // Awake) wires the pointer events. The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // Its picture (vff(Sprite)): the session icon's sprite.
     static readonly Lookup<MethodInfo> saveRowIcon = Lookup<MethodInfo>.Among("save row icon",

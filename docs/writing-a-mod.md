@@ -17,8 +17,10 @@ research console), [game-names.md](game-names.md) (the generated names), [catalo
 - PowerShell. The build scripts default to the Game Pass folder
   (`C:\XboxGames\Heroes of Might and Magic- Olden Era\Content`); pass `-GameDir` for another one.
 
-The game's code is obfuscated and its names change with every patch. A mod is built for **one** game version and stays
-off on another one (see ModBase below).
+The game's code is obfuscated and its names change with every patch. The library (`OldenEraCommon.dll`) holds the game's
+names for one game version and is released for each: a mod that uses only its public API keeps working after a patch
+once the library for the new version is installed. A mod that works on the game's obfuscated classes itself (section 4)
+is built for **one** game version and stays off on another one (see ModBase below).
 
 ## 2. The smallest mod, step by step
 
@@ -40,10 +42,11 @@ Copy `OldenEraSkipIntro.csproj` and change `AssemblyName` and `RootNamespace`. W
 
 - References: `<game>\dotnet\*.dll`, `BepInEx.Core`, `BepInEx.Unity.IL2CPP`, `0Harmony`, `Il2CppInterop.*`,
   `BepInEx\interop\*.dll`, all with `Private="false"`.
-- `<ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />`: the common library
-  (`ModBase`, `ModMenu`, `Texts`, `ModEvents`, `Ticker`). It is installed once and shared by all mods.
-- `<Compile Include="..\mod-common\shared\**\*.cs" Link="shared\..." />`: the shared code (`Game*.cs`,
-  `GameNames.g.cs`, `search/`, `MapMarkers`, ...) is **compiled into every mod**, so it reloads with the mod.
+- `<ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />`: the library (`ModBase`,
+  `ModMenu`, `Texts`, `ModEvents`, `Ticker`, and `mod-common/shared`: the helpers, `Game*.cs` and the game's names). It
+  is installed once, in `BepInEx\plugins`, and shared by all mods.
+- Only a mod that works on the game's obfuscated classes itself adds `<Compile Include="..\mod-common\shared\GameTypes.g.cs"
+  Link="shared\GameTypes.g.cs" />` and its assembly name to the library's `InternalsVisibleTo` (section 4).
 - `<EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />`: the texts.
   The name must be `<root namespace>.lang.<language>.json`; `Texts.Load` reads it from there.
 - `Directory.Build.targets` in the root makes `GameNames.g.cs` again before the build when the game or the searches
@@ -54,9 +57,9 @@ Copy `OldenEraSkipIntro.csproj` and change `AssemblyName` and `RootNamespace`. W
 ```csharp
 using BepInEx;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.SkipIntro;
+namespace Nobirds.OldenEra.Modding.SkipIntro;
 
 [BepInPlugin("nobirds.oldenera.skipintro", "Olden Era Skip Intro", "0.1.0")]
 public class Plugin : ModBase
@@ -210,7 +213,7 @@ protected override void OnLoad()
 ### UI helpers (`mod-common/shared`)
 
 A window or a panel of a mod is best made from the game's own widgets, so it looks and behaves like the game. These
-helpers are compiled into every mod; each file starts with a short usage example. `mod-settings/ModsWindow*.cs` (the
+helpers are in the library; each file starts with a short usage example. `mod-settings/ModsWindow*.cs` (the
 Mods window, a copy of the game's Load screen) uses all of them.
 
 - `ModScreen` — a screen of your own in the game's screen registry (issue #24): `Create(name, sortingOrder)` makes it
@@ -224,7 +227,7 @@ Mods window, a copy of the game's Load screen) uses all of them.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
   off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts);
   `ModScreen.Adopt` makes the built copy a screen of the game's registry; `DrawOnTop` puts a part over the rest.
-- `SettingsTab` — a tab of your own in the game's settings: `Add(Harmony, name, labelKey)` (null until the settings
+- `SettingsTab` — a tab of your own in the game's settings: `Add(name, labelKey)` (null until the settings
   screen is loaded) copies a section with a settings type of its own and a tab of that type into the screen's arrays,
   so the game switches, shows and hides it as its own; `List` takes your rows, `NewTitle` makes a title from the
   game's row factory, `SwitchRow`/`ChoiceRow`/`ButtonRow` are templates of the General section's rows; `Shown` is
@@ -240,7 +243,7 @@ Mods window, a copy of the game's Load screen) uses all of them.
 - `GameUi` — the Load screen's filter (`SetUpFilter`, `Ticked`), a tag chip (`ShowChip`), a dropdown's options
   (`SetDropdownTexts`), a check box (`Check`), through the game's own methods.
 - `UiLayout` — `NewRect`, `Stretch`, `Size`, `HRow`, `Widen`, `Clear`, `Hide`, `Clickable` for building UI next to
-  the game's widgets (`using static OldenEra.Modding.Common.UiLayout;`).
+  the game's widgets (`using static Nobirds.OldenEra.Modding.Common.UiLayout;`).
 
 ## 4. Using the game's code
 
@@ -263,6 +266,15 @@ has none, and say so. First look at how the game does the same thing in a simila
 - Mod code uses only the generated names and the readable wrappers in `mod-common/shared/Game*.cs` (`Game`,
   `GameBattle`, `GameTooltip`, `GameVisits`, `GameEncounter`, `GameSettingsUI`). No searching by obfuscated name in a mod.
 - After a game patch, `git diff` on `GameNames.g.cs` shows what was renamed.
+- **Public and internal.** A generated name is public when it shows no obfuscated class: `row.ShowIcon(sprite)` on the
+  readable `BhSessionInfoElement` stays the same on the next version (the library is made again for it). One that shows
+  an obfuscated class (`GameHero`, `GameSaveRowPresenter`: the aliases of `GameTypes.g.cs`) is internal, and so are the
+  handwritten members that show them. The library's public members never show one: wrap it (`SaveRow` hides the
+  row's presenter).
+- **The plugins that work on the obfuscated classes** (the core, the research console, the fixes, the skip intro, the
+  battle counter, the squad tooltip, the visited buildings, the map badges) compile `GameTypes.g.cs`, which stamps them
+  with the game version (`AssemblyMetadata("Nobirds.OldenEra.GameVersion")`), and see the library's internals
+  (`InternalsVisibleTo` in `OldenEraCommon.csproj`). They are released again with every patch; the others are not.
 
 ### Adding a search: `mod-common/shared/search/GameIntro.cs`
 
@@ -335,11 +347,11 @@ the order that worked: [process.md](process.md), "Researching game code".
   for mods on `ModBase`. The first `-Dev` of a mod that was in `plugins` must be done with the game closed (it moves
   the DLL). Old assemblies stay in memory; that is fine for a session.
 - **Not reloadable:** `OldenEraCommon.dll` (`ModBase`, `ModMenu`, `Texts`, `ModEvents`, `Ticker`) and `mod-devloader`.
-  Install them with `-Install` and restart the game. This is why new shared code goes into `mod-common/shared/` by
-  default: it is compiled into each mod and reloads with it.
+  Install them with `-Install` and restart the game. The shared code (`mod-common/shared/`) is in the library too: a
+  change to it needs a restart; a mod's own code reloads.
 - **Logs:** `<game>\BepInEx\LogOutput.log` (BepInEx) and
   `%USERPROFILE%\AppData\LocalLow\Unfrozen\HeroesOldenEra\Player.log` (Unity). Wait for `Chainloader startup complete`.
-  What `Game.Log = Logs.Info` collects (what each lookup found, `Patch: ... not patched`) is there too.
+  What the library's own log (`Olden Era Library`) collects (what each lookup found, `Patch: ... not patched`) is there too.
 - Start the game from Game Pass: `Start-Process "shell:AppsFolder\HoodedHorse.HeroesofMightandMagicOldenEra_znaey1dw2bdpr!Game"`.
 - After a game patch: start the game once to the main menu, then rebuild. The build makes the names for the new
   version; fix the searches that stopped it, check `git diff`.

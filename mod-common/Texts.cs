@@ -9,7 +9,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Logger = BepInEx.Logging.Logger;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Our texts in the game's own localization table, so the game's UI shows them by key (a row's label, its hover
 // description, a dropdown's options) and switches them with the game's language.

@@ -3,10 +3,10 @@ using System.Linq;
 using System.Reflection;
 using Hex.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's texts: its localization service and its "text of a key" (the searches; Game.Translate uses them).
-internal static partial class Game
+public static partial class Game
 {
     // The localization service (cav on 0.82.7), held statically by the game's texts facade (iv.buvy): the one static
     // property of a class with the language (ELang) and the texts' dictionary, the table Texts puts our texts into.

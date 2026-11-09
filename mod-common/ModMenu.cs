@@ -5,7 +5,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A plugin's entry in the "Моды" tab of the game's settings (drawn by the mod-settings plugin): a title with the
 // plugin's version, a master switch and the plugin's own switches and choices, in the order they are declared.

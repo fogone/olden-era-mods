@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // The generated names (docs/game-names.md): the lookups marked with Lookup.Generate are run on the live game and
 // written as C#:
@@ -172,17 +172,28 @@ internal static class NamesGenerator
             yield break;
         }
 
+        // The names of the game's obfuscated classes, in a file of their own: the library compiles it, and so do the
+        // plugins that work on the game's code itself (the core, the research console), which stay bound to the version.
+        var typeNames = new StringBuilder();
+        typeNames.AppendLine($"// Generated for the game {version} with GameNames.g.cs (docs/game-names.md). Do not edit. The game's obfuscated");
+        typeNames.AppendLine("// classes under names of their own; they change with every patch, so the library's public members never show them.");
+        typeNames.AppendLine();
+        foreach (var (type, name) in aliases.OrderBy(a => a.Value))
+            typeNames.AppendLine($"global using {name} = {CSharp(type, null)};");
+        typeNames.AppendLine();
+        typeNames.AppendLine("// A plugin compiling this file works on the game's code itself: built for this version only (ModBase checks it).");
+        typeNames.AppendLine($"[assembly: global::System.Reflection.AssemblyMetadata(\"Nobirds.OldenEra.GameVersion\", \"{version}\")]");
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(Path.GetFullPath(path)) ?? ".", "GameTypes.g.cs"), typeNames.ToString(), new UTF8Encoding(false));
+
         var code = new StringBuilder();
         code.AppendLine($"// Generated for the game {version} (tools/game-names from the game's files, or the research plugin's `aliases`). Do not edit:");
         code.AppendLine("// make it again (docs/game-names.md). The lookups behind each name are the Lookup.Generate ones in Game*.cs,");
-        code.AppendLine("// the choices among several candidates are in GameNames.pins.txt.");
+        code.AppendLine("// the choices among several candidates are in GameNames.pins.txt. A name is public when it shows no obfuscated class");
+        code.AppendLine("// (GameTypes.g.cs): it then stays the same on the next version of the game; the others are the library's own.");
         code.AppendLine();
-        foreach (var (type, name) in aliases.OrderBy(a => a.Value))
-            code.AppendLine($"global using {name} = {CSharp(type, null)};");
+        code.AppendLine("namespace Nobirds.OldenEra.Modding.Common;");
         code.AppendLine();
-        code.AppendLine("namespace OldenEra.Modding.Common;");
-        code.AppendLine();
-        code.AppendLine("internal static class GameNames");
+        code.AppendLine("public static class GameNames");
         code.AppendLine("{");
         code.AppendLine($"    public const string GameVersion = \"{version}\";");
         foreach (var (entry, value) in constants.OrderBy(c => c.entry.Name))
@@ -211,7 +222,7 @@ internal static class NamesGenerator
         {
             code.AppendLine();
             code.AppendLine($"    // {f.Entry.What}: {Describe(f.Member)}");
-            code.AppendLine("    public static " + Member(f.Entry, (MemberInfo)f.Member, CSharp(f.Member is MemberInfo m ? m.DeclaringType : null, null), aliases));
+            code.AppendLine($"    {Access(f.Member, aliases)} static " + Member(f.Entry, (MemberInfo)f.Member, CSharp(f.Member is MemberInfo m ? m.DeclaringType : null, null), aliases));
         }
         foreach (var owner in members.Where(f => !IsStatic(f.Member)).GroupBy(f => Owner(f.Member)).OrderBy(g => Alias(g.Key, aliases)))
         {
@@ -226,7 +237,7 @@ internal static class NamesGenerator
                     code.AppendLine();
                 first = false;
                 code.AppendLine($"        // {f.Entry.What}: {Describe(f.Member)}");
-                code.AppendLine("        public " + (f.Member is Paths paths ? List(f.Entry, paths, receiver, aliases) : Member(f.Entry, (MemberInfo)f.Member, receiver, aliases)));
+                code.AppendLine($"        {Access(f.Member, aliases)} " + (f.Member is Paths paths ? List(f.Entry, paths, receiver, aliases) : Member(f.Entry, (MemberInfo)f.Member, receiver, aliases)));
             }
             code.AppendLine("    }");
         }
@@ -282,6 +293,9 @@ internal static class NamesGenerator
         _ => Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture),
     };
 
+    // A generated member is public when none of the classes it shows is an obfuscated one (an alias of GameTypes.g.cs).
+    static string Access(object member, Dictionary<Type, string> aliases) =>
+        Exposed(member).SelectMany(Parts).Any(aliases.ContainsKey) ? "internal" : "public";
     // The classes a generated member shows.
     static IEnumerable<Type> Exposed(object member) => member switch
     {

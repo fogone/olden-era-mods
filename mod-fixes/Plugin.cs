@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using BepInEx;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Fixes;
+namespace Nobirds.OldenEra.Modding.Fixes;
 
 // Fixes of the game's own bugs, each a switch of its own (fogone 06.11: a separate mod for the game's bugs). A fix does
 // what the game does in the place where it works, with the game's own functions.
@@ -20,7 +20,6 @@ public class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         dwellingGrowth = Menu.Toggle("DwellingGrowth", true);
         On(ModEvents.MapLoaded, _ => { checksLeft = Checks; nextCheck = Time.frameCount; });
         OnTick(Tick);

@@ -73,7 +73,7 @@ Wrappers instead of `object`: `MapHero`, `MapSquad`, `MapObject`, `SideOwner`, `
 ## Where it lives
 Currently two layers:
 - `OldenEraCommon.dll` in `plugins` — loaded once, changes only while the game is closed;
-- `shared/*.cs` — compiled into every mod and reloaded with it.
+- `shared/*.cs` — compiled into every mod and reloaded with it (until 09.11; since then compiled into the library, #30).
 
 For a hook to be installed once for everyone, there must be a single owner. Proposal:
 - **description of events and contexts** — in `OldenEraCommon.dll`. It is the interface and changes rarely;

@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static OldenEra.Modding.Common.Badges;   // the glyphs' shapes: Segment, Circle, RoundBox, Min
+using static Nobirds.OldenEra.Modding.Common.Badges;   // the glyphs' shapes: Segment, Circle, RoundBox, Min
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Our drawn badges: the visit status, the visit period, the guard, the pickups and mines. The tooltip of a building
 // shows the visit ones ("Посещения"), the map the others too ("Значки на карте").
-internal enum Badge { Visited, Available, Once, PerHero, PerSide, Unlimited, Week, Day, Guard, Res, OwnRes, Item, Chest }
+public enum Badge { Visited, Available, Once, PerHero, PerSide, Unlimited, Week, Day, Guard, Res, OwnRes, Item, Chest }
 
 // The badges as sprites (Badges: dark plate, rounded frame, glyph), drawn once per mod. The status ones in their colour
 // (visited green, available amber, guard red, pickups amber), the period ones gold in a plain frame.
-internal static class BadgeIcons
+public static class BadgeIcons
 {
     static readonly Dictionary<Badge, Sprite> icons = new();
 

@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The catalog (issue #10): a root meta file listing mods by their own meta files, each mod's meta file listing its
 // releases, each release the game versions it works on and its files with their sha256. Read over HTTPS (a local file

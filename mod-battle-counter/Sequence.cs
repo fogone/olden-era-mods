@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Hex.Configs;
 using Hex.Session.Battle;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.BattleCounter;
+namespace Nobirds.OldenEra.Modding.BattleCounter;
 
 // An attack as the game plays it (issue #8, fogone 06.11): the defender's counter before the strike (counter_before_attack),
 // the strike, the counter after it (also a second one for counter_before_and_after_attack, the fauns' law), the second
