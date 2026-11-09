@@ -129,9 +129,15 @@ to nuget.org by a workflow that nuget.org trusts (Trusted Publishing: no API key
 - `.\publish-sdk.ps1 -Publish` also makes the GitHub release `sdk-v<version>` with the package and runs the workflow
   `.github/workflows/publish-sdk.yml`, which takes the package from that release, gets a key for an hour from nuget.org
   (`NuGet/login`) and pushes it. A version is published once: raise `<Version>` in the SDK's csproj.
+- `.\publish-sdk.ps1 -Tool [-Publish]` does the same for the catalog tool (`tools/catalog`, the dotnet tool
+  `oe-catalog`, package `Nobirds.OldenEra.Modding.Catalog`, release `catalog-tool-v<version>`).
 - Once, on nuget.org: the account's **Trusted Publishing** page, a policy with owner `fogone`, repository
-  `olden-era-mods`, workflow file `publish-sdk.yml`; and in the repository's secrets, `NUGET_USER`: the nuget.org
-  profile name (not the e-mail).
+  `olden-era-mods`, workflow file `publish-sdk.yml`, for the packages `Nobirds.OldenEra.Modding.Sdk` and
+  `Nobirds.OldenEra.Modding.Catalog`; and in the repository's secrets, `NUGET_USER`: the nuget.org profile name (not
+  the e-mail).
+- The modders' starting point is the template repository
+  [olden-era-mods-template](https://github.com/fogone/olden-era-mods-template), which uses both packages: after a
+  new SDK version, raise it in the template's `global.json` (and the tool's in `.config/dotnet-tools.json`).
 
 ## How it is built
 

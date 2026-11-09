@@ -1,6 +1,6 @@
-# Publishes the mods' SDK (Nobirds.OldenEra.Modding.Sdk) to nuget.org, run by hand after publish-sdk.ps1 made its GitHub
-# release sdk-v<version> with the .nupkg (it is built where the game is: the library inside builds against the game's
-# files, which a runner does not have). nuget.org trusts this workflow (Trusted Publishing: owner fogone, repository
+# Publishes the modders' packages (Nobirds.OldenEra.Modding.Sdk, .Catalog) to nuget.org, run by hand after
+# publish-sdk.ps1 made its GitHub release (sdk-v<version>, catalog-tool-v<version>) with the .nupkg (built where the game
+# is: the library inside the SDK builds against the game's files, which a runner does not have). nuget.org trusts this workflow (Trusted Publishing: owner fogone, repository
 # olden-era-mods, workflow file publish-sdk.yml) and gives it a key for an hour; no key is stored anywhere.
 #   gh workflow run publish-sdk.yml -f tag=sdk-v0.1.0
 name: publish-sdk
@@ -24,8 +24,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag }}
         run: |
-          case "$TAG" in sdk-v*) ;; *) echo "not an SDK release: $TAG"; exit 1 ;; esac
-          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'Nobirds.OldenEra.Modding.Sdk.*.nupkg' --dir package
+          case "$TAG" in sdk-v*|catalog-tool-v*) ;; *) echo "not a release of the modding packages: $TAG"; exit 1 ;; esac
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" --pattern 'Nobirds.OldenEra.Modding.*.nupkg' --dir package
           ls -l package
       - name: A short-lived key from nuget.org
         uses: NuGet/login@v1

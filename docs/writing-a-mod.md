@@ -3,6 +3,12 @@
 A guide for writing a BepInEx 6 (IL2CPP) mod for Heroes of Might and Magic: Olden Era on this repository's framework.
 The worked example is `mod-skip-intro/`, the smallest mod. Read it next to this page.
 
+**Mods of your own, in a repository of your own:** start from the template
+[olden-era-mods-template](https://github.com/fogone/olden-era-mods-template): two example mods on the SDK from nuget.org
+(`Nobirds.OldenEra.Modding.Sdk`), a release script and a catalog of your own (`oe-catalog`,
+`Nobirds.OldenEra.Modding.Catalog`), and its README as the step-by-step guide. This page is the framework's reference
+and how the mods of this repository are made.
+
 Related: [building.md](building.md) (building, releases, pull requests), [process.md](process.md) (the work cycle, the
 research console), [game-names.md](game-names.md) (the generated names), [catalog.md](catalog.md) (the mod catalog),
 [game-internals.md](game-internals.md) (what is known about the game's code).

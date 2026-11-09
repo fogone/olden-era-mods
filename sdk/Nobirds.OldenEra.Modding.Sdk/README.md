@@ -35,4 +35,5 @@ public class Plugin : ModBase { protected override void OnLoad() { } }
 - The library (`Nobirds.OldenEra.Modding.Common`: `ModBase`, `ModMenu`, `Texts`, the game's events, UI helpers) is
   installed in the game by the mod manager; the package carries a copy to compile against.
 
-Docs: https://github.com/fogone/olden-era-mods/blob/main/docs/writing-a-mod.md
+Start from the template: https://github.com/fogone/olden-era-mods-template (two example mods, a catalog of your own).
+The framework: https://github.com/fogone/olden-era-mods/blob/main/docs/writing-a-mod.md

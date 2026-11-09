@@ -1,13 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Writes the catalog's meta files (catalog/catalog.json, catalog/mods/ID.json) for a release, with the same models
-       the mod manager reads (mod-manager/shared/Catalog.cs). Run by publish-mods.ps1. -->
+       the mod manager reads (mod-manager/shared/Catalog.cs). Run by publish-mods.ps1 here; elsewhere it is the dotnet
+       tool Nobirds.OldenEra.Modding.Catalog (command oe-catalog):
+         dotnet pack tools\catalog -c Release   -> bin\Release\Nobirds.OldenEra.Modding.Catalog.<version>.nupkg -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>catalog</AssemblyName>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>oe-catalog</ToolCommandName>
+    <PackageId>Nobirds.OldenEra.Modding.Catalog</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>fogone</Authors>
+    <Description>Writes a mod catalog for the Olden Era mod manager (Heroes of Might and Magic: Olden Era, BepInEx 6): adds a mod's package (the zip Nobirds.OldenEra.Modding.Sdk makes) to the catalog's meta files. Not affiliated with the game's publishers.</Description>
+    <PackageTags>olden-era;heroes;bepinex;mod;catalog</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/fogone/olden-era-mods</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\mod-manager\shared\*.cs" Link="shared\%(Filename)%(Extension)" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

@@ -116,7 +116,7 @@ The hidden numbers the game does not show (exact counts, Diplomacy points, the a
 
 ## Building
 
-To build the mods yourself or to work on them: **[docs/building.md](docs/building.md)** (building, releases, publishing a mod into the catalog with `publish-mods.ps1`). Writing a mod of your own: **[docs/writing-a-mod.md](docs/writing-a-mod.md)**; the catalog's format and hosting a catalog: **[docs/catalog.md](docs/catalog.md)**. Tasks and ideas are in the
+To build the mods yourself or to work on them: **[docs/building.md](docs/building.md)** (building, releases, publishing a mod into the catalog with `publish-mods.ps1`). Writing a mod of your own: start from the template **[olden-era-mods-template](https://github.com/fogone/olden-era-mods-template)** (the SDK from nuget.org, two example mods, a catalog of your own), the framework's reference is **[docs/writing-a-mod.md](docs/writing-a-mod.md)**; the catalog's format and hosting a catalog: **[docs/catalog.md](docs/catalog.md)**. Tasks and ideas are in the
 repository's [Issues](../../issues).
 Changes come as pull requests; each is checked for anything personal, secrets and game files before it can be merged
 (`tools/check-public.ps1`).
