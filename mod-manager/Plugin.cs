@@ -8,7 +8,7 @@ namespace OldenEra.Modding.Manager;
 // BepInEx\oldenera-mods (ManagerState, ModLoader) on the first frame, after BepInEx has loaded its own plugins.
 // Its package (one release) holds the manager, the library, the Mods tab (mod-settings, where the catalog is shown) and
 // the preloader patcher that updates them (Updater); the mods come from the catalog (ManagerService, CatalogRows).
-[BepInPlugin("nobirds.oldenera.manager", "Olden Era Mod Manager", "0.4.2")]
+[BepInPlugin("nobirds.oldenera.manager", "Olden Era Mod Manager", "0.4.3")]
 public class Plugin : BasePlugin
 {
     bool started;
