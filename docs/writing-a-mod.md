@@ -44,7 +44,7 @@ mod-skip-intro/
 
 The mod's csproj says what the mod is; the SDK (`sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.props` and `Sdk.targets`)
 does the rest. In this repository it is imported by path; a mod in a repository of its own takes the package:
-`<Project Sdk="Nobirds.OldenEra.Modding.Sdk/0.1.0">` (its README: `sdk/Nobirds.OldenEra.Modding.Sdk/README.md`).
+`<Project Sdk="Nobirds.OldenEra.Modding.Sdk/0.1.1">` (its README: `sdk/Nobirds.OldenEra.Modding.Sdk/README.md`).
 
 ```xml
 <Project>

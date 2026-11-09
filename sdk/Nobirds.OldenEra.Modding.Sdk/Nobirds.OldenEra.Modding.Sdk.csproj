@@ -6,7 +6,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>Nobirds.OldenEra.Modding.Sdk</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>fogone</Authors>
     <Description>MSBuild SDK for mods of Heroes of Might and Magic: Olden Era on BepInEx 6 (IL2CPP): builds against the game installed on your machine, with the Nobirds.OldenEra.Modding library; makes the mod's package (manifest.json and its files). Not affiliated with the game's publishers.</Description>
     <PackageType>MSBuildSdk</PackageType>
