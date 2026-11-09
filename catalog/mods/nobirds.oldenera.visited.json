@@ -74,7 +74,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.35.2/OldenEraVisited.dll",
           "sha256": "49a17b27d55a19292f525659144b3cdd896d2110e846a961e3a63200c5665335"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.35.1",
@@ -94,7 +95,29 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.35.1/OldenEraVisited.dll",
           "sha256": "346deda51a9a0a7d37c1ea4a29aba5e27fb24be0411e86fb8ebfbdd52ba92d27"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "0.36.0",
+      "games": [
+        "0.82.08"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.visited-0.36.0.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.36.0/nobirds.oldenera.visited-0.36.0.zip",
+        "sha256": "510c8674167af6a71beed3b25739ec3efe0b905bfada58f8f81e27e0444cd4d7"
+      }
     }
   ]
 }

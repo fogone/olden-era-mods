@@ -75,7 +75,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/map-badges-v0.1.2/OldenEraMapBadges.dll",
           "sha256": "8aa3d4721972265fe5e436ec179899197d7697b47e2b1b61f29d11e4c805173c"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.1.1",
@@ -95,7 +96,29 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/map-badges-v0.1.1/OldenEraMapBadges.dll",
           "sha256": "32b73df1aed52d0a1331a9693b507e0f6fa7c713008d22da932cdbdc34b9d3d9"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "0.2.0",
+      "games": [
+        "0.82.08"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.mapbadges-0.2.0.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/map-badges-v0.2.0/nobirds.oldenera.mapbadges-0.2.0.zip",
+        "sha256": "4f4408022ab260ed5511984eaeb25752c00052ca9cc8309dd134098403bcd612"
+      }
     }
   ]
 }

@@ -58,7 +58,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.1.1/OldenEraSkipIntro.dll",
           "sha256": "70a93f87f13a687fbb92377d634a91d3e55f5ecf04f70b46917ac35e0f0f88b2"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.1.0",
@@ -73,7 +74,24 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.1.0/OldenEraSkipIntro.dll",
           "sha256": "98409dbc66a44eb7ca63558d95812e2b0e406cf4e4acd73da606b9d528b802ce"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "0.2.0",
+      "games": [
+        "0.82.08"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.skipintro-0.2.0.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.2.0/nobirds.oldenera.skipintro-0.2.0.zip",
+        "sha256": "f9e6890a22920a1efe35ba8db606bb0f496a28f4feeb5f802cea881e351d9042"
+      }
     }
   ]
 }

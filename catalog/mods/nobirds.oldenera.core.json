@@ -57,7 +57,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.4/OldenEraCore.dll",
           "sha256": "edfc70e19f6709537254492415649cd24287c58030b7a640a06382a6b1b5f0e7"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.7.3",
@@ -72,7 +73,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.3/OldenEraCore.dll",
           "sha256": "f713175a2a94ba4de8391d4bdd6c8c3a6281fffd42c9ef487e89084cb2b592b7"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.7.2",
@@ -87,7 +89,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.2/OldenEraCore.dll",
           "sha256": "b955e8f293c9756d37ffefb5f97efaee7fe591121cbd6e06f33cf07366cdfca3"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.7.1",
@@ -102,7 +105,24 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.7.1/OldenEraCore.dll",
           "sha256": "89cbaa276cfbc3bab8c2004154c56b76d9e265d2c1ffad29231d8181b0306f38"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "0.8.0",
+      "games": [
+        "0.82.08"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.core-0.8.0.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.8.0/nobirds.oldenera.core-0.8.0.zip",
+        "sha256": "9b6a4260534afa781f005c5d12ec8787b11976008a093c0b5c15ebc58ddfd214"
+      }
     }
   ]
 }
