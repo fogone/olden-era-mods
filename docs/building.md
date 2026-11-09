@@ -77,7 +77,7 @@ game's version, the mods' versions, how to install).
   game's version ("0.82.07 · mods 0.1.0"), with the game's version the set is built for in the mods table.
 - A version of the mods is for one version of the game. A new version of the game gets a new version of the mods: raise
   `version.txt`, build, release. One version is never released twice: `release.ps1 -Publish` refuses a tag that exists.
-- Each mod keeps its own version in its `BepInPlugin` attribute (shown in the Mods tab): it says which build of that one
+- Each mod keeps its own version in its csproj (`Version`, which `[BepInPlugin]` takes through `ModInfo`) (shown in the Mods tab): it says which build of that one
   mod is loaded, the release says which set.
 
 ## Publishing into the catalog (the mod manager, issue #10)
@@ -98,13 +98,13 @@ with the manager's own models (`mod-manager/shared/Catalog.cs`), each file with 
 What goes into a mod's catalog entry (`tools/catalog add`, see [catalog.md](catalog.md)):
 - **Name and description** in every language: from the mod's `lang/<language>.json`, keys `oe.<id>.title` and
   `oe.<id>.description`.
-- **Tags**: the `Tags` of the mod in `$catalogParts` of `publish-mods.ps1` (`map`, `battle`, `tooltip`, `ui`, `fix`,
+- **Tags**: the mod's `ModTags` in its csproj (`map`, `battle`, `tooltip`, `ui`, `fix`,
   `qol`, `library`).
 - **Author and source**: `fogone` and the repository's address.
 - **Icon**: the catalog's own, `catalog/icon.png` (drawn by `catalog/make-icon.ps1`), written into the root file.
 - **Screenshots**: the PNG and JPG files of `mod-<id>/screenshots/` (up to 2 MB each), served from `main`, with English
   captions from `screenshots/captions.txt` (`<file name>=<caption>` a line). No folder: the meta file keeps its screenshots.
-- **Requirements**: `Requires` (`nobirds.oldenera.core` for the mods that listen to the core's events).
+- **Requirements**: the csproj's `ModRequires` (`nobirds.oldenera.core` for the mods that listen to the core's events).
 
 The manager's package is special: the manager, the library, the Mods tab and the patcher go in one release (the DLLs and
 `olden-era-mod-manager-<version>-for-game-<game version>.zip` for the first install, unpacked into the game's folder).
@@ -116,7 +116,7 @@ deleted; when it did not, the pull request stays open and the script warns. The 
 `main`, so a release is seen once its pull request is merged. Your own branch is switched back to and updated.
 
 A version is published once. Run again on another game version with the same DLL, the release only gets that game
-version added (it works there too); with another DLL it stops: raise the mod's version in its `[BepInPlugin]`.
+version added (it works there too); with another DLL it stops: raise the mod's `Version` in its csproj.
 
 ## How it is built
 

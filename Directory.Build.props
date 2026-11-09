@@ -1,0 +1,8 @@
+<Project>
+  <!-- This repository's mods build with the SDK from sdk\ and the library's project, not the package's copy. -->
+  <PropertyGroup>
+    <OeLibraryProject Condition="'$(MSBuildProjectName)' != 'OldenEraCommon'">$(MSBuildThisFileDirectory)mod-common\OldenEraCommon.csproj</OeLibraryProject>
+    <ModAuthor>fogone</ModAuthor>
+    <ModSource>https://github.com/fogone/olden-era-mods</ModSource>
+  </PropertyGroup>
+</Project>

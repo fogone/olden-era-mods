@@ -19,7 +19,7 @@ namespace Nobirds.OldenEra.Modding.Core;
 // not found: its event does not come, and the log says which.
 //
 // The game's members through Game (mod-common/shared/Game*.cs). This plugin reloads like the others (devplugins).
-[BepInPlugin("nobirds.oldenera.core", "Olden Era Core", "0.7.4")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public class Plugin : ModBase
 {
     static ModLog log;

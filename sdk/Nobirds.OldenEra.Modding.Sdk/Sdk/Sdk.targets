@@ -1,0 +1,208 @@
+<Project>
+  <!-- A mod's csproj says what the mod is; this SDK writes it into the DLL and into the mod's package:
+
+       <ModId>nobirds.oldenera.visited</ModId>          the BepInEx plugin's GUID (lower case, dots)
+       <ModName>Olden Era Visited</ModName>             its name in BepInEx's log
+       <Version>0.35.2</Version>                        its version
+       <ModTags>ui;map</ModTags>                         the catalog's tags (optional)
+       <ModRequires>nobirds.oldenera.core</ModRequires>  the mods it needs, id or id@version, ';' between (optional)
+       <ModAuthor>…</ModAuthor> <ModSource>…</ModSource>  who made it and where its code is (optional)
+
+     The code uses them as ModInfo.Id, ModInfo.Name, ModInfo.Version: [BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)].
+     The texts are lang\<language>.json (the game's languages: english, russian, ...); the mod's name and description in
+     every language are its keys oe.<last part of the id>.title and .description.
+
+       dotnet build                 the DLL
+       dotnet build -t:ModPackage   and bin\<configuration>\<id>-<version>.zip: manifest.json, plugins\<the DLL>, README.md,
+                                    icon.png and screenshots\ when the mod has them -->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <ModName Condition="'$(ModName)' == ''">$(AssemblyName)</ModName>
+    <ModBepInEx Condition="'$(ModBepInEx)' == ''">6.0.0-be.788</ModBepInEx>
+    <OeSdkDir>$(MSBuildThisFileDirectory)</OeSdkDir>
+    <!-- The library: the package's own copy, or this repository's project (its own mods). -->
+    <OeLibraryDll Condition="'$(OeLibraryDll)' == ''">$(MSBuildThisFileDirectory)..\lib\OldenEraCommon.dll</OeLibraryDll>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(GameDir)\dotnet\*.dll"
+               Exclude="$(GameDir)\dotnet\clretwrc.dll;$(GameDir)\dotnet\clrjit.dll;$(GameDir)\dotnet\coreclr.dll;$(GameDir)\dotnet\dbgshim.dll;$(GameDir)\dotnet\hostpolicy.dll;$(GameDir)\dotnet\Microsoft.DiaSymReader.Native.amd64.dll;$(GameDir)\dotnet\mscordaccore*.dll;$(GameDir)\dotnet\mscordbi.dll;$(GameDir)\dotnet\mscorrc.dll;$(GameDir)\dotnet\msquic.dll;$(GameDir)\dotnet\System.IO.Compression.Native.dll"
+               Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Unity.IL2CPP.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\SemanticVersioning.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Iced.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" Private="false" />
+    <Reference Include="$(GameDir)\BepInEx\interop\*.dll" Private="false" />
+
+    <ProjectReference Include="$(OeLibraryProject)" Private="false" Condition="'$(OeLibraryProject)' != ''" />
+    <Reference Include="$(OeLibraryDll)" Private="false" Condition="'$(OeLibraryProject)' == ''" />
+
+    <!-- The .NET 6 runtime's assemblies keep these attributes internal: declared for the compiler. -->
+    <Compile Include="$(MSBuildThisFileDirectory)CompilerAttributes.cs" Link="Sdk\CompilerAttributes.cs" Visible="false" />
+    <EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />
+  </ItemGroup>
+
+  <!-- What the mod is, in the DLL: the catalog tool and the mod manager read it there. -->
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(ModId)' != ''">
+      <_Parameter1>Nobirds.OldenEra.ModId</_Parameter1>
+      <_Parameter2>$(ModId)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(ModTags)' != ''">
+      <_Parameter1>Nobirds.OldenEra.ModTags</_Parameter1>
+      <_Parameter2>$(ModTags)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(ModRequires)' != ''">
+      <_Parameter1>Nobirds.OldenEra.ModRequires</_Parameter1>
+      <_Parameter2>$(ModRequires)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(ModAuthor)' != ''">
+      <_Parameter1>Nobirds.OldenEra.ModAuthor</_Parameter1>
+      <_Parameter2>$(ModAuthor)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'$(ModSource)' != ''">
+      <_Parameter1>Nobirds.OldenEra.ModSource</_Parameter1>
+      <_Parameter2>$(ModSource)</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- The game is needed to build: its runtime and BepInEx's wrappers of its code. -->
+  <Target Name="OeCheckGame" BeforeTargets="ResolveAssemblyReferences;CoreCompile">
+    <Error Condition="'$(GameDir)' == '' or !Exists('$(GameDir)\HeroesOldenEra.exe')"
+           Text="The game is not found. Set OLDENERA_GAME (or GameDir) to its folder, the one with HeroesOldenEra.exe." />
+    <Error Condition="!Exists('$(GameDir)\BepInEx\interop\Hex.dll')"
+           Text="No BepInEx wrappers in $(GameDir)\BepInEx\interop: install BepInEx 6 (IL2CPP) into the game and start the game once to the main menu." />
+    <Error Condition="'$(ModId)' == ''" Text="The mod has no ModId: set &lt;ModId&gt; (e.g. yourname.oldenera.something) in its csproj." />
+  </Target>
+
+  <!-- ModInfo: the constants [BepInPlugin] takes. -->
+  <Target Name="OeModInfo" BeforeTargets="CoreCompile" Condition="'$(ModId)' != ''">
+    <PropertyGroup>
+      <_OeModInfo>$(IntermediateOutputPath)ModInfo.g.cs</_OeModInfo>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_OeModInfo)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                      Lines="// Made by the build from the csproj (Nobirds.OldenEra.Modding.Sdk).;namespace $(RootNamespace)%3B;internal static class ModInfo;{;    public const string Id = &quot;$(ModId)&quot;%3B;    public const string Name = &quot;$(ModName)&quot;%3B;    public const string Version = &quot;$(Version)&quot;%3B;}" />
+    <ItemGroup>
+      <Compile Include="$(_OeModInfo)" />
+      <FileWrites Include="$(_OeModInfo)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- The mod's package: its manifest (what the mod is, its names and descriptions, the game version it was built on,
+       the files) and its files, zipped. -->
+  <Target Name="ModPackage" DependsOnTargets="Build">
+    <PropertyGroup>
+      <_OePackageDir>$(OutputPath)package\</_OePackageDir>
+      <_OePackageZip>$(OutputPath)$(ModId)-$(Version).zip</_OePackageZip>
+    </PropertyGroup>
+    <ItemGroup>
+      <_OeShot Include="screenshots\*.png;screenshots\*.jpg" />
+      <_OeShot Include="screenshots\captions.txt" Condition="Exists('screenshots\captions.txt')" />
+      <_OePackageFile Include="$(TargetPath)" Destination="plugins\$(TargetFileName)" />
+      <_OePackageFile Include="@(ModFile)" Destination="plugins\%(ModFile.RecursiveDir)%(ModFile.Filename)%(ModFile.Extension)" />
+      <_OePackageFile Include="README.md" Destination="README.md" Condition="Exists('README.md')" />
+      <_OePackageFile Include="icon.png" Destination="icon.png" Condition="Exists('icon.png')" />
+      <_OePackageFile Include="@(_OeShot)" Destination="screenshots\%(_OeShot.Filename)%(_OeShot.Extension)" />
+      <_OeLang Include="lang\*.json" />
+    </ItemGroup>
+    <RemoveDir Directories="$(_OePackageDir)" />
+    <Copy SourceFiles="@(_OePackageFile)" DestinationFiles="@(_OePackageFile->'$(_OePackageDir)%(Destination)')" />
+    <OeWriteManifest Path="$(_OePackageDir)manifest.json" Id="$(ModId)" Version="$(Version)" Author="$(ModAuthor)" Source="$(ModSource)"
+                     Tags="$(ModTags)" Requires="$(ModRequires)" BepInEx="$(ModBepInEx)" GameDir="$(GameDir)"
+                     Lang="@(_OeLang)" Files="@(_OePackageFile->'%(Destination)')" />
+    <Delete Files="$(_OePackageZip)" />
+    <ZipDirectory SourceDirectory="$(_OePackageDir)" DestinationFile="$(_OePackageZip)" />
+    <Message Importance="high" Text="$(ModId) $(Version): $(_OePackageZip)" />
+  </Target>
+
+  <UsingTask TaskName="OeWriteManifest" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Path Required="true" />
+      <Id Required="true" />
+      <Version Required="true" />
+      <Author />
+      <Source />
+      <Tags />
+      <Requires />
+      <BepInEx />
+      <GameDir />
+      <Lang ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Linq" />
+      <Using Namespace="System.Text" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        // Texts are taken from the lang files as written there (JSON strings stay escaped as they are).
+        string Q(string s) => "\"" + (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+        string List(string s) => "[" + string.Join(", ", (s ?? "").Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => Q(x.Trim()))) + "]";
+        var shortId = Id.Split('.').Last();
+        var names = new SortedDictionary<string, string>();
+        var descriptions = new SortedDictionary<string, string>();
+        var entry = new Regex("\"sid\"\\s*:\\s*\"(?<sid>[^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"(?<text>(?:[^\"\\\\]|\\\\.)*)\"");
+        foreach (var file in Lang ?? new Microsoft.Build.Framework.ITaskItem[0])
+        {
+            var language = System.IO.Path.GetFileNameWithoutExtension(file.ItemSpec);
+            foreach (Match m in entry.Matches(File.ReadAllText(file.ItemSpec)))
+            {
+                var sid = m.Groups["sid"].Value;
+                if (sid == "oe." + shortId + ".title" || sid == "oe." + shortId + ".name" && !names.ContainsKey(language))
+                    names[language] = m.Groups["text"].Value;
+                else if (sid == "oe." + shortId + ".description")
+                    descriptions[language] = m.Groups["text"].Value;
+            }
+        }
+        // The game's version (Application.version): Unity keeps it in globalgamemanagers as a length-prefixed string,
+        // the only version-like one there besides Unity's own (as tools/game-names reads it).
+        var games = new List<string>();
+        var managers = System.IO.Path.Combine(GameDir ?? "", "HeroesOldenEra_Data", "globalgamemanagers");
+        if (File.Exists(managers))
+        {
+            var bytes = File.ReadAllBytes(managers);
+            var shape = new Regex(@"^\d+\.\d+(\.\d+)+$");
+            for (var i = 0; i + 4 < bytes.Length; i += 4)
+            {
+                var length = BitConverter.ToInt32(bytes, i);
+                if (length < 3 || length > 24 || i + 4 + length > bytes.Length)
+                    continue;
+                var text = Encoding.ASCII.GetString(bytes, i + 4, length);
+                if (shape.IsMatch(text) && !games.Contains(text))
+                    games.Add(text);
+            }
+            if (games.Count != 1)
+                games.Clear();
+        }
+        string Texts(SortedDictionary<string, string> texts) =>
+            "{" + string.Join(", ", texts.Select(t => Q(t.Key) + ": \"" + t.Value + "\"")) + "}";
+        var requires = (Requires ?? "").Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries).Select(r => r.Trim().Split('@'))
+            .Select(r => r.Length > 1 ? "{\"id\": " + Q(r[0]) + ", \"version\": " + Q(r[1]) + "}" : "{\"id\": " + Q(r[0]) + "}");
+        var json = new StringBuilder();
+        json.Append("{\n");
+        json.Append("  \"schema\": 1,\n");
+        json.Append("  \"id\": " + Q(Id) + ",\n");
+        json.Append("  \"version\": " + Q(Version) + ",\n");
+        json.Append("  \"name\": " + Texts(names) + ",\n");
+        json.Append("  \"description\": " + Texts(descriptions) + ",\n");
+        if (!string.IsNullOrEmpty(Author)) json.Append("  \"author\": " + Q(Author) + ",\n");
+        if (!string.IsNullOrEmpty(Source)) json.Append("  \"source\": " + Q(Source) + ",\n");
+        json.Append("  \"tags\": " + List(Tags) + ",\n");
+        json.Append("  \"games\": " + "[" + string.Join(", ", games.Select(Q)) + "],\n");
+        json.Append("  \"bepinex\": " + Q(BepInEx) + ",\n");
+        json.Append("  \"requires\": [" + string.Join(", ", requires) + "],\n");
+        json.Append("  \"files\": [" + string.Join(", ", (Files ?? new Microsoft.Build.Framework.ITaskItem[0]).Select(f => Q(f.ItemSpec.Replace('\\', '/')))) + "]\n");
+        json.Append("}\n");
+        File.WriteAllText(Path, json.ToString(), new UTF8Encoding(false));
+        if (games.Count == 0)
+            Log.LogWarning("The game's version was not found in " + managers + ": the manifest lists no game version.");
+]]></Code>
+    </Task>
+  </UsingTask>
+</Project>

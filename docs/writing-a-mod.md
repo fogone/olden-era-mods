@@ -13,10 +13,9 @@ research console), [game-names.md](game-names.md) (the generated names), [catalo
   makes the wrappers of the game's code in `<game>\BepInEx\interop` (`Hex.dll` holds the game's code). After a game
   patch, start it once again.
 - The **.NET SDK 10**. Plugins target `net6.0` and compile against `<game>\dotnet\*.dll`, `BepInEx\core` and
-  `BepInEx\interop`. There is no NuGet and no download.
-- PowerShell. The build scripts default to the Game Pass folder
-  (`C:\XboxGames\Heroes of Might and Magic- Olden Era\Content`); pass `-GameDir` for another one.
-
+  `BepInEx\interop`: the SDK of the mods (`sdk/Nobirds.OldenEra.Modding.Sdk`) finds the game (Game Pass; elsewhere set
+  `OLDENERA_GAME`) and sets all of it up. Nothing of the game is downloaded.
+- PowerShell for the build scripts (`build.ps1 -Dev`, `-Install`); they pass `-GameDir`, the Game Pass folder by default.
 The game's code is obfuscated and its names change with every patch. The library (`OldenEraCommon.dll`) holds the game's
 names for one game version and is released for each: a mod that uses only its public API keeps working after a patch
 once the library for the new version is installed. A mod that works on the game's obfuscated classes itself (section 4)
@@ -29,7 +28,6 @@ Folder `mod-<id>/`, as in `mod-skip-intro/`:
 ```
 mod-skip-intro/
   OldenEraSkipIntro.csproj
-  CompilerAttributes.cs      copy it as it is (stubs of NullableAttribute, needed for the .NET 6 runtime assemblies)
   Plugin.cs
   build.ps1                  copy it, change the DLL's name
   lang/english.json
@@ -38,20 +36,40 @@ mod-skip-intro/
 
 ### The csproj
 
-Copy `OldenEraSkipIntro.csproj` and change `AssemblyName` and `RootNamespace`. What matters in it:
+The mod's csproj says what the mod is; the SDK (`sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.props` and `Sdk.targets`)
+does the rest. In this repository it is imported by path; a mod in a repository of its own takes the package:
+`<Project Sdk="Nobirds.OldenEra.Modding.Sdk/0.1.0">` (its README: `sdk/Nobirds.OldenEra.Modding.Sdk/README.md`).
 
-- References: `<game>\dotnet\*.dll`, `BepInEx.Core`, `BepInEx.Unity.IL2CPP`, `0Harmony`, `Il2CppInterop.*`,
-  `BepInEx\interop\*.dll`, all with `Private="false"`.
-- `<ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />`: the library (`ModBase`,
-  `ModMenu`, `Texts`, `ModEvents`, `Ticker`, and `mod-common/shared`: the helpers, `Game*.cs` and the game's names). It
-  is installed once, in `BepInEx\plugins`, and shared by all mods.
+```xml
+<Project>
+  <Import Project="../sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.props" />
+  <PropertyGroup>
+    <AssemblyName>OldenEraSkipIntro</AssemblyName>
+    <RootNamespace>Nobirds.OldenEra.Modding.SkipIntro</RootNamespace>
+    <ModId>nobirds.oldenera.skipintro</ModId>          <!-- the BepInEx GUID -->
+    <ModName>Olden Era Skip Intro</ModName>
+    <Version>0.1.1</Version>
+    <ModTags>ui;qol</ModTags>                          <!-- the catalog's tags -->
+    <ModRequires>nobirds.oldenera.core</ModRequires>   <!-- only a mod that listens to the core's events -->
+  </PropertyGroup>
+  <Import Project="../sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.targets" />
+</Project>
+```
+
+- The SDK references the game's runtime, BepInEx and its wrappers of the game's code, and the library (this
+  repository's `mod-common` project, `OeLibraryProject` in `Directory.Build.props`; the package's copy elsewhere). The
+  library (`ModBase`, `ModMenu`, `Texts`, `ModEvents`, `Ticker`, and `mod-common/shared`: the helpers, `Game*.cs` and the
+  game's names) is installed once, in `BepInEx\plugins`, and shared by all mods.
+- It embeds `lang\*.json` as `<root namespace>.lang.<language>.json` (`Texts.Load` reads them), declares the compiler's
+  attributes the .NET 6 runtime keeps internal, and writes `ModInfo` (`Id`, `Name`, `Version`) for `[BepInPlugin]` and
+  the `Mod*` properties into the assembly (`AssemblyMetadata`). `ModAuthor` and `ModSource` come from `Directory.Build.props`.
+- `dotnet build -t:ModPackage` makes the mod's archive `bin\Release\net6.0\<ModId>-<Version>.zip`: `manifest.json`
+  (what the mod is, its names and descriptions from the lang files, the game version it was built on, its files),
+  `plugins\<the DLL>`, and `README.md`, `icon.png`, `screenshots\` when the mod has them.
 - Only a mod that works on the game's obfuscated classes itself adds `<Compile Include="..\mod-common\shared\GameTypes.g.cs"
   Link="shared\GameTypes.g.cs" />` and its assembly name to the library's `InternalsVisibleTo` (section 4).
-- `<EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />`: the texts.
-  The name must be `<root namespace>.lang.<language>.json`; `Texts.Load` reads it from there.
-- `Directory.Build.targets` in the root makes `GameNames.g.cs` again before the build when the game or the searches
-  changed (section 4) and writes the mods' version (`version.txt`) into the assembly.
-
+- `Directory.Build.targets` in the root makes `GameNames.g.cs` again before the library's build when the game or the
+  searches changed (section 4) and writes the mods' version (`version.txt`) into the assemblies.
 ### The plugin
 
 ```csharp
@@ -61,7 +79,7 @@ using Nobirds.OldenEra.Modding.Common;
 
 namespace Nobirds.OldenEra.Modding.SkipIntro;
 
-[BepInPlugin("nobirds.oldenera.skipintro", "Olden Era Skip Intro", "0.1.0")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]   // from the csproj
 public class Plugin : ModBase
 {
     static Switch skipVideos;
@@ -70,7 +88,6 @@ public class Plugin : ModBase
     protected override void OnLoad()
     {
         instance = this;
-        Game.Log = Logs.Info;                          // what the game-member lookups found goes to the log
         skipVideos = Menu.Toggle("SkipVideos", true);  // a switch in the Mods tab, on by default
         if (Harmony.PatchEach(new[] { GameTargets.IntroVideos },
                 prefix: new HarmonyMethod(typeof(Plugin), nameof(IntroPrefix))).Count == 0)
@@ -87,7 +104,7 @@ public class Plugin : ModBase
 }
 ```
 
-- The GUID is `nobirds.oldenera.<id>`. **`<id>` (the last part of the GUID) names the mod's texts**; the config file is
+- The GUID (`ModId`) is `nobirds.oldenera.<id>`. **`<id>` (the last part of the GUID) names the mod's texts**; the config file is
   `BepInEx\config\<GUID>.cfg`.
 - Use `OnLoad`, never `Load` (it is sealed in `ModBase`). Patch through `Harmony` from the base class, never
   `new Harmony`: the base class unpatches it all on unload.
@@ -359,12 +376,12 @@ the order that worked: [process.md](process.md), "Researching game code".
 ## 6. Publishing
 
 - A new mod joins the list in three scripts: `install.ps1` (`$parts`), `release.ps1` (folder to DLL name), and
-  `publish-mods.ps1` (`$catalogParts`: the DLL path, `Tags` (catalog.md) and `Requires`: `'nobirds.oldenera.core'` for a mod that listens to
-  core events, `''` otherwise). The plugin's GUID, name and version are read from its `[BepInPlugin(...)]`.
+  `publish-mods.ps1` (`$catalogParts`: the DLL path). Its id, name, version, tags and requirements are read from its
+  csproj (`ModId`, `ModName`, `Version`, `ModTags`, `ModRequires`).
 - `.\publish-mods.ps1 -Mods <id>` builds the mod and writes its catalog files into `release\catalog-preview`; nothing is
   published. `-Publish` makes a GitHub release `<id>-v<version>` (the DLL is the asset) and a pull request with
-  `catalog\`. A version is published once: change the mod and **raise the version in `[BepInPlugin]`** to publish again.
-- Tags: `Tags` in `$catalogParts` is a comma-separated list for the catalog (`map`, `battle`, `tooltip`, `ui`, `fix`,
+  `catalog\`. A version is published once: change the mod and **raise its `Version` in the csproj** to publish again.
+- Tags: `ModTags` in the csproj, `;` between, for the catalog (`map`, `battle`, `tooltip`, `ui`, `fix`,
   `qol`, `library`, `info`, `squads`, `buildings`; the Mods window filters by them, the names of the known ones are the `oe.manager.tag.<id>` keys of
   `mod-manager/lang`, so a new tag needs those keys in every language file).
 - Screenshots: put PNG or JPG pictures (up to 2 MB each) in the mod's `mod-<id>/screenshots/` folder. They are listed in
