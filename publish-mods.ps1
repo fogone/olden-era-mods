@@ -57,13 +57,19 @@ foreach ($mod in $selected) {
     $part = $catalogParts[$mod]
     $descriptionOnly = $MetaOnly -contains $mod
     "== $mod$(if ($descriptionOnly) { ' (the description only)' })"
+    # A mod is published as its package (the SDK's ModPackage: a zip with manifest.json and plugins\, in the catalog's
+    # "packages", which managers before 0.5 do not read); the manager as its files (it updates itself through them).
+    $asPackage = $mod -ne 'manager'
+    $pluginFolder = Join-Path $root "mod-$mod"
     if (-not $descriptionOnly) {
-        $builds = if ($part.Builds) { $part.Builds } else { @("mod-$mod") }
-        foreach ($b in $builds) {
-            & (Join-Path $root "$b\build.ps1") -GameDir $GameDir | Select-Object -Last 1
+        if ($asPackage) {
+            & $dotnet build (Get-ChildItem $pluginFolder -Filter *.csproj | Select-Object -First 1).FullName -c Release -nologo -v:minimal -t:ModPackage "-p:GameDir=$GameDir" | Select-Object -Last 1
+            if ($LASTEXITCODE -ne 0) { throw "mod-${mod}: the package does not build" }
+        }
+        else {
+            foreach ($b in $part.Builds) { & (Join-Path $root "$b\build.ps1") -GameDir $GameDir | Select-Object -Last 1 }
         }
     }
-    $pluginFolder = Join-Path $root "mod-$mod"
     # What the mod is: its csproj's Mod* properties (the SDK writes them into the DLL and [BepInPlugin] takes ModInfo).
     $csproj = Get-ChildItem $pluginFolder -Filter *.csproj | Select-Object -First 1
     $props = (& $dotnet msbuild $csproj.FullName -nologo -getProperty:ModId -getProperty:ModName -getProperty:Version -getProperty:ModTags -getProperty:ModRequires | Out-String | ConvertFrom-Json).Properties
@@ -75,6 +81,7 @@ foreach ($mod in $selected) {
     $part.Requires = ($props.ModRequires -replace ';', ',')
     $tag = "$mod-v$version"
     $files = @($part.Files | ForEach-Object { Join-Path $root $_ })
+    $package = Join-Path $pluginFolder "bin\Release\net6.0\$id-$version.zip"
 
     $released = $false
     if ($Publish) {
@@ -111,13 +118,20 @@ foreach ($mod in $selected) {
         if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
         continue
     }
-    & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
-        @requiresArgs @tagsArgs @iconArgs --name 'Nobirds catalog' --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
+    if ($asPackage) {
+        # The package's manifest says the rest: id, version, game, requirements, names, descriptions, tags, author, source.
+        & $dotnet $tool add --catalog $catalog --root-url $rootUrl --package "$package=https://github.com/$repo/releases/download/$tag/$(Split-Path $package -Leaf)" `
+            --game $gameVersion --bepinex $bepinex @iconArgs --name 'Nobirds catalog' @shotArgs
+    }
+    else {
+        & $dotnet $tool add --catalog $catalog --root-url $rootUrl --id $id --version $version --game $gameVersion --bepinex $bepinex `
+            @requiresArgs @tagsArgs @iconArgs --name 'Nobirds catalog' --author fogone --source "https://github.com/$repo" @langArgs @shotArgs @fileArgs
+    }
     if ($LASTEXITCODE -ne 0) { throw "${mod}: the catalog refused it (see above)" }
 
     # The manager's release also holds the first install: a zip to unpack into the game's folder (over BepInEx), the
     # manager, the library and the Mods tab in BepInEx\plugins, its patcher in BepInEx\patchers. Not in the catalog.
-    $assets = $files
+    $assets = if ($asPackage) { @($package) } else { $files }
     if ($mod -eq 'manager') {
         Add-Type -AssemblyName System.IO.Compression, System.IO.Compression.FileSystem
         $zipPath = Join-Path $root "release\olden-era-mod-manager-$version-for-game-$gameVersion.zip"

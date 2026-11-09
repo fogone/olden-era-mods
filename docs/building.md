@@ -106,7 +106,9 @@ What goes into a mod's catalog entry (`tools/catalog add`, see [catalog.md](cata
   captions from `screenshots/captions.txt` (`<file name>=<caption>` a line). No folder: the meta file keeps its screenshots.
 - **Requirements**: the csproj's `ModRequires` (`nobirds.oldenera.core` for the mods that listen to the core's events).
 
-The manager's package is special: the manager, the library, the Mods tab and the patcher go in one release (the DLLs and
+The mods go into the catalog as **packages** (the SDK's `ModPackage`: one zip per release, the catalog's `packages`,
+see catalog.md), read only by managers from 0.5; the manager's package is special: the manager, the library, the Mods
+tab and the patcher go in one release of files (the managers before 0.5 update themselves through it) (the DLLs and
 `olden-era-mod-manager-<version>-for-game-<game version>.zip` for the first install, unpacked into the game's folder).
 
 How `-Publish` goes: for each mod, `gh release create` if its tag does not exist yet; then all `catalog\` changes go to

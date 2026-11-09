@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.SkipIntro</RootNamespace>
     <ModId>nobirds.oldenera.skipintro</ModId>
     <ModName>Olden Era Skip Intro</ModName>
-    <Version>0.1.1</Version>
+    <Version>0.2.0</Version>
     <ModTags>ui;qol</ModTags>
   </PropertyGroup>
 

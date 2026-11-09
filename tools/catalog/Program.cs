@@ -15,6 +15,10 @@ using Nobirds.OldenEra.Modding.Manager;
 //               --file <path>=<download URL> [--file ...]
 // The same version again with the same files: the game version is added to it (a build that works on another game
 // version too); with other files: refused (a version is never published twice with other content).
+//   catalog add --catalog <dir> --root-url <url> --package <the mod's zip>=<download URL> [--game <game version>]
+//               [--name, --icon, --screenshot, --tags, --author, --source as above]
+//               (a package the SDK's ModPackage made: id, version, games, BepInEx, requirements, names, descriptions,
+//               tags, author and source are its manifest.json's; given options win; added to the mod's "packages")
 //   catalog meta --catalog <dir> --root-url <url> --id <id> [the options above but --version, --game, --bepinex,
 //                --requires and --file]   (only the mod's description: name, texts, tags, screenshots, author, source,
 //                and the root file's name and icon; its releases stay as they are)
@@ -39,7 +43,32 @@ string Need(string key) => One(key) ?? throw new ArgumentException($"--{key} is 
 var json = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping, PropertyNameCaseInsensitive = true };
 var catalogDir = Need("catalog");
 var rootUrl = Need("root-url").TrimEnd('/');
-var id = Need("id");
+
+// A package: its manifest says what the mod is.
+string packagePath = null, packageUrl = null;
+PackageManifest manifest = null;
+if (One("package") is { } packageArg)
+{
+    var at = packageArg.IndexOf('=');
+    if (at <= 0)
+        return Fail($"--package {packageArg}: <zip>=<url>");
+    packagePath = packageArg[..at];
+    packageUrl = packageArg[(at + 1)..];
+    if (!File.Exists(packagePath))
+        return Fail($"--package {packagePath}: no such file");
+    using var zip = System.IO.Compression.ZipFile.OpenRead(packagePath);
+    if (zip.GetEntry("manifest.json") is not { } entry)
+        return Fail($"--package {packagePath}: no manifest.json in it");
+    using (var reader = new StreamReader(entry.Open()))
+        manifest = JsonSerializer.Deserialize<PackageManifest>(reader.ReadToEnd(), json);
+    if (string.IsNullOrWhiteSpace(manifest?.Id) || string.IsNullOrWhiteSpace(manifest.Version))
+        return Fail($"--package {packagePath}: its manifest has no id or version");
+    if (!zip.Entries.Any(e => e.FullName.StartsWith("plugins/", StringComparison.OrdinalIgnoreCase) && e.FullName.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
+        return Fail($"--package {packagePath}: no DLL under plugins/");
+}
+var id = One("id") ?? manifest?.Id ?? throw new ArgumentException("--id is needed");
+if (manifest != null && !string.Equals(manifest.Id, id, StringComparison.OrdinalIgnoreCase))
+    return Fail($"--id {id}, but the package is {manifest.Id}");
 
 // The root file's name is required (it is shown everywhere): given now, or already in the file.
 var rootPath = Path.Combine(catalogDir, "catalog.json");
@@ -69,6 +98,18 @@ if (One("icon") is { } iconArg)
 
 var metaPath = Path.Combine(catalogDir, "mods", id + ".json");
 var meta = File.Exists(metaPath) ? JsonSerializer.Deserialize<ModMeta>(File.ReadAllText(metaPath), json) : new ModMeta { Id = id };
+if (manifest != null)
+{
+    // The package's description of the mod, replaced by the options given below.
+    meta.Author = manifest.Author ?? meta.Author;
+    meta.Source = manifest.Source ?? meta.Source;
+    if (manifest.Tags.Count > 0)
+        meta.Tags = manifest.Tags.Select(t => t.Trim().ToLowerInvariant()).Where(t => t.Length > 0).Distinct().ToList();
+    foreach (var (language, text) in manifest.Name)
+        meta.Name[language] = text;
+    foreach (var (language, text) in manifest.Description)
+        meta.Description[language] = text;
+}
 meta.Author = One("author") ?? meta.Author;
 meta.Source = One("source") ?? meta.Source;
 if (One("tags") is { } tagsArg)
@@ -135,7 +176,7 @@ if (metaOnly)
         return Fail($"{id}: no release in the catalog yet; add one first");
     Console.WriteLine($"{id}: the description only, the releases kept");
 }
-else if (AddRelease() is var failed && failed != 0)
+else if ((manifest != null ? AddPackage() : AddRelease()) is var failed && failed != 0)
     return failed;
 Directory.CreateDirectory(Path.GetDirectoryName(metaPath)!);
 File.WriteAllText(metaPath, JsonSerializer.Serialize(meta, json) + "\n");
@@ -194,6 +235,36 @@ int AddRelease()
         meta.Releases.Sort((a, b) => VersionComparer.Instance.Compare(b.Version, a.Version));
         Console.WriteLine($"{id} {version}: added for the game {game}");
     }
+    return 0;
+}
+
+// The package added to the meta file's packages, or the game version added to the same package; non-zero: refused.
+int AddPackage()
+{
+    var sha = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(packagePath))).ToLowerInvariant();
+    var games = One("game") is { } g ? new List<string> { g } : manifest.Games;
+    if (games.Count == 0)
+        return Fail($"{id} {manifest.Version}: the manifest names no game version; give --game");
+    var package = meta.Packages.FirstOrDefault(r => r.Version == manifest.Version);
+    if (package != null)
+    {
+        if (package.Archive?.Sha256 != sha)
+            return Fail($"{id} {manifest.Version} is published already with another package: raise the version");
+        foreach (var game in games.Where(game => !package.Games.Contains(game)))
+            package.Games.Add(game);
+        Console.WriteLine($"{id} {manifest.Version}: the same package, now for the games {string.Join(", ", package.Games)}");
+        return 0;
+    }
+    meta.Packages.Add(new ModRelease
+    {
+        Version = manifest.Version,
+        Games = games.ToList(),
+        BepInEx = One("bepinex") ?? manifest.BepInEx,
+        Requires = manifest.Requires,
+        Archive = new ReleaseFile { Name = Path.GetFileName(packagePath), Url = packageUrl, Sha256 = sha },
+    });
+    meta.Packages.Sort((a, b) => VersionComparer.Instance.Compare(b.Version, a.Version));
+    Console.WriteLine($"{id} {manifest.Version}: the package added for the games {string.Join(", ", games)}");
     return 0;
 }
 
