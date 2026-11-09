@@ -129,6 +129,11 @@ public partial class Plugin
     {
         try
         {
+            if (Stale())
+            {
+                Logs.Info("Mods window: the game unloaded what its texts were drawn with: built again");
+                DropWindow();
+            }
             if (window == null && !BuildWindow())
                 return;
             suspended = false;
@@ -526,13 +531,23 @@ public partial class Plugin
 
     void HideModsWindow()
     {
+        DropWindow();
+        MainMenu.Remove(modsButton);
+        modsButton = null;
+    }
+
+    // The copy of the Load screen keeps the game's objects its texts were made with (their fonts' materials). The game
+    // unloads some of them when a game session ends: the texts are then drawn with nothing (empty tabs back from a map).
+    bool Stale() =>
+        window != null && window.GetComponentsInChildren<TMP_Text>(true).Any(text => text.fontSharedMaterial == null);
+
+    void DropWindow()
+    {
         // At once: the reloaded build looks for them in the same frame.
         screen?.Destroy();
         screen = null;
-        MainMenu.Remove(modsButton);
         pictures?.Clear();
         window = staging = null;
-        modsButton = null;
         titleText = statusText = nothingText = selectAllText = panelTitle = versionLabel = versionValue = originLabel = originValue = null;
         simpleTabs = null;
         tabList.Clear();
