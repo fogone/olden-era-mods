@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -204,22 +204,30 @@ public static partial class Game
     static readonly Lookup<Type> battleLogic = Lookup<Type>.Among("battle logic",
         () => counterDecision.Value is { } d ? new[] { d.DeclaringType } : null, t => t.Name).Generate("GameBattleLogic");
 
-    // Whether the attacker strikes again after the counter (Double Strike; eqe.bhqa(Unit, eji) on 0.82.7, called by the
-    // attack's sequence): bool M(Unit, ability) of the battle logic that goes on to the check by attack type, bool
-    // M(Unit, EAttackType) (eqe.bhqb: does the unit carry add_attack_after_counter_melee / _range / _shoot / _cast).
+    // Whether the attacker strikes again after the counter (Double Strike; eqe.bhqa(Unit, eji) on 0.82.7, eqe.bhpv on
+    // 0.82.8, called by the attack's sequence): bool M(Unit, ability) of the battle logic that checks the unit's sequence
+    // effects by attack type (add_attack_after_counter_melee / _range / _shoot / _cast): through bool M(Unit,
+    // EAttackType) (eqe.bhqb on 0.82.7), or with that check inlined, calling the unit's bool M(string) itself (0.82.8).
     static readonly Lookup<MethodInfo> extraStrike = Lookup<MethodInfo>.Among("battle logic: a second strike after the counter",
         () => battleLogic.Value is { } logic && AbilityType is { } a
             ? logic.Methods().Instance().Returns(typeof(bool)).Takes(typeof(Unit), a)
-                .Where(m => GameCode.Calls(m).Any(c => GameCode.At(c.target).Any(t => t.ReturnType == typeof(bool) && ParamTypes(t).SequenceEqual(new[] { typeof(Unit), typeof(EAttackType) }))))
+                .Where(m => GameCode.Calls(m).Any(c => GameCode.At(c.target).Any(t => IsAttackTypeCheck(t) || IsSequenceEffectCheck(t))))
                 .DistinctCode()
             : null, Name).Generate("StrikesAgainAfterCounter");
 
-    // Whether the unit carries a sequence effect (Unit.bjnz(String) on 0.82.7: its passives' and buffs' sequenceEffect, e.g.
-    // "counter_before_and_after_attack"): bool M(string) of the unit the second strike's check calls.
+    static bool IsAttackTypeCheck(MethodInfo m) => m.ReturnType == typeof(bool) && ParamTypes(m).SequenceEqual(new[] { typeof(Unit), typeof(EAttackType) });
+
+    static bool IsSequenceEffectCheck(MethodInfo m) =>
+        m.DeclaringType == typeof(Unit) && m.ReturnType == typeof(bool) && ParamTypes(m).SequenceEqual(new[] { typeof(string) });
+
+    // Whether the unit carries a sequence effect (Unit.bjnz(String) on 0.82.7, bjnu on 0.82.8: its passives' and buffs'
+    // sequenceEffect, e.g. "counter_before_and_after_attack"): bool M(string) of the unit the second strike's check
+    // calls, itself or through its check by attack type.
     static readonly Lookup<MethodInfo> hasSequenceEffect = Lookup<MethodInfo>.Among("unit: has a sequence effect",
         () => extraStrike.Value is { } check
             ? GameCode.Calls(check).SelectMany(c => GameCode.At(c.target))
-                .Where(m => m.DeclaringType == typeof(Unit) && m.ReturnType == typeof(bool) && ParamTypes(m).SequenceEqual(new[] { typeof(string) })).Distinct()
+                .SelectMany(m => IsAttackTypeCheck(m) ? GameCode.Calls(m).SelectMany(c => GameCode.At(c.target)) : new[] { m })
+                .Where(IsSequenceEffectCheck).Distinct()
             : null, Name).Generate("HasSequenceEffect");
 
     // Whether the defender answers before the strike (eqe.bhpz(Unit) on 0.82.7, called by the attack's sequence: the unit

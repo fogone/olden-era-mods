@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -62,9 +62,13 @@ public static partial class Game
 
     internal static List<MethodInfo> EncounterActions => encounterActions.Value ?? new List<MethodInfo>();
 
-    // Of the encounter's actions, the battle (dkw.zkj): the one choosing the arena (it calls ArenasInfo/ArenaInfo).
+    // Of the encounter's actions, the battle (dkw.zkj on 0.82.7, dkw.zki on 0.82.8): the one choosing the arena (it calls
+    // ArenasInfo/ArenaInfo), else the one static void (hero, squad) (joining at once takes (squad, hero)).
     static readonly Lookup<MethodInfo> encounterBattle = new Lookup<MethodInfo>("encounter battle",
-        () => EncounterActions.Where(a => GameCode.Calls(a).Any(c => GameCode.At(c.target).Any(m => m.DeclaringType?.Name is "ArenasInfo" or "ArenaInfo"))).OnlyOne(),
+        () => EncounterActions.Where(a => GameCode.Calls(a).Any(c => GameCode.At(c.target).Any(m => m.DeclaringType?.Name is "ArenasInfo" or "ArenaInfo"))).OnlyOne()
+              ?? (Game.HeroType is { } hero && Game.SquadType is { } squad
+                  ? EncounterActions.Where(a => a.IsStatic && a != Encounter && ParamTypes(a).SequenceEqual(new[] { hero, squad })).OnlyOne()
+                  : null),
         Members.Name).GenerateTarget("EncounterBattle");
 
     internal static MethodInfo EncounterBattle => encounterBattle.Value;
