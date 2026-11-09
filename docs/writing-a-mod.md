@@ -213,6 +213,10 @@ A window or a panel of a mod is best made from the game's own widgets, so it loo
 helpers are compiled into every mod; each file starts with a short usage example. `mod-settings/ModsWindow*.cs` (the
 Mods window, a copy of the game's Load screen) uses all of them.
 
+- `ModScreen` — a screen of your own in the game's screen registry (issue #24): `Create(name, sortingOrder)` makes it
+  (its canvas is `Content`), `Open`/`Hide`, `Escape` (hides by default) and `Closed`; the game puts it on its stack of
+  open screens, gives it the UI camera, the input and Escape, and takes the clicks from the screen below. It registers
+  again after a mode change emptied the registry. `Destroy` it in `OnUnload`. Prefer it to a window of your own.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
   off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts); `Place`
   draws it with the game's UI camera just under the game's message box; `DrawOnTop` puts a part over the rest.

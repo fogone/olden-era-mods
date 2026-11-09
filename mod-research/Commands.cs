@@ -37,6 +37,7 @@ internal sealed class Commands
 #                                 e.g. click OE_Row_nobirds.oldenera.visited/Remove
 #   objects Type [regex]          the live Unity objects of that type (at most 80; regex: by name, sprite or path): name, active, scene, path; each kept as $o0, $o1...
 #   sprite <name> <file.png>      a loaded sprite of the game into a PNG file (with its size and 9-slice border)
+#   screen make|open|hide|state|drop  a trial screen of ours in the game's screen registry (ModScreen, issue #24)
 #   holders Type              the game's properties of that type (who holds a config, a service)
 #   fields Type                 the class's fields with their offsets (code reading [obj+0xB8] reads the one at +0xB8)
 #   slot Type 0x238             the method in the class's virtual slot (code calling [klass+0x238])
@@ -334,6 +335,9 @@ internal sealed class Commands
             case "probed":
                 while (probed.TryDequeue(out var call))
                     write(call);
+                break;
+            case "screen":
+                write(ScreenSpike.Run(argument));
                 break;
             case "growth":
                 foreach (var growthLine in words.Length > 1 && words[1] == "dump" ? GrowthDump() : Growth())

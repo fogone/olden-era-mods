@@ -45,3 +45,6 @@ GameBattleLogic.AnswersBeforeStrike = eqe.bhpz  # the one the attack's sequence 
 # 0.82.7: BhNavigationButton has three Actions (chbk, chbl, chbm at +0x90, +0x98, +0xA0); its OnPointerClick calls the
 # one at +0x90 (code read in the game, 07.11), the click; the Mods button in the main menu sets it.
 global::Hex.UI.GeneralKit.BhNavigationButton.MenuClick = BhNavigationButton.chbk  # the click action, OnPointerClick calls +0x90, read in the game on 0.82.7
+
+# Of four clones with their own code (efg, ekm, oal, ujj), the first: BhScreen.Awake does the same inline; checked in the game on 0.82.7 (a screen of ours registered, research console `screen`).
+GameScreenRegistry.Register = cqp.efg  # registering a screen of ours again after the registry was emptied
