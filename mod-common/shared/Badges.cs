@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Badge icons drawn at runtime from distance functions (64x64, y up), so they don't depend on the game's sprites:
 // dark plate, rounded frame, glyph strokes.
 //
 //   var sprite = Badges.Draw(Badges.Amber, (x, y) => Badges.Segment(x, y, 16, 32, 48, 32));
-internal static class Badges
+public static class Badges
 {
     public static readonly Color Plate = new(0.11f, 0.09f, 0.07f, 0.92f), Gold = new(0.88f, 0.78f, 0.56f), Frame = new(0.79f, 0.69f, 0.48f),
                                  Green = new(0.45f, 0.80f, 0.30f), Amber = new(0.94f, 0.62f, 0.15f), Red = new(0.90f, 0.33f, 0.24f);

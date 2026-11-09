@@ -5,7 +5,7 @@ using Hex.UI;
 using Hex.UI.Tooltips;
 using Il2CppInterop.Runtime.InteropTypes;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The events of the game our mods listen to, each with its context: a mod subscribes (ModBase.On) and gets what
 // happened, typed, without patching the game itself. The core plugin (mod-core) patches the game once for all of them

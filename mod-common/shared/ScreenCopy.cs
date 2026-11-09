@@ -4,7 +4,7 @@ using Hex.UI.GeneralKit;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A game screen copied as a window of our own: the copy's scripts that run the screen taken off, its parts filled with
 // ours. The copy keeps the screen's look (canvas, scaler, frames, fonts); a screen of ours in the game's registry
@@ -15,7 +15,7 @@ namespace OldenEra.Modding.Common;
 //   screen = ModScreen.Adopt(copy, ModScreen.UnderGameBoxes());
 //   ...
 //   screen.Destroy();   // on unload
-internal static class ScreenCopy
+public static class ScreenCopy
 {
     // A copy of `screen` with the scripts named in `scripts` (by their Il2Cpp type name) taken off, not under any
     // parent, kept across scenes, shown, its controls on (EnableControls).

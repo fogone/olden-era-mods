@@ -6,7 +6,7 @@ using Il2CppInterop.Runtime.InteropTypes;
 using TMPro;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Badges over map objects, made the way the game shows its campaign quest marks: an object in the world next to
 // the object's model, at the model's quest anchor (a child named quest_point, quest_marker_point on squads). So a
@@ -17,7 +17,7 @@ namespace OldenEra.Modding.Common;
 //   var markers = new MapMarkers("OE_Visit");
 //   markers.Set(new() { [model.Pointer] = new Marker(model, new[] { new MarkerIcon("available", sprite) }, 0.5f, 0.7f) });
 //   OnTick(markers.Face);
-internal sealed class MapMarkers
+public sealed class MapMarkers
 {
     readonly string name;
     readonly Dictionary<IntPtr, (Transform root, string look)> shown = new();
@@ -361,10 +361,10 @@ internal sealed class MapMarkers
 }
 
 // When a mod's map badges are seen; the menu's options (lang "<mod>.MarkersShown.0 .. .2") in this order.
-internal enum MarkersShown { Always, Alt, Never }
+public enum MarkersShown { Always, Alt, Never }
 
 // What a badge shows: one or more icons over a model, `size` (one icon) and `lift` in world units.
-internal sealed class Marker
+public sealed class Marker
 {
     public readonly GameObject Model;
     public readonly IReadOnlyList<MarkerIcon> Icons;
@@ -384,7 +384,7 @@ internal sealed class Marker
     }
 }
 
-internal readonly struct MarkerIcon
+public readonly struct MarkerIcon
 {
     public readonly string Key;
     public readonly Sprite Sprite;

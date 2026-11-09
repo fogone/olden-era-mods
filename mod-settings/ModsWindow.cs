@@ -5,14 +5,14 @@ using Hex.Settings.UI;
 using Hex.UI;
 using Hex.UI.Elements;
 using Hex.UI.GeneralKit;
-using OldenEra.Modding.Common;
-using static OldenEra.Modding.Common.UiLayout;
+using Nobirds.OldenEra.Modding.Common;
+using static Nobirds.OldenEra.Modding.Common.UiLayout;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
 // The mods' own window (issues #6, #13, #14). A "Mods" button in the main menu under Additional (a copy of the game's
 // Options button) opens a copy of the game's Load screen (Hex.UI.SaveLoad.ScLoad), a screen of ours in the game's screen
@@ -406,21 +406,13 @@ public partial class Plugin
             t.transform.Cast<RectTransform>().sizeDelta = new Vector2(width, t.transform.Cast<RectTransform>().sizeDelta.y);
         }
         LayoutRebuilder.ForceRebuildLayoutImmediate(simpleTabs.transform.Cast<RectTransform>());
-        var data = new Il2CppSystem.Collections.Generic.List<GameSimpleTabData>();
-        foreach (var which in WindowTabs)
+        var items = WindowTabs.Select(which => (TabLabel(which), (Action)(() => Guard("tab", () =>
         {
-            var item = new GameSimpleTabData();
-            item.Label = TabLabel(which);
-            var chosen = which;
-            item.Click = (Il2CppSystem.Action)(Action)(() => Guard("tab", () =>
-            {
-                if (!filling && tab != chosen)
-                    Redraw(() => SwitchTab(chosen));
-            }));
-            data.Add(item);
-        }
+            if (!filling && tab != which)
+                Redraw(() => SwitchTab(which));
+        })))).ToList();
         filling = true;
-        try { simpleTabs.Init(data, (int)tab); }
+        try { GameUi.SetTabs(simpleTabs, items, (int)tab); }
         finally { filling = false; }
         // The game's tab answers the press (OnPointerDown); a click (keyboard, tools) selects it the same way, once.
         for (var i = 0; i < tabList.Count; i++)

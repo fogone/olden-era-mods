@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>OldenEraFixes</AssemblyName>
-    <RootNamespace>OldenEra.Modding.Fixes</RootNamespace>
+    <RootNamespace>Nobirds.OldenEra.Modding.Fixes</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -34,8 +34,9 @@
     <Reference Include="$(GameDir)\BepInEx\interop\*.dll" Private="false" />
     <ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />
     <EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />
-    <!-- Shared code that changes often, compiled into the plugin so it reloads with it (mod-common\shared). -->
-    <Compile Include="..\mod-common\shared\**\*.cs" Link="shared\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- The game's obfuscated classes under names of their own (mod-common\shared\GameTypes.g.cs): this plugin works on the
+         game's code itself, with the library's internal names (InternalsVisibleTo), and is built for one game version. -->
+    <Compile Include="..\mod-common\shared\GameTypes.g.cs" Link="shared\GameTypes.g.cs" />
   </ItemGroup>
 
 </Project>

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Il2CppInterop.Runtime.InteropTypes;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // Live reflection over the game's objects: an expression is a chain of steps from a root.
 //   hero                       the hero selected in the HUD (Game.SelectedHero)

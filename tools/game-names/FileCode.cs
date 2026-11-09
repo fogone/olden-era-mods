@@ -3,9 +3,9 @@ using System.Reflection.Emit;
 using LibCpp2IL;
 using LibCpp2IL.Metadata;
 using LibCpp2IL.Reflection;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.GameNamesTool;
+namespace Nobirds.OldenEra.Modding.GameNamesTool;
 
 // The game's code read from its files (GameAssembly.dll and global-metadata.dat) with LibCpp2IL, the library BepInEx
 // itself makes the interop assemblies with: the same addresses, code and field offsets the running game has (checked

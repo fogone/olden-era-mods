@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // What the Installed tab does to several mods at once (remove, switch on or off, update): in which order, and what is
 // left out. No game, no BepInEx (the tests use it).

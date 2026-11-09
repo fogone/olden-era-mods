@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Pictures from files (PNG, JPG) in the UI: loaded once into textures, shown in a RawImage filling its frame ("cover",
 // cut) or whole in an area ("contain"), the picture's aspect kept either way.
@@ -13,7 +13,7 @@ namespace OldenEra.Modding.Common;
 //   Pictures.Cover(rawImage, pictures.Get(path));
 //   Pictures.FitInside(rawImage.rectTransform, texture, new Vector2(400, 300));
 //   pictures.Clear();   // on unload: the textures destroyed
-internal sealed class PictureCache
+public sealed class PictureCache
 {
     readonly Dictionary<string, Texture2D> textures = new();
     readonly Action<string> error;
@@ -55,7 +55,7 @@ internal sealed class PictureCache
     }
 }
 
-internal static class Pictures
+public static class Pictures
 {
     // A picture filling the image's frame, its aspect kept: cut at the sides or at the top and bottom, centred. No
     // picture (not loaded): a dim frame.

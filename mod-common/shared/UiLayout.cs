@@ -3,15 +3,15 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Small helpers for building UI from code next to the game's widgets: a new rect, stretching, a layout size, a row
 // layout, clearing and hiding children, a click on any object.
 //
-//   using static OldenEra.Modding.Common.UiLayout;
+//   using static Nobirds.OldenEra.Modding.Common.UiLayout;
 //   var strip = NewRect("OE_Strip", parent);  Size(strip.gameObject, 440f, 40f);  HRow(strip.gameObject, 8f, TextAnchor.MiddleLeft);
 //   Clickable(strip.gameObject, () => ...);
-internal static class UiLayout
+public static class UiLayout
 {
     // On its parent's layer: the game's UI camera draws only the UI layer, and a new object starts on Default (it would
     // take clicks but not be drawn once it has a canvas of its own).

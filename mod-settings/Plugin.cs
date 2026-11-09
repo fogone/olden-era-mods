@@ -10,13 +10,13 @@ using BhSettingsButton = Hex.Settings.UI.BhSettingsButton;
 using Il2CppInterop.Runtime.InteropTypes;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Hex.UI.Tooltips;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
-// A "Моды" tab in the game's settings: the menus our plugins register with OldenEra.Modding.Common.ModMenu
+// A "Моды" tab in the game's settings: the menus our plugins register with Nobirds.OldenEra.Modding.Common.ModMenu
 // (a title with the version, the master switch, switches, choices as one row per option).
 // The switches are copies of the game's own settings rows; flipping one writes the entry, which the plugin reads
 // when it needs it.
@@ -31,7 +31,6 @@ public partial class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         try
         {
             OnTick(Tick);
@@ -55,7 +54,7 @@ public partial class Plugin : ModBase
             settingsTab = null;
         if (settingsTab != null || tabFailed || !SettingsTab.ScreenLoaded)
             return;
-        settingsTab = SettingsTab.Add(Harmony, SectionName, TabKey);
+        settingsTab = SettingsTab.Add(SectionName, TabKey);
         if (settingsTab == null)
         {
             tabFailed = true;
@@ -66,34 +65,10 @@ public partial class Plugin : ModBase
         FillRows();
         Log.LogInfo($"Mods tab added, {Rows().Count} rows");
     }
-    // Our text on a game text: its localization key cleared first, or the game puts its own text back.
-    // A game text showing one of our localization keys: the game looks it up and follows a language change.
-    static void SetKey(Component text, string key)
-    {
-        if (text == null)
-            return;
-        if (text.GetComponent<GameLocalizedText>() is { } localized)
-            localized.textSid = key;
-        SetText(text, Texts.Get(key));
-        if (text.GetComponent<GameLocalizedText>() is { } again)
-            again.textSid = key;
-    }
+    // A game text showing one of our localization keys (it follows a language change), or a text of ours.
+    static void SetKey(Component text, string key) => GameUi.Label(text, key);
 
-    static void SetText(Component text, string value)
-    {
-        if (text == null)
-            return;
-        if (text.GetComponent<GameLocalizedText>() is { } localized)
-        {
-            localized.textSid = "";
-            // A copy that has not woken up yet has no text element of its own; then the TMP text below is enough.
-            try { localized.HardSetText(value); }
-            catch (Exception) { }
-        }
-        if (text.GetComponent<TMPro.TMP_Text>() is { } tmp)
-            tmp.text = value;
-    }
-
+    static void SetText(Component text, string value) => GameUi.Text(text, value);
     // One row of the tab, by its kind: a title, a switch with how to read and write its value, a choice, a button. Name:
     // the row object's name; Label: a localization key.
     abstract record Row(string Name, string Label);
@@ -103,7 +78,7 @@ public partial class Plugin : ModBase
     // A button row; its button's label (ButtonKey, the Reset text by default), no button when Click is null.
     sealed record ButtonSpec(string Name, string Label, Action Click, string ButtonKey = null) : Row(Name, Label);
 
-    // The rows of every registered menu (OldenEra.Modding.Common.ModMenu): its title with the version, the master switch,
+    // The rows of every registered menu (Nobirds.OldenEra.Modding.Common.ModMenu): its title with the version, the master switch,
     // then its switches and choices (a dropdown), then its reset.
     List<Row> Rows()
     {
@@ -188,7 +163,7 @@ public partial class Plugin : ModBase
             row = UnityEngine.Object.Instantiate(buttonTemplate.gameObject, list, false).transform;
             row.name = spec.Name;
         }
-        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? row.GetComponentInChildren<GameLocalizedText>(true), spec.Label);
+        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? GameUi.LocalizedText(row), spec.Label);
         row.gameObject.SetActive(true);
         row.SetAsLastSibling();
         var button = row.GetComponentInChildren<BhSettingsButton>(true);
@@ -218,7 +193,7 @@ public partial class Plugin : ModBase
             row = UnityEngine.Object.Instantiate(dropdownTemplate.gameObject, list, false).transform;
             row.name = spec.Name;
         }
-        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? row.GetComponentInChildren<GameLocalizedText>(true), spec.Label);
+        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? GameUi.LocalizedText(row), spec.Label);
         row.gameObject.SetActive(true);
         row.SetAsLastSibling();
         var dropdown = row.GetComponentInChildren<BhLocalizedDropdown>(true);
@@ -268,7 +243,7 @@ public partial class Plugin : ModBase
             row = UnityEngine.Object.Instantiate(template.gameObject, list, false).transform;
             row.name = spec.Name;
         }
-        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? row.GetComponentInChildren<GameLocalizedText>(true), spec.Label);
+        SetKey(row.GetComponentInChildren<BhSettingsElement>(true)?.header ?? GameUi.LocalizedText(row), spec.Label);
         row.gameObject.SetActive(true);
         row.SetAsLastSibling();
         Describe(row, spec.Label);
@@ -326,14 +301,14 @@ public partial class Plugin : ModBase
             return;
         if (describedRow != IntPtr.Zero)
         {
-            GameNames.Tooltips?.Hide();
+            GameUi.HideTooltip();
             NarrowText(null);
         }
         describedRow = pointer;
         if (hovered is not var (shownRect, shownLabel))
             return;
         var description = Texts.Get(shownLabel + ".desc");
-        GameNames.Tooltips?.ShowTexts(Texts.Get(shownLabel), description, null, shownRect, null, ESnapDirection.Top, false);
+        GameUi.ShowTooltip(Texts.Get(shownLabel), description, shownRect, ESnapDirection.Top);
         NarrowText(description);
     }
 

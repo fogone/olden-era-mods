@@ -3,7 +3,7 @@ using Hex.MainMenu;
 using Hex.UI.GeneralKit;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A button of ours in the game's main menu (issue #24). The menu is the game's screen ScMainMenu (ScMainMenu.me); its
 // view holds every button and sub-menu in a field of its own and has no list to add to, and its buttons have no prefab
@@ -17,7 +17,7 @@ namespace OldenEra.Modding.Common;
 //   });
 //   ...
 //   MainMenu.Remove(button);   // on unload
-internal static class MainMenu
+public static class MainMenu
 {
     // The menu's view (its buttons and sub-menus), null outside the main menu.
     public static MainMenuNavigationView View => ScMainMenu.me is { } menu && menu != null ? menu.mainMenuNavigationView : null;

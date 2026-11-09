@@ -4,12 +4,12 @@ using System.Reflection;
 using Hex.Settings.UI;
 using Hex.UI.GeneralKit;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's settings screen (sections, tabs, switches). The members are used through the generated names
 // (GameNames.g.cs: section.SectionType, view.ShownSection, tab.ClickAction, tab.ShowSelected(bool), checkbox.SwitchedOn(),
 // settingsCheckbox.SwitchCallback); the searches behind them are here. The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // A section's settings type, the one the game's switch finds it by (BhSettingsSection.bwqv; it has no setter: it is
     // written through its backing field _bwqv_k__BackingField, +0x44, SectionTypeStored).

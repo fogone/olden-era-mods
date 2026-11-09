@@ -9,9 +9,8 @@ The main cycle since 03.11.2026. The plugins we are working on live not in `BepI
 Conditions and limitations:
 - **The mod must be on `ModBase`.** This is a class from `mod-common`: `OnLoad` instead of `Load`, `Harmony` and `Menu` from the base class, `OnTick` instead of your own `MonoBehaviour`s. Created objects are named with a prefix from `ObjectPrefixes`, and whatever the mod changed in game objects it restores in `OnUnload`. Do not create your own `MonoBehaviour`s in a mod: their class cannot be registered in the game a second time.
 - **Moving from `plugins` to `devplugins` — once, with the game closed.** `-Dev` itself deletes the copy from `plugins`, and refuses if the game is open.
-- **`mod-common` and `mod-devloader` cannot be reloaded**, they are installed only by `-Install` with the game closed. .NET does not unload an assembly from a process, and the plugins bind to the first loaded `OldenEraCommon.dll`. The namespaces are `OldenEra.Modding.*` (since 05.11), the DLL names stayed `OldenEra*.dll`.
-  - So `OldenEraCommon.dll` holds only the rarely changing core: `ModBase`, `ModMenu`, `Texts`, `Ticker`.
-  - Frequently changing shared code lives in `mod-common\shared\*.cs`: the map badges `MapMarkers` and the drawn badges `Badges`. It is compiled into every plugin (`<Compile Include="..\mod-common\shared\*.cs" .../>` in the csproj), its types are `internal`, and it is reloaded together with the plugin. Put new shared code there by default, not into the library.
+- **`mod-common` and `mod-devloader` cannot be reloaded**, they are installed only by `-Install` with the game closed. .NET does not unload an assembly from a process, and the plugins bind to the first loaded `OldenEraCommon.dll`. The namespaces are `Nobirds.OldenEra.Modding.*` (since 05.11), the DLL names stayed `OldenEra*.dll`.
+  - `OldenEraCommon.dll` holds the framework since 09.11 (#30): `ModBase`, `ModMenu`, `Texts`, `Ticker` and `mod-common\shared\*.cs` (the helpers, the game's names). A change to the shared code needs a restart; a mod's own code reloads.
 - **Each reload leaves the old assembly in memory.** That is tens of kilobytes and does not affect a development session.
 - **Game crashes, patches of new methods with a risk of merged code, edits of game data** — are checked as before, by restarting.
 - **Release:** `build.ps1 -Install` with the game closed puts the mod back into `plugins` and removes the copy from `devplugins`.
@@ -78,7 +77,7 @@ The `mod-settings` plugin adds a "Mods" tab to the game settings. The menu of ev
 **How to connect a plugin to the tab.** Through the common library `mod-common` (`OldenEraCommon.dll`, class `ModMenu`):
 ```csharp
 // csproj: <ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
 static Switch showThing;
 static Choice<Highlight> highlight;

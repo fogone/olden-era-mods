@@ -1,12 +1,12 @@
 using System;
 using System.Linq;
 using BepInEx;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
 // Next to the game's version in the main menu (the game's text that shows Application.version), the Mods' own:
 // "0.82.07 · моды 0.11.0" (fogone 06.11). The game's text gets our part after its own and back without it on unload.

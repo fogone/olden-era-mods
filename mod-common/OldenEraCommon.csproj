@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>OldenEraCommon</AssemblyName>
-    <RootNamespace>OldenEra.Modding.Common</RootNamespace>
+    <RootNamespace>Nobirds.OldenEra.Modding.Common</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -19,10 +19,17 @@
     <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243</NoWarn>
   </PropertyGroup>
 
-  <!-- shared\*.cs is compiled into each plugin, not into this library: it changes often, and a plugin reloads in the
-       running game while this library does not. -->
+  <!-- The framework: shared\ (the helpers, the game's names for this game version) is compiled into this library. The
+       plugins that work on the game's code itself see its internal names. -->
   <ItemGroup>
-    <Compile Remove="shared\**" />
+    <InternalsVisibleTo Include="OldenEraCore" />
+    <InternalsVisibleTo Include="OldenEraResearch" />
+    <InternalsVisibleTo Include="OldenEraFixes" />
+    <InternalsVisibleTo Include="OldenEraSkipIntro" />
+    <InternalsVisibleTo Include="OldenEraBattleCounter" />
+    <InternalsVisibleTo Include="OldenEraSquadTooltip" />
+    <InternalsVisibleTo Include="OldenEraVisited" />
+    <InternalsVisibleTo Include="OldenEraMapBadges" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,13 +11,13 @@ using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.InteropTypes;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The searches for the game's members (the build-time side, docs/game-names.md): run by the generator on the game's
 // files (tools/game-names) and, where a plugin needs a member itself (a patch), on first use in the game. Each finds by
 // signature and readable types; what it found goes to the log (Game.Log). Nothing here uses the generated names: the
 // generator compiles this side to make them. The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // Where the lookups say what they found; set by the plugin.
     public static Action<string> Log { get; set; }

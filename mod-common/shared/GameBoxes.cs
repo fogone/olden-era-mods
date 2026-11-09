@@ -2,14 +2,14 @@ using System;
 using Hex.UI.GeneralKit;
 using Hex.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's own message box (a question with two buttons) and input box (a line of text), opened with the game's
 // options objects (GameWidgets.cs). The texts are ours (already translated); the callbacks run on the main thread.
 //
 //   GameBoxes.Confirm(Texts.Get("oe.x.title"), Texts.Get("oe.x.text"), Texts.Get("oe.x.go"), cancel, onConfirm: Go, onCancel: null);
 //   GameBoxes.Ask(Texts.Get("oe.x.caption"), Texts.Get("oe.x.placeholder"), ok, cancel, onConfirm: text => Add(text), onCancel: null);
-internal static class GameBoxes
+public static class GameBoxes
 {
     public static void Confirm(string caption, string text, string confirmLabel, string cancelLabel, Action onConfirm, Action onCancel)
     {

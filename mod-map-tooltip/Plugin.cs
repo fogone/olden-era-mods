@@ -4,10 +4,10 @@ using System.Linq;
 using BepInEx;
 using Hex.Session.Hud;
 using Hex.UI.Tooltips;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.MapTooltip;
+namespace Nobirds.OldenEra.Modding.MapTooltip;
 
 // The tooltip of a map object (a squad, a building, a pickup) stands over the object and often covers it. The game
 // shows it with BhTooltip.Show(Camera, GameObject, float), and every frame its positioner places it (wgf(Vector3) on
@@ -46,7 +46,6 @@ public partial class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         placeFree = Menu.Toggle("PlaceFree", false);
         // The game's events (mod-core): the tooltip shown over its object, hidden, every frame, its place.
         On(ModEvents.TooltipShown, OnShown);
@@ -58,7 +57,7 @@ public partial class Plugin : ModBase
     void OnShown(TooltipShown shownOver)
     {
         shown[shownOver.Tooltip.Pointer] = new Over { Target = shownOver.Target, Camera = shownOver.Camera };
-        var positioner = shownOver.Tooltip.Positioner?.Pointer ?? IntPtr.Zero;
+        var positioner = GameUi.Positioner(shownOver.Tooltip)?.Pointer ?? IntPtr.Zero;
         if (positioner != IntPtr.Zero)
             tooltipOf[positioner] = shownOver.Tooltip.Pointer;
     }

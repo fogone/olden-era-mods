@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.SquadTooltip;
+namespace Nobirds.OldenEra.Modding.SquadTooltip;
 
 // The decision journal: one line per squad in BepInEx/LogOutput.log, always on, nothing on screen.
 //   SQUAD     <type>#<id> <map|guard?> escape=<DataSquad.isEscape> tooltip=<what the tooltip says> dipl=<the Diplomacy check alone>

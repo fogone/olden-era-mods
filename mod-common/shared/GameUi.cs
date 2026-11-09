@@ -7,7 +7,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Small widgets of the game set up with our data through the game's own methods (GameWidgets.cs): the Load screen's
 // filter (a funnel opening check marks), a tag chip, a dropdown's options, a check box.
@@ -16,7 +16,7 @@ namespace OldenEra.Modding.Common;
 //   GameUi.ShowChip(chip, Texts.Get(key), back, labelColor);
 //   GameUi.SetDropdownTexts(dropdown, new[] { "A", "B" }, chosen: 0);
 //   GameUi.Check(toggle, isOn, value => ...);
-internal static class GameUi
+public static class GameUi
 {
     // The filter's check marks, one per name (localization keys: the game translates them); `changed` when one is
     // ticked or unticked. Setting it up unticks them all.
@@ -70,5 +70,49 @@ internal static class GameUi
         }
         if (text.GetComponent<TMPro.TMP_Text>() is { } tmp)
             tmp.text = value;
+    }
+
+    // A text of the game showing a text of ours that is no localization key (a number, a name): its key cleared, or the
+    // game puts its own text back.
+    public static void Text(Component text, string value)
+    {
+        if (text == null)
+            return;
+        if (text.GetComponent<GameLocalizedText>() is { } localized)
+        {
+            localized.textSid = "";
+            try { localized.HardSetText(value); }
+            catch (Exception) { }
+        }
+        if (text.GetComponent<TMPro.TMP_Text>() is { } tmp)
+            tmp.text = value;
+    }
+
+    // The game's localized text (its text component that follows the language) on or under an object; null if none.
+    public static Component LocalizedText(Component under) =>
+        under == null ? null : under.GetComponent<GameLocalizedText>() ?? under.GetComponentInChildren<GameLocalizedText>(true);
+
+    // The game's text tooltip (a header and a text, as a unit buff's) over a rectangle, kept on screen by the game.
+    public static void ShowTooltip(string header, string text, RectTransform over, Hex.UI.Tooltips.ESnapDirection side) =>
+        GameNames.Tooltips?.ShowTexts(header, text, null, over, null, side, false);
+
+    public static void HideTooltip() => GameNames.Tooltips?.Hide();
+
+    // The tooltip's positioner (the object that places it, the one ModEvents.TooltipPlace names), to match the two.
+    public static Il2CppInterop.Runtime.InteropTypes.Il2CppObjectBase Positioner(Hex.UI.Tooltips.BhTooltip tooltip) => tooltip?.Positioner;
+
+    // The Load screen's tabs (BhSimpleTabs) labelled and wired by the game's own Init: a label and a click each, the one
+    // selected. The game labels as many tabs as it has: add copies of a tab to `tabs` first for more.
+    public static void SetTabs(Hex.UI.Elements.BhSimpleTabs tabs, IReadOnlyList<(string label, Action click)> items, int selected)
+    {
+        var data = new Il2CppSystem.Collections.Generic.List<GameSimpleTabData>();
+        foreach (var (label, click) in items)
+        {
+            var item = new GameSimpleTabData();
+            item.Label = label;
+            item.Click = (Il2CppSystem.Action)click;
+            data.Add(item);
+        }
+        tabs.Init(data, selected);
     }
 }

@@ -1,8 +1,8 @@
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // The mod manager (issue #10): it stays in BepInEx\plugins with the library, and loads the mods it installed from
 // BepInEx\oldenera-mods (ManagerState, ModLoader) on the first frame, after BepInEx has loaded its own plugins.

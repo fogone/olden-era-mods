@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // What the manager has installed (issue #10): BepInEx\oldenera-mods\mods.json, one entry per mod, and each mod's files
 // in BepInEx\oldenera-mods\<id>\<version>\. The catalog client (later) writes entries and files; the loader reads them.

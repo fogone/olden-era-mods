@@ -123,8 +123,8 @@ version added (it works there too); with another DLL it stops: raise the mod's v
 - **`mod-common/`**: the common library `OldenEraCommon.dll`, one for every version of the game: `ModBase` (a mod's frame:
   log, loading and unloading, the version check), `ModMenu` (a mod's menu), `Texts` (the mods' texts in the game's
   localization), `ModEvents` (the core's events), `Ticker`, the wrong-version notice.
-- **`mod-common/shared/`**: code compiled into every mod: `search/` (the searches for the game's members, for the
-  generator), `GameNames.g.cs` (the generated names), `Game*.cs` (readable wrappers over them: `Game.MeetingOutcome`,
+- **`mod-common/shared/`**: the library's shared code (compiled into `OldenEraCommon.dll`): `search/` (the searches for the game's members, for the
+  generator), `GameNames.g.cs` (the generated names; `GameTypes.g.cs`, the obfuscated classes' names, also compiled by the plugins that work on them), `Game*.cs` (readable wrappers over them: `Game.MeetingOutcome`,
   `Game.VisitFor`, `Game.Translate`…), `MapMarkers`, `Badges`, `BadgeIcons` (badges).
 - **`mod-*/`**: the mods. The strings seen in the game are in their `lang/<language>.json`, one file per language of the game (`Hex.UI.ELang` names: `english`, `russian`, `german`, `zhcn`…; the library's own in `mod-common/lang`). A language without a file falls back to English. The texts keep the game's own words for its terms (taken from its texts in `Core.zip`, `Lang/<language>/texts`).
 - **`tools/game-names`**: the game's names generator; **`tools/typedump`**, **`tools/disasm`**: looking into the game's

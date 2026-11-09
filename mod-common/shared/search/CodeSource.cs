@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Il2CppInterop.Common;
 using Il2CppInterop.Runtime;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Where GameCode reads the game's machine code and the layout of its classes: the running game (LiveCode, in the
 // plugins), or the game's files, GameAssembly.dll and global-metadata.dat (tools/game-names: the generated names are

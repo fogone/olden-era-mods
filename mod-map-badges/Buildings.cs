@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hex.Session.Data;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.MapBadges;
+namespace Nobirds.OldenEra.Modding.MapBadges;
 
 // Badges over buildings: the amber "available" one over every building with a visit rule that the selected hero can
 // still use (with its period icons too, if chosen), the gem over mines not the hero's side's (green over its own), a

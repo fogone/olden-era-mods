@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hex.Session.Battle;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.BattleCounter;
+namespace Nobirds.OldenEra.Modding.BattleCounter;
 
 // By a choice (fogone 06.11), one more row in the forecast: the game's health icon and the defender's health, and when the
 // defender answers, the swords and the attacker's health (as in the rows above; the row's icon says it is health for

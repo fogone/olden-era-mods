@@ -9,10 +9,10 @@ using Hex.Session.World;
 using Hex.UI;
 using Hex.UI.Tooltips;
 using Il2CppInterop.Runtime.InteropTypes;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Core;
+namespace Nobirds.OldenEra.Modding.Core;
 
 // The core: the game's events for our mods (ModEvents in OldenEraCommon.dll). It patches the game's methods once, for
 // all the mods, and raises each event with its typed context; a mod only subscribes (ModBase.On). A method of the game
@@ -29,7 +29,6 @@ public class Plugin : ModBase
     protected override void OnLoad()
     {
         log = Logs;
-        Game.Log = log.Info;
         ModEvents.Log = log.Error;
         var harmony = Harmony;
         harmony.PatchOne(GameTargets.SquadTooltipFill, "squad tooltip filling / filled",

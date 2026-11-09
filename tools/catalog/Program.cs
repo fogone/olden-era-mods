@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using OldenEra.Modding.Manager;
+using Nobirds.OldenEra.Modding.Manager;
 
 // Adds a release to a mod's meta file in the catalog and the mod to the root file (issue #10):
 //   catalog add --catalog <dir> --root-url <URL the catalog folder is served at> --id <id> --version <v> --game <game version>

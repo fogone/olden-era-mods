@@ -2,12 +2,12 @@
 using System.Linq;
 using Hex.Session.Hud;
 using Hex.Session.World;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // The frame rate under the players' list of the map (else in the top left corner of the screen), with a switch in the "Моды" tab (ShowFps): the frames per
 // second of the last second in a disc, green while smooth, amber with a frame over 33 ms, red with one over 100 ms

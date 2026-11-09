@@ -1,12 +1,12 @@
 using System.Linq;
 using Hex.UI;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static OldenEra.Modding.Common.UiLayout;
+using static Nobirds.OldenEra.Modding.Common.UiLayout;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // A trial screen of ours in the game's screen registry (ModScreen, issue #24), to check it with the game running:
 //   screen make | open | hide | state | drop

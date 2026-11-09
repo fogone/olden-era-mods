@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A row of the game's Load screen list showing data of ours (issue #24): an instance of the row prefab the list makes
 // its rows of (BhVirtualizedList.sessionPrefab), its own script kept. The game lays it out, its presenter plays the hover
@@ -16,7 +16,7 @@ namespace OldenEra.Modding.Common;
 //   row.Name("Map badges");  row.Icon(texture);  row.Tags(new[] { ("UI", color) });
 //   row.Info("Built-in catalog", "0.1.2", "");  row.Selected(picked);  row.OnClick(() => pick(id));
 //   row.Check(isOn, value => ...);   // or row.NoCheck()
-internal sealed class SaveRow
+public sealed class SaveRow
 {
     public readonly BhSessionInfoElement View;
 

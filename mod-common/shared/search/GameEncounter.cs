@@ -5,7 +5,7 @@ using System.Reflection;
 using Hex.Configs;
 using Hex.Session.World;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The encounter of a hero and a map squad, and the Diplomacy points: readable names for the game's members (Lookup,
 // Members, GameCode; found once, said in the log). The comments name each member as it is on 0.82.7.
@@ -13,7 +13,7 @@ namespace OldenEra.Modding.Common;
 // Most of them are what the game's encounter (dkw.zki) reads: Game.MeetingOutcome (GameEncounter.cs)
 // asks the same questions in the same order, without the encounter's actions. Each is found among the encounter's
 // own calls and reads, so they are the members the game uses there.
-internal static partial class Game
+public static partial class Game
 {
     // ---------- the encounter ----------
 

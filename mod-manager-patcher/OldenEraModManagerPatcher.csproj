@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>OldenEraModManager.Patcher</AssemblyName>
-    <RootNamespace>OldenEra.Modding.Manager</RootNamespace>
+    <RootNamespace>Nobirds.OldenEra.Modding.Manager</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <GameDir>C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>

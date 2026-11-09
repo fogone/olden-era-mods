@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>OldenEraModManager</AssemblyName>
-    <RootNamespace>OldenEra.Modding.Manager</RootNamespace>
+    <RootNamespace>Nobirds.OldenEra.Modding.Manager</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

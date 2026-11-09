@@ -2,13 +2,13 @@ using System.Linq;
 using System.Reflection;
 using Hex.MainMenu;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's main menu (issue #24): its screen (ScMainMenu.me) holds the view with every button and sub-menu in a field
 // of its own; the view wires them one by one (MainMenuNavigationView.qjf). A top-level button's handler (the settings
 // one, qjc) first clears the menu's selection, which also closes an open sub-menu. The comments name each member as it
 // is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // Select a button of the menu, null for none (MainMenuNavigationView.qjp(cab)): the view's only bool M(cab); with
     // another button it closes the open sub-menu.

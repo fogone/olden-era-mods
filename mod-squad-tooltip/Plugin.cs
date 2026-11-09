@@ -4,7 +4,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using Hex.Session.Data;
 using Hex.UI;
 using Il2CppInterop.Runtime.InteropTypes;
@@ -12,7 +12,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.SquadTooltip;
+namespace Nobirds.OldenEra.Modding.SquadTooltip;
 
 // When the hovered map squad would join the selected hero or offer to flee (the game's encounter decides it:
 // Game.MeetingOutcome), the tooltip's battle difficulty block says so: "Хотят присоединиться" with the Diplomacy skill
@@ -40,7 +40,6 @@ public partial class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         // The "Моды" tab of the game's settings (mod-settings plugin).
         var menu = Menu;
         showJoin = menu.Toggle("ShowJoin", true);

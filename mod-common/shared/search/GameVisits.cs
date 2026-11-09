@@ -8,11 +8,11 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Visits of map objects, their tooltip's texts and the map's outline: readable names for the game's members (Lookup,
 // Members; found once, said in the log). The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // The game's key of the "already visited" line of a map object's tooltip (ui.json, "tooltipVisited"). The tooltip's
     // fillers (cwt.wdx for event banks, cwx for other map objects) put its text when VisitedBy says so, an empty string

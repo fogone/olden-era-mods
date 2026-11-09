@@ -7,7 +7,7 @@ using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 
-namespace OldenEra.Modding.Manager;
+namespace Nobirds.OldenEra.Modding.Manager;
 
 // Loads the installed mods (ManagerState) at run time, the way the dev loader does: each DLL from its bytes (the file
 // stays free for an update), its BepInEx plugin made and loaded, after the mods it requires. A mod is switched off,

@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using OldenEra.Modding.Common;
-using OldenEra.Modding.GameNamesTool;
-using OldenEra.Modding.Research;
+using Nobirds.OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.GameNamesTool;
+using Nobirds.OldenEra.Modding.Research;
 
 // The generated names (docs/game-names.md) made from the game's files, with no game running: the interop assemblies
 // BepInEx made for this game version (BepInEx\interop, made on the first start after a patch), GameAssembly.dll and

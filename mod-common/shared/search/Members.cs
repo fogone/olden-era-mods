@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // One lookup of a game member, done on first use, once; `describe` names what was found, for the log (Game.Log).
 //   static readonly Lookup<MethodInfo> setTexts = new("tooltip set texts", () => ..., Members.Name);

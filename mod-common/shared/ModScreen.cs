@@ -6,7 +6,7 @@ using Hex.UI.GeneralKit;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // A screen of ours in the game's screen registry (issue #24), opened and hidden as the game's own screens are: the
 // registry puts it on its stack of open screens, gives it the UI camera and the input (Escape included), takes the
@@ -22,7 +22,7 @@ namespace OldenEra.Modding.Common;
 // A copy of a game screen (ScreenCopy.Make), built, becomes one with ModScreen.Adopt(copy, order).
 // The registry is emptied on a mode change (cqp.Clear, refilled by cqp.Init from the scenes); the screen registers
 // again when it is opened next. Its object outlives the scenes (DontDestroyOnLoad).
-internal sealed class ModScreen
+public sealed class ModScreen
 {
     public readonly string Name;
     // The canvas the content goes under.

@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // Frame rate and the time our mods take, for finding what makes the game stutter.
 //   fps            the last 10 seconds: frames per second, the slowest frames; with `perf on`, our code by time

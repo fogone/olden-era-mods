@@ -1,12 +1,12 @@
 using System.Linq;
 using HarmonyLib;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The encounter of a hero and a map squad (dkw.zki on 0.82.7): what it would do (MeetingOutcome), asked with the same
 // questions the game's encounter asks, through the generated names (the searches are in search/GameEncounter.cs); and
 // the Diplomacy points its check counts on the way (DiplomacyPoints).
-internal static partial class Game
+public static partial class Game
 {
     extension(GameHero hero)
     {
@@ -90,7 +90,7 @@ internal static partial class Game
 // the check runs for the mod. Where the check answers without counting (a squad that always or never joins), none.
 //   DiplomacyPoints.Watch(Harmony);                       // in OnLoad; the mod's Harmony takes it off on unload
 //   var (joins, reason, points) = DiplomacyPoints.Check(hero, squad);
-internal static class DiplomacyPoints
+public static class DiplomacyPoints
 {
     static bool counting;
     static int? heroPoints, squadPoints;
@@ -105,7 +105,7 @@ internal static class DiplomacyPoints
     }
 
     // The game's explained check (GameHero.WouldJoin) and the points it counted, if it did.
-    public static (bool joins, string reason, (int hero, int squad)? points) Check(GameHero hero, GameSquad squad)
+    internal static (bool joins, string reason, (int hero, int squad)? points) Check(GameHero hero, GameSquad squad)
     {
         heroPoints = squadPoints = null;
         counting = true;

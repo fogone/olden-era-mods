@@ -4,10 +4,10 @@ using System.Linq;
 using System.Reflection;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's start: the intro videos (issue #9). The comments name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // The game's video player's static Play(ClipInfo[] clips, bool, Action whenDone) (lr.Play): plays the clips one after
     // another (each with its own skip rules), then calls back.

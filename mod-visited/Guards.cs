@@ -3,9 +3,9 @@ using System.Reflection;
 using Hex.Session.Data;
 using Hex.UI;
 using Hex.UI.Tooltips;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Visited;
+namespace Nobirds.OldenEra.Modding.Visited;
 
 // Who guards a building (a unit dwelling, a bank): the tooltip of a guarded map object gets the game's own garrison
 // row (BhTooltipGarnison, the one a squad's tooltip shows), filled with the object's guard party the way the game

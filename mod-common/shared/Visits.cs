@@ -3,17 +3,17 @@ using System.Linq;
 using Hex.Configs;
 using Hex.Session.Data;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // How often a map building may be visited (its config's visitType) and when its visitors are forgotten (visitorsResetType).
-internal enum VisitRule { Once, PerHero, PerSide, Unlimited }
-internal enum VisitReset { None, Week, Day }
+public enum VisitRule { Once, PerHero, PerSide, Unlimited }
+public enum VisitReset { None, Week, Day }
 
 // A building's visit rule and whether the selected hero (or their player) has used it: Visited null when the building
 // has no limit for this period (nothing to mark).
-internal sealed record VisitState(VisitRule Rule, VisitReset Reset, bool? Visited);
+public sealed record VisitState(VisitRule Rule, VisitReset Reset, bool? Visited);
 
-internal static partial class Game
+public static partial class Game
 {
     extension(GameMapObject mapObject)
     {

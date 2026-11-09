@@ -2,11 +2,11 @@ using System;
 using System.Globalization;
 using System.Linq;
 using Hex.UI.GeneralKit;
-using OldenEra.Modding.Common;
-using static OldenEra.Modding.Common.UiLayout;
+using Nobirds.OldenEra.Modding.Common;
+using static Nobirds.OldenEra.Modding.Common.UiLayout;
 using UnityEngine;
 
-namespace OldenEra.Modding.Settings;
+namespace Nobirds.OldenEra.Modding.Settings;
 
 // The Mods window's Sources tab: the sources' rows and details, and adding one through the game's own message box (a
 // warning) and input box (the address).

@@ -1,8 +1,8 @@
 using BepInEx;
 using HarmonyLib;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.SkipIntro;
+namespace Nobirds.OldenEra.Modding.SkipIntro;
 
 // The videos on the game's start skipped (issue #9, fogone 08.11): the studios' logos and the trailer. The game's start
 // is a row of steps; the intro step (Game.IntroVideos: ccj.qrx on 0.82.7) hands the clips to the video player and the
@@ -17,7 +17,6 @@ public class Plugin : ModBase
     protected override void OnLoad()
     {
         instance = this;
-        Game.Log = Logs.Info;
         skipVideos = Menu.Toggle("SkipVideos", true);
         if (Harmony.PatchEach(new[] { GameTargets.IntroVideos }, prefix: new HarmonyMethod(typeof(Plugin), nameof(IntroPrefix))).Count == 0)
             Logs.Warn("the game's intro step not found: the videos play");

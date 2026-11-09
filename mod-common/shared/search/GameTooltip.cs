@@ -5,11 +5,11 @@ using System.Reflection;
 using Hex.UI.Tooltips;
 using UnityEngine;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // The game's tooltips: readable names for their members (Lookup, Members; found once, said in the log). The comments
 // name each member as it is on 0.82.7.
-internal static partial class Game
+public static partial class Game
 {
     // ---------- the tooltip's positioner ----------
 

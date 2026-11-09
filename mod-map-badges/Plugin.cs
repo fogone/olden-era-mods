@@ -1,8 +1,8 @@
 using BepInEx;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 using UnityEngine;
 
-namespace OldenEra.Modding.MapBadges;
+namespace Nobirds.OldenEra.Modding.MapBadges;
 
 // Badges over the map, for the hero selected in the HUD, in one menu: over buildings (still to visit, mines, pickups,
 // unit dwellings, the guard's danger: Buildings.cs) and over squads (would join, would flee, the fight's danger:
@@ -25,7 +25,6 @@ public partial class Plugin : ModBase
 
     protected override void OnLoad()
     {
-        Game.Log = Logs.Info;
         // The "Моды" tab of the game's settings (mod-settings plugin).
         var menu = Menu;
         shown = menu.Choose("Shown", MarkersShown.Alt);

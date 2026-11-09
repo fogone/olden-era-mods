@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Il2CppInterop.Runtime;
-using OldenEra.Modding.Common;
+using Nobirds.OldenEra.Modding.Common;
 
-namespace OldenEra.Modding.Research;
+namespace Nobirds.OldenEra.Modding.Research;
 
 // The research console's tools for reading the game's code (GameCode has what the searches need): a method as
 // instructions, the method in a class's virtual slot, a hidden string constant.

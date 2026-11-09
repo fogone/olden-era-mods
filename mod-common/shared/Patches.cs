@@ -5,7 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using Il2CppInterop.Runtime.InteropTypes;
 
-namespace OldenEra.Modding.Common;
+namespace Nobirds.OldenEra.Modding.Common;
 
 // Patching the game's methods safely, and watching its calls when looking for how it does something.
 //
@@ -14,7 +14,7 @@ namespace OldenEra.Modding.Common;
 //       // for all of them: a hot shared stub slows the game down, see cxg.wdq in docs/game-internals.md)
 //   Probe.Calls(harmony, methods, () => filling, line => logger.LogMessage(line))
 //       // debug: every call of the methods while the condition holds, with the object, the arguments, the result
-internal static class Patches
+public static class Patches
 {
     // Patches the methods, each native code once; leaves out (and says so) those sharing code with methods outside
     // the given ones. Returns the methods patched.
