@@ -89,6 +89,28 @@ public partial class Plugin
         Bind(cross, null, click, true);
     }
 
+    // The update button: a text button with the new version, the game's level-up arrow (LevelUping) before it in place
+    // of the words; the words ("Update to 0.4.4") while the arrow is not loaded.
+    void NewUpdateButton(Transform line, string version, Action click)
+    {
+        var arrow = Game.SpriteNamed("LevelUping");
+        var button = TextButton(line, arrow != null ? version : string.Format(Texts.Get(W + "updateTo"), version), arrow != null ? 110f : 170f, click);
+        button.name = "OE_Update";
+        if (arrow == null || button.label is not { } label)
+            return;
+        // The arrow as high as the label's line, just left of its text (the label is centred in the button).
+        var height = label.fontSize * 1.1f;
+        var image = NewRect("OE_Arrow", label.transform).gameObject.AddComponent<Image>();
+        image.sprite = arrow;
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        var rect = image.rectTransform;
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(1f, 0.5f);
+        rect.sizeDelta = new Vector2(height, height);
+        rect.anchoredPosition = new Vector2(-label.GetPreferredValues(version).x / 2f - 4f, 0f);
+    }
+
     // A text button: a copy of the panel's "Set up in the lobby" button, waiting (greyed out) while the manager works.
     BhGenericButton TextButton(Transform parent, string label, float width, Action click)
     {

@@ -135,7 +135,7 @@ public partial class Plugin
         HRow(controls.gameObject, 10f, TextAnchor.MiddleRight);
         // No update and no cross for a mod BepInEx loaded itself (ByHand).
         if (mod.HasUpdate && !mod.ByHand && ModCatalog.Update != null && textButtonTemplate != null)
-            TextButton(controls, string.Format(Texts.Get(W + "updateTo"), mod.Available), 170f, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
+            NewUpdateButton(controls, mod.Available, () => ModCatalog.Update?.Invoke(new[] { mod.Id }));
         if (!isManager && mod.Enabled is { } on && !mod.RequiredByOthers && ModCatalog.SetEnabled != null && switchSource != null)
             NewSwitch(controls, on, value => Guard("switch " + mod.Id, () => ModCatalog.SetEnabled?.Invoke(new[] { mod.Id }, value)));
         if (!isManager && !mod.RequiredByOthers && !mod.ByHand && ModCatalog.Remove != null && crossSource != null)
