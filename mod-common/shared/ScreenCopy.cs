@@ -18,7 +18,9 @@ namespace Nobirds.OldenEra.Modding.Common;
 public static class ScreenCopy
 {
     // A copy of `screen` with the scripts named in `scripts` (by their Il2Cpp type name) taken off, not under any
-    // parent, kept across scenes, shown, its controls on (EnableControls).
+    // parent, in the screen's scene: it lives as long as the screen it copies (the game unloads that scene, with what the
+    // copy's texts and pictures are drawn with, and makes the screen anew in the next one), shown, its controls on
+    // (EnableControls).
     public static GameObject Make(GameObject screen, string name, ISet<string> scripts)
     {
         // Made under an inactive holder first: the copy's scripts do not wake up before they are taken off.
@@ -29,7 +31,7 @@ public static class ScreenCopy
         StripScripts(copy, scripts);
         copy.transform.SetParent(null, false);
         Object.Destroy(holder);
-        Object.DontDestroyOnLoad(copy);
+        UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(copy, screen.scene);
         copy.SetActive(true);
         if (copy.GetComponent<Canvas>() is { } canvas)
             canvas.enabled = true;
