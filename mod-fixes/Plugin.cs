@@ -8,7 +8,7 @@ namespace Nobirds.OldenEra.Modding.Fixes;
 
 // Fixes of the game's own bugs, each a switch of its own (fogone 06.11: a separate mod for the game's bugs). A fix does
 // what the game does in the place where it works, with the game's own functions.
-[BepInPlugin("nobirds.oldenera.fixes", "Olden Era Fixes", "0.1.1")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public class Plugin : ModBase
 {
     Switch dwellingGrowth;

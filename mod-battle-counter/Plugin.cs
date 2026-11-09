@@ -18,7 +18,7 @@ namespace Nobirds.OldenEra.Modding.BattleCounter;
 // counter, the row's own icon and white numbers for the attacker's strike. Whether the defender answers is the game's
 // own decision (ModEvents.CounterDecided); the numbers are the game's own forecast for each hit (with the roles swapped
 // for a counter).
-[BepInPlugin("nobirds.oldenera.battlecounter", "Olden Era Battle Counter", "0.48.2")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public partial class Plugin : ModBase
 {
     Switch showCounter;

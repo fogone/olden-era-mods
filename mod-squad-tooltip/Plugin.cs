@@ -19,7 +19,7 @@ namespace Nobirds.OldenEra.Modding.SquadTooltip;
 // icon, or "Хотят сбежать" with the game's escape icon, in place of the skulls. Otherwise the tooltip is untouched.
 // Exact numbers (diplomacy points, creatures joining, power ratio) are off by default so the tooltip doesn't reveal
 // what the game hides. The game's members are its generated names (GameNames.g.cs, made at build time).
-[BepInPlugin("nobirds.oldenera.squadtooltip", "Olden Era Squad Tooltip", "1.31.1")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public partial class Plugin : ModBase
 {
     const string IconName = "OE_DiplomacyIcon";

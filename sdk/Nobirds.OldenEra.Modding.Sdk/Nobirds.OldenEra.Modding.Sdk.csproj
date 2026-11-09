@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The package of the SDK (an MSBuild project SDK): Sdk\ (props, targets, the compiler's attributes) and lib\ (the
+       library the mods compile against, built from mod-common). Nothing of the game: a mod builds against the game on
+       its author's machine.
+         dotnet pack sdk\Nobirds.OldenEra.Modding.Sdk -c Release   -> bin\Release\Nobirds.OldenEra.Modding.Sdk.<version>.nupkg -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>Nobirds.OldenEra.Modding.Sdk</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>fogone</Authors>
+    <Description>MSBuild SDK for mods of Heroes of Might and Magic: Olden Era on BepInEx 6 (IL2CPP): builds against the game installed on your machine, with the Nobirds.OldenEra.Modding library; makes the mod's package (manifest.json and its files). Not affiliated with the game's publishers.</Description>
+    <PackageType>MSBuildSdk</PackageType>
+    <PackageTags>olden-era;heroes;bepinex;mod;msbuild-sdk</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/fogone/olden-era-mods</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <LibraryDll>$(MSBuildThisFileDirectory)..\..\mod-common\bin\Release\net6.0\OldenEraCommon.dll</LibraryDll>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Sdk\**" Pack="true" PackagePath="Sdk\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="$(LibraryDll)" Pack="true" PackagePath="lib\" />
+  </ItemGroup>
+  <Target Name="OeLibraryBuilt" BeforeTargets="GenerateNuspec">
+    <Error Condition="!Exists('$(LibraryDll)')" Text="Build the library first: dotnet build mod-common -c Release" />
+  </Target>
+</Project>

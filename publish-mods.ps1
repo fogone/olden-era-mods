@@ -1,4 +1,4 @@
-﻿# Publishes our mods one by one into the catalog (issue #10): each mod its own GitHub release (tag <mod>-v<version>,
+# Publishes our mods one by one into the catalog (issue #10): each mod its own GitHub release (tag <mod>-v<version>,
 # its DLL as the asset) and its meta file in catalog/mods/<id>.json; the mod manager its own package (the manager, the
 # library, the patcher). A mod whose version is released already is not released again: when its DLL is the same, the
 # running game's version is only added to that release in the catalog (it works on this game version too); when it is
@@ -22,15 +22,15 @@ if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }
 # What a player can install: folder -> its DLLs (the first holds the plugin) and what it requires. The library
 # (OldenEraCommon) and the Mods tab (OldenEraSettings, where the catalog is shown) go with the manager, not as mods of their own.
 $catalogParts = [ordered]@{
-    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings'); Requires = ''; Tags = 'ui,library' }
-    'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll'); Requires = ''; Tags = 'library' }
-    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,tooltip,info,squads,battle' }
-    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,tooltip,info,buildings' }
-    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,map,info,squads,buildings,qol' }
-    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'ui,battle,info,squads' }
-    'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'map,tooltip,ui,qol' }
-    'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll'); Requires = 'nobirds.oldenera.core'; Tags = 'fix,qol' }
-    'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll'); Requires = ''; Tags = 'ui,qol' }
+    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings') }
+    'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll') }
+    'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll') }
+    'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll') }
+    'map-badges'    = @{ Files = @('mod-map-badges\bin\Release\net6.0\OldenEraMapBadges.dll') }
+    'battle-counter'= @{ Files = @('mod-battle-counter\bin\Release\net6.0\OldenEraBattleCounter.dll') }
+    'map-tooltip'   = @{ Files = @('mod-map-tooltip\bin\Release\net6.0\OldenEraMapTooltip.dll') }
+    'fixes'         = @{ Files = @('mod-fixes\bin\Release\net6.0\OldenEraFixes.dll') }
+    'skip-intro'    = @{ Files = @('mod-skip-intro\bin\Release\net6.0\OldenEraSkipIntro.dll') }
 }
 foreach ($m in @($Mods) + @($MetaOnly) | Where-Object { $_ }) {
     if (-not $catalogParts.Contains($m)) { throw "No mod $m; one of: $($catalogParts.Keys -join ', ')" }
@@ -64,11 +64,15 @@ foreach ($mod in $selected) {
         }
     }
     $pluginFolder = Join-Path $root "mod-$mod"
-    $plugin = Get-ChildItem $pluginFolder -Filter *.cs | Select-String -Pattern 'BepInPlugin\("([^"]+)", "([^"]+)", "([^"]+)"\)' | Select-Object -First 1
-    if (-not $plugin) { throw "mod-${mod}: no [BepInPlugin]" }
-    $id = $plugin.Matches[0].Groups[1].Value
-    $title = $plugin.Matches[0].Groups[2].Value
-    $version = $plugin.Matches[0].Groups[3].Value
+    # What the mod is: its csproj's Mod* properties (the SDK writes them into the DLL and [BepInPlugin] takes ModInfo).
+    $csproj = Get-ChildItem $pluginFolder -Filter *.csproj | Select-Object -First 1
+    $props = (& $dotnet msbuild $csproj.FullName -nologo -getProperty:ModId -getProperty:ModName -getProperty:Version -getProperty:ModTags -getProperty:ModRequires | Out-String | ConvertFrom-Json).Properties
+    if (-not $props.ModId) { throw "mod-${mod}: no ModId in $($csproj.Name)" }
+    $id = $props.ModId
+    $title = $props.ModName
+    $version = $props.Version
+    $part.Tags = ($props.ModTags -replace ';', ',')
+    $part.Requires = ($props.ModRequires -replace ';', ',')
     $tag = "$mod-v$version"
     $files = @($part.Files | ForEach-Object { Join-Path $root $_ })
 

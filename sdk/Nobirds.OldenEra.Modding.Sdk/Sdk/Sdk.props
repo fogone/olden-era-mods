@@ -1,0 +1,35 @@
+<Project>
+  <!-- The MSBuild SDK for a mod of Heroes of Might and Magic: Olden Era (issue #30): a mod's csproj is
+         <Project Sdk="Nobirds.OldenEra.Modding.Sdk/1.0.0"> with its Mod* properties (Sdk.targets says which).
+       It builds against the game's own runtime and BepInEx's wrappers of the game's code, found in the game's folder on
+       this machine: nothing of the game is in the package. -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Compiled against the .NET 6 runtime BepInEx ships in <game>\dotnet, not the targeting pack from NuGet. -->
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243;CA1416</NoWarn>
+  </PropertyGroup>
+
+  <!-- The game's folder: GameDir given, or the OLDENERA_GAME environment variable, or the game found where Game Pass and
+       Steam put it (the folder's name on Steam is not checked yet). Another place: set OLDENERA_GAME. -->
+  <PropertyGroup>
+    <GameDir Condition="'$(GameDir)' == ''">$(OLDENERA_GAME)</GameDir>
+    <_OeSteam>$([MSBuild]::GetRegistryValue('HKEY_CURRENT_USER\Software\Valve\Steam', 'SteamPath'))</_OeSteam>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GameDir)' == ''">
+    <GameDir Condition="'$(GameDir)' == '' and Exists('C:\XboxGames\Heroes of Might and Magic- Olden Era\Content\HeroesOldenEra.exe')">C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' and Exists('D:\XboxGames\Heroes of Might and Magic- Olden Era\Content\HeroesOldenEra.exe')">D:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' and Exists('E:\XboxGames\Heroes of Might and Magic- Olden Era\Content\HeroesOldenEra.exe')">E:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
+    <GameDir Condition="'$(GameDir)' == '' and '$(_OeSteam)' != '' and Exists('$(_OeSteam)\steamapps\common\Heroes of Might and Magic Olden Era\HeroesOldenEra.exe')">$(_OeSteam)\steamapps\common\Heroes of Might and Magic Olden Era</GameDir>
+  </PropertyGroup>
+</Project>

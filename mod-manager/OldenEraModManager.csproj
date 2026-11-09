@@ -1,41 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+  <Import Project="../sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>OldenEraModManager</AssemblyName>
     <RootNamespace>Nobirds.OldenEra.Modding.Manager</RootNamespace>
-    <LangVersion>latest</LangVersion>
-    <Nullable>disable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GameDir>C:\XboxGames\Heroes of Might and Magic- Olden Era\Content</GameDir>
-
-    <!-- Compile against the .NET 6 runtime BepInEx ships in <game>\dotnet instead of
-         downloading the net6.0 targeting pack from NuGet. -->
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
-    <GenerateDependencyFile>false</GenerateDependencyFile>
-    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243</NoWarn>
+    <ModId>nobirds.oldenera.manager</ModId>
+    <ModName>Olden Era Mod Manager</ModName>
+    <Version>0.4.4</Version>
+    <ModTags>ui;library</ModTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="$(GameDir)\dotnet\*.dll"
-               Exclude="$(GameDir)\dotnet\clretwrc.dll;$(GameDir)\dotnet\clrjit.dll;$(GameDir)\dotnet\coreclr.dll;$(GameDir)\dotnet\dbgshim.dll;$(GameDir)\dotnet\hostpolicy.dll;$(GameDir)\dotnet\Microsoft.DiaSymReader.Native.amd64.dll;$(GameDir)\dotnet\mscordaccore*.dll;$(GameDir)\dotnet\mscordbi.dll;$(GameDir)\dotnet\mscorrc.dll;$(GameDir)\dotnet\msquic.dll;$(GameDir)\dotnet\System.IO.Compression.Native.dll"
-               Private="false" />
-
-    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Core.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\SemanticVersioning.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\BepInEx.Unity.IL2CPP.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\Iced.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Common.dll" Private="false" />
-    <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" Private="false" />
-
-    <Reference Include="$(GameDir)\BepInEx\interop\*.dll" Private="false" />
-    <ProjectReference Include="..\mod-common\OldenEraCommon.csproj" Private="false" />
-    <EmbeddedResource Include="lang\*.json" LogicalName="$(RootNamespace).lang.%(Filename).json" />
-  </ItemGroup>
-
+  <Import Project="../sdk/Nobirds.OldenEra.Modding.Sdk/Sdk/Sdk.targets" />
 </Project>
-

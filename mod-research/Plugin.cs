@@ -13,7 +13,7 @@ namespace Nobirds.OldenEra.Modding.Research;
 // The commands (Commands.cs) run on the game's main thread, from two places:
 //   - the console on this computer only, http://127.0.0.1:8766/?c=<command> (Console.cs): the answer is the output;
 //   - BepInEx\research.txt, when it is saved: the results replace BepInEx\research-out.txt and go to the log too.
-[BepInPlugin("nobirds.oldenera.research", "Olden Era Research", "0.9.5")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public partial class Plugin : ModBase
 {
     static ManualLogSource logger;

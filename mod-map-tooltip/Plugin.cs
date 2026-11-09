@@ -19,7 +19,7 @@ namespace Nobirds.OldenEra.Modding.MapTooltip;
 // (the resources bar, the day panel, the heroes and towns lists), to the first free side: above, right, left, below.
 // The move is chosen once per showing, on the first frame the tooltip is laid out, from where the game put it; after
 // that the game places it as always, with the move, and keeps it on screen.
-[BepInPlugin("nobirds.oldenera.maptooltip", "Olden Era Map Tooltip", "0.9.3")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public partial class Plugin : ModBase
 {
     Switch placeFree;

@@ -15,7 +15,7 @@ namespace Nobirds.OldenEra.Modding.DevLoader;
 // patches, menu, callbacks and objects of a ModBase plugin), then the new one is loaded from the file's bytes, so
 // the file stays free for the next build. Old builds stay in memory: .NET cannot unload assemblies Harmony patched
 // from.
-[BepInPlugin("nobirds.oldenera.devloader", "Olden Era Dev Loader", "0.1.0")]
+[BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
 public class Plugin : BasePlugin
 {
     static ManualLogSource logger;

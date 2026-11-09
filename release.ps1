@@ -11,6 +11,8 @@ param([string]$GameDir = "C:\XboxGames\Heroes of Might and Magic- Olden Era\Cont
 
 $ErrorActionPreference = 'Stop'
 $root = $PSScriptRoot
+$dotnet = Join-Path $env:LOCALAPPDATA 'Microsoft\dotnet\dotnet.exe'
+if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }   # a .NET SDK installed for all users, on PATH
 # What a player needs: the common library, the core, the Mods tab and the mods (not the dev loader nor the research tools).
 $parts = [ordered]@{
     'mod-common' = 'OldenEraCommon'; 'mod-core' = 'OldenEraCore'; 'mod-settings' = 'OldenEraSettings';
@@ -42,8 +44,10 @@ foreach ($part in $parts.Keys) {
     & (Join-Path $root "$part\build.ps1") -GameDir $GameDir | Select-Object -Last 1
     $dll = Join-Path $root "$part\bin\Release\net6.0\$($parts[$part]).dll"
     Copy-Item $dll $plugins
-    $plugin = Get-ChildItem (Join-Path $root $part) -Filter *.cs | Select-String -Pattern 'BepInPlugin\("[^"]+", "([^"]+)", "([^"]+)"\)' | Select-Object -First 1
-    if ($plugin) { $versions += "- $($plugin.Matches[0].Groups[1].Value) $($plugin.Matches[0].Groups[2].Value)" }
+    # The mod's name and version: its csproj's (ModName, Version).
+    $csproj = Get-ChildItem (Join-Path $root $part) -Filter *.csproj | Select-Object -First 1
+    $props = (& $dotnet msbuild $csproj.FullName -nologo -getProperty:ModName -getProperty:Version | Out-String | ConvertFrom-Json).Properties
+    if ($props.ModName) { $versions += "- $($props.ModName) $($props.Version)" }
 }
 
 $notes = @"
