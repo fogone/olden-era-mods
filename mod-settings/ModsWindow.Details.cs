@@ -72,7 +72,7 @@ public partial class Plugin
         SetPair(versionLabel, versionValue, Texts.Get(W + "versionLabel"),
             mod.Installed != null && mod.HasUpdate && mod.Available != null ? $"{mod.Installed} / {mod.Available}" : mod.Installed ?? mod.Available ?? "");
         // The catalog's box: its icon at the left, its name over the mod's author.
-        SetPair(originLabel, originValue, Coloured(mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand"), versionValue),
+        SetPair(originLabel, originValue, Coloured(Origin(mod), versionValue),
             string.IsNullOrEmpty(mod.Author) ? "" : PairText(W + "authorLabel", mod.Author));
         BoxIcon(Picture(CatalogIcon(mod.SourceNameKey)));
 

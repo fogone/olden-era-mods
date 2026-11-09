@@ -22,6 +22,11 @@ public partial class Plugin
     static List<ModEntry> Catalog() => ModCatalog.Mods.Where(m => m.SourceNameKey != null)
         .OrderBy(m => m.Installed != null).ThenBy(m => Texts.Get(m.NameKey), StringComparer.CurrentCultureIgnoreCase).ToList();
 
+    // Where a mod comes from: its catalog's name; "installed by hand" for one BepInEx loaded by itself; "source removed"
+    // for one the manager installed from a source no longer in the list (it is still the manager's: off, on, remove).
+    static string Origin(ModEntry mod) =>
+        mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + (mod.ByHand ? "byHand" : "noSource"));
+
     List<ModEntry> InstalledShown() => Installed().Where(m => Matches(m, filterText)).ToList();
 
     // The text typed matches a mod: its name, description or author.
@@ -122,8 +127,8 @@ public partial class Plugin
                 mod.Installed != null ? Texts.Get(W + "installed") : mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "");
             return;
         }
-        // The catalog it comes from on top, "by hand" when none; the version; the note (unless it says the same).
-        var origin = mod.SourceNameKey != null ? Texts.Get(mod.SourceNameKey) : Texts.Get(W + "byHand");
+        // The catalog it comes from on top (see Origin); the version; the note (unless it says the same).
+        var origin = Origin(mod);
         var note = mod.NoteKey != null ? Texts.Get(mod.NoteKey) : "";
         RowInfo(row, origin, mod.Installed ?? "", string.Equals(note, origin, StringComparison.CurrentCultureIgnoreCase) ? "" : note);
 
