@@ -224,6 +224,11 @@ Mods window, a copy of the game's Load screen) uses all of them.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
   off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts);
   `ModScreen.Adopt` makes the built copy a screen of the game's registry; `DrawOnTop` puts a part over the rest.
+- `SettingsTab` — a tab of your own in the game's settings: `Add(Harmony, name, labelKey)` (null until the settings
+  screen is loaded) copies a section with a settings type of its own and a tab of that type into the screen's arrays,
+  so the game switches, shows and hides it as its own; `List` takes your rows, `NewTitle` makes a title from the
+  game's row factory, `SwitchRow`/`ChoiceRow`/`ButtonRow` are templates of the General section's rows; `Shown` is
+  called when the game shows it (Apply and Reset are hidden there). `Remove` it in `OnUnload`.
 - `SaveRow` — a row of the game's save list for data of yours: `Make(parent, name)` instantiates the row prefab the
   Load screen's list makes its rows of, with its own script (the game lays it out and plays its hover and selected
   looks); `Name`, `Icon`, `Tags` (and `TagsUnderName`), `Info` (the three lines on the right), `Selected`, `Check` /

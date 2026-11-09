@@ -101,14 +101,12 @@ var mode = highlight.Value(Highlight.Off);      // Off when the whole mod is off
 - A choice is shown as a row per option: the enabled option is the selected one.
 - `mod-common` must also be installed into the game (`build.ps1 -Install`); it lies next to the plugins in `BepInEx\plugins`.
 
-**How it works (if it needs fixing after a game patch):**
-- a tab section is a copy of the "Sound" section, with the game's rows hidden and ours added;
-- the rows are copies of the last toggle of the "Main" section, the headers are copies of its header;
+**How it works (if it needs fixing after a game patch):** the tab is a `SettingsTab` (`mod-common/shared/SettingsTab.cs`):
+- its section is a copy of the "Sound" section, the game's rows hidden and ours added; switch, choice and button rows are copies of the General section's rows, titles come from the game's row factory (`SettingsElementsPrefabs.titlePrefab`, held by the hotkeys section);
 - in the copies `cpz.textSid` (the translation key) must be erased, otherwise the game brings back its own text;
-- the section and the tab are appended to the game's arrays, and the game itself shows them: the section is found by type (Gameplay). The copy of "Sound" has `Start` set its type to Sound on first display, so `mod-settings` restores the type after `Start` (0.7). When the screen closes, the section is also hidden manually (`ScSettings.Hide`, `OnBackButton`);
-- after copying, the list layout must be rebuilt (`LayoutRebuilder.ForceRebuildLayoutImmediate`), otherwise the height is 0 and the scrolling drifts away;
-- debugging: `[Debug] LogTree = true` in `nobirds.oldenera.settings.cfg` — the tree of sections and the state of our section after presses.
-
+- the section and the tab are appended to the game's arrays once the settings screen is loaded, and the game itself switches, shows and hides them: the section is found by its type, a value of its own (100) the game does not declare (`SettingsSectionsView.ShowSection`, `ktn` on 0.82.7, compares numbers). The copy of "Sound" has `Start` set its type to Sound on first display: the type is restored after `Start`;
+- the screen hands every tab its click when it opens, ours included; Apply and Reset are hidden while ours is shown (a postfix on the game's switch);
+- after copying, the list layout must be rebuilt (`LayoutRebuilder.ForceRebuildLayoutImmediate`), otherwise the height is 0 and the scrolling drifts away.
 ## Data (JSON) without code
 - Unpacking `Core.zip`: the paths are long, use the `\\?\` prefix or a short folder. Paths inside the archive use `/`, no BOM.
 - An overlay is a separate `.zip` in `StreamingAssets` with the same path structure. The game picks it up (in the log: `Found N archives`, `Loaded N entries from config archive ...`).

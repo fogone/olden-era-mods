@@ -54,4 +54,21 @@ internal static class GameUi
         toggle.ShowValue(value);
         toggle.toggle.onValueChanged.AddListener((UnityAction<bool>)changed);
     }
+
+    // A text of the game showing our localization key, as its own texts do: it follows a language change.
+    public static void Label(Component text, string key)
+    {
+        if (text == null)
+            return;
+        var value = Texts.Get(key);
+        if (text.GetComponent<GameLocalizedText>() is { } localized)
+        {
+            localized.textSid = "";
+            try { localized.HardSetText(value); }   // its own text element, the one it draws from
+            catch (Exception) { }                   // a copy not awake yet has none: the text below is enough
+            localized.textSid = key;
+        }
+        if (text.GetComponent<TMPro.TMP_Text>() is { } tmp)
+            tmp.text = value;
+    }
 }

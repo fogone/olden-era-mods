@@ -94,7 +94,7 @@ See `archive/mod-ideas-until-2026-11-06.md` §1 and her `retaliation_methods.md`
 
 ## Settings screen — [verified on 0.82.7]
 - The screen `Hex.Settings.UI.ScSettings`: `tabs` (an array of `BhSettingsTab`), `sectionsController.sectionsView.sections` (an array of `BhSettingsSection`), static `Hide()`, `OnBackButton()`. The sections are **not** inside the screen; to find them — `Resources.FindObjectsOfTypeAll` with `scene.IsValid()`.
-- Section types `ESettingsType`: General=0, Control=1, Sound=2, Video=3, Hotkeys=4, Gameplay=5, Multiplayer=6, Visibility=7. The sections Control, Gameplay, Multiplayer are absent; "Mods" takes Gameplay.
+- Section types `ESettingsType`: General=0, Control=1, Sound=2, Video=3, Hotkeys=4, Gameplay=5, Multiplayer=6, Visibility=7. The sections Control, Gameplay, Multiplayer are absent. The game uses the type only to find a section by it: "Mods" has a value of its own, 100 (`SettingsTab`).
 - Sections: `BhGeneralSection` ("General"), `BhSoundSection`, `BhVideoSection`, `BhVisibilitySection` (highlight, `outliningDropdown`, `highlightInteractiveObjs*`), `BhHotkeysSection`. Their `Start` runs at game launch; `Show(SettingsData)` is not called when a tab is opened.
 - Elements: `BhSettingsCheckbox.Init(Action<bool>, bool)`, `BhSettingsSlider.Init(Action<float>, float)`, `BhLocalizedDropdown.Init(...)`, `BhSettingsTitle`. The row label is `BhSettingsElement.header` (`cpz`: `textSid`, `HardSetText`). Tab: `BhSettingsTab.sectionType`, the click action `bwrb` (supplied by the screen when it opens), selection `kqf(bool)`.
 
