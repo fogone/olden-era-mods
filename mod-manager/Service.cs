@@ -154,7 +154,7 @@ public static class ManagerService
     {
         var sources = Sources.ToList();
         var installed = ModLoader.State.Mods.ToList();
-        var reading = await client.ReadAll(sources, installed, online);
+        var reading = await client.ReadAll(sources, installed, online, gameVersion);
         var catalog = reading.Mods;
         mainThread.Enqueue(() =>
         {
@@ -273,6 +273,8 @@ public static class ManagerService
             order.Add((meta, release));
         }
         Add(id, 0);
+        if (order.Count == 0)
+            return;   // installed already (a second click before the window caught up)
         var downloaded = new List<InstalledMod>();
         foreach (var (meta, release) in order)
             downloaded.Add(await client.Download(meta, release));

@@ -223,6 +223,66 @@ Case("catalog: download checked by sha256 into <id>\\<version>, the entry with i
     Check(installed.Version == "0.49.0" && installed.Files.SequenceEqual(new[] { "Counter.dll" }) && installed.Requires.SequenceEqual(new[] { "oe.core" }) && installed.Source == MetaUrl, "the entry");
 });
 
+// A package: a zip with manifest.json and plugins\ (what the SDK's ModPackage makes).
+static byte[] Package(string id, string version, params (string path, string text)[] files)
+{
+    using var memory = new MemoryStream();
+    using (var zip = new System.IO.Compression.ZipArchive(memory, System.IO.Compression.ZipArchiveMode.Create, true))
+    {
+        void Add(string path, string text)
+        {
+            using var writer = new StreamWriter(zip.CreateEntry(path).Open());
+            writer.Write(text);
+        }
+        Add("manifest.json", $$"""{ "schema": 1, "id": "{{id}}", "version": "{{version}}", "files": [] }""");
+        foreach (var (path, text) in files)
+            Add(path, text);
+    }
+    return memory.ToArray();
+}
+
+void PublishPackage(Dictionary<string, byte[]> net, byte[] zip)
+{
+    net[Source] = Bytes($$"""{ "schema": 1, "name": "test", "mods": [ { "id": "oe.counter", "meta": "{{MetaUrl}}" } ] }""");
+    net[MetaUrl] = Bytes($$"""
+    { "schema": 1, "id": "oe.counter",
+      "releases": [ { "version": "0.49.0", "games": [ "0.82.08" ],
+          "files": [ { "name": "Counter.dll", "url": "https://example.test/0.49/Counter.dll", "sha256": "{{Sha(dll049)}}" } ] } ],
+      "packages": [ { "version": "0.51.0", "games": [ "0.82.08" ], "requires": [ { "id": "oe.core" } ],
+          "archive": { "name": "oe.counter-0.51.0.zip", "url": "https://example.test/0.51/oe.counter-0.51.0.zip", "sha256": "{{Sha(zip)}}" } } ] }
+    """);
+    net["https://example.test/0.51/oe.counter-0.51.0.zip"] = zip;
+}
+
+Case("catalog: a package is newer than the release of files, installed from its archive's plugins", root =>
+{
+    var (client, net, _) = Net(root);
+    PublishPackage(net, Package("oe.counter", "0.51.0", ("plugins/Counter.dll", "counter 0.51"), ("README.md", "readme")));
+    var meta = client.Read(new[] { Source }).Result[0];
+    var release = CatalogClient.ReleaseFor(meta, "0.82.08");
+    Check(release.Version == "0.51.0" && release.Archive != null, "the package is not the one for 0.82.08");
+    var installed = client.Download(meta, release).Result;
+    var folder = Path.Combine(root, "oldenera-mods", "oe.counter", "0.51.0");
+    Check(Read(Path.Combine(folder, "Counter.dll")) == "counter 0.51", "the plugin is not there");
+    Check(!File.Exists(Path.Combine(folder, "README.md")) && !File.Exists(Path.Combine(folder, "manifest.json")), "more than the plugins installed");
+    Check(installed.Files.SequenceEqual(new[] { "Counter.dll" }) && installed.Requires.SequenceEqual(new[] { "oe.core" }), "the entry");
+});
+
+Case("catalog: a package of another mod, or with a path in plugins, is refused", root =>
+{
+    foreach (var zip in new[] { Package("oe.other", "0.51.0", ("plugins/Counter.dll", "x")), Package("oe.counter", "0.51.0", ("plugins/../evil.dll", "x")) })
+    {
+        var (client, net, _) = Net(root);
+        PublishPackage(net, zip);
+        var meta = client.Read(new[] { Source }).Result[0];
+        var refused = false;
+        try { client.Download(meta, CatalogClient.ReleaseFor(meta, "0.82.08")).Wait(); }
+        catch (AggregateException e) when (e.InnerException is InvalidOperationException) { refused = true; }
+        Check(refused, "taken");
+        Check(!Directory.Exists(Path.Combine(root, "oldenera-mods", "oe.counter", "0.51.0")), "a folder was left");
+    }
+});
+
 Case("catalog: a file whose sha256 does not match is refused and nothing is left", root =>
 {
     var (client, net, _) = Net(root);
@@ -359,7 +419,7 @@ Case("sources: one source read for adding does not use the cache", root =>
     Check(offline.ReadSource(Source, false).Result.result.State == SourceState.Failed, "the cache stood in for a source being added");
 });
 
-Case("sources: an installed mod's own source wins, otherwise the first source", root =>
+Case("sources: an installed mod's own source wins, otherwise the first with a release for the game, otherwise the first", root =>
 {
     var (client, net, _) = Net(root);
     Publish(net);
@@ -372,6 +432,12 @@ Case("sources: an installed mod's own source wins, otherwise the first source", 
     Check(client.Read(new[] { OtherSource, Source }, fromFirst).Result.First(m => m.Id == "oe.counter").Url == MetaUrl, "the mod's own source did not win over the first");
     var byHand = new[] { new InstalledMod { Id = "oe.counter", Version = "0.48.0" } };
     Check(client.Read(new[] { OtherSource, Source }, byHand).Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "a mod put by hand: the first source");
+    // Not installed from either: the first source with a release for the game (Other has 0.82.07 only).
+    var reversed = new[] { OtherSource, Source };
+    Check(client.Read(reversed, null, "0.82.08").Result.First(m => m.Id == "oe.counter").Url == MetaUrl, "a source without a release for the game chosen");
+    Check(client.Read(reversed, null, "0.82.07").Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "both have a release: not the first");
+    Check(client.Read(reversed, null, "0.99.01").Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "none has a release: not the first");
+    Check(client.Read(reversed, fromOther, "0.82.08").Result.First(m => m.Id == "oe.counter").Url == OtherMeta, "the installed mod's source did not win over a release elsewhere");
     // Its source gone from the list: the other source's meta is chosen but offers no update.
     var chosen = client.Read(new[] { OtherSource }, fromFirst).Result;
     var state = new ManagerState { Mods = { new InstalledMod { Id = "oe.counter", Version = "0.48.0", Source = MetaUrl } } };

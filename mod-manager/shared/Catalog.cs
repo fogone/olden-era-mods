@@ -60,6 +60,10 @@ public sealed class ModMeta
     // PNG or JPG pictures for the mod's details: checked by sha256 and cached (CatalogClient.LoadScreenshot).
     [JsonPropertyName("screenshots")] public List<ScreenshotFile> Screenshots { get; set; } = new();
     [JsonPropertyName("releases")] public List<ModRelease> Releases { get; set; } = new();
+    // Releases as packages (an archive with manifest.json and the files: the SDK's ModPackage), for the library of
+    // Nobirds.OldenEra.Modding.* (#30). A list of their own: managers before it read only `releases` and never take
+    // a package, whose mod needs the library they do not have.
+    [JsonPropertyName("packages")] public List<ModRelease> Packages { get; set; } = new();
 
     // The URL it was read from (not in the file).
     [JsonIgnore] public string Url { get; set; }
@@ -89,6 +93,25 @@ public sealed class ModRelease
     [JsonPropertyName("bepinex")] public string BepInEx { get; set; }
     [JsonPropertyName("requires")] public List<Requirement> Requires { get; set; } = new();
     [JsonPropertyName("files")] public List<ReleaseFile> Files { get; set; } = new();
+    // A package's archive (its `name` the zip's): its plugins\ files go into the mod's folder. Null for a release of files.
+    [JsonPropertyName("archive")] public ReleaseFile Archive { get; set; }
+}
+
+// A package's manifest.json (the SDK writes it, sdk/Nobirds.OldenEra.Modding.Sdk): what the mod is and what it needs.
+public sealed class PackageManifest
+{
+    [JsonPropertyName("schema")] public int Schema { get; set; } = 1;
+    [JsonPropertyName("id")] public string Id { get; set; }
+    [JsonPropertyName("version")] public string Version { get; set; }
+    [JsonPropertyName("name")] public Dictionary<string, string> Name { get; set; } = new();
+    [JsonPropertyName("description")] public Dictionary<string, string> Description { get; set; } = new();
+    [JsonPropertyName("author")] public string Author { get; set; }
+    [JsonPropertyName("source")] public string Source { get; set; }
+    [JsonPropertyName("tags")] public List<string> Tags { get; set; } = new();
+    [JsonPropertyName("games")] public List<string> Games { get; set; } = new();
+    [JsonPropertyName("bepinex")] public string BepInEx { get; set; }
+    [JsonPropertyName("requires")] public List<Requirement> Requires { get; set; } = new();
+    [JsonPropertyName("files")] public List<string> Files { get; set; } = new();
 }
 
 public sealed class Requirement
@@ -193,13 +216,15 @@ public sealed class CatalogClient
     }
 
     // Every mod of the sources (their root files). A mod in several sources: the one from the source it was installed
-    // from (an installed mod's Source is its meta file's URL), else from the first source.
-    public async Task<List<ModMeta>> Read(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null) =>
-        (await ReadAll(sources, installed)).Mods;
+    // from (an installed mod's Source is its meta file's URL), else from the first source with a release for
+    // `gameVersion`, else from the first source.
+    public async Task<List<ModMeta>> Read(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null, string gameVersion = null) =>
+        (await ReadAll(sources, installed, null, gameVersion)).Mods;
 
     // `online`: whether a source is read from the network now (default: all); the others come from the saved copies
     // (a source that is not due for a check, ManagerService).
-    public async Task<CatalogReading> ReadAll(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null, Func<string, bool> online = null)
+    public async Task<CatalogReading> ReadAll(IEnumerable<string> sources, IEnumerable<InstalledMod> installed = null, Func<string, bool> online = null,
+        string gameVersion = null)
     {
         var reading = new CatalogReading();
         foreach (var source in sources)
@@ -208,7 +233,7 @@ public sealed class CatalogClient
             reading.Sources.Add(result);
             reading.All.AddRange(metas);
         }
-        reading.Mods = Choose(reading.All, installed);
+        reading.Mods = Choose(reading.All, installed, gameVersion);
         return reading;
     }
 
@@ -346,22 +371,24 @@ public sealed class CatalogClient
     }
 
     // One meta per id, in the order the ids first appear: the installed mod's own source's (its Source is the meta
-    // file's URL) when that source listed it, else the first source's.
-    public static List<ModMeta> Choose(IEnumerable<ModMeta> all, IEnumerable<InstalledMod> installed)
+    // file's URL) when that source listed it, else the first source's with a release for this game version (any, when
+    // `gameVersion` is not given), else the first source's.
+    public static List<ModMeta> Choose(IEnumerable<ModMeta> all, IEnumerable<InstalledMod> installed, string gameVersion = null)
     {
         var own = (installed ?? Array.Empty<InstalledMod>()).Where(m => !string.IsNullOrEmpty(m.Source)).ToList();
         var chosen = new List<ModMeta>();
         foreach (var group in all.GroupBy(m => m.Id, StringComparer.OrdinalIgnoreCase))
         {
             var from = own.FirstOrDefault(m => string.Equals(m.Id, group.Key, StringComparison.OrdinalIgnoreCase))?.Source;
-            chosen.Add(from != null ? group.FirstOrDefault(m => string.Equals(m.Url, from, StringComparison.OrdinalIgnoreCase)) ?? group.First() : group.First());
+            var released = gameVersion == null ? null : group.FirstOrDefault(m => ReleaseFor(m, gameVersion) != null);
+            chosen.Add((from == null ? null : group.FirstOrDefault(m => string.Equals(m.Url, from, StringComparison.OrdinalIgnoreCase))) ?? released ?? group.First());
         }
         return chosen;
     }
 
-    // The newest release made for this game version, or null.
+    // The newest release made for this game version, a package or a release of files, or null.
     public static ModRelease ReleaseFor(ModMeta meta, string gameVersion) =>
-        meta.Releases.Where(r => r.Games.Contains(gameVersion)).OrderByDescending(r => r.Version, VersionComparer.Instance).FirstOrDefault();
+        meta.Packages.Concat(meta.Releases).Where(r => r.Games.Contains(gameVersion)).OrderByDescending(r => r.Version, VersionComparer.Instance).FirstOrDefault();
 
     // The installed mods the catalog has a newer release of for this game version (not one that failed before).
     public static List<Update> Updates(IEnumerable<ModMeta> catalog, ManagerState state, string gameVersion) =>
@@ -378,8 +405,8 @@ public sealed class CatalogClient
     public async Task<InstalledMod> Download(ModMeta meta, ModRelease release)
     {
         var folder = Path.Combine(ModsFolder, meta.Id, release.Version);
-        var files = new List<(string name, byte[] bytes)>();
-        foreach (var file in release.Files)
+        var files = release.Archive != null ? await Unpack(meta, release) : new List<(string name, byte[] bytes)>();
+        foreach (var file in release.Archive != null ? new List<ReleaseFile>() : release.Files)
         {
             if (string.IsNullOrWhiteSpace(file.Name) || file.Name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || file.Name.Contains(".."))
                 throw new InvalidOperationException($"{meta.Id} {release.Version}: a file name that is not a plain name: {file.Name}");
@@ -408,13 +435,51 @@ public sealed class CatalogClient
             Id = meta.Id,
             Version = release.Version,
             Enabled = true,
-            Files = release.Files.Select(f => f.Name).ToList(),
+            Files = files.Select(f => f.name).Where(n => n.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)).ToList(),
             Requires = release.Requires.Select(r => r.Id).ToList(),
             Source = meta.Url,
         };
     }
 
     static string Hex(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
+
+    // A package's files: the archive checked by its sha256, its manifest the mod's (the same id and version), the files
+    // under plugins\ (plain names, no folders). The rest of the archive (the manifest, README, pictures) is not installed.
+    async Task<List<(string name, byte[] bytes)>> Unpack(ModMeta meta, ModRelease release)
+    {
+        var archive = release.Archive;
+        if (string.IsNullOrWhiteSpace(archive.Sha256))
+            throw new InvalidOperationException($"{meta.Id} {release.Version}: the package has no sha256; refused");
+        var bytes = await Get(archive.Url);
+        var hash = Hex(SHA256.HashData(bytes));
+        if (!string.Equals(hash, archive.Sha256.Trim(), StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"{meta.Id} {release.Version}: the package is not the one the catalog names (sha256 {hash}, expected {archive.Sha256}); refused");
+        using var zip = new System.IO.Compression.ZipArchive(new MemoryStream(bytes), System.IO.Compression.ZipArchiveMode.Read);
+        var manifestEntry = zip.GetEntry("manifest.json") ?? throw new InvalidOperationException($"{meta.Id} {release.Version}: the package has no manifest.json");
+        using (var reader = new StreamReader(manifestEntry.Open()))
+        {
+            var manifest = JsonSerializer.Deserialize<PackageManifest>(reader.ReadToEnd());
+            if (!string.Equals(manifest?.Id, meta.Id, StringComparison.OrdinalIgnoreCase) || manifest.Version != release.Version)
+                throw new InvalidOperationException($"{meta.Id} {release.Version}: the package is {manifest?.Id} {manifest?.Version}; refused");
+        }
+        var files = new List<(string name, byte[] bytes)>();
+        foreach (var entry in zip.Entries)
+        {
+            var path = entry.FullName.Replace('\\', '/');
+            if (!path.StartsWith("plugins/", StringComparison.OrdinalIgnoreCase) || path.EndsWith("/"))
+                continue;
+            var name = path["plugins/".Length..];
+            if (name.Length == 0 || name.Contains('/') || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.Contains(".."))
+                throw new InvalidOperationException($"{meta.Id} {release.Version}: a file in the package that is not a plain name: {path}");
+            using var stream = entry.Open();
+            using var copy = new MemoryStream();
+            stream.CopyTo(copy);
+            files.Add((name, copy.ToArray()));
+        }
+        if (!files.Any(f => f.name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
+            throw new InvalidOperationException($"{meta.Id} {release.Version}: the package has no DLL under plugins/");
+        return files;
+    }
 }
 
 // Versions by semver precedence (semver.org, 11): the release part by numbers, part by part ("0.48.10" > "0.48.9",

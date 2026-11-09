@@ -379,7 +379,7 @@ the order that worked: [process.md](process.md), "Researching game code".
   `publish-mods.ps1` (`$catalogParts`: the DLL path). Its id, name, version, tags and requirements are read from its
   csproj (`ModId`, `ModName`, `Version`, `ModTags`, `ModRequires`).
 - `.\publish-mods.ps1 -Mods <id>` builds the mod and writes its catalog files into `release\catalog-preview`; nothing is
-  published. `-Publish` makes a GitHub release `<id>-v<version>` (the DLL is the asset) and a pull request with
+  published. `-Publish` makes a GitHub release `<id>-v<version>` (the mod's package, `-t:ModPackage`, is the asset) and a pull request with
   `catalog\`. A version is published once: change the mod and **raise its `Version` in the csproj** to publish again.
 - Tags: `ModTags` in the csproj, `;` between, for the catalog (`map`, `battle`, `tooltip`, `ui`, `fix`,
   `qol`, `library`, `info`, `squads`, `buildings`; the Mods window filters by them, the names of the known ones are the `oe.manager.tag.<id>` keys of

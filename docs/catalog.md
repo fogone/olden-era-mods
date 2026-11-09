@@ -89,6 +89,33 @@ Nothing is installed or updated without the player's click; installing a mod fir
 | `files[].url` | string | yes | https URL (or a local `file:` URL for a development source). |
 | `files[].sha256` | string | yes | Hex sha256 of the file, any case. |
 
+### Packages (`packages`, manager 0.5 and later)
+
+A release can be a **package**: one archive the mods' SDK makes (`dotnet build -t:ModPackage`,
+`sdk/Nobirds.OldenEra.Modding.Sdk/README.md`). It is listed in `packages`, a list of its own with the same fields as
+`releases` but `files`, and `archive` in their place:
+
+```json
+  "packages": [
+    {
+      "version": "1.1.0",
+      "games": ["0.82.08"],
+      "bepinex": "6.0.0-be.788",
+      "requires": [ { "id": "nobirds.oldenera.core", "version": null } ],
+      "archive": { "name": "me.oldenera.hello-1.1.0.zip", "url": "https://github.com/me/mods/releases/download/hello-v1.1.0/me.oldenera.hello-1.1.0.zip", "sha256": "<64 hex digits>" }
+    }
+  ]
+```
+
+- The archive holds `manifest.json` (what the mod is: `id`, `version`, `name` and `description` by language, `author`,
+  `source`, `tags`, `games`, `bepinex`, `requires`, `files`), `plugins\` (the DLLs, plain names), and optionally
+  `README.md`, `icon.png`, `screenshots\`. The manager installs what is under `plugins\` into `<id>\<version>\`; the
+  manifest's `id` and `version` must be the mod's and the package's, or the package is refused.
+- `tools/catalog add --package <zip>=<url>` writes the entry from the manifest (and the mod's names, descriptions,
+  tags, author and source with it).
+- Managers before 0.5 read only `releases`: a mod built on the library of `Nobirds.OldenEra.Modding.*` goes into
+  `packages`, so they never install it without that library. A manager 0.5 takes the newest of both lists.
+
 "Required" means a mod without it is not offered or not shown properly. The manager refuses outright only a wrong
 `id`, a file without a plain `name` or without `sha256` (below); a missing `name` shows the id, a missing `releases` or
 `games` means no release for the game.
