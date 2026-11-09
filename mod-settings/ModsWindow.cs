@@ -129,9 +129,10 @@ public partial class Plugin
     {
         try
         {
-            if (Stale())
+            if (screen != null && !screen.Alive)
             {
-                Logs.Info("Mods window: the game unloaded what its texts were drawn with: built again");
+                // Gone with the main menu's scene, as the Load screen it copies: made again from the new one.
+                Logs.Info("Mods window: gone with the last main menu, built again");
                 DropWindow();
             }
             if (window == null && !BuildWindow())
@@ -536,11 +537,7 @@ public partial class Plugin
         modsButton = null;
     }
 
-    // The copy of the Load screen keeps the game's objects its texts were made with (their fonts' materials). The game
-    // unloads some of them when a game session ends: the texts are then drawn with nothing (empty tabs back from a map).
-    bool Stale() =>
-        window != null && window.GetComponentsInChildren<TMP_Text>(true).Any(text => text.fontSharedMaterial == null);
-
+    // Forgets the window and its parts (destroyed, unless it already went with its scene).
     void DropWindow()
     {
         // At once: the reloaded build looks for them in the same frame.

@@ -21,7 +21,8 @@ namespace Nobirds.OldenEra.Modding.Common;
 //
 // A copy of a game screen (ScreenCopy.Make), built, becomes one with ModScreen.Adopt(copy, order).
 // The registry is emptied on a mode change (cqp.Clear, refilled by cqp.Init from the scenes); the screen registers
-// again when it is opened next. Its object outlives the scenes (DontDestroyOnLoad).
+// again when it is opened next. A screen made by Create outlives the scenes (DontDestroyOnLoad); an adopted copy stays in
+// the scene of the screen it copies and goes with it (Alive false: make it again, Destroy only forgets it).
 public sealed class ModScreen
 {
     public readonly string Name;
@@ -50,6 +51,7 @@ public sealed class ModScreen
         root.AddComponent<RectTransform>();
         root.AddComponent<Canvas>();
         ScaleAsGame(root.AddComponent<CanvasScaler>());
+        UnityEngine.Object.DontDestroyOnLoad(root);
         return Adopt(root, sortingOrder);
     }
 
@@ -70,8 +72,6 @@ public sealed class ModScreen
 
         root.SetActive(false);   // BhScreen's Awake waits until its fields are set
         root.layer = 5;          // UI: the only layer the game's UI camera draws
-        if (root.transform.parent == null)
-            UnityEngine.Object.DontDestroyOnLoad(root);
         var canvas = root.GetComponent<Canvas>();
         SetOrder(canvas, sortingOrder);
         var raycaster = root.GetComponent<GraphicRaycaster>() ?? root.AddComponent<GraphicRaycaster>();
@@ -140,6 +140,9 @@ public sealed class ModScreen
 
     public bool IsOpen => screen != null && screen.IsOpen;
 
+    // False once its object is gone: an adopted copy went with its scene.
+    public bool Alive => screen != null;
+
     public void Open()
     {
         if (screen == null)
@@ -170,9 +173,14 @@ public sealed class ModScreen
     // frame). Open, it is hidden by the registry first: the screen below gets the clicks back.
     public void Destroy()
     {
-        if (screen == null)
-            return;
         var registry = GameNames.ScreenRegistry();
+        if (screen == null)
+        {
+            // Gone with its scene: only its name is left in the registry, if the registry was not emptied since.
+            if (registry.Screens.TryGetValue(Name, out var left) && left == null)
+                registry.Screens.Remove(Name);
+            return;
+        }
         var registered = registry.Screens.TryGetValue(Name, out var found) && found == screen;
         if (registered && IsOpen)
             registry.Hide(Name);
