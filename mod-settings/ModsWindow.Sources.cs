@@ -28,12 +28,10 @@ public partial class Plugin
     {
         foreach (var source in ModCatalog.Sources)
         {
-            var row = Copy(rowSource, listContent);
-            row.name = "OE_Source";
-            row.SetActive(true);
             var url = source.Url;
-            RowBase(row, sourcePick == url, () => sourcePick = url);
-            row.transform.Find("Toggle")?.gameObject.SetActive(false);
+            var row = NewRow("OE_Source", sourcePick == url, () => sourcePick = url);
+            if (row == null)
+                continue;
             RowPicture(row, source.IconPath, Texts.Get(source.TitleKey));
             RowName(row, Texts.Get(source.TitleKey), source.BuiltIn ? new[] { W + "builtIn" } : null);
             RowInfo(row, string.Format(Texts.Get(W + "mods"), source.Mods),

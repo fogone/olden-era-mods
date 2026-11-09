@@ -67,7 +67,7 @@ public partial class Plugin
     string tagBoxKeys, sourceBoxKeys, sortOptions;
 
     // Copy sources: rows, texts, chips, buttons (all from the copy), and the settings' switch, the input box's field.
-    GameObject rowSource, lineTemplate, wrapTemplate, chipTemplate, textButtonTemplate, crossSource, dropdownSource, deleteTemplate;
+    GameObject lineTemplate, wrapTemplate, chipTemplate, textButtonTemplate, crossSource, dropdownSource, deleteTemplate;
     BhSettingsCheckbox switchSource;
     TMP_InputField inputTemplate;
 
@@ -182,7 +182,7 @@ public partial class Plugin
         nothingText = sar.Find("NoSavesHeader")?.GetComponent<TMP_Text>();
         if (!BuildList(sar))
         {
-            Log.LogWarning("mods window: no save row to copy");
+            Log.LogWarning("mods window: no save row prefab");
             UnityEngine.Object.DestroyImmediate(window);
             window = null;
             return false;
@@ -237,32 +237,18 @@ public partial class Plugin
         statusText.alignment = TextAlignmentOptions.Center;
     }
 
-    // The list: its rows laid out by a layout group of ours (the game's virtualized list, taken off, placed them), its
-    // scrollbar kept; a save row kept as the rows' source. False when there is no save row to copy.
+    // The list: its rows (the game's save rows, SaveRow) laid out by a layout group of ours (the game's virtualized list,
+    // taken off, placed them), its scrollbar kept. False when the game has no save row prefab.
     bool BuildList(Transform sar)
     {
+        if (SaveRow.Prefab is not { } prefab || prefab == null)
+            return false;
         var list = sar.Find("VirtualizedList");
         listContent = list.Find("Viewport/Content");
         FitViewport(list, 24f);
-        var firstRow = listContent.childCount > 0 ? listContent.GetChild(0).gameObject : null;
-        if (firstRow == null)
-        {
-            // No save shown: its row prefab among the loaded objects.
-            var prefab = Resources.FindObjectsOfTypeAll<Transform>().FirstOrDefault(t => t != null && t.name == "SessionElement");
-            if (prefab != null)
-            {
-                firstRow = UnityEngine.Object.Instantiate(prefab.gameObject, staging.transform, false);
-                ScreenCopy.StripScripts(firstRow, ScreenScripts);
-            }
-        }
-        if (firstRow == null)
-            return false;
-        firstRow.transform.SetParent(staging.transform, false);
-        rowSource = firstRow;
-        OwnRow(rowSource);
         Clear(listContent);
         var column = listContent.gameObject.AddComponent<VerticalLayoutGroup>();
-        column.spacing = 6f;
+        column.spacing = SaveRow.Spacing;
         column.padding.left = column.padding.right = 10;
         column.padding.top = column.padding.bottom = 6;
         column.childAlignment = TextAnchor.UpperLeft;
@@ -278,25 +264,10 @@ public partial class Plugin
         contentRect.sizeDelta = new Vector2(0f, contentRect.sizeDelta.y);
         if (list.Find("InvisibleContainer") is { } invisible)
             Clear(invisible);
-        // A tag chip of the row: the chips' source.
-        chipTemplate = firstRow.GetComponentInChildren<BhTag>(true)?.gameObject;
+        // A tag chip of the row prefab: the details panel's chips.
+        chipTemplate = prefab.sessionTags is { Count: > 0 } tags ? tags[0].gameObject : null;
         return true;
     }
-
-    // The save row's own script (an obfuscated slot class on its root, with its selection and double click) and its
-    // button's persistent click off: they answered the clicks before ours. The Unity parts of the root are kept.
-    void OwnRow(GameObject row)
-    {
-        foreach (var script in row.GetComponents<MonoBehaviour>().ToList())
-            if (script != null && !(script.GetIl2CppType().FullName ?? "").StartsWith("UnityEngine.", StringComparison.Ordinal))
-            {
-                Logs.Once($"Mods window: the row's script {script.GetIl2CppType().FullName} taken off");
-                UnityEngine.Object.DestroyImmediate(script);
-            }
-        if (row.GetComponent<Button>() is { } button)
-            button.onClick = new Button.ButtonClickedEvent();
-    }
-
     // The information panel: its title, picture, texts and buttons; the empty panel with a hint.
     void BuildPanel(Transform sar)
     {
@@ -585,7 +556,7 @@ public partial class Plugin
         tagBox = sourceBox = null;
         tagLabel = sourceLabel = null;
         tagBoxKeys = sourceBoxKeys = sortOptions = null;
-        rowSource = lineTemplate = wrapTemplate = chipTemplate = textButtonTemplate = crossSource = dropdownSource = deleteTemplate = null;
+        lineTemplate = wrapTemplate = chipTemplate = textButtonTemplate = crossSource = dropdownSource = deleteTemplate = null;
         switchSource = null;
         greyed.Clear();
         suspended = false;

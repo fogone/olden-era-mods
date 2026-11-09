@@ -30,6 +30,7 @@ global using GameMessageBoxButton = global::dcm;
 global using GameMessageBoxOptions = global::dcl;
 global using GameModelHolder = global::bye;
 global using GameParty = global::eco;
+global using GameSaveRowPresenter = global::cum;
 global using GameScreenRegistry = global::cqp;
 global using GameSession = global::dkd;
 global using GameSettingsService = global::bak;
@@ -311,6 +312,15 @@ internal static class GameNames
     {
         // map object model -> GameObjects: bye._cbor_k__BackingField, bye.cbou, bye.cbor
         public global::System.Collections.Generic.IEnumerable<global::UnityEngine.GameObject> SceneObjects => GameNames.Each<global::UnityEngine.GameObject>(() => modelHolder._cbor_k__BackingField, () => modelHolder.cbou, () => modelHolder.cbor);
+    }
+
+    extension(GameSaveRowPresenter saveRowPresenter)
+    {
+        // save row on click: cum.fkf(Action) : Void
+        public void OnClick(global::Il2CppSystem.Action a0) => saveRowPresenter.fkf(a0);
+
+        // save row name: cum.ifs(String, String) : Void
+        public void ShowName(string a0, string a1) => saveRowPresenter.ifs(a0, a1);
     }
 
     extension(GameScreenRegistry screenRegistry)
@@ -623,6 +633,33 @@ internal static class GameNames
     {
         // save filter element ticked: BhFilterElement.uxo() : Boolean
         public bool Ticked() => it.uxo();
+    }
+
+    extension(global::Hex.UI.SaveLoad.BhSessionInfoElement it)
+    {
+        // save row presenter: BhSessionInfoElement.vfc() : cum
+        public GameSaveRowPresenter Presenter() => it.vfc();
+
+        // save row campaign shown: BhSessionInfoElement.vfk(Boolean) : Void
+        public void ShowCampaign(bool a0) => it.vfk(a0);
+
+        // save row icon: BhSessionInfoElement.vff(Sprite) : Void
+        public void ShowIcon(global::UnityEngine.Sprite a0) => it.vff(a0);
+
+        // save row cloud: BhSessionInfoElement.vfe(Boolean) : Void
+        public void ShowInCloud(bool a0) => it.vfe(a0);
+
+        // save row map icons shown: BhSessionInfoElement.vfn(Boolean) : Void
+        public void ShowMapIcons(bool a0) => it.vfn(a0);
+
+        // save row selected look: BhSessionInfoElement.vfp(Boolean) : Void
+        public void ShowSelected(bool a0) => it.vfp(a0);
+
+        // save row tag: BhSessionInfoElement.vfh(Int32, String, Color) : Void
+        public void ShowTag(int a0, string a1, global::UnityEngine.Color a2) => it.vfh(a0, a1, a2);
+
+        // save row tag shown: BhSessionInfoElement.vfi(Int32, Boolean) : Void
+        public void ShowTagShown(int a0, bool a1) => it.vfi(a0, a1);
     }
 
     extension(global::Hex.UI.Tooltips.BhTooltip it)
