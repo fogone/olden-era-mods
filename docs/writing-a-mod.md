@@ -218,9 +218,8 @@ Mods window, a copy of the game's Load screen) uses all of them.
   open screens, gives it the UI camera, the input and Escape, and takes the clicks from the screen below. It registers
   again after a mode change emptied the registry. `Destroy` it in `OnUnload`. Prefer it to a window of your own.
 - `ScreenCopy` — a game screen copied as a window of your own: `Make` copies it with the screen's own scripts taken
-  off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts); `Place`
-  draws it with the game's UI camera just under the game's message box; `DrawOnTop` puts a part over the rest.
-  Destroy the copy with `DestroyImmediate` in `OnUnload`.
+  off and switches on what the hidden screen keeps off (raycasters, scrolling, controls, dropdowns, layouts);
+  `ModScreen.Adopt` makes the built copy a screen of the game's registry; `DrawOnTop` puts a part over the rest.
 - `GameBoxes` — the game's message box (`Confirm`: a question with two buttons) and input box (`Ask`: a line of text),
   one call each with callbacks; `AnyShown` tells whether one is on screen.
 - `Pictures`, `PictureCache` — PNG or JPG files loaded once into textures; shown filling a frame (`Cover`, cut) or whole

@@ -90,7 +90,7 @@ public partial class Plugin
     // ---------- the game's boxes: adding a source ----------
 
     // First the game's own message box warning that nobody reviews other sources, then its input box for the address;
-    // they come over our window (PlaceCanvas), which waits under them.
+    // they come over our window (drawn just under them), which waits.
     void AskForSource(string captionKey, string placeholderKey, Action<string> add)
     {
         if (add == null)
@@ -130,14 +130,11 @@ public partial class Plugin
             () => Guard("problem told", ResumeWindow));
     }
 
-    // A game box is open over the window: the window stays (drawn under it, PlaceCanvas), only its own Escape waits;
-    // when the window is drawn over everything (no camera to share), it hides meanwhile.
+    // A game box is open over the window: the window stays (drawn under it), its Escape and filling wait.
     void SuspendWindow()
     {
         suspended = true;
         suspendedAt = Time.frameCount;
-        if (window != null && window.GetComponent<Canvas>().renderMode == RenderMode.ScreenSpaceOverlay)
-            window.SetActive(false);
     }
 
     void ResumeWindow()
@@ -146,7 +143,6 @@ public partial class Plugin
             return;
         suspended = false;
         resumedAt = Time.frameCount;
-        window.SetActive(true);
         windowDirty = true;
     }
 

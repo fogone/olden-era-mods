@@ -536,6 +536,9 @@ internal static class GameNames
 
     extension(global::Hex.UI.BhScreen it)
     {
+        // screen hidden at once: BhScreen.udm() : Void
+        public void HideAtOnce() => it.udm();
+
         // screen input: BhScreen.cekt : cbe
         public GameInputReceiver Input => it.cekt;
 
