@@ -123,6 +123,20 @@ public static class Texts
         Changed();
     }
 
+    // The texts of copied entries (DataCopies): the game names some texts by an entry's id (a hero's name is the text
+    // of its id, its motto <id>_motto), so a copy shows the original's texts under its own id: each key of the
+    // game's that is an old id, or starts with one and "_", is put in under the new id, unless there is a text of ours.
+    static readonly Dictionary<string, string> idTexts = new(StringComparer.Ordinal);
+    static readonly HashSet<string> copiedKeys = new(StringComparer.Ordinal);
+    static string sampleKey, sampleText;
+
+    public static void CopyIdTexts(IReadOnlyDictionary<string, string> renamed)
+    {
+        foreach (var (from, to) in renamed)
+            idTexts[from] = to;
+        Changed();
+    }
+
     static void Set(ELang language, string key, string text)
     {
         if (string.IsNullOrEmpty(key))
@@ -191,9 +205,11 @@ public static class Texts
         if (service == null || tableProperty.GetValue(service) is not Il2CppObjectBase table)
             return;
         var language = languageProperty.GetValue(service) is ELang now ? now : (ELang?)null;
-        if (!dirty && table.Pointer == filledTable && language == filledLanguage)
-            return;
         var setItem = table.GetType().GetProperty("Item");
+        // The same table may be filled again in place (another language's texts over the first): the text of one key a
+        // copy was made from tells.
+        if (!dirty && table.Pointer == filledTable && language == filledLanguage && SampleText(table, setItem) == sampleText)
+            return;
         var keys = texts.Values.SelectMany(t => t.Keys).Distinct().ToList();
         foreach (var key in keys)
         {
@@ -203,10 +219,58 @@ public static class Texts
             entryArgs?.SetValue(entry, new Il2CppStringArray(0));
             setItem.SetValue(table, entry, new object[] { key });
         }
+        var copied = idTexts.Count > 0 ? CopyIdTexts(table, setItem) : 0;
+        sampleText = SampleText(table, setItem);
         filledTable = table.Pointer;
         filledLanguage = language;
         dirty = false;
-        log.LogInfo($"{keys.Count} texts put into the game's localization ({language})");
+        log.LogInfo($"{keys.Count} texts put into the game's localization ({language})" + (copied > 0 ? $", {copied} of copied entries" : ""));
+    }
+
+    // The game's text of the sample key (one a copy's text was made from), null while there is none.
+    static string SampleText(Il2CppObjectBase table, PropertyInfo setItem)
+    {
+        if (sampleKey == null)
+            return null;
+        try { return entryText.GetValue(setItem.GetValue(table, new object[] { sampleKey })) as string; }
+        catch (TargetInvocationException) { return null; }
+    }
+
+    // The game's texts named by an old id put in under the new one (idTexts); how many.
+    static int CopyIdTexts(Il2CppObjectBase table, PropertyInfo setItem)
+    {
+        var type = table.GetType();
+        var keys = type.GetProperty("Keys")!.GetValue(table);
+        var enumerator = keys!.GetType().GetMethod("GetEnumerator")!.Invoke(keys, null)!;
+        var moveNext = enumerator.GetType().GetMethod("MoveNext")!;
+        var current = enumerator.GetType().GetProperty("Current")!;
+        var all = new List<string>();
+        while ((bool)moveNext.Invoke(enumerator, null)!)
+            all.Add((string)current.GetValue(enumerator));
+        var present = new HashSet<string>(all, StringComparer.Ordinal);
+        var count = 0;
+        foreach (var key in all)
+        {
+            // The key itself, then each part of it up to a "_", as an old id.
+            string to = null;
+            for (var end = key.Length; end > 0 && to == null; end = key.LastIndexOf('_', end - 1))
+                if (idTexts.TryGetValue(key.Substring(0, end), out var id))
+                    to = id + key.Substring(end);
+            // A key the game has of its own stays; one put in for a copy before takes the text of this language.
+            if (to == null || Has(to) || present.Contains(to) && !copiedKeys.Contains(to))
+                continue;
+            var original = setItem.GetValue(table, new object[] { key });
+            sampleKey ??= key;
+            var entry = entryConstructor.Invoke(Array.Empty<object>());
+            entryKey.SetValue(entry, to);
+            entryText.SetValue(entry, entryText.GetValue(original));
+            entryArgs?.SetValue(entry, entryArgs.GetValue(original) ?? new Il2CppStringArray(0));
+            setItem.SetValue(table, entry, new object[] { to });
+            present.Add(to);
+            copiedKeys.Add(to);
+            count++;
+        }
+        return count;
     }
 
     static bool Find()
