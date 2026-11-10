@@ -13,6 +13,33 @@ Related: [building.md](building.md) (building, releases, pull requests), [proces
 research console), [game-names.md](game-names.md) (the generated names), [catalog.md](catalog.md) (the mod catalog),
 [game-internals.md](game-internals.md) (what is known about the game's code).
 
+## Principles of the SDK
+
+What the framework (and a mod on it) does, and in what order, whatever is added: a menu row, a text, a picture, a
+faction, a model. Check a design against these before writing it.
+
+1. **The game's own functions, not its logic rewritten.** A number, a decision, a widget's filling, a sprite, a font,
+   a text is taken from the game: find the method that does it and call it. Look first at how the game itself does
+   the same thing in a similar place. Own code only where the game has no such function, and say so.
+2. **Into the game's mechanisms, not around them.** Find how the game itself defines and loads the thing (its data
+   files, its tables of texts and pictures, its registry of screens, its menu, its caches) and add ours through the
+   same mechanism, so the game treats it as its own. A faction: how the game defines its own factions, then a new one
+   added the same way. Copying the game's live objects, or hiding the game's thing and drawing ours over it, only when
+   there is no mechanism, said so in the code.
+3. **The resources of a mod from the mod's folder, through the game's loaders.** The game loads its data and assets
+   by path (its data roots, `Resources`, its sprite tables, its localization). The framework joins those loaders once,
+   so a path can also name a mod's file, and every place of the game that loads by that path takes the mod's resource;
+   not a hook in each place that shows it.
+4. **A hook only where no mechanism exists**, at the narrowest point the game passes through, with a comment why.
+   Hooks are installed once for everyone (the core) and mods subscribe to its events.
+5. **Mods ask the framework, not the game.** A mod adds a menu row, a tab, a screen, a text, a picture, a faction
+   through the framework's API or as data; it does not reach into the game's objects. A mod of data alone needs no code.
+6. **Game names are generated, not written.** Obfuscated names change with every patch: code is written on the
+   generated names (`GameNames.g.cs`) and readable aliases (`Game*.cs`), not on obfuscated names or reflection.
+7. **Next to other mods.** Whatever a mod adds goes on top of the untouched game and of the other mods: lists are added
+   to (`Add\`), not replaced; nothing of the game's files is changed or copied out.
+8. **Every visible string through localization**, and hidden numbers of the game shown only when a setting asks.
+
 ## 1. What you need
 
 - The game, with **BepInEx `6.0.0-be.788` (IL2CPP)** in its folder, **started once to the main menu**: BepInEx then
