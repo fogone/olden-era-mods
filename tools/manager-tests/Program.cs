@@ -781,25 +781,52 @@ Case("data additions: two mods' factions both in the lists, an entry with the sa
     Check(music.Count == 2 && (string)music[0]!["val"]!["soundSetName"] == "h2" && (string)music[1]!["key"] == "reef", $"music: {music.ToJsonString()}");
 });
 
-Case("data additions: a faction's map squads copied from another's, ids, faction and units renamed", root =>
+Case("data copies: a faction's entries copied under new ids, references renamed, the mod's own entries kept", root =>
 {
     var core = Path.Combine(root, "core");
     Zip(core, "Core.zip",
-        ("DB/squads/squads_human/special/squad_human_custom_1.json",
-         """{ "array": [ { "id": "squad_human_custom_1", "baseSquad": { "units": [ { "s": "esquire", "v": 5 }, { "s": "pixie", "v": 1 } ] }, "dynamicSquad": { "units": ["esquire"] }, "fraction": "human" } ] }"""),
-        ("DB/squads/squads_undead/squad_undead_1.json", """{ "array": [ { "id": "squad_undead_1", "fraction": "undead" } ] }"""));
+        ("DB/units/units_logics/humans/esquire_l.json", """{ "array": [ { "id": "esquire", "fraction": "human", "tags": ["unit", "human"], "upgradeSid": "esquire_upg", "name": "esquire_name" } ] }"""),
+        ("DB/units/units_logics/humans/esquire_upg_l.json", """{ "array": [ { "id": "esquire_upg", "fraction": "human" } ] }"""),
+        ("DB/units/units_views/humans/esquire_v.json", """{ "array": [ { "id": "esquire", "mesh": "Humans/esquire" } ] }"""),
+        ("DB/heroes/humans/human_hero_1.json", """{ "array": [ { "id": "human_hero_1", "fraction": "human", "specialization": "human_hero_1_specialization", "startSquad": [ { "sid": "esquire" } ], "startSkills": [ { "sid": "skill_faction_humans" }, { "sid": "skill_logistic" } ] } ] }"""),
+        ("DB/heroes/humans/human_hero_2.json", """{ "array": [ { "id": "human_hero_2", "fraction": "human", "icon": "hero_human_2" } ] }"""),
+        ("DB/heroes_skills/skills/skills.json", """{ "array": [ { "id": "skill_logistic" }, { "id": "skill_faction_humans", "name": "skill_faction_humans_name" } ] }"""),
+        ("DB/map/objects/4_interactables.json", """{ "array": [ { "id": "mine_gold" }, { "id": "human_city", "prefs": ["interactive/castle"] }, { "id": "undead_city" } ] }"""));
+    var mod = Path.Combine(root, "mod");
+    // The mod's own second hero, with its own texts: not copied.
+    Zip(mod, "mod.zip", ("DB/heroes/cove/cove_hero_2.json", """{ "array": [ { "id": "cove_hero_2", "fraction": "cove" } ] }"""));
     Nobirds.OldenEra.Modding.Common.DataAdditions.Clear();
-    Nobirds.OldenEra.Modding.Common.DataAdditions.AddSquads("c", "cove", Bytes("""{ "like": "human", "units": { "esquire": "cove_esquire" } }"""));
+    Nobirds.OldenEra.Modding.Common.DataCopies.Add("mod", "cove", Bytes("""
+        { "like": "human", "words": { "humans": "cove" }, "names": { "esquire_name": "cove_esquire_name" },
+          "files": [ "DB/units/units_logics/humans/", "DB/units/units_views/humans/", "DB/heroes/humans/", "DB/heroes_skills/skills/skills.json", "DB/map/objects/4_interactables.json", "DB/nothing.json" ] }
+        """));
     var output = Path.Combine(root, "additions");
-    Check(Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, Array.Empty<(string, string)>()), "nothing written");
-    using var archive = System.IO.Compression.ZipFile.OpenRead(Path.Combine(output, "additions.zip"));
-    var squads = archive.Entries.Where(e => e.FullName.StartsWith("DB/squads/")).ToList();
-    Check(squads.Count == 1 && squads[0].FullName == "DB/squads/squads_cove/special/squad_cove_custom_1.json", $"files: {string.Join(", ", squads.Select(e => e.FullName))}");
-    using var reader = new StreamReader(squads[0].Open());
-    var squad = System.Text.Json.Nodes.JsonNode.Parse(reader.ReadToEnd())!["array"]![0]!;
-    Check((string)squad["id"] == "squad_cove_custom_1" && (string)squad["fraction"] == "cove", $"id or faction: {squad.ToJsonString()}");
-    var units = squad["baseSquad"]!["units"]!.AsArray();
-    Check((string)units[0]!["s"] == "cove_esquire" && (string)units[1]!["s"] == "pixie" && (string)squad["dynamicSquad"]!["units"]![0] == "cove_esquire", $"units: {squad.ToJsonString()}");
+    // No additions: no archive of them; the copies are in the mod's own folder.
+    Check(!Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, new[] { ("mod", mod) }), "an additions archive without additions");
+    using var archive = System.IO.Compression.ZipFile.OpenRead(Path.Combine(mod, Nobirds.OldenEra.Modding.Common.DataCopies.CopiesFile));
+    System.Text.Json.Nodes.JsonArray Array(string path)
+    {
+        var entry = archive.GetEntry(path) ?? throw new Exception($"no {path}: {string.Join(", ", archive.Entries.Select(e => e.FullName))}");
+        using var reader = new StreamReader(entry.Open());
+        return System.Text.Json.Nodes.JsonNode.Parse(reader.ReadToEnd())!["array"]!.AsArray();
+    }
+    var esquire = Array("DB/units/units_logics/cove/esquire_l.json")[0]!;
+    Check((string)esquire["id"] == "cove_esquire" && (string)esquire["upgradeSid"] == "cove_esquire_upg" && (string)esquire["fraction"] == "cove" &&
+          (string)esquire["tags"]![1] == "cove" && (string)esquire["name"] == "cove_esquire_name", $"unit: {esquire.ToJsonString()}");
+    var view = Array("DB/units/units_views/cove/esquire_v.json")[0]!;
+    Check((string)view["id"] == "cove_esquire" && (string)view["mesh"] == "Humans/esquire", $"view: {view.ToJsonString()}");
+    var hero = Array("DB/heroes/cove/cove_hero_1.json")[0]!;
+    Check((string)hero["startSquad"]![0]!["sid"] == "cove_esquire" && (string)hero["startSkills"]![0]!["sid"] == "skill_faction_cove" &&
+          (string)hero["startSkills"]![1]!["sid"] == "skill_logistic" && (string)hero["specialization"] == "human_hero_1_specialization", $"hero: {hero.ToJsonString()}");
+    Check(archive.GetEntry("DB/heroes/cove/cove_hero_2.json") == null, "the mod's own hero was copied over");
+    var skills = Array("DB/heroes_skills/skills/skills_cove.json");
+    Check(skills.Count == 1 && (string)skills[0]!["id"] == "skill_faction_cove" && (string)skills[0]!["name"] == "skill_faction_humans_name", $"skills: {skills.ToJsonString()}");
+    var objects = Array("DB/map/objects/4_interactables_cove.json");
+    Check(objects.Count == 1 && (string)objects[0]!["id"] == "cove_city", $"map objects: {objects.ToJsonString()}");
+    archive.Dispose();
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Clear();
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, new[] { ("mod", mod) });
+    Check(!File.Exists(Path.Combine(mod, Nobirds.OldenEra.Modding.Common.DataCopies.CopiesFile)), "the copies stayed after the mod no longer had them");
 });
 
 Console.WriteLine($"{cases - failures} of {cases} passed");

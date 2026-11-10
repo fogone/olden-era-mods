@@ -50,8 +50,11 @@ public static class DataRoots
         }
         // What of its archives the game does not read itself: texts, pictures, lobby entries, additions.
         ModContent.Read(name, folder);
-        if (DataAdditions.Any)
-            additions = DataAdditions.Write(AdditionsFolder, GameFolders(), added);
+        // Always: it also removes the archives of copies a mod no longer has.
+        additions = DataAdditions.Write(AdditionsFolder, GameFolders(), added);
+        // A copied entry shows the original's texts under its id until the mod has its own.
+        if (DataCopies.CopiedIds.Count > 0)
+            Texts.CopyIdTexts(DataCopies.CopiedIds);
         Put();
         return true;
     }

@@ -12,5 +12,6 @@
     <Compile Include="..\..\mod-manager\shared\*.cs" Link="shared\%(Filename)%(Extension)" />
     <!-- The library's additions to the game's single-object files: plain JSON and zip work (its log in GameLog.cs). -->
     <Compile Include="..\..\mod-common\shared\DataAdditions.cs" Link="shared\DataAdditions.cs" />
+    <Compile Include="..\..\mod-common\shared\DataCopies.cs" Link="shared\DataCopies.cs" />
   </ItemGroup>
 </Project>

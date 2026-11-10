@@ -178,18 +178,59 @@ What the game does not read from a mod's data the library reads, so a mod of dat
 | `Lobby\<faction>.json` | the faction in the lobby: `{"like": "human"}`, its lobby pictures those of that faction |
 | `Lobby\<faction>\<picture>.png` | ... except these: `icon`, `slotFon`, `statisticFon`, `versusFon`, `bigIcon`, `card` |
 | `Add\<path>.json` | what the mod adds to the game's single-object file `<path>`: `Add\DB\data.json` with `{"fractions": ["myfaction"]}` adds to that list. An object is added to field by field, an array gets the elements at its end; an element already there (the same value, an object with the same `key`, `sid` or `id`) is replaced. Every mod's additions go into one data root of the library's, after all the others |
-| `Squads\<faction>.json` | the faction's squads on the map, made from another's: `{"like": "human", "units": {"esquire": "myfaction_esquire", ...}}`. The game keeps about 650 squad files per faction (`DB\squads\squads_human\...`: dwelling guards and the squads near cities, by tier and value; the map generator looks for those of the city's faction); each gets a copy with `squad_myfaction_...` for `squad_human_...`, the faction's id and the units given replaced |
+| `Copy\<faction>.json` | the faction's parts copied from a faction of the game, below |
 
 The folders of the game's pictures are the Resources paths in `<game>\HeroesOldenEra_Data\globalgamemanagers`
 (`icons/units/hex_portraits/angel`, `icons/heroes/...`, `icons/cities_buildings/...`). In code the same is
 `Sprites.Add(folder, sprite)` / `Sprites.FromPng(bytes, name)` and `Factions.AddLobby(id, like, pictures)`.
 
-A new faction is these together: `Add\DB\data.json` with the faction in `fractions` and `availableFractions`, its
-`DB\fractions\` entry, its city (`DB\objects_logic\cities\`, a map object of it in `DB\map\objects\`), heroes and units
-(copies of the game's with new ids), its texts, pictures and lobby entry (#56). The game's ids of a faction's parts
-are not all made from its id (`skill_faction_humans`, `humans_might_skills_table`, `barracks_necropolis_1`): copy them
-from one faction and rename them. `DB/biomes_info.json` maps one faction to each biome; adding the faction to a biome
-of the game (`{"key": "Grass", ...}`) would replace that biome's faction, so leave it out.
+#### A new faction
+
+A faction is many entries in many files: its units and their views, heroes and their specializations, its city and
+the city's map object, dwellings, laws, the faction skill with its sub-skills and roll tables, sub-classes, and about
+650 map squads (the map generator looks for those of the city's faction). Their ids are not all made from the
+faction's id (`skill_faction_humans`, `humans_might_skills_table`), so a faction mod copies them from a faction of the
+game instead of writing them: `data\Copy\myfaction.json`
+
+```json
+{
+  "like": "human",
+  "words": { "humans": "myfaction" },
+  "files": [
+    "DB/units/units_logics/humans/", "DB/units/units_views/humans/", "DB/heroes/humans/",
+    "DB/heroes_specializations/specializations_human.json",
+    "DB/heroes_skills/skills/skills.json", "DB/heroes_skills/sub_skills/sub_skills.json",
+    "DB/heroes_skills/skills_by_level_tables/", "DB/heroes_sub_classes/sub_classes_human.json",
+    "DB/fractions_laws/fractions_laws_table_human.json",
+    "DB/objects_logic/cities/human_city.json", "DB/objects_logic/hires/barracks.json",
+    "DB/map/objects/4_interactables.json", "DB/squads/squads_human/"
+  ],
+  "names": { "human_name": "myfaction_name" }
+}
+```
+
+- From the files given (a path ending in `/` is a folder: every file under it), the entries of the faction are copied:
+  those whose `fraction` (or `faction`) is `like`, or whose id has a word of `words` (words are the parts between
+  `_`; `like` is always one), and the entries with the id of one of those (a unit's view has the unit's id).
+- A copy's id has the words replaced (`human_hero_1` → `myfaction_hero_1`, `skill_faction_humans` →
+  `skill_faction_myfaction`); an id without such a word gets the faction's id in front (`esquire` → `myfaction_esquire`).
+  `names` gives an id (or any string) its new value instead.
+- In the copies, every string that is the id of a copied entry becomes the copy's id (a hero's start squad, its
+  specialization and skill table, a city's units), `like` becomes the faction's id, and a string of `names` its value.
+  The rest (text keys, pictures, ids not copied) stays: the copies show the game's pictures and texts. The texts the
+  game names by an entry's id (a hero's name is the text of its id, its motto `<id>_motto`) are put in under the
+  copy's id too, until the mod's `Lang` has its own.
+- An entry the mod's own `DB` has (the same id as a copy's) is not copied: the mod's wins. Refer to copies by their ids
+  (`fraction_law_myfaction_3` in the faction's `fractionLawsLines`).
+- The copies are written into the mod's data folder (`~oe-copies.zip`) at the start: the game takes some of a
+  faction's entries only from the data root that has the faction (the random hero of the lobby is one of its heroes
+  from that root).
+
+Besides the copies, a new faction is its `DB\fractions\` entry (its name, icon, laws, city names; written by the mod),
+`Add\DB\data.json` with it in `fractions` and `availableFractions`, `Add\DB\city_music_sounds.json` and
+`city_ambient_sounds.json` with its key, its texts, pictures and lobby entry (#56). `DB/biomes_info.json` maps one
+faction to each biome; adding the faction to a biome of the game (`{"key": "Grass", ...}`) would replace that biome's
+faction, so leave it out.
 
 ## 3. The framework
 
