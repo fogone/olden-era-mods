@@ -48,15 +48,29 @@ public static class DataRoots
             harmony = new Harmony("nobirds.oldenera.common.data-roots");
             harmony.PatchEach(GameTargets.DataRootsBuilders, postfix: new HarmonyMethod(typeof(DataRoots), nameof(BuiltPostfix)));
         }
-        Put();
-        // What of its archives the game does not read itself: texts, pictures, lobby entries.
+        // What of its archives the game does not read itself: texts, pictures, lobby entries, additions.
         ModContent.Read(name, folder);
+        if (DataAdditions.Any)
+            additions = DataAdditions.Write(AdditionsFolder, GameFolders(), added);
+        Put();
         return true;
+    }
+
+    // The root of the additions to the game's single-object files (DataAdditions), after all the others.
+    static bool additions;
+    static string AdditionsFolder => Path.Combine(BepInEx.Paths.CachePath, "oldenera-data-additions").Replace('\\', '/');
+
+    // The game's own roots' folders (its list, before ours; StreamingAssets while the list is not there).
+    static IEnumerable<string> GameFolders()
+    {
+        var names = added.Select(r => r.name).Append(DataAdditions.RootName).ToHashSet();
+        var own = GameNames.DataRoots?.Where(r => !names.Contains(r.Name)).Select(r => r.Folder).ToList();
+        return own is { Count: > 0 } ? own : new List<string> { UnityEngine.Application.streamingAssetsPath };
     }
 
     static void BuiltPostfix() => Put();
 
-    // Ours at the end of the game's list, each once.
+    // Ours at the end of the game's list, in order, each once; the additions last.
     static void Put()
     {
         try
@@ -64,20 +78,23 @@ public static class DataRoots
             var roots = GameNames.DataRoots?.ToList();
             if (roots == null)
                 return;
-            var missing = added.Where(r => !roots.Any(g => g.Name == r.name)).ToList();
-            if (missing.Count == 0)
+            var ours = added.ToList();
+            if (additions)
+                ours.Add((DataAdditions.RootName, AdditionsFolder));
+            var names = ours.Select(r => r.name).ToList();
+            if (roots.Skip(roots.Count - names.Count).Select(g => g.Name).SequenceEqual(names))
                 return;
-            foreach (var (name, folder) in missing)
-            {
-                // The class has no managed constructor: a bare object of it, its fields set.
-                var root = new GameDataRoot(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<GameDataRoot>.NativeClassPtr))
-                {
-                    Enabled = true,
-                    Name = name,
-                    Folder = folder,
-                };
-                roots.Add(root);
-            }
+            var kept = roots.Where(g => !names.Contains(g.Name)).ToList();
+            foreach (var (name, folder) in ours)
+                kept.Add(roots.FirstOrDefault(g => g.Name == name) ??
+                    // The class has no managed constructor: a bare object of it, its fields set.
+                    new GameDataRoot(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<GameDataRoot>.NativeClassPtr))
+                    {
+                        Enabled = true,
+                        Name = name,
+                        Folder = folder,
+                    });
+            roots = kept;
             GameNames.DataRoots = new Il2CppReferenceArray<GameDataRoot>(roots.ToArray());
             Game.Log?.Invoke($"DataRoots: {string.Join(", ", roots.Select(r => $"{r.Name} = {r.Folder}"))}");
         }

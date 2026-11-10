@@ -735,5 +735,72 @@ if (Environment.GetEnvironmentVariable("OE_GITHUB_TOKEN") is { Length: > 0 } git
         Check(client.Read(new[] { "https://raw.githubusercontent.com/fogone/olden-era-mods/main/catalog/catalog.json" }).Result.Count == 0, "read without a token");
     });
 }
+// The library's additions to single-object files: two mods adding to the same lists keep both.
+void Zip(string folder, string name, params (string path, string json)[] files)
+{
+    Directory.CreateDirectory(folder);
+    using var archive = System.IO.Compression.ZipFile.Open(Path.Combine(folder, name), System.IO.Compression.ZipArchiveMode.Create);
+    foreach (var (path, json) in files)
+    {
+        using var stream = archive.CreateEntry(path).Open();
+        // The game's files start with a byte order mark.
+        stream.Write(Encoding.UTF8.GetPreamble());
+        stream.Write(Bytes(json));
+    }
+}
+
+Case("data additions: two mods' factions both in the lists, an entry with the same key replaced", root =>
+{
+    var core = Path.Combine(root, "core");
+    Zip(core, "Core.zip",
+        ("DB/data.json", """{ "fractions": ["human", "undead"], "availableFractions": ["human"], "other": 1, }"""),
+        ("DB/city_music_sounds.json", """{ "data": [ { "key": "human", "val": { "soundSetName": "h" } } ] }"""));
+    var a = Path.Combine(root, "a");
+    var b = Path.Combine(root, "b");
+    // Mod a also overwrites a field as the game merges it.
+    Zip(a, "a.zip", ("DB/data.json", """{ "other": 2 }"""));
+    Zip(b, "b.zip");
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Clear();
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Add("a", "DB/data.json", Bytes("""{ "fractions": ["cove"], "availableFractions": ["cove"] }"""));
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Add("b", "DB/data.json", Bytes("""{ "fractions": ["reef", "cove"] }"""));
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Add("b", "DB/city_music_sounds.json",
+        Bytes("""{ "data": [ { "key": "reef", "val": { "soundSetName": "r" } }, { "key": "human", "val": { "soundSetName": "h2" } } ] }"""));
+    var output = Path.Combine(root, "additions");
+    Check(Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, new[] { ("a", a), ("b", b) }), "nothing written");
+    using var archive = System.IO.Compression.ZipFile.OpenRead(Path.Combine(output, "additions.zip"));
+    string Entry(string path)
+    {
+        using var reader = new StreamReader(archive.GetEntry(path)!.Open());
+        return reader.ReadToEnd();
+    }
+    var data = System.Text.Json.Nodes.JsonNode.Parse(Entry("DB/data.json"))!;
+    Check(string.Join(",", data["fractions"]!.AsArray().Select(f => (string)f)) == "human,undead,cove,reef", $"fractions: {data["fractions"]}");
+    Check(string.Join(",", data["availableFractions"]!.AsArray().Select(f => (string)f)) == "human,cove", $"available: {data["availableFractions"]}");
+    Check(data["other"] == null, "a field not added to was written");
+    var music = System.Text.Json.Nodes.JsonNode.Parse(Entry("DB/city_music_sounds.json"))!["data"]!.AsArray();
+    Check(music.Count == 2 && (string)music[0]!["val"]!["soundSetName"] == "h2" && (string)music[1]!["key"] == "reef", $"music: {music.ToJsonString()}");
+});
+
+Case("data additions: a faction's map squads copied from another's, ids, faction and units renamed", root =>
+{
+    var core = Path.Combine(root, "core");
+    Zip(core, "Core.zip",
+        ("DB/squads/squads_human/special/squad_human_custom_1.json",
+         """{ "array": [ { "id": "squad_human_custom_1", "baseSquad": { "units": [ { "s": "esquire", "v": 5 }, { "s": "pixie", "v": 1 } ] }, "dynamicSquad": { "units": ["esquire"] }, "fraction": "human" } ] }"""),
+        ("DB/squads/squads_undead/squad_undead_1.json", """{ "array": [ { "id": "squad_undead_1", "fraction": "undead" } ] }"""));
+    Nobirds.OldenEra.Modding.Common.DataAdditions.Clear();
+    Nobirds.OldenEra.Modding.Common.DataAdditions.AddSquads("c", "cove", Bytes("""{ "like": "human", "units": { "esquire": "cove_esquire" } }"""));
+    var output = Path.Combine(root, "additions");
+    Check(Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, Array.Empty<(string, string)>()), "nothing written");
+    using var archive = System.IO.Compression.ZipFile.OpenRead(Path.Combine(output, "additions.zip"));
+    var squads = archive.Entries.Where(e => e.FullName.StartsWith("DB/squads/")).ToList();
+    Check(squads.Count == 1 && squads[0].FullName == "DB/squads/squads_cove/special/squad_cove_custom_1.json", $"files: {string.Join(", ", squads.Select(e => e.FullName))}");
+    using var reader = new StreamReader(squads[0].Open());
+    var squad = System.Text.Json.Nodes.JsonNode.Parse(reader.ReadToEnd())!["array"]![0]!;
+    Check((string)squad["id"] == "squad_cove_custom_1" && (string)squad["fraction"] == "cove", $"id or faction: {squad.ToJsonString()}");
+    var units = squad["baseSquad"]!["units"]!.AsArray();
+    Check((string)units[0]!["s"] == "cove_esquire" && (string)units[1]!["s"] == "pixie" && (string)squad["dynamicSquad"]!["units"]![0] == "cove_esquire", $"units: {squad.ToJsonString()}");
+});
+
 Console.WriteLine($"{cases - failures} of {cases} passed");
 return failures == 0 ? 0 : 1;
