@@ -11,7 +11,8 @@ namespace Nobirds.OldenEra.Modding.Common;
 // A mod's data as one of the game's own data roots (#56). The game keeps a list of mod folders (GameNames.DataRoots,
 // only "core" = StreamingAssets of its own): it mounts each folder's *.zip, laid out as Core.zip (DB/..., campaigns/...),
 // and loads the database root after root. An entry with a new id is added; one with an id already there replaces it
-// whole; a single-object file (DB/data.json) is merged field by field. Lang texts are not read from these roots.
+// whole; a single-object file (DB/data.json) is merged field by field. What the game does not read from a root (texts,
+// pictures, lobby entries) is read by ModContent.
 //
 //   DataRoots.Add("me.oldenera.myfaction", @"...\data")   // before the game loads its database: at the chainloader
 //
@@ -48,6 +49,8 @@ public static class DataRoots
             harmony.PatchEach(GameTargets.DataRootsBuilders, postfix: new HarmonyMethod(typeof(DataRoots), nameof(BuiltPostfix)));
         }
         Put();
+        // What of its archives the game does not read itself: texts, pictures, lobby entries.
+        ModContent.Read(name, folder);
         return true;
     }
 

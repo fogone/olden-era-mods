@@ -48,3 +48,7 @@ global::Hex.UI.GeneralKit.BhNavigationButton.MenuClick = BhNavigationButton.chbk
 
 # Of four clones with their own code (efg, ekm, oal, ujj), the first: BhScreen.Awake does the same inline; checked in the game on 0.82.7 (a screen of ours registered, research console `screen`).
 GameScreenRegistry.Register = cqp.nie  # clones with the same code, the first (efg on 0.82.7)
+
+# 0.82.08: the sprite registry (coi) has two static properties of its own type; cdwo is the one with the filled tables
+# (the faction prototype aliased its sprites there, checked in the game 10.11).
+GameNames.SpriteRegistry = coi.cdwo  # the registry the game fills (checked in the game, 10.11)

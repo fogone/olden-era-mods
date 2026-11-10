@@ -19,7 +19,11 @@
      Game data: the files under data\ (the ModData items; EnableDefaultModData=false to list them yourself), laid out as
      the game's Core.zip (data\DB\fractions\..., data\DB\units\...). The game loads them after its own: an entry with a
      new id is added, one with an id the game has replaces it whole, a single-object file (DB\data.json) is merged field
-     by field. -->
+     by field. The library reads what the game does not: data\Lang\<language>\**\*.json (texts), data\Sprites\<Resources
+     folder>\<name>.png (pictures among the game's), data\Lobby\<faction>.json and data\Lobby\<faction>\*.png (a faction
+     in the lobby); see docs/writing-a-mod.md, "Game data".
+
+     <ModCode>false</ModCode>: a mod of data alone, its package without the DLL. -->
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
@@ -131,7 +135,7 @@
       <_OePackageFile Include="@(_OeDataPackage)" Destination="data\%(_OeDataPackage.Filename)%(_OeDataPackage.Extension)" />
       <_OeShot Include="screenshots\*.png;screenshots\*.jpg" />
       <_OeShot Include="screenshots\captions.txt" Condition="Exists('screenshots\captions.txt')" />
-      <_OePackageFile Include="$(TargetPath)" Destination="plugins\$(TargetFileName)" />
+      <_OePackageFile Include="$(TargetPath)" Destination="plugins\$(TargetFileName)" Condition="'$(ModCode)' != 'false'" />
       <_OePackageFile Include="@(ModFile)" Destination="plugins\%(ModFile.RecursiveDir)%(ModFile.Filename)%(ModFile.Extension)" />
       <_OePackageFile Include="README.md" Destination="README.md" Condition="Exists('README.md')" />
       <_OePackageFile Include="icon.png" Destination="icon.png" Condition="Exists('icon.png')" />

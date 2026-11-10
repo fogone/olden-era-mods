@@ -50,24 +50,37 @@ public static class Texts
                 log.LogWarning($"{assembly.GetName().Name} {name}: no such language of the game");
                 continue;
             }
-            try
-            {
-                using var stream = assembly.GetManifestResourceStream(name);
-                using var json = JsonDocument.Parse(stream, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
-                var count = 0;
-                foreach (var token in json.RootElement.GetProperty("tokens").EnumerateArray())
-                {
-                    Set(language, token.GetProperty("sid").GetString(), token.GetProperty("text").GetString());
-                    count++;
-                }
-                log.LogInfo($"{assembly.GetName().Name}: {count} texts in {language}");
-            }
-            catch (Exception e)
-            {
-                log.LogError($"{assembly.GetName().Name} {name}: {e.Message}");
-            }
+            using var stream = assembly.GetManifestResourceStream(name);
+            Read(language, stream, assembly.GetName().Name);
         }
         Changed();
+    }
+
+    // A file of texts in the game's format for one language: a data mod's Lang/<language>/**/*.json (ModContent).
+    public static void Load(ELang language, System.IO.Stream stream, string source)
+    {
+        log ??= Logger.CreateLogSource("Olden Era Texts");
+        Read(language, stream, source);
+        Changed();
+    }
+
+    static void Read(ELang language, System.IO.Stream stream, string source)
+    {
+        try
+        {
+            using var json = JsonDocument.Parse(stream, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
+            var count = 0;
+            foreach (var token in json.RootElement.GetProperty("tokens").EnumerateArray())
+            {
+                Set(language, token.GetProperty("sid").GetString(), token.GetProperty("text").GetString());
+                count++;
+            }
+            log.LogInfo($"{source}: {count} texts in {language}");
+        }
+        catch (Exception e)
+        {
+            log.LogError($"{source}: {e.Message}");
+        }
     }
 
     // The library's own texts (its lang/<language>.json: "Mod enabled", the wrong-version notice), loaded once.

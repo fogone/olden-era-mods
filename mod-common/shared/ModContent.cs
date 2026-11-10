@@ -1,0 +1,112 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Text.Json;
+using Hex.UI;
+using UnityEngine;
+
+namespace Nobirds.OldenEra.Modding.Common;
+
+// What of a data mod's archives the game does not read itself (#56), read from a data root (DataRoots.Add) the moment
+// it is added:
+//
+//   Lang/<language>/**/*.json        the mod's texts, in the game's format ({"tokens":[{"sid","text"}]}); the game reads
+//                                    its own Lang from a fixed place, these go into its table through Texts
+//   Sprites/<folder>/<name>.png      a picture into the game's table of that Resources folder, under <name> (Sprites)
+//   Lobby/<id>.json                  a faction in the lobby: {"like": "<faction>"}, its pictures those of that faction
+//   Lobby/<id>/<picture>.png         ... except these (icon, slotFon, statisticFon, versusFon, bigIcon, card; Factions)
+//
+// The rest (DB/..., campaigns/...) the game reads itself. Paths are matched without regard to case; the archives in
+// the order of their names, a later one's file of the same path replacing an earlier one's.
+internal static class ModContent
+{
+    public static void Read(string root, string folder)
+    {
+        var files = new Dictionary<string, Func<byte[]>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var zip in Directory.GetFiles(folder, "*.zip").OrderBy(f => f, StringComparer.Ordinal))
+            try
+            {
+                using var archive = ZipFile.OpenRead(zip);
+                foreach (var entry in archive.Entries.Where(e => e.Name.Length > 0))
+                {
+                    var path = entry.FullName.Replace('\\', '/');
+                    if (IsOurs(path))
+                        files[path] = Bytes(zip, entry.FullName);
+                }
+            }
+            catch (Exception e) { Game.Log?.Invoke($"ModContent: {root}: {Path.GetFileName(zip)}: {e.GetType().Name}: {e.Message}"); }
+        if (files.Count == 0)
+            return;
+        int texts = 0, sprites = 0, lobbies = 0;
+        foreach (var (path, bytes) in files.OrderBy(f => f.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            var parts = path.Split('/');
+            var top = parts[0].ToLowerInvariant();
+            if (top == "lang" && parts.Length >= 3 && path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!Enum.TryParse<ELang>(parts[1], true, out var language))
+                {
+                    if (!parts[1].Equals("args", StringComparison.OrdinalIgnoreCase))
+                        Game.Log?.Invoke($"ModContent: {root}: {path}: no such language of the game");
+                    continue;
+                }
+                using var stream = new MemoryStream(bytes());
+                Texts.Load(language, stream, $"{root} {path}");
+                texts++;
+            }
+            else if (top == "sprites" && parts.Length >= 3 && path.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            {
+                var spriteFolder = string.Join("/", parts.Skip(1).Take(parts.Length - 2));
+                Sprites.AddPng(spriteFolder, Path.GetFileNameWithoutExtension(parts[^1]), bytes());
+                sprites++;
+            }
+            else if (top == "lobby" && parts.Length == 2 && path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                var id = Path.GetFileNameWithoutExtension(parts[1]);
+                if (Like(root, path, bytes()) is not { } like)
+                    continue;
+                var pictures = new Dictionary<string, Func<Sprite>>();
+                foreach (var name in Factions.Pictures)
+                    if (files.TryGetValue($"{parts[0]}/{id}/{name}.png", out var picture))
+                    {
+                        var png = picture();
+                        var spriteName = $"{id}_lobby_{name}";
+                        pictures[name] = () => Sprites.FromPng(png, spriteName);
+                    }
+                Factions.AddLobby(id, like, pictures);
+                lobbies++;
+            }
+        }
+        Game.Log?.Invoke($"ModContent: {root}: {texts} text files, {sprites} sprites, {lobbies} lobby factions");
+    }
+
+    static bool IsOurs(string path) =>
+        path.StartsWith("Lang/", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith("Sprites/", StringComparison.OrdinalIgnoreCase) ||
+        path.StartsWith("Lobby/", StringComparison.OrdinalIgnoreCase);
+
+    // An entry's bytes, read when asked (the archive opened again then).
+    static Func<byte[]> Bytes(string zip, string entryName) => () =>
+    {
+        using var archive = ZipFile.OpenRead(zip);
+        using var stream = archive.GetEntry(entryName)!.Open();
+        using var copy = new MemoryStream();
+        stream.CopyTo(copy);
+        return copy.ToArray();
+    };
+
+    static string Like(string root, string path, byte[] json)
+    {
+        try
+        {
+            using var document = JsonDocument.Parse(json, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip });
+            if (document.RootElement.TryGetProperty("like", out var like) && like.GetString() is { Length: > 0 } faction)
+                return faction;
+            Game.Log?.Invoke($"ModContent: {root}: {path}: no \"like\" (the faction whose pictures it starts from)");
+        }
+        catch (Exception e) { Game.Log?.Invoke($"ModContent: {root}: {path}: {e.Message}"); }
+        return null;
+    }
+}
