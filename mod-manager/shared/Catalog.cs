@@ -424,7 +424,11 @@ public sealed class CatalogClient
             Directory.Delete(temporary, true);
         Directory.CreateDirectory(temporary);
         foreach (var (name, bytes) in files)
-            File.WriteAllBytes(Path.Combine(temporary, name), bytes);
+        {
+            var path = Path.Combine(temporary, name);
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllBytes(path, bytes);
+        }
         if (Directory.Exists(folder))
             Directory.Delete(folder, true);
         Directory.CreateDirectory(Path.GetDirectoryName(folder)!);
@@ -466,18 +470,24 @@ public sealed class CatalogClient
         foreach (var entry in zip.Entries)
         {
             var path = entry.FullName.Replace('\\', '/');
-            if (!path.StartsWith("plugins/", StringComparison.OrdinalIgnoreCase) || path.EndsWith("/"))
+            // The plugins' files go into the mod's folder, its data archives (data\*.zip, the game's data roots: the
+            // library's DataRoots) into its data folder.
+            var folder = path.StartsWith("plugins/", StringComparison.OrdinalIgnoreCase) ? "plugins/"
+                : path.StartsWith(ManagerState.DataFolder + "/", StringComparison.OrdinalIgnoreCase) ? ManagerState.DataFolder + "/" : null;
+            if (folder == null || path.EndsWith("/"))
                 continue;
-            var name = path["plugins/".Length..];
+            var name = path[folder.Length..];
             if (name.Length == 0 || name.Contains('/') || name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0 || name.Contains(".."))
                 throw new InvalidOperationException($"{meta.Id} {release.Version}: a file in the package that is not a plain name: {path}");
+            if (folder != "plugins/" && !name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+                continue;
             using var stream = entry.Open();
             using var copy = new MemoryStream();
             stream.CopyTo(copy);
-            files.Add((name, copy.ToArray()));
+            files.Add((folder == "plugins/" ? name : Path.Combine(ManagerState.DataFolder, name), copy.ToArray()));
         }
-        if (!files.Any(f => f.name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
-            throw new InvalidOperationException($"{meta.Id} {release.Version}: the package has no DLL under plugins/");
+        if (!files.Any(f => f.name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) || f.name.StartsWith(ManagerState.DataFolder + Path.DirectorySeparatorChar)))
+            throw new InvalidOperationException($"{meta.Id} {release.Version}: the package has no DLL under plugins/ and no data under {ManagerState.DataFolder}/");
         return files;
     }
 }

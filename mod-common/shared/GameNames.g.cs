@@ -31,6 +31,9 @@ public static class GameNames
     // forecast builder: exw.bjfe(DamageUiParams, Boolean) : exv
     internal static GameForecast BuildForecast(global::Hex.Session.Battle.DamageUiParams a0, bool a1) => global::exw.bjfe(a0, a1);
 
+    // data roots: bkp.byxl : Il2CppReferenceArray`1
+    internal static global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameDataRoot> DataRoots { get => global::bkp.byxl; set => global::bkp.byxl = value; }
+
     // encounter: dkw.zkh(fgd, frc) : Void
     internal static void Encounter(GameHero a0, GameSquad a1) => global::dkw.zkh(a0, a1);
 
@@ -110,6 +113,18 @@ public static class GameNames
     {
         // buffs -> lists: elg.cmgb, elg.cmgc, elg.cmge
         internal global::System.Collections.Generic.IEnumerable<global::Il2CppSystem.Collections.Generic.List<GameBuff>> Lists => GameNames.Each<global::Il2CppSystem.Collections.Generic.List<GameBuff>>(() => buffs.cmgb, () => buffs.cmgc, () => buffs.cmge);
+    }
+
+    extension(GameDataRoot dataRoot)
+    {
+        // data root enabled: bko.byxi : Boolean
+        internal bool Enabled { get => dataRoot.byxi; set => dataRoot.byxi = value; }
+
+        // data root folder: bko.byxk : String
+        internal string Folder { get => dataRoot.byxk; set => dataRoot.byxk = value; }
+
+        // data root name: bko.byxj : String
+        internal string Name { get => dataRoot.byxj; set => dataRoot.byxj = value; }
     }
 
     extension(GameDwelling dwelling)
@@ -659,6 +674,13 @@ internal static class GameTargets
 
     // counter decision: eqe.bhqe(Unit, Unit, eji, Hex, List`1) : Boolean
     public static readonly global::System.Reflection.MethodInfo CounterDecision = M(typeof(GameBattleLogic), nameof(GameBattleLogic.bhqe), typeof(global::Hex.Session.Battle.Unit), typeof(global::Hex.Session.Battle.Unit), typeof(GameAbility), typeof(global::Hex.Session.Battle.Hex), typeof(global::Il2CppSystem.Collections.Generic.List<global::Hex.Session.Battle.Hex>));
+
+    // data roots builders: bkp.htm() : Void, bkp.nbv() : Void
+    public static readonly global::System.Reflection.MethodInfo[] DataRootsBuilders =
+    {
+        M(typeof(global::bkp), nameof(global::bkp.htm)),
+        M(typeof(global::bkp), nameof(global::bkp.nbv)),
+    };
 
     // diplomacy points (squad, hero): ffd.blop(fgd, frc, DiplomacyInfoConfig) : Int32, ffd.blor(fgd, frc, DiplomacyInfoConfig) : Int32
     public static readonly global::System.Reflection.MethodInfo[] DiplomacyPoints =

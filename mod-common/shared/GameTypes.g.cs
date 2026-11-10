@@ -11,6 +11,7 @@ global using GameBuffs = global::elg;
 global using GameCaster = global::elm;
 global using GameCastSource = global::eln;
 global using GameCastTarget = global::elq;
+global using GameDataRoot = global::bko;
 global using GameDwelling = global::fpq;
 global using GameEntity = global::fhf;
 global using GameForecast = global::exv;

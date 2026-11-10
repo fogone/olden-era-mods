@@ -41,6 +41,26 @@ public static class ModLoader
         log = logSource;
     }
 
+    // The mods whose data the game mounted at this start, by id: their version.
+    static readonly Dictionary<string, string> mounted = new(StringComparer.OrdinalIgnoreCase);
+
+    // The data of every mod switched on, as the game's data roots, in the order of their requirements: called at the
+    // chainloader, before the game reads its roots. The game reads them once, so a data mod's change (on, off, another
+    // version, removed) counts from the next start.
+    public static void MountData()
+    {
+        foreach (var mod in InOrder(state.Mods.Where(m => m.Enabled)))
+            if (ManagerState.DataOf(mod) is { } folder && Nobirds.OldenEra.Modding.Common.DataRoots.Add(mod.Id, folder))
+            {
+                mounted[mod.Id] = mod.Version;
+                log.LogMessage($"{mod.Id} {mod.Version}: its data mounted");
+            }
+    }
+
+    // Whether the mod's data as it is now differs from what the game mounted at the start.
+    static bool DataChanged(InstalledMod mod) =>
+        (mod.Enabled && ManagerState.DataOf(mod) != null ? mod.Version : null) != (mounted.TryGetValue(mod.Id, out var v) ? v : null);
+
     // Every mod switched on, each after the ones it requires; one whose requirement is missing, off or failed is not
     // loaded, and the log says why.
     public static void LoadAll()
@@ -119,9 +139,9 @@ public static class ModLoader
                 entry.Plugins.Add(plugin);
                 log.LogMessage($"loaded {metadata.Name} {metadata.Version} ({mod.Id} {mod.Version})");
             }
-            if (entry.Plugins.Count == 0)
+            if (entry.Plugins.Count == 0 && ManagerState.DataOf(mod) == null)
             {
-                log.LogWarning($"{mod.Id} {mod.Version}: no BepInEx plugin in its files");
+                log.LogWarning($"{mod.Id} {mod.Version}: no BepInEx plugin in its files and no data");
                 return false;
             }
             loaded[mod.Id] = entry;
@@ -175,19 +195,30 @@ public static class ModLoader
         if (!enabled)
         {
             if (Unload(id))
-                return Outcome.Done;
+                return AfterData(mod, "off");
             pending[id] = "off";
             return Outcome.NeedsRestart;
         }
         if (loaded.ContainsKey(id))
-            return Outcome.Done;
+            return AfterData(mod, "on");
         if (!Load(mod))
             return Outcome.Failed;
         // The mods that waited for it come too.
         foreach (var waiting in InOrder(state.Mods.Where(m => m.Enabled && !loaded.ContainsKey(m.Id))))
             if (MissingRequirement(waiting) == null)
                 Load(waiting);
-        return Outcome.Done;
+        return AfterData(mod, "on");
+    }
+
+    // Done, unless the mod's data now differs from what the game mounted at the start: then the change (`what`) waits
+    // for the next start.
+    static Outcome AfterData(InstalledMod mod, string what)
+    {
+        if (!DataChanged(mod))
+            return Outcome.Done;
+        pending[mod.Id] = what;
+        log.LogMessage($"{mod.Id}: its data changes at the next start");
+        return Outcome.NeedsRestart;
     }
 
     // The installed mods that require this one (whether switched on or not).
@@ -218,7 +249,7 @@ public static class ModLoader
         }
         catch (Exception e) { log.LogWarning($"{id}: its folder is not deleted ({e.Message}); delete {folder} with the game closed"); }
         log.LogMessage($"removed {id} {mod.Version}");
-        if (unloaded)
+        if (unloaded && !mounted.ContainsKey(id))
         {
             pending.Remove(id);
             return Outcome.Done;
@@ -237,7 +268,7 @@ public static class ModLoader
         mod.Version = version;
         state.Save();
         if (!mod.Enabled || !loaded.ContainsKey(id))
-            return Outcome.Done;
+            return AfterData(mod, version);
         var dependents = loaded.Keys.Where(k => state.Find(k)?.Requires.Contains(id, StringComparer.OrdinalIgnoreCase) == true).ToList();
         if (!Unload(id))
         {
@@ -258,7 +289,7 @@ public static class ModLoader
         foreach (var d in dependents)
             if (state.Find(d) is { } dependent)
                 Load(dependent);
-        return Outcome.Done;
+        return AfterData(mod, version);
     }
 
     static IEnumerable<Type> SafeTypes(Assembly assembly)

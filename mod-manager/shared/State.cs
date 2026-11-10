@@ -79,4 +79,15 @@ public sealed class ManagerState
 
     // A mod's version folder.
     public static string FolderOf(InstalledMod mod) => Path.Combine(Folder, mod.Id, mod.Version);
+
+    // A mod's data: the folder in its version folder with its data archives (*.zip), mounted as one of the game's data
+    // roots at the start (the library's DataRoots).
+    public const string DataFolder = "data";
+
+    // The mod's data folder when it has data archives, else null.
+    public static string DataOf(InstalledMod mod)
+    {
+        var folder = Path.Combine(FolderOf(mod), DataFolder);
+        return Directory.Exists(folder) && Directory.EnumerateFiles(folder, "*.zip").Any() ? folder : null;
+    }
 }

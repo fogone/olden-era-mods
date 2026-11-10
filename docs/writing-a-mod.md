@@ -151,6 +151,21 @@ falls back to English, then Russian.
 
 Section 5 has the rest. The mod's lines are in `<game>\BepInEx\LogOutput.log`, under its plugin name.
 
+### Game data
+
+A mod can bring the game's own data: files under `data\` of the project, laid out as the game's `Core.zip`
+(`data\DB\fractions\7_myfaction.json`, `data\DB\units\units_logics\...`; unpack `Core.zip` from
+`<game>\HeroesOldenEra_Data\StreamingAssets` to see the formats). `-t:ModPackage` packs them into `data\<id>.zip`; the
+mod manager mounts it as one of the game's data roots when the game starts, after the game's own data:
+
+- an entry with a new `id` is added (a new unit, hero, city, faction);
+- an entry with an `id` the game has replaces it whole: copy the whole entry, then change it;
+- a single-object file (`DB/data.json`) is merged field by field: write only the fields you change (an array whole).
+
+The game reads its data once, at the start: switching such a mod on or off, or updating it, counts from the next
+start. Data changes the game's rules, so such a mod is for single player and hotseat only; a save made with its
+content needs it installed. The game does not read texts (`Lang\`) from a mod's data yet (#56).
+
 ## 3. The framework
 
 ### ModBase (`mod-common/ModBase.cs`)

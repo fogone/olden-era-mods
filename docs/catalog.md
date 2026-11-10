@@ -109,8 +109,11 @@ A release can be a **package**: one archive the mods' SDK makes (`dotnet build -
 
 - The archive holds `manifest.json` (what the mod is: `id`, `version`, `name` and `description` by language, `author`,
   `source`, `tags`, `games`, `bepinex`, `requires`, `files`), `plugins\` (the DLLs, plain names), and optionally
-  `README.md`, `icon.png`, `screenshots\`. The manager installs what is under `plugins\` into `<id>\<version>\`; the
-  manifest's `id` and `version` must be the mod's and the package's, or the package is refused.
+  `README.md`, `icon.png`, `screenshots\`, `data\` (the mod's game data archives, `*.zip` laid out as the game's
+  `Core.zip`; manager 0.6 and later). The manager installs what is under `plugins\` into `<id>\<version>\` and the
+  archives under `data\` into `<id>\<version>\data\`, which it mounts as one of the game's data roots at the start (a
+  change to such a mod counts from the next start); a package of data only, with no DLL, is fine. The manifest's `id`
+  and `version` must be the mod's and the package's, or the package is refused.
 - `tools/catalog add --package <zip>=<url>` writes the entry from the manifest (and the mod's names, descriptions,
   tags, author and source with it).
 - Managers before 0.5 read only `releases`: a mod built on the library of `Nobirds.OldenEra.Modding.*` goes into
