@@ -164,7 +164,25 @@ mod manager mounts it as one of the game's data roots when the game starts, afte
 
 The game reads its data once, at the start: switching such a mod on or off, or updating it, counts from the next
 start. Data changes the game's rules, so such a mod is for single player and hotseat only; a save made with its
-content needs it installed. The game does not read texts (`Lang\`) from a mod's data yet (#56).
+content needs it installed.
+
+What the game does not read from a mod's data the library reads, so a mod of data alone needs no code
+(`<ModCode>false</ModCode>` in the csproj: the package without the DLL):
+
+| In `data\` | What it does |
+|---|---|
+| `Lang\<language>\**\*.json` | the mod's texts, in the game's format (`{"tokens":[{"sid":"...","text":"..."}]}`, as `Core.zip`'s `Lang\english\texts\*.json`); `<language>` is the game's (`english`, `russian`, ...). A JSON field that names a text key (`"name": "myfaction_name"`) shows it |
+| `Sprites\<folder>\<name>.png` | a picture among the game's, under `<name>` in the game's table of that Resources folder: `Sprites\icons\units\hex_portraits\myfaction_knight.png` is the portrait of the unit `myfaction_knight`, `Sprites\icons\fractions\fraction_myfaction.png` the icon a faction's `"icon": "fraction_myfaction"` names |
+| `Lobby\<faction>.json` | the faction in the lobby: `{"like": "human"}`, its lobby pictures those of that faction |
+| `Lobby\<faction>\<picture>.png` | ... except these: `icon`, `slotFon`, `statisticFon`, `versusFon`, `bigIcon`, `card` |
+
+The folders of the game's pictures are the Resources paths in `<game>\HeroesOldenEra_Data\globalgamemanagers`
+(`icons/units/hex_portraits/angel`, `icons/heroes/...`, `icons/cities_buildings/...`). In code the same is
+`Sprites.Add(folder, sprite)` / `Sprites.FromPng(bytes, name)` and `Factions.AddLobby(id, like, pictures)`.
+
+A new faction is these together: `DB\data.json` with the faction in `fractions` and `availableFractions`, its
+`DB\fractions\` entry, its city (`DB\objects_logic\cities\`, a map object of it in `DB\map\objects\`), heroes and units
+(copies of the game's with new ids), its texts, pictures and lobby entry (#56).
 
 ## 3. The framework
 

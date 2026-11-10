@@ -64,6 +64,9 @@ public static class GameNames
     // settings service: bak.bwsc : bak
     internal static GameSettingsService SettingsService => global::bak.bwsc;
 
+    // sprite registry instance: coi.cdwo : coi
+    internal static GameSpriteRegistry SpriteRegistry => global::coi.cdwo;
+
     // tooltips holder: BhTooltips.cftf : BhTooltips
     public static global::Hex.UI.Tooltips.BhTooltips Tooltips => global::Hex.UI.Tooltips.BhTooltips.cftf;
 
@@ -367,6 +370,12 @@ public static class GameNames
         internal string Label { get => simpleTabData.chix; set => simpleTabData.chix = value; }
     }
 
+    extension(GameSpriteRegistry spriteRegistry)
+    {
+        // sprite tables: coi.cdwp, coi.cdwq, coi.cdwr, coi.cdws, coi.cdwt, coi.cdwu, coi.cdwv, coi.cdww, coi.cdwx, coi.cdwy, coi.cdwz, coi.cdxa, coi.cdxb, coi.cdxc, coi.cdxd, coi.cdxe, coi.cdxf, coi.cdxg, coi.cdxh, coi.cdxi, coi.cdxj, coi.cdxk, coi.cdxl, coi.cdxm, coi.cdxn, coi.cdxo, coi.cdxp, coi.cdxq, coi.cdxr, coi.cdxs, coi.cdxt, coi.cdxu, coi.cdxv, coi.cdxw, coi.cdxx, coi.cdxy, coi.cdxz, coi.cdya, coi.cdyb, coi.cdyc, coi.cdyd
+        internal global::System.Collections.Generic.IEnumerable<global::Il2CppSystem.Collections.Generic.Dictionary<string, global::UnityEngine.Sprite>> Tables => GameNames.Each<global::Il2CppSystem.Collections.Generic.Dictionary<string, global::UnityEngine.Sprite>>(() => spriteRegistry.cdwp, () => spriteRegistry.cdwq, () => spriteRegistry.cdwr, () => spriteRegistry.cdws, () => spriteRegistry.cdwt, () => spriteRegistry.cdwu, () => spriteRegistry.cdwv, () => spriteRegistry.cdww, () => spriteRegistry.cdwx, () => spriteRegistry.cdwy, () => spriteRegistry.cdwz, () => spriteRegistry.cdxa, () => spriteRegistry.cdxb, () => spriteRegistry.cdxc, () => spriteRegistry.cdxd, () => spriteRegistry.cdxe, () => spriteRegistry.cdxf, () => spriteRegistry.cdxg, () => spriteRegistry.cdxh, () => spriteRegistry.cdxi, () => spriteRegistry.cdxj, () => spriteRegistry.cdxk, () => spriteRegistry.cdxl, () => spriteRegistry.cdxm, () => spriteRegistry.cdxn, () => spriteRegistry.cdxo, () => spriteRegistry.cdxp, () => spriteRegistry.cdxq, () => spriteRegistry.cdxr, () => spriteRegistry.cdxs, () => spriteRegistry.cdxt, () => spriteRegistry.cdxu, () => spriteRegistry.cdxv, () => spriteRegistry.cdxw, () => spriteRegistry.cdxx, () => spriteRegistry.cdxy, () => spriteRegistry.cdxz, () => spriteRegistry.cdya, () => spriteRegistry.cdyb, () => spriteRegistry.cdyc, () => spriteRegistry.cdyd);
+    }
+
     extension(GameSquad squad)
     {
         // squad -> entity: frc.cron : fhf
@@ -518,6 +527,12 @@ public static class GameNames
 
         // settings show section: SettingsSectionsView.ktl(ESettingsType) : Void
         public void ShowSection(global::Hex.Settings.UI.ESettingsType a0) => it.ktl(a0);
+    }
+
+    extension(global::Hex.Storage.IconData it)
+    {
+        // PNG to sprite: IconData.jvk() : Sprite
+        public global::UnityEngine.Sprite ToSprite() => it.jvk();
     }
 
     extension(global::Hex.UI.BhGenericButton it)

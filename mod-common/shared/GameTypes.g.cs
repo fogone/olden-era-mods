@@ -40,6 +40,7 @@ global using GameSideBonusReceiver = global::dyj;
 global using GameSideLogic = global::edc;
 global using GameSideState = global::fmr;
 global using GameSimpleTabData = global::dcs;
+global using GameSpriteRegistry = global::coi;
 global using GameSquad = global::frc;
 global using GameSquadEntity = global::fgy;
 global using GameSquadStore = global::fre;
