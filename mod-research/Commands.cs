@@ -15,11 +15,15 @@ namespace Nobirds.OldenEra.Modding.Research;
 // console (127.0.0.1:8766). The tools are GameCode, Members, Probe in mod-common/shared, and Eval (live reflection).
 internal sealed class Commands
 {
+    // The bundles loaded by the bundle command, by file name.
+    static readonly System.Collections.Generic.Dictionary<string, UnityEngine.AssetBundle> bundles = new();
+
     public const string Help =
 @"# Research of the game's code and live state. A method is Type.method (all its overloads); Type.* is all of the
 # type's own methods. Obfuscated names are fine here: this is for finding what a member does.
 #
-# Live state (Eval: hero, $var, $ = last result, Type.static, .member, .method(args), [i], .as(Type)):
+# Live state (Eval: hero, $var, $ = last result, Type.static, .member, .method(args), [i], .as(Type); a type is the game's or
+# Unity's, any module of it, by its name or with its namespace: UnityEngine.Resources.Load("units/...")):
 #   eval hero.cqei.cwfa           the value of an expression
 #   inspect hero                  the object's properties with their values (and its elements, for a list)
 #   methods hero                  the same and its methods' signatures
@@ -37,6 +41,8 @@ internal sealed class Commands
 #                                 e.g. click OE_Row_nobirds.oldenera.visited/Remove
 #   objects Type [regex]          the live Unity objects of that type (at most 80; regex: by name, sprite or path): name, active, scene, path; each kept as $o0, $o1...
 #   sprite <name> <file.png>      a loaded sprite of the game into a PNG file (with its size and 9-slice border)
+#   bundle load <file>            an AssetBundle (a mod's models, #62): its prefabs; bundle spawn <file name> <asset path> [scale] puts one
+#                                 on the ground where the camera looks, with its shaders; bundle drop removes them and unloads
 #   screen make|open|hide|state|drop  a trial screen of ours in the game's screen registry (ModScreen, issue #24)
 #   holders Type              the game's properties of that type (who holds a config, a service)
 #   fields Type                 the class's fields with their offsets (code reading [obj+0xB8] reads the one at +0xB8)
@@ -272,6 +278,57 @@ internal sealed class Commands
                     var file = string.Join(" ", words.Skip(2));
                     System.IO.File.WriteAllBytes(file, png);
                     write($"sprite {sprite.name} {r.width:0}x{r.height:0} (border {sprite.border}) into {file}");
+                }
+                break;
+            case "bundle":
+                // bundle load <file> | bundle spawn <file name> <asset path> [scale] | bundle drop: an AssetBundle of a mod's
+                // (#62): its assets; a prefab of it put on the ground where the camera looks, with its renderers' shaders (whether
+                // the game's build supports them).
+                {
+                    var verb = words.Length > 1 ? words[1] : "";
+                    if (verb == "load" && words.Length > 2)
+                    {
+                        var path = string.Join(" ", words.Skip(2));
+                        var loaded = UnityEngine.AssetBundle.LoadFromFile(path);
+                        if (loaded == null) { write($"no bundle loaded from {path}"); break; }
+                        bundles[System.IO.Path.GetFileName(path)] = loaded;
+                        var names = loaded.GetAllAssetNames();
+                        write($"bundle {loaded.name}: {names.Length} assets");
+                        foreach (var asset in names.Where(n => n.EndsWith(".prefab")).Take(20))
+                            write($"  {asset}");
+                    }
+                    else if (verb == "spawn" && words.Length > 3 && bundles.TryGetValue(words[2], out var bundle))
+                    {
+                        // A last word that is a number: the scale.
+                        var scale = words.Length > 4 && float.TryParse(words[^1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var given) ? given : 0f;
+                        var prefab = bundle.LoadAsset<UnityEngine.GameObject>(string.Join(" ", words.Skip(3).Take(words.Length - 3 - (scale > 0 ? 1 : 0))));
+                        if (prefab == null) { write("no such prefab"); break; }
+                        var camera = UnityEngine.Camera.main;
+                        // On the ground (y = 0) where the camera looks.
+                        var forward = camera.transform.forward;
+                        var at = forward.y < -0.01f ? camera.transform.position - forward * (camera.transform.position.y / forward.y) : camera.transform.position + forward * 25f;
+                        var made = UnityEngine.Object.Instantiate(prefab, at, UnityEngine.Quaternion.identity);
+                        if (scale > 0)
+                            made.transform.localScale = UnityEngine.Vector3.one * scale;
+                        made.name = "OE_Bundle_" + prefab.name;
+                        write($"spawned {made.name} at {at}");
+                        foreach (var renderer in made.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                            foreach (var material in renderer.sharedMaterials)
+                                write($"  {renderer.GetIl2CppType().Name} {renderer.name}: {material?.name} shader {material?.shader?.name} supported {material?.shader?.isSupported}");
+                        if (made.GetComponentInChildren<UnityEngine.Animator>(true) is { } animator)
+                            write($"  animator {animator.runtimeAnimatorController?.name}");
+                    }
+                    else if (verb == "drop")
+                    {
+                        foreach (var o in UnityEngine.Object.FindObjectsOfType<UnityEngine.Transform>().Where(t => t.name.StartsWith("OE_Bundle_")).ToList())
+                            UnityEngine.Object.Destroy(o.gameObject);
+                        foreach (var b in bundles.Values)
+                            b.Unload(true);
+                        bundles.Clear();
+                        write("dropped");
+                    }
+                    else
+                        write("bundle load <file> | bundle spawn <file name> <asset path> [scale] | bundle drop");
                 }
                 break;
             case "tree":

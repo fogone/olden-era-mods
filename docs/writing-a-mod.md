@@ -30,6 +30,11 @@ faction, a model. Check a design against these before writing it.
    by path (its data roots, `Resources`, its sprite tables, its localization). The framework joins those loaders once,
    so a path can also name a mod's file, and every place of the game that loads by that path takes the mod's resource;
    not a hook in each place that shows it.
+   **Which loader:** look at what the game's code itself calls before deciding. A call into the engine (Unity's
+   `Resources.Load`) may sit under a resource manager of the game's with logic of its own (paths, caches, pools,
+   fallbacks); join the game's abstraction of finding a resource, not the engine function under it, nor the place
+   above it that shows the result. Follow the calls from a place that loads (who calls whom, what it caches) to the
+   layer that answers "where is the resource of this path", and join that layer.
 4. **A hook only where no mechanism exists**, at the narrowest point the game passes through, with a comment why.
    Hooks are installed once for everyone (the core) and mods subscribe to its events.
 5. **Mods ask the framework, not the game.** A mod adds a menu row, a tab, a screen, a text, a picture, a faction

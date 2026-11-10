@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.Research</RootNamespace>
     <ModId>nobirds.oldenera.research</ModId>
     <ModName>Olden Era Research</ModName>
-    <Version>0.10.0</Version>
+    <Version>0.11.0</Version>
     <ModTags>dev</ModTags>
   </PropertyGroup>
 

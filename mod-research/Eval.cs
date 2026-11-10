@@ -92,8 +92,10 @@ internal static class Eval
 
     static Type[] types;
 
-    static Type[] Types() => types ??= new[] { typeof(Hex.UI.Tooltips.BhTooltip).Assembly, typeof(UnityEngine.Object).Assembly, typeof(UnityEngine.Camera).Assembly,
-                                               typeof(UnityEngine.UI.Image).Assembly, typeof(UnityEngine.Canvas).Assembly, typeof(TMPro.TMP_Text).Assembly, typeof(Il2CppSystem.String).Assembly }
+    // The game's code, Unity's modules (AssetBundle, Physics, Audio... each a module of its own) and the IL2CPP system
+    // types: every such assembly loaded.
+    static Type[] Types() => types ??= new[] { typeof(Hex.UI.Tooltips.BhTooltip).Assembly, typeof(UnityEngine.Object).Assembly, typeof(TMPro.TMP_Text).Assembly, typeof(Il2CppSystem.String).Assembly }
+        .Concat(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name is { } n && (n.StartsWith("UnityEngine") || n.StartsWith("Unity.") || n == "Il2Cppmscorlib")))
         .Distinct().SelectMany(Game.SafeTypes).ToArray();
 
     sealed class Parser
@@ -206,7 +208,19 @@ internal static class Eval
                 case "false": return (false, false);
                 case "hero": return (Game.SelectedHero, false);
             }
-            return TypeNamed(name) is { } type ? (type, true) : throw new KeyNotFoundException($"no type or root '{name}'");
+            if (TypeNamed(name) is { } type)
+                return (type, true);
+            // A name with its namespace (UnityEngine.Resources): its parts taken while they are no type yet.
+            var afterName = at;
+            var full = name;
+            while (Take('.') && !AtEnd && (char.IsLetter(text[at]) || text[at] == '_'))
+            {
+                full += "." + Name();
+                if (TypeNamed(full) is { } named)
+                    return (named, true);
+            }
+            at = afterName;
+            throw new KeyNotFoundException($"no type or root '{name}'");
         }
 
         List<object> Arguments()
