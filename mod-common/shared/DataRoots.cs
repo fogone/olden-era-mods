@@ -52,9 +52,12 @@ public static class DataRoots
         ModContent.Read(name, folder);
         // Always: it also removes the archives of copies a mod no longer has.
         additions = DataAdditions.Write(AdditionsFolder, GameFolders(), added);
-        // A copied entry shows the original's texts under its id until the mod has its own.
+        // A copied entry shows the original's texts and pictures under its id until the mod has its own.
         if (DataCopies.CopiedIds.Count > 0)
+        {
             Texts.CopyIdTexts(DataCopies.CopiedIds);
+            Sprites.CopyIdSprites(DataCopies.CopiedIds);
+        }
         Put();
         return true;
     }

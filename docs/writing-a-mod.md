@@ -219,7 +219,8 @@ game instead of writing them: `data\Copy\myfaction.json`
   specialization and skill table, a city's units), `like` becomes the faction's id, and a string of `names` its value.
   The rest (text keys, pictures, ids not copied) stays: the copies show the game's pictures and texts. The texts the
   game names by an entry's id (a hero's name is the text of its id, its motto `<id>_motto`) are put in under the
-  copy's id too, until the mod's `Lang` has its own.
+  copy's id too, until the mod's `Lang` has its own; so are the pictures it names by an id (a unit's portrait), until
+  the mod's `Sprites` has its own.
 - An entry the mod's own `DB` has (the same id as a copy's) is not copied: the mod's wins. Refer to copies by their ids
   (`fraction_law_myfaction_3` in the faction's `fractionLawsLines`).
 - The copies are written into the mod's data folder (`~oe-copies.zip`) at the start: the game takes some of a

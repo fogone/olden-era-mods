@@ -65,6 +65,11 @@ public static class Sprites
             wanted[folder] = names = new Dictionary<string, Func<Sprite>>();
         names[name] = make;
         made.Remove(folder + "/" + name);
+        Start();
+    }
+
+    static void Start()
+    {
         nextCheck = 0;
         if (!started)
         {
@@ -114,8 +119,44 @@ public static class Sprites
                     put++;
                 }
         }
+        put += FillCopies(registry);
         if (put > 0)
             Game.Log?.Invoke($"Sprites: {put} put into the game's tables");
+    }
+
+    // The pictures of copied entries (DataCopies): the game looks some pictures up by an entry's id (a unit's portrait
+    // by the unit's id), so a copy shows the original's picture under its own id until the mod gives one: in every table
+    // that has a picture named by an old id, the same picture under the new id. A table is looked at again when its
+    // count changes (the game filled it, or we did).
+    static readonly Dictionary<string, string> copiedIds = new(StringComparer.Ordinal);
+    static readonly Dictionary<IntPtr, int> copiesFilled = new();
+
+    public static void CopyIdSprites(IReadOnlyDictionary<string, string> renamed)
+    {
+        foreach (var (from, to) in renamed)
+            copiedIds[from] = to;
+        copiesFilled.Clear();
+        Start();
+    }
+
+    static int FillCopies(GameSpriteRegistry registry)
+    {
+        if (copiedIds.Count == 0)
+            return 0;
+        var put = 0;
+        foreach (var table in registry.Tables)
+        {
+            if (table == null || table.Count == 0 || copiesFilled.TryGetValue(table.Pointer, out var count) && count == table.Count)
+                continue;
+            foreach (var (from, to) in copiedIds)
+                if (!table.ContainsKey(to) && table.TryGetValue(from, out var sprite) && sprite != null)
+                {
+                    table[to] = sprite;
+                    put++;
+                }
+            copiesFilled[table.Pointer] = table.Count;
+        }
+        return put;
     }
 
     // The table the game fills from a folder: the one with the most of the folder's own sprites.
