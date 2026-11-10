@@ -272,6 +272,16 @@ internal static class Eval
                 return true;
             if (arg is Il2CppObjectBase && (converted = arg.CastTo(to)) != null)
                 return true;
+            // A type written in the expression (GetComponent(Animator)) for the game's Il2CppSystem.Type.
+            if (arg is Type written && to == typeof(Il2CppSystem.Type))
+            {
+                try
+                {
+                    converted = Il2CppInterop.Runtime.Il2CppType.From(written);
+                    return converted != null;
+                }
+                catch (Exception) { return false; }
+            }
             try
             {
                 if (to.IsEnum)
