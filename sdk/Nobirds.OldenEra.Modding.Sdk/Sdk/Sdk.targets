@@ -14,7 +14,12 @@
 
        dotnet build                 the DLL
        dotnet build -t:ModPackage   and bin\<configuration>\<id>-<version>.zip: manifest.json, plugins\<the DLL>, README.md,
-                                    icon.png and screenshots\ when the mod has them -->
+                                    icon.png and screenshots\ when the mod has them, data\<id>.zip with its game data
+
+     Game data: the files under data\ (the ModData items; EnableDefaultModData=false to list them yourself), laid out as
+     the game's Core.zip (data\DB\fractions\..., data\DB\units\...). The game loads them after its own: an entry with a
+     new id is added, one with an id the game has replaces it whole, a single-object file (DB\data.json) is merged field
+     by field. -->
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
@@ -24,6 +29,11 @@
     <!-- The library: the package's own copy, or this repository's project (its own mods). -->
     <OeLibraryDll Condition="'$(OeLibraryDll)' == ''">$(MSBuildThisFileDirectory)..\lib\OldenEraCommon.dll</OeLibraryDll>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableDefaultModData)' != 'false'">
+    <ModData Include="data\**\*" />
+    <None Remove="data\**\*" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="$(GameDir)\dotnet\*.dll"
@@ -94,12 +104,31 @@
 
   <!-- The mod's package: its manifest (what the mod is, its names and descriptions, the game version it was built on,
        the files) and its files, zipped. -->
-  <Target Name="ModPackage" DependsOnTargets="Build">
+  <!-- The mod's game data (ModData, by default everything under data\), laid out as the game's Core.zip (DB\..., the
+       folders the game reads): packed into data\<id>.zip of the package, which the mod manager mounts as one of the
+       game's data roots (the library's DataRoots). -->
+  <Target Name="OeModData" DependsOnTargets="Build" Condition="'@(ModData)' != ''">
+    <PropertyGroup>
+      <_OeDataDir>$(OutputPath)data-staging\</_OeDataDir>
+      <_OeDataZip>$(OutputPath)data\$(ModId).zip</_OeDataZip>
+    </PropertyGroup>
+    <RemoveDir Directories="$(_OeDataDir)" />
+    <Copy SourceFiles="@(ModData)" DestinationFiles="@(ModData->'$(_OeDataDir)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Delete Files="$(_OeDataZip)" />
+    <MakeDir Directories="$(OutputPath)data" />
+    <ZipDirectory SourceDirectory="$(_OeDataDir)" DestinationFile="$(_OeDataZip)" />
+    <ItemGroup>
+      <_OeDataPackage Include="$(_OeDataZip)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ModPackage" DependsOnTargets="Build;OeModData">
     <PropertyGroup>
       <_OePackageDir>$(OutputPath)package\</_OePackageDir>
       <_OePackageZip>$(OutputPath)$(ModId)-$(Version).zip</_OePackageZip>
     </PropertyGroup>
     <ItemGroup>
+      <_OePackageFile Include="@(_OeDataPackage)" Destination="data\%(_OeDataPackage.Filename)%(_OeDataPackage.Extension)" />
       <_OeShot Include="screenshots\*.png;screenshots\*.jpg" />
       <_OeShot Include="screenshots\captions.txt" Condition="Exists('screenshots\captions.txt')" />
       <_OePackageFile Include="$(TargetPath)" Destination="plugins\$(TargetFileName)" />

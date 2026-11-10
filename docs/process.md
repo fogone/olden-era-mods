@@ -108,5 +108,5 @@ var mode = highlight.Value(Highlight.Off);      // Off when the whole mod is off
 - after copying, the list layout must be rebuilt (`LayoutRebuilder.ForceRebuildLayoutImmediate`), otherwise the height is 0 and the scrolling drifts away.
 ## Data (JSON) without code
 - Unpacking `Core.zip`: the paths are long, use the `\\?\` prefix or a short folder. Paths inside the archive use `/`, no BOM.
-- An overlay is a separate `.zip` in `StreamingAssets` with the same path structure. The game picks it up (in the log: `Found N archives`, `Loaded N entries from config archive ...`).
-- What happens if the overlay has a file at the same path as in `Core.zip` (replacement or duplicate) is **not verified**.
+- A mod's data goes in its package (`data\` of the project, the SDK packs it into `data\<id>.zip`); the manager mounts it as one of the game's data roots (`DataRoots`, see `game-internals.md` "Data roots"). In the log: `Found 1 archives in '...\<id>\<version>\data'`, `Loaded N entries from config archive ...`, `mod:<id>|configs loaded from folder:...`; Player.log says `<id>: DB/data.json is overriden` for a single-object file.
+- An overlay `.zip` in `StreamingAssets` itself also loads (a later archive replaces a file at the same path), but it writes into the game's folder: not for our mods.

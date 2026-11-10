@@ -14,6 +14,12 @@ Markers: **[0.81.4]** — a name or offset from that version; **[verified]** —
   - quests and triggers: `conditions`/`actions`, about 50 conditions and 88 actions;
   - dialog call: `{"a":"Dialog","p":["<id>"]}`;
   - the dialogs themselves: `DB/dialogs/dialogs/**`.
+- **Data roots** — [verified on 0.82.08, 10.11.2026]. The game keeps a static list of mod folders (`GameNames.DataRoots` = `bkp.byxl`, each `bko` {enabled, name, folder}; built by `bkp.nbv`/`htm` with one root, `core` = StreamingAssets, usually before the plugins load). For each root it mounts the folder's `*.zip` (top level, not sorted; the key is `folder/path in the zip`, a later archive replaces the same path) and loads the database root after root:
+  - id-keyed collections (about 90: heroes, units, cities, items, map objects...): a new id is added, an id already there is replaced whole (no field merge); within a root files go in path order;
+  - single-object files (`DB/data.json`, `diplomacy_info.json`, `battle_balance.json`): merged field by field (`JsonUtility.FromJsonOverwrite`), an array replaced whole;
+  - Lang texts are read from a fixed path under the game's data folder, not per root.
+  The library's `DataRoots.Add` appends a root (and again after the builders); the manager does it at the chainloader for every enabled mod with `data\*.zip`.
+- **A new faction** — [verified on 0.82.08, 10.11.2026, a local copy of the human faction under a new id]: the faction, its city (`sceneName` of a built-in scene), units, heroes and `DB/data.json` (`fractions`, `availableFractions`) as data; in code, a `FractionLobbyAsset` for the new id in `SoFractions.dict_` and `fractions` (the HUD reads it unchecked) and the units' sprites under their ids in the sprite registry (`coi`). The lobby, the random map (the player got the new city), the town, hiring, battle, save and load worked. Missing data then: hero texts, `sub_classes` of the faction, city and battle sound sets, a building looked up by faction (`PortalSummoning`). Details: issue #56.
 - **Squads.** `DB/squads/**` — composition. The squad config has no flee flag: it lives in the runtime data (`DataSquad.isEscape`).
 
 ## Squad tooltip on the map (UI)

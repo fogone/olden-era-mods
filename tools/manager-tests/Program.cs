@@ -268,9 +268,22 @@ Case("catalog: a package is newer than the release of files, installed from its 
     Check(installed.Files.SequenceEqual(new[] { "Counter.dll" }) && installed.Requires.SequenceEqual(new[] { "oe.core" }), "the entry");
 });
 
-Case("catalog: a package of another mod, or with a path in plugins, is refused", root =>
+Case("catalog: a package's data archives go into its data folder; a package of data only installs", root =>
 {
-    foreach (var zip in new[] { Package("oe.other", "0.51.0", ("plugins/Counter.dll", "x")), Package("oe.counter", "0.51.0", ("plugins/../evil.dll", "x")) })
+    var (client, net, _) = Net(root);
+    PublishPackage(net, Package("oe.counter", "0.51.0", ("data/faction.zip", "zip"), ("data/notes.txt", "x")));
+    var meta = client.Read(new[] { Source }).Result[0];
+    var installed = client.Download(meta, CatalogClient.ReleaseFor(meta, "0.82.08")).Result;
+    var folder = Path.Combine(root, "oldenera-mods", "oe.counter", "0.51.0");
+    Check(Read(Path.Combine(folder, "data", "faction.zip")) == "zip", "the data archive is not there");
+    Check(!File.Exists(Path.Combine(folder, "data", "notes.txt")), "more than the data archives installed");
+    Check(installed.Files.Count == 0, "the entry");
+});
+
+Case("catalog: a package of another mod, a path in plugins or data, or nothing to install, is refused", root =>
+{
+    foreach (var zip in new[] { Package("oe.other", "0.51.0", ("plugins/Counter.dll", "x")), Package("oe.counter", "0.51.0", ("plugins/../evil.dll", "x")),
+                 Package("oe.counter", "0.51.0", ("data/a/b.zip", "x")), Package("oe.counter", "0.51.0", ("README.md", "x")) })
     {
         var (client, net, _) = Net(root);
         PublishPackage(net, zip);

@@ -18,6 +18,8 @@ public class Plugin : BasePlugin
         ModCatalog.ManagerVersion = MetadataHelper.GetMetadata(this).Version.ToString();
         var state = ManagerState.Load(Paths.BepInExRootPath, Log.LogWarning);
         ModLoader.Init(state, Log);
+        // The mods' data now, at the chainloader: the game reads its data roots before the first frame.
+        ModLoader.MountData();
         ManagerService.Init(Config, Log, UnityEngine.Application.version, MetadataHelper.GetMetadata(this).Version.ToString());
         Ticker.Add(this, ManagerService.Pump);
         Ticker.Add(this, Start);
