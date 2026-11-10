@@ -17,6 +17,8 @@ namespace Nobirds.OldenEra.Modding.Common;
 //   Sprites/<folder>/<name>.png      a picture into the game's table of that Resources folder, under <name> (Sprites)
 //   Lobby/<id>.json                  a faction in the lobby: {"like": "<faction>"}, its pictures those of that faction
 //   Lobby/<id>/<picture>.png         ... except these (icon, slotFon, statisticFon, versusFon, bigIcon, card; Factions)
+//   Add/<path>.json                  what it adds to the game's single-object file <path> (DB/data.json): DataAdditions
+//   Squads/<id>.json                 the faction's map squads, made from another's: {"like", "units"} (DataAdditions)
 //
 // The rest (DB/..., campaigns/...) the game reads itself. Paths are matched without regard to case; the archives in
 // the order of their names, a later one's file of the same path replacing an earlier one's.
@@ -39,7 +41,7 @@ internal static class ModContent
             catch (Exception e) { Game.Log?.Invoke($"ModContent: {root}: {Path.GetFileName(zip)}: {e.GetType().Name}: {e.Message}"); }
         if (files.Count == 0)
             return;
-        int texts = 0, sprites = 0, lobbies = 0;
+        int texts = 0, sprites = 0, lobbies = 0, added = 0, squads = 0;
         foreach (var (path, bytes) in files.OrderBy(f => f.Key, StringComparer.OrdinalIgnoreCase))
         {
             var parts = path.Split('/');
@@ -78,14 +80,22 @@ internal static class ModContent
                 Factions.AddLobby(id, like, pictures);
                 lobbies++;
             }
+            else if (top == "add" && parts.Length >= 2 && path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                DataAdditions.Add(root, path.Substring(parts[0].Length + 1), bytes());
+                added++;
+            }
+            else if (top == "squads" && parts.Length == 2 && path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                DataAdditions.AddSquads(root, Path.GetFileNameWithoutExtension(parts[1]), bytes());
+                squads++;
+            }
         }
-        Game.Log?.Invoke($"ModContent: {root}: {texts} text files, {sprites} sprites, {lobbies} lobby factions");
+        Game.Log?.Invoke($"ModContent: {root}: {texts} text files, {sprites} sprites, {lobbies} lobby factions, {added} additions, {squads} squad sets");
     }
 
     static bool IsOurs(string path) =>
-        path.StartsWith("Lang/", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("Sprites/", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("Lobby/", StringComparison.OrdinalIgnoreCase);
+        new[] { "Lang/", "Sprites/", "Lobby/", "Add/", "Squads/" }.Any(top => path.StartsWith(top, StringComparison.OrdinalIgnoreCase));
 
     // An entry's bytes, read when asked (the archive opened again then).
     static Func<byte[]> Bytes(string zip, string entryName) => () =>

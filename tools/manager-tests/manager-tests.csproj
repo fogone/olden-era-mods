@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Tests of the mod manager's file logic (the update and its rollback) on temporary folders: no BepInEx, no game.
+  <!-- Tests of the mod manager's file logic (the update and its rollback) and of the library's data additions on
+       temporary folders: no BepInEx, no game.
        Run: dotnet run, project tools/manager-tests. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,5 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\mod-manager\shared\*.cs" Link="shared\%(Filename)%(Extension)" />
+    <!-- The library's additions to the game's single-object files: plain JSON and zip work (its log in GameLog.cs). -->
+    <Compile Include="..\..\mod-common\shared\DataAdditions.cs" Link="shared\DataAdditions.cs" />
   </ItemGroup>
 </Project>

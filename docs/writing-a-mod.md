@@ -160,7 +160,9 @@ mod manager mounts it as one of the game's data roots when the game starts, afte
 
 - an entry with a new `id` is added (a new unit, hero, city, faction);
 - an entry with an `id` the game has replaces it whole: copy the whole entry, then change it;
-- a single-object file (`DB/data.json`) is merged field by field: write only the fields you change (an array whole).
+- a single-object file (`DB/data.json`, the key/value lists like `DB/city_music_sounds.json`) is merged field by field:
+  write only the fields you change, an array whole. To add to an array, write the addition instead (`Add\` below): two
+  mods that both write the whole array would drop each other's entries.
 
 The game reads its data once, at the start: switching such a mod on or off, or updating it, counts from the next
 start. Data changes the game's rules, so such a mod is for single player and hotseat only; a save made with its
@@ -175,14 +177,19 @@ What the game does not read from a mod's data the library reads, so a mod of dat
 | `Sprites\<folder>\<name>.png` | a picture among the game's, under `<name>` in the game's table of that Resources folder: `Sprites\icons\units\hex_portraits\myfaction_knight.png` is the portrait of the unit `myfaction_knight`, `Sprites\icons\fractions\fraction_myfaction.png` the icon a faction's `"icon": "fraction_myfaction"` names |
 | `Lobby\<faction>.json` | the faction in the lobby: `{"like": "human"}`, its lobby pictures those of that faction |
 | `Lobby\<faction>\<picture>.png` | ... except these: `icon`, `slotFon`, `statisticFon`, `versusFon`, `bigIcon`, `card` |
+| `Add\<path>.json` | what the mod adds to the game's single-object file `<path>`: `Add\DB\data.json` with `{"fractions": ["myfaction"]}` adds to that list. An object is added to field by field, an array gets the elements at its end; an element already there (the same value, an object with the same `key`, `sid` or `id`) is replaced. Every mod's additions go into one data root of the library's, after all the others |
+| `Squads\<faction>.json` | the faction's squads on the map, made from another's: `{"like": "human", "units": {"esquire": "myfaction_esquire", ...}}`. The game keeps about 650 squad files per faction (`DB\squads\squads_human\...`: dwelling guards and the squads near cities, by tier and value; the map generator looks for those of the city's faction); each gets a copy with `squad_myfaction_...` for `squad_human_...`, the faction's id and the units given replaced |
 
 The folders of the game's pictures are the Resources paths in `<game>\HeroesOldenEra_Data\globalgamemanagers`
 (`icons/units/hex_portraits/angel`, `icons/heroes/...`, `icons/cities_buildings/...`). In code the same is
 `Sprites.Add(folder, sprite)` / `Sprites.FromPng(bytes, name)` and `Factions.AddLobby(id, like, pictures)`.
 
-A new faction is these together: `DB\data.json` with the faction in `fractions` and `availableFractions`, its
+A new faction is these together: `Add\DB\data.json` with the faction in `fractions` and `availableFractions`, its
 `DB\fractions\` entry, its city (`DB\objects_logic\cities\`, a map object of it in `DB\map\objects\`), heroes and units
-(copies of the game's with new ids), its texts, pictures and lobby entry (#56).
+(copies of the game's with new ids), its texts, pictures and lobby entry (#56). The game's ids of a faction's parts
+are not all made from its id (`skill_faction_humans`, `humans_might_skills_table`, `barracks_necropolis_1`): copy them
+from one faction and rename them. `DB/biomes_info.json` maps one faction to each biome; adding the faction to a biome
+of the game (`{"key": "Grass", ...}`) would replace that biome's faction, so leave it out.
 
 ## 3. The framework
 
