@@ -23,7 +23,7 @@ internal sealed class Commands
 # type's own methods. Obfuscated names are fine here: this is for finding what a member does.
 #
 # Live state (Eval: hero, $var, $ = last result, Type.static, .member, .method(args), [i], .as(Type); a type is the game's or
-# Unity's, any module of it, by its name or with its namespace: UnityEngine.Resources.Load("units/...")):
+# Unity's, any module of it, by its name or with its namespace: UnityEngine.Resources.Load(""units/..."")):
 #   eval hero.cqei.cwfa           the value of an expression
 #   inspect hero                  the object's properties with their values (and its elements, for a list)
 #   methods hero                  the same and its methods' signatures
