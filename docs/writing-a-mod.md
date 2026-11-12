@@ -271,31 +271,55 @@ faction, so leave it out.
 #### Models
 
 The game takes a unit's models by path through its resource manager (`Hex.ResManager`): the map model is
-`units/` + the view's `mapMesh`, the battle model `units/` + its `mesh`. The manager looks a path up first among the
-assets of the AssetBundles it loaded (`assets/resources/<path>`), then in the game's `Resources`. The game ships no
-bundles; a mod's `Bundles\` are loaded by that manager the moment the game shows its first frame, so the mod's assets
-are found the same way as the game's (#62):
+`units/` + the view's `mapMesh`, the battle model and the model in the hire and unit windows `units/` + its `mesh`.
+The manager looks a path up first among the assets of the AssetBundles it loaded (`assets/resources/<path>`), then in
+the game's `Resources`. The game ships no bundles; a mod's `Bundles\` are loaded by that manager the moment the game
+shows its first frame, so the mod's assets are found the same way as the game's (#62): a bundle built from
+`Assets/Resources/units/myfaction/goblin.prefab` is the view's `"mesh": "myfaction/goblin"`.
 
-- a bundle built from `Assets/Resources/units/myfaction/goblin_map.prefab` is the view's `"mapMesh":
-  "myfaction/goblin_map"`. Such a prefab must be of the game's kind: the game's scripts on it (the squad helper of a
-  map model, the battle helpers of a battle model), which a bundle made outside the game's project cannot have;
-- `Models\<path>.json` makes one of the game's kind from a model that has no scripts (an animated mesh):
+**A prefab of the game's kind.** The game reads its own components on the prefab, so the mod's prefab carries the same
+ones, laid out as the game's. A battle unit (checked 12.11.2026 with a goblin in a battle and in the hire window):
 
-  ```json
-  { "like": "units/Dungeon/1Prefabs/troglodyte_map", "model": "goblin/goblin", "scale": 1 }
-  ```
+```
+goblin                 UnitViewHelper (projectileSpawnPoint, projectileEndPoint, shieldPoint, shieldScale,
+                       meshRenderer, idleVFX), PlayableDirector, BhBattleTimelineHelper (director; its
+                       startAttackTimelines and impactAttackTimelines by ability, may be empty), BhParticleAccelerator
+  Scale_roll_pos       the first child: the game sets its scale to the view's "scale" (and turns the model, a turn on
+                       it stays: a model facing another way than the game's is turned here)
+    goblin_model       Animator (an override of the game's battle controller), UnitAnimationEvents (the sounds the
+                       clips call), the skinned mesh
+```
 
-  The game's prefab `like` is copied with its scripts and points, and its animated model (the part with the Animator)
-  replaced by the mod's `model` (an asset of the mod's bundles by the end of its path, no extension), as big as the
-  model it replaces times `scale`. `Models\units\myfaction\goblin_map.json` is then the view's
-  `"mapMesh": "myfaction/goblin_map"`.
+Plain attacks need no timeline; the times of an attack, of being hit and of dying are the view's (`attackTimeBefore`,
+`attackTimeAfter`, `takeDamageTime`, `deathTimeOffset`) and should match the model's clips.
+
+**The game's components by readable names.** A bundle refers to a component by its script: assembly, namespace, class.
+Some of the game's classes have names the obfuscator changes with every patch, so a mod's bundle names them in
+namespace `OldenEra` by what they are, and the library puts the running game's names in when it takes the bundle
+(`BundleNames`, once, into `BepInEx\cache\oldenera-mod-assets`); the bundle then works on every game version the
+library knows:
+
+| In the bundle (assembly `Hex.dll`) | What it is | The game's class on 0.82.08 |
+|---|---|---|
+| `OldenEra.UnitViewHelper` | a battle unit's points, skinned mesh, idle effects | `emp` |
+| `OldenEra.UnitAnimationEvents` | the receiver of a unit model's animation events (sounds) | `cf` |
+
+The classes the game names readably (`Hex.Session.Battle.BhBattleTimelineHelper`, `BhParticleAccelerator`) are
+referred to as they are. In a Unity project they are stub scripts of those names with the game's serialized fields,
+in an assembly definition named `Hex`.
+
+`Models\<path>.json` makes a model of the game's kind from a mesh without the game's scripts, by copying a prefab of
+the game and putting the mod's animated model into it:
+
+```json
+{ "like": "units/Dungeon/1Prefabs/troglodyte_map", "model": "goblin/goblin", "scale": 1 }
+```
+
+It is what the map model of the first test used; a prefab of the game's kind in the bundle is the way.
 
 A bundle carries its own copies of the shaders its materials use, and a copy of the game's `Hex/Lit` made outside the
 game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
 of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
-
-So far checked on the map (a squad's model, 12.11.2026); a battle model needs more of the game's kind (its timeline
-helper, attack points) and is not done yet (#62).
 
 ## 3. The framework
 

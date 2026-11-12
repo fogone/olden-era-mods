@@ -47,19 +47,32 @@ public static class ModAssets
 
     static string CacheFolder => System.IO.Path.Combine(BepInEx.Paths.CachePath, "oldenera-mod-assets");
 
-    // A bundle of a mod's data root, from its archive: put into the cache folder when it is not there as it is.
+    // A bundle of a mod's data root, from its archive: put into the cache folder with the game's components named as
+    // in this game version (BundleNames), when it is not there as it is. A stamp next to it says from what it was made.
     internal static void AddBundle(string root, string name, long length, DateTimeOffset written, Action<Stream> copyTo)
     {
         var file = System.IO.Path.Combine(CacheFolder, Safe(root), name);
         try
         {
-            var info = new FileInfo(file);
-            if (!info.Exists || info.Length != length || info.LastWriteTimeUtc != written.UtcDateTime)
+            var stamp = file + ".stamp";
+            var made = $"{length};{written.UtcTicks};{BundleNames.Stamp}";
+            if (!File.Exists(file) || !File.Exists(stamp) || File.ReadAllText(stamp) != made)
             {
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file)!);
-                using (var target = File.Create(file))
+                var copy = file + ".copy";
+                using (var target = File.Create(copy))
                     copyTo(target);
-                File.SetLastWriteTimeUtc(file, written.UtcDateTime);
+                var renamed = BundleNames.Rename(copy, file + ".renamed");
+                File.Delete(file);
+                if (renamed > 0)
+                {
+                    File.Move(file + ".renamed", file);
+                    File.Delete(copy);
+                    Game.Log?.Invoke($"ModAssets: {root}: bundle {name}: {renamed} of the game's components named as in the game {GameNames.GameVersion}");
+                }
+                else
+                    File.Move(copy, file);
+                File.WriteAllText(stamp, made);
             }
         }
         catch (Exception e)

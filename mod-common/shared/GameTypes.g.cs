@@ -50,7 +50,9 @@ global using GameSquadView = global::fno;
 global using GameTabItem = global::cia;
 global using GameTooltipOptions = global::crv;
 global using GameTooltipPositioner = global::cxg;
+global using GameUnitAnimationEvents = global::cf;
 global using GameUnitBase = global::eon;
+global using GameUnitViewHelper = global::emp;
 
 // A plugin compiling this file works on the game's code itself: built for this version only (ModBase checks it).
 [assembly: global::System.Reflection.AssemblyMetadata("Nobirds.OldenEra.GameVersion", "0.82.08")]

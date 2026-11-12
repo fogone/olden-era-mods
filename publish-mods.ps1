@@ -22,7 +22,7 @@ if (-not (Test-Path $dotnet)) { $dotnet = 'dotnet' }
 # What a player can install: folder -> its DLLs (the first holds the plugin) and what it requires. The library
 # (OldenEraCommon) and the Mods tab (OldenEraSettings, where the catalog is shown) go with the manager, not as mods of their own.
 $catalogParts = [ordered]@{
-    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings') }
+    'manager'       = @{ Files = @('mod-manager\bin\Release\net6.0\OldenEraModManager.dll', 'mod-common\bin\Release\net6.0\OldenEraCommon.dll', 'mod-common\bin\Release\net6.0\AssetsTools.NET.dll', 'mod-common\bin\Release\net6.0\AssetsTools.NET-LICENSE.txt', 'mod-manager-patcher\bin\Release\net6.0\OldenEraModManager.Patcher.dll', 'mod-settings\bin\Release\net6.0\OldenEraSettings.dll'); Builds = @('mod-common', 'mod-manager', 'mod-manager-patcher', 'mod-settings') }
     'core'          = @{ Files = @('mod-core\bin\Release\net6.0\OldenEraCore.dll') }
     'squad-tooltip' = @{ Files = @('mod-squad-tooltip\bin\Release\net6.0\OldenEraSquadTooltip.dll') }
     'visited'       = @{ Files = @('mod-visited\bin\Release\net6.0\OldenEraVisited.dll') }

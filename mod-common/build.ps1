@@ -27,6 +27,8 @@ $dll = Join-Path $PSScriptRoot 'bin\Release\net6.0\OldenEraCommon.dll'
 if ($Install) {
     if (Get-Process HeroesOldenEra -ErrorAction SilentlyContinue) { throw "Close the game before installing" }
     Copy-Item $dll $pluginPath -Force
+    # The library reads and writes mods' AssetBundles with AssetsTools.NET (MIT): it goes next to it.
+    Copy-Item (Join-Path $PSScriptRoot 'bin\Release\net6.0\AssetsTools.NET.dll') (Split-Path $pluginPath) -Force
     "Installed to $pluginPath"
 }
 
