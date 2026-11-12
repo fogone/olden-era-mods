@@ -89,6 +89,22 @@ static class TypeTrees
         PPtr(5, "second", "Object"),
     }.SelectMany(n => n));
 
+    public static TypeTreeType BoxCollider() => Make(65, 0xFFFF, new[]
+    {
+        new[] { new Node(0, "BoxCollider", "Base", -1, 0, Version: 3) },
+        PPtr(1, "m_GameObject", "GameObject"),
+        PPtr(1, "m_Material", "PhysicsMaterial"),
+        new[]
+        {
+            new Node(1, "BitField", "m_IncludeLayers", 4, 0, Version: 2), new Node(2, "unsigned int", "m_Bits", 4, 0),
+            new Node(1, "BitField", "m_ExcludeLayers", 4, 0, Version: 2), new Node(2, "unsigned int", "m_Bits", 4, 0),
+            new Node(1, "int", "m_LayerOverridePriority", 4, 0), new Node(1, "bool", "m_IsTrigger", 1, 0),
+            new Node(1, "bool", "m_ProvidesContacts", 1, Aligned), new Node(1, "bool", "m_Enabled", 1, Aligned),
+        },
+        Vector3(1, "m_Size"),
+        Vector3(1, "m_Center"),
+    }.SelectMany(n => n));
+
     static TypeTreeType Make(int typeId, ushort scriptIndex, IEnumerable<Node> nodes)
     {
         var list = nodes.ToList();
