@@ -18,6 +18,11 @@ internal static class CodeResearch
     {
         var start = (ulong)Game.NativeAddress(method).ToInt64();
         var code = GameCode.Bytes(method);
+        // A method of the game's other assemblies (Hex.ResManager...) is not among the method starts: read on, up to the
+        // padding after its last ret.
+        var unbounded = code.Length == 0 && start != 0;
+        if (unbounded)
+            code = CodeSource.Current.Read((long)start, 0x1000);
         var decoder = Iced.Intel.Decoder.Create(64, new Iced.Intel.ByteArrayCodeReader(code));
         decoder.IP = start;
         var formatter = new Iced.Intel.IntelFormatter();
@@ -26,7 +31,11 @@ internal static class CodeResearch
         {
             var instruction = decoder.Decode();
             if (instruction.Code == Iced.Intel.Code.Int3)
+            {
+                if (unbounded)
+                    yield break;
                 continue;
+            }
             formatter.Format(instruction, output);
             var note = instruction.IsCallNear || instruction.IsJmpNear ? $"   ; {GameCode.NameAt((long)instruction.NearBranchTarget)}"
                      : instruction.IsJccShort || instruction.IsJccNear || instruction.IsJmpShort ? $"   ; -> +{instruction.NearBranchTarget - start:X}"

@@ -55,6 +55,9 @@ public static class GameNames
     // map session: feh.me : feh
     internal static GameMapSession MapSession => global::feh.me;
 
+    // resource manager instance: ResManager.bsbr() : ResManager
+    public static global::Hex.ResManager ResourceManager() => global::Hex.ResManager.bsbr();
+
     // screen registry instance: cqp.ujd() : cqp
     internal static GameScreenRegistry ScreenRegistry() => global::cqp.ujd();
 
@@ -286,6 +289,27 @@ public static class GameNames
         internal global::System.Collections.Generic.IEnumerable<global::UnityEngine.GameObject> SceneObjects => GameNames.Each<global::UnityEngine.GameObject>(() => modelHolder._cbop_k__BackingField, () => modelHolder.cbos, () => modelHolder.cbop);
     }
 
+    extension(GameResourceEntry resourceEntry)
+    {
+        // resource entry: asset: gpu.ctyh : Object
+        internal global::UnityEngine.Object Asset { get => resourceEntry.ctyh; set => resourceEntry.ctyh = value; }
+
+        // resource entry: key: gpu.ctyg : gpt
+        internal GameResourceKey Key { get => resourceEntry.ctyg; set => resourceEntry.ctyg = value; }
+    }
+
+    extension(GameResourceKey resourceKey)
+    {
+        // resource key: type: gpt.ctyf : Type
+        internal global::Il2CppSystem.Type AssetType { get => resourceKey.ctyf; set => resourceKey.ctyf = value; }
+
+        // resource key: bundle: gpt.ctye : String
+        internal string Bundle { get => resourceKey.ctye; set => resourceKey.ctye = value; }
+
+        // resource key: path: gpt.ctyd : String
+        internal string Path { get => resourceKey.ctyd; set => resourceKey.ctyd = value; }
+    }
+
     extension(GameSaveRowPresenter saveRowPresenter)
     {
         // save row on click: cum.cmv(Action) : Void
@@ -446,6 +470,12 @@ public static class GameNames
 
         // main menu select: MainMenuNavigationView.qjp(cab) : Boolean
         internal bool Select(GameMenuSelectable a0) => it.qjp(a0);
+    }
+
+    extension(global::Hex.ResManager it)
+    {
+        // resource table: ResManager.ctyt : Dictionary`2
+        internal global::Il2CppSystem.Collections.Generic.Dictionary<GameResourceKey, GameResourceEntry> Assets => it.ctyt;
     }
 
     extension(global::Hex.Session.Battle.Unit it)

@@ -793,8 +793,10 @@ Case("data copies: a faction's entries copied under new ids, references renamed,
         ("DB/heroes_skills/skills/skills.json", """{ "array": [ { "id": "skill_logistic" }, { "id": "skill_faction_humans", "name": "skill_faction_humans_name" } ] }"""),
         ("DB/map/objects/4_interactables.json", """{ "array": [ { "id": "mine_gold" }, { "id": "human_city", "prefs": ["interactive/castle"] }, { "id": "undead_city" } ] }"""));
     var mod = Path.Combine(root, "mod");
-    // The mod's own second hero, with its own texts: not copied.
-    Zip(mod, "mod.zip", ("DB/heroes/cove/cove_hero_2.json", """{ "array": [ { "id": "cove_hero_2", "fraction": "cove" } ] }"""));
+    // The mod's own second hero, with its own texts, and its own view of the unit: not copied (the unit's logic, of the
+    // same id, is).
+    Zip(mod, "mod.zip", ("DB/heroes/cove/cove_hero_2.json", """{ "array": [ { "id": "cove_hero_2", "fraction": "cove" } ] }"""),
+        ("DB/units/units_views/cove/cove_esquire_v.json", """{ "array": [ { "id": "cove_esquire", "mesh": "cove/esquire" } ] }"""));
     Nobirds.OldenEra.Modding.Common.DataAdditions.Clear();
     Nobirds.OldenEra.Modding.Common.DataCopies.Add("mod", "cove", Bytes("""
         { "like": "human", "words": { "humans": "cove" }, "names": { "esquire_name": "cove_esquire_name" },
@@ -813,8 +815,7 @@ Case("data copies: a faction's entries copied under new ids, references renamed,
     var esquire = Array("DB/units/units_logics/cove/esquire_l.json")[0]!;
     Check((string)esquire["id"] == "cove_esquire" && (string)esquire["upgradeSid"] == "cove_esquire_upg" && (string)esquire["fraction"] == "cove" &&
           (string)esquire["tags"]![1] == "cove" && (string)esquire["name"] == "cove_esquire_name", $"unit: {esquire.ToJsonString()}");
-    var view = Array("DB/units/units_views/cove/esquire_v.json")[0]!;
-    Check((string)view["id"] == "cove_esquire" && (string)view["mesh"] == "Humans/esquire", $"view: {view.ToJsonString()}");
+    Check(archive.GetEntry("DB/units/units_views/cove/esquire_v.json") == null, "the mod's own view of the unit was copied over");
     var hero = Array("DB/heroes/cove/cove_hero_1.json")[0]!;
     Check((string)hero["startSquad"]![0]!["sid"] == "cove_esquire" && (string)hero["startSkills"]![0]!["sid"] == "skill_faction_cove" &&
           (string)hero["startSkills"]![1]!["sid"] == "skill_logistic" && (string)hero["specialization"] == "human_hero_1_specialization", $"hero: {hero.ToJsonString()}");

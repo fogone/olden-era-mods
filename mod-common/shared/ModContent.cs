@@ -19,6 +19,8 @@ namespace Nobirds.OldenEra.Modding.Common;
 //   Lobby/<id>/<picture>.png         ... except these (icon, slotFon, statisticFon, versusFon, bigIcon, card; Factions)
 //   Add/<path>.json                  what it adds to the game's single-object file <path> (DB/data.json): DataAdditions
 //   Copy/<id>.json                   the faction's parts copied from another's: {"like", "files", "words", "names"} (DataCopies)
+//   Bundles/<bundle>                 an AssetBundle, loaded by the game's resource manager (ModAssets)
+//   Models/<path>.json               a model of the game's kind at <path>, made from a bundle's: {"like", "model", "scale"} (ModAssets)
 //
 // The rest (DB/..., campaigns/...) the game reads itself. Paths are matched without regard to case; the archives in
 // the order of their names, a later one's file of the same path replacing an earlier one's.
@@ -27,6 +29,7 @@ internal static class ModContent
     public static void Read(string root, string folder)
     {
         var files = new Dictionary<string, Func<byte[]>>(StringComparer.OrdinalIgnoreCase);
+        var bundles = new Dictionary<string, (string zip, string entry, long length, DateTimeOffset written)>(StringComparer.OrdinalIgnoreCase);
         foreach (var zip in DataCopies.Archives(folder))
             try
             {
@@ -34,14 +37,23 @@ internal static class ModContent
                 foreach (var entry in archive.Entries.Where(e => e.Name.Length > 0))
                 {
                     var path = entry.FullName.Replace('\\', '/');
-                    if (IsOurs(path))
+                    if (path.StartsWith("Bundles/", StringComparison.OrdinalIgnoreCase) && path.Count(c => c == '/') == 1)
+                        bundles[path.Substring(8)] = (zip, entry.FullName, entry.Length, entry.LastWriteTime);
+                    else if (IsOurs(path))
                         files[path] = Bytes(zip, entry.FullName);
                 }
             }
             catch (Exception e) { Game.Log?.Invoke($"ModContent: {root}: {Path.GetFileName(zip)}: {e.GetType().Name}: {e.Message}"); }
-        if (files.Count == 0)
+        foreach (var (name, (zip, entry, length, written)) in bundles)
+            ModAssets.AddBundle(root, name, length, written, target =>
+            {
+                using var archive = ZipFile.OpenRead(zip);
+                using var stream = archive.GetEntry(entry)!.Open();
+                stream.CopyTo(target);
+            });
+        if (files.Count == 0 && bundles.Count == 0)
             return;
-        int texts = 0, sprites = 0, lobbies = 0, added = 0, copies = 0;
+        int texts = 0, sprites = 0, lobbies = 0, added = 0, copies = 0, models = 0;
         foreach (var (path, bytes) in files.OrderBy(f => f.Key, StringComparer.OrdinalIgnoreCase))
         {
             var parts = path.Split('/');
@@ -90,12 +102,17 @@ internal static class ModContent
                 DataCopies.Add(root, Path.GetFileNameWithoutExtension(parts[1]), bytes());
                 copies++;
             }
+            else if (top == "models" && parts.Length >= 2 && path.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+                ModAssets.AddModel(root, path.Substring(parts[0].Length + 1, path.Length - parts[0].Length - 1 - ".json".Length), bytes());
+                models++;
+            }
         }
-        Game.Log?.Invoke($"ModContent: {root}: {texts} text files, {sprites} sprites, {lobbies} lobby factions, {added} additions, {copies} copies");
+        Game.Log?.Invoke($"ModContent: {root}: {texts} text files, {sprites} sprites, {lobbies} lobby factions, {added} additions, {copies} copies, {bundles.Count} bundles, {models} models");
     }
 
     static bool IsOurs(string path) =>
-        new[] { "Lang/", "Sprites/", "Lobby/", "Add/", "Copy/" }.Any(top => path.StartsWith(top, StringComparison.OrdinalIgnoreCase));
+        new[] { "Lang/", "Sprites/", "Lobby/", "Add/", "Copy/", "Models/" }.Any(top => path.StartsWith(top, StringComparison.OrdinalIgnoreCase));
 
     // An entry's bytes, read when asked (the archive opened again then).
     static Func<byte[]> Bytes(string zip, string entryName) => () =>

@@ -22,7 +22,9 @@
      by field. The library reads what the game does not: data\Lang\<language>\**\*.json (texts), data\Sprites\<Resources
      folder>\<name>.png (pictures among the game's), data\Lobby\<faction>.json and data\Lobby\<faction>\*.png (a faction
      in the lobby), data\Add\<path>.json (what is added to a single-object file's lists: Add\DB\data.json),
-     data\Copy\<faction>.json (a faction's parts copied from one of the game's); see docs/writing-a-mod.md, "Game data".
+     data\Copy\<faction>.json (a faction's parts copied from one of the game's), data\Bundles\<bundle> (an AssetBundle
+     loaded by the game's resource manager), data\Models\<path>.json (a model of the game's kind made from a bundle's);
+     see docs/writing-a-mod.md, "Game data".
 
      <ModCode>false</ModCode>: a mod of data alone, its package without the DLL. -->
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />

@@ -211,6 +211,8 @@ What the game does not read from a mod's data the library reads, so a mod of dat
 | `Lobby\<faction>\<picture>.png` | ... except these: `icon`, `slotFon`, `statisticFon`, `versusFon`, `bigIcon`, `card` |
 | `Add\<path>.json` | what the mod adds to the game's single-object file `<path>`: `Add\DB\data.json` with `{"fractions": ["myfaction"]}` adds to that list. An object is added to field by field, an array gets the elements at its end; an element already there (the same value, an object with the same `key`, `sid` or `id`) is replaced. Every mod's additions go into one data root of the library's, after all the others |
 | `Copy\<faction>.json` | the faction's parts copied from a faction of the game, below |
+| `Bundles\<bundle>` | an AssetBundle of the mod's (models, sounds...), built with the game's Unity version (6000.0.66): the game's resource manager loads it as its own, and what is under `Assets/Resources/` in it the game finds at its path. Its materials are put on the game's shaders of the same names. Below |
+| `Models\<path>.json` | a model of the game's kind made from a model of the mod's bundles, found by the game at `<path>`. Below |
 
 The folders of the game's pictures are the Resources paths in `<game>\HeroesOldenEra_Data\globalgamemanagers`
 (`icons/units/hex_portraits/angel`, `icons/heroes/...`, `icons/cities_buildings/...`). In code the same is
@@ -253,7 +255,8 @@ game instead of writing them: `data\Copy\myfaction.json`
   game names by an entry's id (a hero's name is the text of its id, its motto `<id>_motto`) are put in under the
   copy's id too, until the mod's `Lang` has its own; so are the pictures it names by an id (a unit's portrait), until
   the mod's `Sprites` has its own.
-- An entry the mod's own `DB` has (the same id as a copy's) is not copied: the mod's wins. Refer to copies by their ids
+- An entry the mod's own `DB` has (the same id as a copy's, in the same folder: a unit's view of the mod's is not its
+  logic) is not copied: the mod's wins. Refer to copies by their ids
   (`fraction_law_myfaction_3` in the faction's `fractionLawsLines`).
 - The copies are written into the mod's data folder (`~oe-copies.zip`) at the start: the game takes some of a
   faction's entries only from the data root that has the faction (the random hero of the lobby is one of its heroes
@@ -264,6 +267,35 @@ Besides the copies, a new faction is its `DB\fractions\` entry (its name, icon, 
 `city_ambient_sounds.json` with its key, its texts, pictures and lobby entry (#56). `DB/biomes_info.json` maps one
 faction to each biome; adding the faction to a biome of the game (`{"key": "Grass", ...}`) would replace that biome's
 faction, so leave it out.
+
+#### Models
+
+The game takes a unit's models by path through its resource manager (`Hex.ResManager`): the map model is
+`units/` + the view's `mapMesh`, the battle model `units/` + its `mesh`. The manager looks a path up first among the
+assets of the AssetBundles it loaded (`assets/resources/<path>`), then in the game's `Resources`. The game ships no
+bundles; a mod's `Bundles\` are loaded by that manager the moment the game shows its first frame, so the mod's assets
+are found the same way as the game's (#62):
+
+- a bundle built from `Assets/Resources/units/myfaction/goblin_map.prefab` is the view's `"mapMesh":
+  "myfaction/goblin_map"`. Such a prefab must be of the game's kind: the game's scripts on it (the squad helper of a
+  map model, the battle helpers of a battle model), which a bundle made outside the game's project cannot have;
+- `Models\<path>.json` makes one of the game's kind from a model that has no scripts (an animated mesh):
+
+  ```json
+  { "like": "units/Dungeon/1Prefabs/troglodyte_map", "model": "goblin/goblin", "scale": 1 }
+  ```
+
+  The game's prefab `like` is copied with its scripts and points, and its animated model (the part with the Animator)
+  replaced by the mod's `model` (an asset of the mod's bundles by the end of its path, no extension), as big as the
+  model it replaces times `scale`. `Models\units\myfaction\goblin_map.json` is then the view's
+  `"mapMesh": "myfaction/goblin_map"`.
+
+A bundle carries its own copies of the shaders its materials use, and a copy of the game's `Hex/Lit` made outside the
+game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
+of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
+
+So far checked on the map (a squad's model, 12.11.2026); a battle model needs more of the game's kind (its timeline
+helper, attack points) and is not done yet (#62).
 
 ## 3. The framework
 
