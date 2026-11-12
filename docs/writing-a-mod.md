@@ -317,6 +317,26 @@ the game and putting the mod's animated model into it:
 
 It is what the map model of the first test used; a prefab of the game's kind in the bundle is the way.
 
+**Without Unity: `oe-bundle`** (`tools/bundle`). From a model prefab of a bundle (an animated skinned mesh) it writes a
+unit's battle and map prefabs of the game's kind into the bundle, the game's components by the readable names:
+
+```
+oe-bundle units goblin.bundle Bundles\goblin goblin.json
+```
+
+```json
+{
+  "model": "goblin/goblin.prefab",
+  "battle": { "path": "units/myfaction/goblin", "turn": 60, "projectileSpawn": "RightHand", "projectileEnd": "Spine1", "shield": "Spine1" },
+  "map":    { "path": "units/myfaction/goblin_map", "turn": 195, "scale": 0.96, "mirror": true, "questMarker": 1.55 }
+}
+```
+
+The map prefab of the game (troglodyte): root with `Hex.Session.World.BhSquadViewHelper` (`questMarkerPoint`),
+`Scale_roll_pos` (turned 195°, mirrored, its scale the prefab's own: the map does not use the view's `scale`) with the
+model, `FX_empty`, `quest_marker_point`. Checked 12.11.2026: a goblin from a Golden-Era bundle on the map and in a
+battle from the tool's prefabs, no `Models\` file. The tool's README has the fields.
+
 A bundle carries its own copies of the shaders its materials use, and a copy of the game's `Hex/Lit` made outside the
 game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
 of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
