@@ -16,7 +16,9 @@
     <GenerateDependencyFile>false</GenerateDependencyFile>
     <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243</NoWarn>
+    <NoWarn>$(NoWarn);CS1701;CS1702;MSB3277;MSB3243;CA1416</NoWarn>
+    <!-- The package (AssetsTools.NET) is copied next to the library: the manager ships it. -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <!-- The framework: shared\ (the helpers, the game's names for this game version) is compiled into this library. The
@@ -46,6 +48,12 @@
     <Reference Include="$(GameDir)\BepInEx\core\Il2CppInterop.Runtime.dll" Private="false" />
 
     <Reference Include="$(GameDir)\BepInEx\interop\*.dll" Private="false" />
+  </ItemGroup>
+
+  <!-- Reading and writing a mod's AssetBundles (BundleNames): AssetsTools.NET (MIT), shipped next to the library. -->
+  <ItemGroup>
+    <PackageReference Include="AssetsTools.NET" Version="3.0.5" />
+    <None Include="third-party\AssetsTools.NET-LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
