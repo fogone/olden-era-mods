@@ -80,6 +80,20 @@
   ],
   "packages": [
     {
+      "version": "0.2.1",
+      "games": [
+        "0.82.09"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.skipintro-0.2.1.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/skip-intro-v0.2.1/nobirds.oldenera.skipintro-0.2.1.zip",
+        "sha256": "f5af627f722574bc3dcef1b93ba80b0b189b1f4ee2e99a707839baab975f6d47"
+      }
+    },
+    {
       "version": "0.2.0",
       "games": [
         "0.82.08"

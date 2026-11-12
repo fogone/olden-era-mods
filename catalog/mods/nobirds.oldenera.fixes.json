@@ -63,7 +63,8 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/fixes-v0.1.1/OldenEraFixes.dll",
           "sha256": "1aa0c197d6ebf21c73e115fafcaa668c002eef8413b50a7e84440553c225f2d4"
         }
-      ]
+      ],
+      "archive": null
     },
     {
       "version": "0.1.0",
@@ -83,7 +84,29 @@
           "url": "https://github.com/fogone/olden-era-mods/releases/download/fixes-v0.1.0/OldenEraFixes.dll",
           "sha256": "cc39ae825fd27c669245926a0b7ae6b1829fa5066689532c61a3408a12f8687c"
         }
-      ]
+      ],
+      "archive": null
+    }
+  ],
+  "packages": [
+    {
+      "version": "0.1.2",
+      "games": [
+        "0.82.09"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.fixes-0.1.2.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/fixes-v0.1.2/nobirds.oldenera.fixes-0.1.2.zip",
+        "sha256": "2363e6ea0b82743c9b8bd66560b8d543abba7961d3f9f39dd711caa6b903b80d"
+      }
     }
   ]
 }

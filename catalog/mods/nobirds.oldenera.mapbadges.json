@@ -102,6 +102,25 @@
   ],
   "packages": [
     {
+      "version": "0.2.1",
+      "games": [
+        "0.82.09"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.mapbadges-0.2.1.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/map-badges-v0.2.1/nobirds.oldenera.mapbadges-0.2.1.zip",
+        "sha256": "cc631271e7a6bfb13946178ea1ad08c49d0d3b711b5638189c65337b950edfd9"
+      }
+    },
+    {
       "version": "0.2.0",
       "games": [
         "0.82.08"
