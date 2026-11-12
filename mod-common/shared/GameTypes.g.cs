@@ -1,4 +1,4 @@
-// Generated for the game 0.82.08 with GameNames.g.cs (docs/game-names.md). Do not edit. The game's obfuscated
+// Generated for the game 0.82.09 with GameNames.g.cs (docs/game-names.md). Do not edit. The game's obfuscated
 // classes under names of their own; they change with every patch, so the library's public members never show them.
 
 global using GameAbilities = global::ejh;
@@ -59,4 +59,4 @@ global using GameUnitBase = global::eon;
 global using GameUnitViewHelper = global::emp;
 
 // A plugin compiling this file works on the game's code itself: built for this version only (ModBase checks it).
-[assembly: global::System.Reflection.AssemblyMetadata("Nobirds.OldenEra.GameVersion", "0.82.08")]
+[assembly: global::System.Reflection.AssemblyMetadata("Nobirds.OldenEra.GameVersion", "0.82.09")]

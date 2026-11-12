@@ -42,9 +42,12 @@ public static partial class Game
 
     // chs.rat(): the entry takes its scene's root objects (Scene.GetRootGameObjects) and turns them off, as the game does
     // once its scene is loaded.
+    // Of the methods turning the scene's roots off (clones on 0.82.09), the one that also keeps them in the entry's
+    // list: its one call more (List.Add, shared generic code).
     static readonly Lookup<MethodInfo> entryTakeRoots = Lookup<MethodInfo>.Among("scene entry: take the roots",
         () => sceneEntry.Value?.GetMethods(Own).Where(m => m.ReturnType == typeof(void) && m.GetParameters().Length == 0
-            && GameCode.Calls(m).Any(c => GameCode.At(c.target).Any(t => t.Name == "GetRootGameObjects"))),
+                && GameCode.Calls(m).Any(c => GameCode.At(c.target).Any(t => t.Name == "GetRootGameObjects")))
+            .GroupBy(m => GameCode.Calls(m).Count()).OrderByDescending(g => g.Key).FirstOrDefault()?.DistinctCode(),
         Name).Generate("TakeRoots");
 
     static Lookup<PropertyInfo> EntryProperty(string what, Type type, string name) => Lookup<PropertyInfo>.Among(what,
@@ -56,16 +59,27 @@ public static partial class Game
     static readonly Lookup<PropertyInfo> entryRoots = EntryProperty("scene entry: roots",
         typeof(Il2CppSystem.Collections.Generic.List<UnityEngine.GameObject>), "Roots");
 
-    // A session's town scenes (eja): the static sets of scenes a session loads, the town's registry, and the one method
-    // opening a town by its scene's name (eja.beoq(String)). The battle's and the arenas' scene parts (emv, elr) have
-    // registries and scene sets too, and several methods of a string.
+    // A session's town scenes (eja): the static sets of scenes a session loads, the town's registry, and the method
+    // opening a town by its scene's name (eja.bepd(String) on 0.82.09, with clones), the one the game's town opener calls
+    // (eir.mmk(fpi): a method of a town, the map object with an ObjCityConfig). The battle's and the arenas' scene parts
+    // (emv, elr) have registries, scene sets and methods of a string too.
     static readonly Lookup<Type> cityScenes = Lookup<Type>.Among("town scenes",
         () => sceneRegistry.Value is { } r
-            ? Types.Where(t => t.GetProperties(Own).Any(p => p.PropertyType == r)
+            ? TownOpenerCallees().Select(m => m.DeclaringType).Distinct().Where(t => t.GetProperties(Own).Any(p => p.PropertyType == r)
                 && t.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                    .Any(p => p.PropertyType == typeof(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<EScene>))
-                && t.GetMethods(Own).Count(m => m.ReturnType == typeof(void) && m.GetParameters() is { Length: 1 } ps && ps[0].ParameterType == typeof(string)) == 1)
+                    .Any(p => p.PropertyType == typeof(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppStructArray<EScene>)))
             : null, t => t.Name, onlyOne: true).Generate("GameCityScenes");
+
+    // What the methods of a town (a type with an ObjCityConfig) as their one parameter call that takes a string.
+    static System.Collections.Generic.IEnumerable<MethodInfo> TownOpenerCallees()
+    {
+        var towns = Types.Where(t => t.GetProperties(Own).Any(p => p.PropertyType == typeof(Hex.Configs.ObjCityConfig))).ToHashSet();
+        return Types.SelectMany(t => t.GetMethods(Own))
+            .Where(m => m.ReturnType == typeof(void) && m.GetParameters() is { Length: 1 } ps && towns.Contains(ps[0].ParameterType))
+            .SelectMany(m => GameCode.Calls(m).SelectMany(c => GameCode.At(c.target)))
+            .OfType<MethodInfo>()
+            .Where(m => m.GetParameters() is { Length: 1 } ps && ps[0].ParameterType == typeof(string));
+    }
 
     // eja.cluu
     static readonly Lookup<PropertyInfo> cityRegistry = Lookup<PropertyInfo>.Among("town scenes: registry",
