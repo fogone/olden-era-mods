@@ -155,6 +155,20 @@ ticked: all); the list sorts by name, not installed first, or installed first.
   itself.
 - Nothing is installed or updated without a click.
 
+## When the game does not start
+
+- **The first start after installing takes 2-5 minutes**, with no window or a black one: BepInEx makes its wrappers for
+  the game's code. Wait; later starts are quick.
+- The BepInEx console (if it is on) shows `Class::Init signatures have been exhausted, using a substitute!`: this line
+  is normal and comes on working installs too.
+- The mods are made for the game's engine, Unity 6000.0 (the installer prints the version it found). On another one the
+  game may not start with BepInEx at all.
+- Still no main menu after 5 minutes: close the game and open an
+  [issue](https://github.com/fogone/olden-era-mods/issues) with the store (Steam or Game Pass), the game's version and
+  these files: `BepInEx\LogOutput.log` from the game's folder and
+  `%USERPROFILE%\AppData\LocalLow\Unfrozen\HeroesOldenEra\Player.log`. To play without the mods meanwhile, run the
+  installer with `-Uninstall` (see the [README](../README.md)).
+
 ## When a mod did not switch on
 
 The mods are built for one version of the game. After a game patch, a mod built for the old version does not switch

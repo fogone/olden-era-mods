@@ -162,6 +162,20 @@ if (-not $gameVersion) {
 }
 Say "   Game version: $gameVersion"
 
+# BepInEx build 788 and the mods are made for the game's engine, Unity 6000.0: on another one BepInEx may not find
+# what it needs in the engine's code and the game may not start.
+$UnityLine = '6000.0.'
+$unity = $null
+$player = Join-Path $dir 'UnityPlayer.dll'
+if (Test-Path -LiteralPath $player) { $unity = ((Get-Item -LiteralPath $player).VersionInfo.ProductVersion -split ' ')[0] }
+if (-not $unity) { Say '   Unity version: not found (no UnityPlayer.dll).' -ForegroundColor Yellow }
+elseif ($unity.StartsWith($UnityLine)) { Say "   Unity version: $unity" }
+else {
+    Say "   Unity version: $unity, but BepInEx $BepInExVer and the mods are checked on Unity $($UnityLine)x." -ForegroundColor Yellow
+    Say '   The game may not start with them. If it does not, run this script with -Uninstall and report the Unity version.' -ForegroundColor Yellow
+    if (-not $DryRun -and (Read-Host 'Install anyway? (y/n)') -notmatch '^[yYдД]') { Stop-Here 'Stopped: nothing was installed.' }
+}
+
 $coreDll = Join-Path $dir 'BepInEx\core\BepInEx.Core.dll'
 $haveBepInEx = $null
 if (Test-Path -LiteralPath $coreDll) { $haveBepInEx = ((Get-Item -LiteralPath $coreDll).VersionInfo.ProductVersion -split '\+')[0] }
@@ -255,7 +269,12 @@ if (Test-Path -LiteralPath $work) { Remove-Item -LiteralPath $work -Recurse -For
 # ---- 5/6. mods and the first start -------------------------------------------------------------------------------
 Step 'Done'
 Say '   The mods themselves are installed from the game: main menu, Additional, Mods (Install buttons).'
-Say '   The first start takes about a minute: BepInEx makes its wrappers for the game''s code. Wait for the main menu.'
+Say '   The first start takes 2-5 minutes with no window or a black one: BepInEx makes its wrappers for the game''s code.' -ForegroundColor Yellow
+Say '   Wait for the main menu. Later starts are quick.' -ForegroundColor Yellow
+Say '   The BepInEx console may show "Class::Init signatures have been exhausted, using a substitute!": that is normal.'
+Say '   No main menu after 5 minutes? Open an issue at https://github.com/fogone/olden-era-mods/issues and attach:'
+Say "     $(Join-Path $dir 'BepInEx\LogOutput.log')"
+Say "     $(Join-Path $env:USERPROFILE 'AppData\LocalLow\Unfrozen\HeroesOldenEra\Player.log')"
 if ($DryRun) { Say ''; Say 'Dry run done: nothing changed.'; return }
 if ((Read-Host 'Start the game now? (y/n)') -match '^[yYдД]') {
     if ($game.Family) { Start-Process "shell:AppsFolder\$($game.Family)!Game" }
