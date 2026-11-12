@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.Core</RootNamespace>
     <ModId>nobirds.oldenera.core</ModId>
     <ModName>Olden Era Core</ModName>
-    <Version>0.8.0</Version>
+    <Version>0.8.1</Version>
     <ModTags>library</ModTags>
   </PropertyGroup>
 
