@@ -30,6 +30,10 @@ sealed class CitySpec
         public float MaxMovementSpeed { get; set; } = 4;
         public float TransitionTime { get; set; } = 0.5f;
         public uint CullingMask { get; set; } = 40727; // cityDungeon's camera's
+        // Where the camera stands and how much an orthographic one shows (half its height), when the scene's own camera
+        // frames something else; the scene's by default.
+        public float[] Position { get; set; }
+        public float? Size { get; set; }
     }
 
     public static CitySpec Read(string file) => JsonSerializer.Deserialize<CitySpec>(File.ReadAllText(file),
@@ -157,6 +161,11 @@ sealed class CityScene
         var cameraTransform = TransformOf(cameraGo);
         var position = Field(scene, cameraTransform)["m_LocalPosition"];
         float x = position["x"].AsFloat, y = position["y"].AsFloat, z = position["z"].AsFloat;
+        if (spec.Position is { Length: 3 } p)
+        {
+            (x, y, z) = (p[0], p[1], p[2]);
+            Edit(cameraTransform, v => { var at = v["m_LocalPosition"]; at["x"].AsFloat = x; at["y"].AsFloat = y; at["z"].AsFloat = z; });
+        }
 
         long rig = nextScene++, rigTransform = nextScene++, controller = nextScene++, helper = nextScene++;
         long context = nextScene++, raycaster = nextScene++;
@@ -213,6 +222,8 @@ sealed class CityScene
             {
                 v["m_Depth"].AsFloat = 0;
                 v["m_CullingMask.m_Bits"].AsUInt = spec.CullingMask;
+                if (spec.Size is { } size)
+                    v["orthographic size"].AsFloat = size;
             });
         Console.WriteLine($"  camera: {spec.Object} under CityCamera, at ({x}, {y}, {z})");
     }
