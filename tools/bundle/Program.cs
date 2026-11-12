@@ -2,7 +2,7 @@ using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 using Nobirds.OldenEra.Modding.Bundle;
 
-// oe-bundle units <bundle> <out bundle> <unit.json>...   a unit's battle and map prefabs of the game's kind, made from
+// oe-bundle units <bundle> <out bundle> <unit.json>... [--uncompressed]   a unit's battle and map prefabs of the game's kind, made from
 //                                                       a model prefab of the bundle, written with the bundle into <out>
 if (args.Length < 4 || args[0] != "units")
 {
@@ -20,14 +20,29 @@ if (!file.file.Metadata.TypeTreeEnabled)
     return 1;
 }
 var prefabs = new UnitPrefabs(manager, file);
-foreach (var spec in args.Skip(3))
+foreach (var spec in args.Skip(3).Where(a => !a.StartsWith("--")))
 {
     Console.WriteLine(spec);
     prefabs.Add(UnitSpec.Read(spec));
 }
 prefabs.Save();
 bundle.file.BlockAndDirInfo.DirectoryInfos[index].SetNewData(file.file);
-using (var writer = new AssetsFileWriter(target))
-    bundle.file.Write(writer);
-Console.WriteLine($"written {target}");
+// Written whole, then packed with LZ4 as Unity's ChunkBasedCompression (the game loads it as is); --uncompressed keeps
+// it whole.
+var uncompressed = args.Contains("--uncompressed");
+using (var whole = new MemoryStream())
+{
+    bundle.file.Write(new AssetsFileWriter(whole));
+    if (uncompressed)
+        File.WriteAllBytes(target, whole.ToArray());
+    else
+    {
+        whole.Position = 0;
+        var written = new AssetBundleFile();
+        written.Read(new AssetsFileReader(whole));
+        using var writer = new AssetsFileWriter(target);
+        written.Pack(writer, AssetBundleCompressionType.LZ4, true, null);
+    }
+}
+Console.WriteLine($"written {target} ({new FileInfo(target).Length / 1024 / 1024} MB{(uncompressed ? "" : ", LZ4")})");
 return 0;

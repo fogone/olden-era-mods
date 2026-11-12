@@ -35,7 +35,7 @@ public static class BundleNames
     public static string Stamp => GameNames.GameVersion + ";" + string.Join(",", Names().Select(n => $"{n.Key}={n.Value.ns}.{n.Value.cls}"));
 
     // The bundle `source` with this version's names written to `target`; the number of scripts renamed (0: nothing
-    // written, the bundle has no readable names). A bundle is read whole into memory.
+    // written, the bundle has no readable names). A bundle is read whole into memory, the result packed with LZ4.
     public static int Rename(string source, string target)
     {
         var manager = new AssetsManager();
@@ -68,8 +68,15 @@ public static class BundleNames
             }
             if (renamed == 0)
                 return 0;
+            // Written whole, then packed with LZ4 (Unity's chunk-based compression, loaded as is): a cache of a
+            // faction's bundles stays about the size of the mod's.
+            using var whole = new MemoryStream();
+            bundle.file.Write(new AssetsFileWriter(whole));
+            whole.Position = 0;
+            var written = new AssetBundleFile();
+            written.Read(new AssetsFileReader(whole));
             using (var writer = new AssetsFileWriter(target))
-                bundle.file.Write(writer);
+                written.Pack(writer, AssetBundleCompressionType.LZ4, true, null);
             return renamed;
         }
         finally
