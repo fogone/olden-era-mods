@@ -355,9 +355,15 @@ others), and the city names it by its name:
 The library gives each mod scene an `EScene` number of its own (from 256: Unity takes a number for a build index, so the
 scene keeps its name), writes the number into the cities naming the scene, and when a session's town registry is there
 loads the scene by its name and adds it to the registry as the game adds its own (the game's entry, `chs(EScene, Scene)`,
-taking the scene's roots). Checked 12.11.2026: a town of the Stronghold prototype opened in Golden-Era's scene. What the
-scene must hold to work as a town (the buildings' root with its slots and buildings, the city camera) is not done yet:
-the game's own city scene is described in `docs/game-internals.md`.
+taking the scene's roots).
+
+What the scene holds is the game's town (`docs/game-internals.md`): the buildings' manager with a slot per building of
+the city's data and a building per level, and the town camera with its controller. `oe-bundle city` (`tools/bundle`)
+makes them of a scene's objects: which object is shown at which level of which slot, which camera is the town's and
+what it frames; the slots' component is named `OldenEra.BuildingSlot`, the game's name put in by the library. Then the
+game does the rest: it shows the levels built, opens a building's windows on a click on it, and draws its town
+interface over the camera. Checked 13.11.2026 on the Stronghold prototype in Golden-Era's scene: the town opens with the
+game's interface, a click on the town hall opens the building tree, a market built there appears in the scene.
 
 ## 3. The framework
 

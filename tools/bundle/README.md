@@ -31,3 +31,37 @@ oe-bundle units <bundle> <out bundle> <unit.json>...
 
 The model is copied into each prefab; its meshes, materials, controller and avatar are shared. The bundle must be built
 with type trees (Unity's default). See `docs/writing-a-mod.md`, "Models".
+
+## Town scenes
+
+```
+oe-bundle city <scene bundle> <out bundle> <city.json>
+```
+
+A town is a scene of the game's kind: the buildings' manager (`BhBuildingsManager`) with a slot per building of the
+city's data (by its `sceneSlot`, e.g. `Main`, `Tier_1`, `Build_Wall`), a building per level in each slot (`BhBuilding`
+and a collider: the game shows the level built and opens its windows on a click), and the town camera (`CityCamera`:
+the game's camera controller and its settings, the scene's camera under it tagged `MainCamera`, drawn first, the game's
+interface over it). The tool makes them of the scene's objects:
+
+```json
+{
+  "slots": {
+    "Main":       ["townHall_1", "townHall_2", "townHall_3"],
+    "Tier_1":     ["dwelling1", "dwelling1_upg"],
+    "Build_Wall": ["wall_1", "wall_2", "wall_3"],
+    "Treasury":   [""]
+  },
+  "camera": { "object": "TownCamera", "position": [-5.6, 2.4, -10], "size": 3 }
+}
+```
+
+- `slots`: a slot's levels, each the name of the scene's object shown at that level; `""` is a level with nothing shown,
+  a name repeated shows the same object. A slot needs as many levels as the building has in the city's data;
+- `camera.object`: the scene's camera; `position` and `size` (an orthographic camera's half height) frame it when the
+  scene's own values frame something else; `rotationSpeed`, `deltaHorizontalAngle`, `deltaVerticalAngle`,
+  `maxMovementSpeed`, `transitionTime`, `cullingMask`: the controller's settings, the game's town values by default;
+- `buildingHeight`: the buildings' height for the game's effects (2);
+- `offset`: where the scene is put (`[0, -2000, 0]`: away from the world map, which the game keeps loaded under it).
+
+See `docs/writing-a-mod.md`, "Town scenes".

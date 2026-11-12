@@ -41,6 +41,17 @@ static class TypeTrees
 
     public static IEnumerable<Node> PPtrArray(int level, string name, string type) => Vector(level, name, PPtr(level + 2, "data", type));
 
+    public static IEnumerable<Node> Vector3Array(int level, string name) => Vector(level, name, Vector3(level + 2, "data"));
+
+    // A curve (UnityEngine.AnimationCurve), as Unity writes it.
+    public static IEnumerable<Node> AnimationCurve(int level, string name) =>
+        new[] { new Node(level, "AnimationCurve", name, -1, 0, Version: 2) }
+            .Concat(Vector(level + 1, "m_Curve", new[] { new Node(level + 3, "Keyframe", "data", 28, 0, Version: 3) }
+                .Concat(new[] { "time", "value", "inSlope", "outSlope" }.Select(f => new Node(level + 4, "float", f, 4, 0)))
+                .Append(new Node(level + 4, "int", "weightedMode", 4, 0))
+                .Concat(new[] { "inWeight", "outWeight" }.Select(f => new Node(level + 4, "float", f, 4, 0)))))
+            .Concat(new[] { "m_PreInfinity", "m_PostInfinity", "m_RotationOrder" }.Select(f => new Node(level + 1, "int", f, 4, 0)));
+
     // A serialized dictionary of the game's (its pairs' list), written empty: the element's type does not matter then.
     public static IEnumerable<Node> EmptyDictionary(int level, string type, string name) =>
         new[] { new Node(level, type, name, -1, 0) }.Concat(Vector(level + 1, "keyValuePairs", new[] { new Node(level + 3, "int", "data", 4, 0) }));
@@ -87,6 +98,22 @@ static class TypeTrees
         },
         Str(6, "id", Aligned),
         PPtr(5, "second", "Object"),
+    }.SelectMany(n => n));
+
+    public static TypeTreeType BoxCollider() => Make(65, 0xFFFF, new[]
+    {
+        new[] { new Node(0, "BoxCollider", "Base", -1, 0, Version: 3) },
+        PPtr(1, "m_GameObject", "GameObject"),
+        PPtr(1, "m_Material", "PhysicsMaterial"),
+        new[]
+        {
+            new Node(1, "BitField", "m_IncludeLayers", 4, 0, Version: 2), new Node(2, "unsigned int", "m_Bits", 4, 0),
+            new Node(1, "BitField", "m_ExcludeLayers", 4, 0, Version: 2), new Node(2, "unsigned int", "m_Bits", 4, 0),
+            new Node(1, "int", "m_LayerOverridePriority", 4, 0), new Node(1, "bool", "m_IsTrigger", 1, 0),
+            new Node(1, "bool", "m_ProvidesContacts", 1, Aligned), new Node(1, "bool", "m_Enabled", 1, Aligned),
+        },
+        Vector3(1, "m_Size"),
+        Vector3(1, "m_Center"),
     }.SelectMany(n => n));
 
     static TypeTreeType Make(int typeId, ushort scriptIndex, IEnumerable<Node> nodes)

@@ -29,6 +29,26 @@ public static partial class Game
             .All(n => t.GetMethod(n, BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null, new[] { typeof(string) }, null) != null)),
         t => t.Name, onlyOne: true).Generate("GameUnitAnimationEvents");
 
+    // A slot of a town's buildings (eiq): its buildings by level (buildingsInSlot) and its name, the one the city's data
+    // calls its "sceneSlot" (an auto-property's backing field, <clsg>k__BackingField: obfuscated, serialized). The
+    // buildings' manager finds its slot by that name (BhBuildingsManager.bemb(String)).
+    static readonly Lookup<Type> buildingSlot = Lookup<Type>.Among("town building slot",
+        () => Types.Where(t => IsComponent(t) && HasField(t, "buildingsInSlot", typeof(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<Hex.Session.City.BhBuilding>))),
+        t => t.Name, onlyOne: true).Generate("GameBuildingSlot");
+
+    // eiq's slot name: its one string field, the backing field of an auto-property (the serialized name of the field
+    // a bundle sets).
+    static readonly Lookup<object> buildingSlotName = new Lookup<object>("town building slot: name field",
+        () => buildingSlot.Value is { } t
+            ? GameCode.Fields(t).Where(f => !f.isStatic && f.type == "System.String" && f.name.EndsWith(">k__BackingField"))
+                .Select(f => f.name).ToList() is { Count: 1 } names ? names[0] : null
+            : null, v => $"{v}").GenerateConstant("BuildingSlotNameField");
+
+    // A town camera's point (eis, on the scene's CameraPoint): its speed, angles and the point the camera goes to.
+    static readonly Lookup<Type> cityCameraPoint = Lookup<Type>.Among("town camera point",
+        () => Types.Where(t => IsComponent(t) && HasField(t, "camPoint", typeof(UnityEngine.Transform)) && HasField(t, "speed", typeof(float))),
+        t => t.Name, onlyOne: true).Generate("GameCityCameraPoint");
+
     public static Type UnitViewHelperType => unitViewHelper.Value;
     public static Type UnitAnimationEventsType => unitAnimationEvents.Value;
 }
