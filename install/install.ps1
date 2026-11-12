@@ -176,6 +176,22 @@ else {
     if (-not $DryRun -and (Read-Host 'Install anyway? (y/n)') -notmatch '^[yYдД]') { Stop-Here 'Stopped: nothing was installed.' }
 }
 
+# The build: the start of the SHA-256 of the IL2CPP metadata, the same as the mods compute (GameBuild in mod-common).
+# The mods are made from the Game Pass build; the Steam build of the same version has other internal names (#68), and
+# the mods turn themselves off on it.
+$metadata = Join-Path $dir 'HeroesOldenEra_Data\il2cpp_data\Metadata\global-metadata.dat'
+$gameBuild = $null
+if (Test-Path -LiteralPath $metadata) {
+    $stream = [IO.File]::OpenRead($metadata)
+    try { $gameBuild = (Sha256Of $stream).Substring(0, 12) } finally { $stream.Dispose() }
+}
+Say "   Game build: $(if ($gameBuild) { $gameBuild } else { 'not found' })"
+if ($game.Kind -ne 'Game Pass' -and -not (Test-Path -LiteralPath (Join-Path $dir 'appxmanifest.xml'))) {
+    Say '   The mods are built from the Game Pass version of the game. The Steam version of the same game version has' -ForegroundColor Yellow
+    Say '   other internal names, so the mods may stay off on it (the main menu then says so) until they are built for it.' -ForegroundColor Yellow
+    if (-not $DryRun -and (Read-Host 'Install anyway? (y/n)') -notmatch '^[yYдД]') { Stop-Here 'Stopped: nothing was installed.' }
+}
+
 $coreDll = Join-Path $dir 'BepInEx\core\BepInEx.Core.dll'
 $haveBepInEx = $null
 if (Test-Path -LiteralPath $coreDll) { $haveBepInEx = ((Get-Item -LiteralPath $coreDll).VersionInfo.ProductVersion -split '\+')[0] }

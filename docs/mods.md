@@ -179,6 +179,11 @@ on. Then:
 
 Such a mod needs a build for the new version of the game: the mods window offers it as an update when it is in the catalog.
 
+**Steam.** The mods are built from the Game Pass version of the game. The Steam version of the same game version (same
+number in the main menu) is another build with other internal names, so the mods do not work on it: they switch off
+and the main menu says so, with the builds in brackets (the installer prints the game's build too). Builds for Steam
+are not made yet ([#68](https://github.com/fogone/olden-era-mods/issues/68)).
+
 ## For development
 
 **Research** shows the frame rate in a circle at the top left (option "Frame rate in the screen's corner", off by

@@ -9,6 +9,9 @@ public static class GameNames
 {
     public const string GameVersion = "0.82.08";
 
+    // the build of that version (GameBuild): the Steam and Game Pass builds have other obfuscated names
+    public const string GameBuild = "a10bb80d5db0";
+
     // weak squad share
     public const float WeakShare = 0.5f;
 
