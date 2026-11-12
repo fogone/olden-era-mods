@@ -341,6 +341,24 @@ A bundle carries its own copies of the shaders its materials use, and a copy of 
 game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
 of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
 
+#### Town scenes
+
+A town is a scene: a session loads the game's city scenes with it and keeps each in the town's scene registry by its
+`EScene` (the city's `sceneName` parsed); opening the town activates the registry's entry. A mod's town scene is a scene
+bundle among its `Bundles\` (built from `Assets/.../<scene>.unity`; the game's resource manager loads it like the
+others), and the city names it by its name:
+
+```json
+{ "id": "myfaction_city", "sceneName": "myfaction_city_scene", ... }
+```
+
+The library gives each mod scene an `EScene` number of its own (from 256: Unity takes a number for a build index, so the
+scene keeps its name), writes the number into the cities naming the scene, and when a session's town registry is there
+loads the scene by its name and adds it to the registry as the game adds its own (the game's entry, `chs(EScene, Scene)`,
+taking the scene's roots). Checked 12.11.2026: a town of the Stronghold prototype opened in Golden-Era's scene. What the
+scene must hold to work as a town (the buildings' root with its slots and buildings, the city camera) is not done yet:
+the game's own city scene is described in `docs/game-internals.md`.
+
 ## 3. The framework
 
 ### ModBase (`mod-common/ModBase.cs`)

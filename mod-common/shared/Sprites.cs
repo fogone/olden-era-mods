@@ -46,8 +46,7 @@ public static class Sprites
     // game unloads unused assets.
     public static Sprite FromPng(byte[] png, string name)
     {
-        // The class has no managed constructor: a bare object of it, its bytes set.
-        var data = new IconData(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<IconData>.NativeClassPtr)) { bytes_ = new Il2CppStructArray<byte>(png) };
+        var data = new IconData(new Il2CppStructArray<byte>(png));
         var sprite = data.ToSprite();
         if (sprite == null)
             return null;

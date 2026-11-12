@@ -54,15 +54,17 @@ public static class ModAssets
         var file = System.IO.Path.Combine(CacheFolder, Safe(root), name);
         try
         {
+            // The stamp: what the cached file was made from, then the scenes the bundle holds (a scene bundle's).
             var stamp = file + ".stamp";
             var made = $"{length};{written.UtcTicks};{BundleNames.Stamp}";
-            if (!File.Exists(file) || !File.Exists(stamp) || File.ReadAllText(stamp) != made)
+            var lines = File.Exists(stamp) ? File.ReadAllLines(stamp) : Array.Empty<string>();
+            if (!File.Exists(file) || lines.Length == 0 || lines[0] != made)
             {
                 Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file)!);
                 var copy = file + ".copy";
                 using (var target = File.Create(copy))
                     copyTo(target);
-                var renamed = BundleNames.Rename(copy, file + ".renamed");
+                var renamed = BundleNames.Rename(copy, file + ".renamed", out var scenes);
                 File.Delete(file);
                 if (renamed > 0)
                 {
@@ -72,8 +74,11 @@ public static class ModAssets
                 }
                 else
                     File.Move(copy, file);
-                File.WriteAllText(stamp, made);
+                lines = new[] { made, string.Join(",", scenes) };
+                File.WriteAllLines(stamp, lines);
             }
+            foreach (var scene in lines.Skip(1).FirstOrDefault()?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>())
+                ModScenes.Add(root, scene);
         }
         catch (Exception e)
         {

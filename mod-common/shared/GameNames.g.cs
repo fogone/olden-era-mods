@@ -121,6 +121,12 @@ public static class GameNames
         internal global::System.Collections.Generic.IEnumerable<global::Il2CppSystem.Collections.Generic.List<GameBuff>> Lists => GameNames.Each<global::Il2CppSystem.Collections.Generic.List<GameBuff>>(() => buffs.cmgb, () => buffs.cmgc, () => buffs.cmge);
     }
 
+    extension(GameCityScenes cityScenes)
+    {
+        // town scenes: registry: eja.cluu : cht
+        internal GameSceneRegistry Registry => cityScenes.cluu;
+    }
+
     extension(GameDataRoot dataRoot)
     {
         // data root enabled: bko.byxi : Boolean
@@ -224,6 +230,9 @@ public static class GameNames
     {
         // session -> map data: dcz.chmi : Data
         internal global::Hex.Session.Data.Data MapData => mapGameSession.chmi;
+
+        // map session: its scenes: dcz.chmk : dkh
+        internal GameSessionScenes Scenes => mapGameSession.chmk;
     }
 
     extension(GameMapObject mapObject)
@@ -319,6 +328,30 @@ public static class GameNames
         internal void ShowName(string a0, string a1) => saveRowPresenter.hav(a0, a1);
     }
 
+    extension(GameSceneEntry sceneEntry)
+    {
+        // scene entry: roots: chs.cclv : List`1
+        internal global::Il2CppSystem.Collections.Generic.List<global::UnityEngine.GameObject> Roots { get => sceneEntry.cclv; set => sceneEntry.cclv = value; }
+
+        // scene entry: EScene: chs.ccls : EScene
+        internal global::Hex.GameScenes.EScene SceneId { get => sceneEntry.ccls; set => sceneEntry.ccls = value; }
+
+        // scene entry: take the roots: chs.rat() : Void
+        internal void TakeRoots() => sceneEntry.rat();
+
+        // scene entry: scene: chs.cclt : Scene
+        internal global::UnityEngine.SceneManagement.Scene UnityScene { get => sceneEntry.cclt; set => sceneEntry.cclt = value; }
+    }
+
+    extension(GameSceneRegistry sceneRegistry)
+    {
+        // scene registry: add: cht.rau(Il2CppReferenceArray`1) : Void
+        internal void AddScenes(global::Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameSceneEntry> a0) => sceneRegistry.rau(a0);
+
+        // scene registry: scenes: cht.cclw : Dictionary`2
+        internal global::Il2CppSystem.Collections.Generic.Dictionary<global::Hex.GameScenes.EScene, GameSceneEntry> Scenes => sceneRegistry.cclw;
+    }
+
     extension(GameScreenRegistry screenRegistry)
     {
         // hide screen by name: cqp.fwj(String) : Void
@@ -347,6 +380,12 @@ public static class GameNames
     {
         // session -> how it is played (EPlay): dkd.cwbj : EPlay
         internal global::Hex.EPlay Play => session.cwbj;
+    }
+
+    extension(GameSessionScenes sessionScenes)
+    {
+        // session scenes: town: dkh.ciik : eja
+        internal GameCityScenes City => sessionScenes.ciik;
     }
 
     extension(GameSettingsService settingsService)

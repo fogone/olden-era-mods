@@ -124,6 +124,10 @@ internal sealed class Commands
                         write($"  values {string.Join(", ", Enum.GetNames(type).Select(n => $"{n}=0x{Convert.ToInt64(Enum.Parse(type, n)):X}"))}");
                     foreach (var p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly))
                         write($"  prop {p.PropertyType.Name} {p.Name}");
+                    // The game's constructors (the wrappers' own IntPtr one left out).
+                    foreach (var c in type.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+                                 .Where(c => !(c.GetParameters() is { Length: 1 } ps && ps[0].ParameterType == typeof(IntPtr))))
+                        write($"  new {type.Name}({string.Join(", ", c.GetParameters().Select(p => $"{p.ParameterType.Name} {p.Name}"))})");
                     foreach (var m in type.Methods())
                         write($"  {(m.IsStatic ? "static " : "")}{m.ReturnType.Name} {GameCode.Signature(m)}");
                 }
