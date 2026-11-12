@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace Nobirds.OldenEra.Modding.Common;
 
-// A button of ours in the game's main menu (issue #24). The menu is the game's screen ScMainMenu (ScMainMenu.me); its
-// view holds every button and sub-menu in a field of its own and has no list to add to, and its buttons have no prefab
-// (each is a copy in the scene). So ours is a copy of one of its buttons, put in its column, clicked as its own
+// A button of ours in the game's main menu (issue #24). The menu is the game's screen ScMainMenu (in its screen
+// registry); its view holds every button and sub-menu in a field of its own and has no list to add to, and its buttons
+// have no prefab (each is a copy in the scene). So ours is a copy of one of its buttons, put in its column, clicked as its own
 // top-level buttons are: the menu's selection cleared and an open sub-menu closed first.
 //
 //   OnTick(() =>
@@ -19,8 +19,14 @@ namespace Nobirds.OldenEra.Modding.Common;
 //   MainMenu.Remove(button);   // on unload
 public static class MainMenu
 {
-    // The menu's view (its buttons and sub-menus), null outside the main menu.
-    public static MainMenuNavigationView View => ScMainMenu.me is { } menu && menu != null ? menu.mainMenuNavigationView : null;
+    // The menu's view (its buttons and sub-menus), null outside the main menu. The menu screen is the one registered
+    // under its name, as ScMainMenu.Open and Hide find it (ScMainMenu.me is no longer set on 0.82.09); the registry's
+    // own "screen by name" logs an error for a missing one, so its dictionary is read.
+    public static MainMenuNavigationView View =>
+        GameNames.ScreenRegistry() is { } registry && registry.Screens is { } screens &&
+        screens.TryGetValue(nameof(ScMainMenu), out var screen) && screen != null && screen.TryCast<ScMainMenu>() is { } menu
+            ? menu.mainMenuNavigationView
+            : null;
 
     // A copy of the menu's Load button named `name`, labelled by our localization key, under `after`'s button in its
     // column (below its sub-menu, if one follows it); one left by a reloaded build is replaced. Null when there is no
