@@ -36,9 +36,11 @@ public static class BundleNames
 
     // The bundle `source` with this version's names written to `target`; the number of scripts renamed (0: nothing
     // written, the bundle has no readable names). A bundle is read whole into memory, the result packed with LZ4.
-    public static int Rename(string source, string target)
+    // `scenes`: the scenes of a scene bundle (by their names, what Unity loads them by), none for another.
+    public static int Rename(string source, string target, out List<string> scenes)
     {
         var manager = new AssetsManager();
+        scenes = new List<string>();
         try
         {
             using var stream = File.OpenRead(source);
@@ -51,6 +53,12 @@ public static class BundleNames
                     continue;
                 var file = manager.LoadAssetsFileFromBundle(bundle, i, false);
                 var changed = false;
+                foreach (var info in file.file.GetAssetsOfType(AssetClassID.AssetBundle))
+                {
+                    var assetBundle = manager.GetBaseField(file, info);
+                    if (assetBundle["m_IsStreamedSceneAssetBundle"].AsBool)
+                        scenes.AddRange(assetBundle["m_Container.Array"].Children.Select(c => Path.GetFileNameWithoutExtension(c["first"].AsString)));
+                }
                 foreach (var info in file.file.GetAssetsOfType(AssetClassID.MonoScript))
                 {
                     var script = manager.GetBaseField(file, info);

@@ -92,14 +92,8 @@ public static class DataRoots
                 return;
             var kept = roots.Where(g => !names.Contains(g.Name)).ToList();
             foreach (var (name, folder) in ours)
-                kept.Add(roots.FirstOrDefault(g => g.Name == name) ??
-                    // The class has no managed constructor: a bare object of it, its fields set.
-                    new GameDataRoot(IL2CPP.il2cpp_object_new(Il2CppClassPointerStore<GameDataRoot>.NativeClassPtr))
-                    {
-                        Enabled = true,
-                        Name = name,
-                        Folder = folder,
-                    });
+                // The game's constructor (enabled, name, folder: bko(Boolean, String, String) on 0.82.08).
+                kept.Add(roots.FirstOrDefault(g => g.Name == name) ?? new GameDataRoot(true, name, folder));
             roots = kept;
             GameNames.DataRoots = new Il2CppReferenceArray<GameDataRoot>(roots.ToArray());
             Game.Log?.Invoke($"DataRoots: {string.Join(", ", roots.Select(r => $"{r.Name} = {r.Folder}"))}");

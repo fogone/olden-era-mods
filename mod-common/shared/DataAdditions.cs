@@ -62,10 +62,18 @@ internal static class DataAdditions
             var sources = gameFolders.Select(f => ("game", f)).Concat(roots).ToList();
             // Each mod's copies go into its own folder (DataCopies.CopiesFile).
             DataCopies.Write(sources);
-            if (additions.Count == 0)
+            // The cities naming a mod's scene, with its number (ModScenes).
+            var cities = ModScenes.Cities(sources).ToList();
+            if (additions.Count == 0 && cities.Count == 0)
                 return false;
             var zip = Path.Combine(folder, "additions.zip");
             using var archive = ZipFile.Open(zip, ZipArchiveMode.Create);
+            foreach (var (path, file) in cities)
+            {
+                using var stream = archive.CreateEntry(path).Open();
+                var bytes = Encoding.UTF8.GetBytes(file.ToJsonString());
+                stream.Write(bytes, 0, bytes.Length);
+            }
             foreach (var group in additions.GroupBy(a => a.path, StringComparer.OrdinalIgnoreCase))
             {
                 var file = Merged(group.Key, sources);
