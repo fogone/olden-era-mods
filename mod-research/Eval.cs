@@ -92,10 +92,10 @@ internal static class Eval
 
     static Type[] types;
 
-    // The game's code, Unity's modules (AssetBundle, Physics, Audio... each a module of its own) and the IL2CPP system
-    // types: every such assembly loaded.
+    // The game's code (Hex and its own assemblies: Hex.ResManager, Hex.Shared...), Unity's modules (AssetBundle,
+    // Physics, Audio... each a module of its own) and the IL2CPP system types: every such assembly loaded.
     static Type[] Types() => types ??= new[] { typeof(Hex.UI.Tooltips.BhTooltip).Assembly, typeof(UnityEngine.Object).Assembly, typeof(TMPro.TMP_Text).Assembly, typeof(Il2CppSystem.String).Assembly }
-        .Concat(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name is { } n && (n.StartsWith("UnityEngine") || n.StartsWith("Unity.") || n == "Il2Cppmscorlib")))
+        .Concat(AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name is { } n && (n.StartsWith("UnityEngine") || n.StartsWith("Unity.") || n.StartsWith("Hex.") || n == "Il2Cppmscorlib")))
         .Distinct().SelectMany(Game.SafeTypes).ToArray();
 
     sealed class Parser

@@ -121,7 +121,9 @@ internal static class DataCopies
         var files = Read(from, path => copy.Files.Any(f => f.EndsWith("/") ? path.StartsWith(f, StringComparison.OrdinalIgnoreCase) : path.Equals(f, StringComparison.OrdinalIgnoreCase)));
         foreach (var f in copy.Files.Where(f => !files.Keys.Any(p => f.EndsWith("/") ? p.StartsWith(f, StringComparison.OrdinalIgnoreCase) : p.Equals(f, StringComparison.OrdinalIgnoreCase))))
             Game.Log?.Invoke($"DataCopies: {copy.Root}: Copy/{copy.Id}.json: no game file {f}");
-        var mine = own < 0 ? new HashSet<string>() : Ids(Read(new List<(string, string)> { sources[own] }, path => path.StartsWith("DB/", StringComparison.OrdinalIgnoreCase)).Values);
+        // The mod's own entries, by collection: a unit's view of the mod's is not its logic.
+        var mine = own < 0 ? new HashSet<string>() : Read(new List<(string, string)> { sources[own] }, path => path.StartsWith("DB/", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(f => Entries(f.Value).Select(e => (string)(e["id"] as JsonValue)).Where(id => id != null).Select(id => Own(f.Key, id))).ToHashSet();
 
         // First those of the faction, then those with the id of one of them (a unit's view has the unit's id).
         var renamed = new Dictionary<string, string>(StringComparer.Ordinal);
@@ -132,7 +134,8 @@ internal static class DataCopies
         foreach (var (path, file) in files)
         {
             // The mod's own entry of that id is referred to as a copy would be, and not copied.
-            var copied = Entries(file).Where(e => (string)e["id"] is { } id && renamed.TryGetValue(id, out var newId) && !mine.Contains(newId)).ToList();
+            var target = Words(path, copy);
+            var copied = Entries(file).Where(e => (string)e["id"] is { } id && renamed.TryGetValue(id, out var newId) && !mine.Contains(Own(target, newId))).ToList();
             if (copied.Count > 0)
                 entries.Add((path, copied));
         }
@@ -149,7 +152,7 @@ internal static class DataCopies
             stream.Write(json, 0, json.Length);
             written += copied.Count;
         }
-        var kept = renamed.Values.Count(mine.Contains);
+        var kept = files.Sum(f => Entries(f.Value).Count(e => (string)e["id"] is { } id && renamed.TryGetValue(id, out var newId) && mine.Contains(Own(Words(f.Key, copy), newId))));
         Game.Log?.Invoke($"DataCopies: {copy.Root}: {written} entries of {copy.Id} copied from those of {copy.Like} in {entries.Count} files" +
             (kept > 0 ? $", {kept} of the mod's own kept" : ""));
     }
@@ -195,9 +198,10 @@ internal static class DataCopies
     // The entries of an id-keyed file.
     static IEnumerable<JsonObject> Entries(JsonObject file) => (file["array"] as JsonArray)?.OfType<JsonObject>() ?? Enumerable.Empty<JsonObject>();
 
-    // The ids of entries in the files.
-    static HashSet<string> Ids(IEnumerable<JsonObject> files) =>
-        files.SelectMany(Entries).Select(e => (string)(e["id"] as JsonValue)).Where(id => id != null).ToHashSet();
+    // An id with the kind of entry its file holds: the game reads each kind from its own folder of DB (a unit's logic
+    // from DB/units/units_logics, its view from DB/units/units_views), so the same id in two of them is two entries. The
+    // folder is taken as the first three parts of the path (as a copy names it: DB/heroes/<the new faction>).
+    static string Own(string path, string id) => string.Join("/", path.Split('/').SkipLast(1).Take(3)) + "|" + id;
 
     // The JSON files of the roots that `take` takes, a later root's (or archive's) replacing an earlier one's.
     static SortedDictionary<string, JsonObject> Read(List<(string name, string folder)> roots, Func<string, bool> take)
