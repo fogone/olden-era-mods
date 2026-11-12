@@ -41,6 +41,17 @@ static class TypeTrees
 
     public static IEnumerable<Node> PPtrArray(int level, string name, string type) => Vector(level, name, PPtr(level + 2, "data", type));
 
+    public static IEnumerable<Node> Vector3Array(int level, string name) => Vector(level, name, Vector3(level + 2, "data"));
+
+    // A curve (UnityEngine.AnimationCurve), as Unity writes it.
+    public static IEnumerable<Node> AnimationCurve(int level, string name) =>
+        new[] { new Node(level, "AnimationCurve", name, -1, 0, Version: 2) }
+            .Concat(Vector(level + 1, "m_Curve", new[] { new Node(level + 3, "Keyframe", "data", 28, 0, Version: 3) }
+                .Concat(new[] { "time", "value", "inSlope", "outSlope" }.Select(f => new Node(level + 4, "float", f, 4, 0)))
+                .Append(new Node(level + 4, "int", "weightedMode", 4, 0))
+                .Concat(new[] { "inWeight", "outWeight" }.Select(f => new Node(level + 4, "float", f, 4, 0)))))
+            .Concat(new[] { "m_PreInfinity", "m_PostInfinity", "m_RotationOrder" }.Select(f => new Node(level + 1, "int", f, 4, 0)));
+
     // A serialized dictionary of the game's (its pairs' list), written empty: the element's type does not matter then.
     public static IEnumerable<Node> EmptyDictionary(int level, string type, string name) =>
         new[] { new Node(level, type, name, -1, 0) }.Concat(Vector(level + 1, "keyValuePairs", new[] { new Node(level + 3, "int", "data", 4, 0) }));

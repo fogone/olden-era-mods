@@ -9,6 +9,9 @@ public static class GameNames
 {
     public const string GameVersion = "0.82.09";
 
+    // town building slot: name field
+    public const string BuildingSlotNameField = "<clsx>k__BackingField";
+
     // weak squad share
     public const float WeakShare = 0.5f;
 
