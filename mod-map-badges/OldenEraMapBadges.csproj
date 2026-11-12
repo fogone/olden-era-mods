@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.MapBadges</RootNamespace>
     <ModId>nobirds.oldenera.mapbadges</ModId>
     <ModName>Olden Era Map Badges</ModName>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <ModTags>ui;map;info;squads;buildings;qol</ModTags>
     <ModRequires>nobirds.oldenera.core</ModRequires>
   </PropertyGroup>
