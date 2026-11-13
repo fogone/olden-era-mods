@@ -4,56 +4,56 @@
 
 # 0.82.7: fql.crko (bye) holds the scene GameObject and Transform the badges and outlines use (checked in the game);
 # fql.crla (bft) has them too.
-GameMapObject.Model = fql.crli  # the model holder (bye) the mods use; crkp on 0.82.08
+GameMapObject.Model = fql.crkv  # the model holder (bye) the mods use; crli on 0.82.09
 
 # 0.82.7: fgd.cwtl is Hex.Session.Data.Hero (its party and stats, checked in the game); fgd.cwto is the party wrapper
 # (eco, the type the garrison row takes).
-GameHero.Data = fgd.cwuf  # the hero's data (Hex.Session.Data.Hero) with the army the mods read; cwtm on 0.82.08
+GameHero.Data = fgd.cwts  # the hero's data (Hex.Session.Data.Hero) with the army the mods read; cwuf on 0.82.09
 
 # 0.82.7: fre.crox and fre.croy are both Dictionary<int, frc>; crox holds every squad on the map (the badges over
 # squads, checked in the game), croy another set of them.
-GameSquadStore.ById = fre.crpr  # the first of the two dictionaries, as crox (all squads, checked in the game) was on 0.82.7; croy on 0.82.08
+GameSquadStore.ById = fre.crpe  # the first of the two dictionaries (+0x20), as crox (all squads, checked in the game) was on 0.82.7; crpr on 0.82.09
 
 # 0.82.7: the squad entity (fgy) has two squad properties; cqhe is the entity's own squad (the tooltip under the
 # cursor, checked in the game), cwui another one.
-GameSquadEntity.Squad = fgy.cqhy  # the first of the two, as cqhe (the squad under the cursor, checked in the game) was on 0.82.7; cqhf on 0.82.08
+GameSquadEntity.Squad = fgy.cqhl  # the entity's own field (+0x28), as cqhe (the squad under the cursor, checked in the game) was on 0.82.7; cqhy on 0.82.09
 
 # 0.82.7: the game's 18 static Sprite M(string) loaders; efr.bdbb answers a unit's sid with its portrait (found by
 # asking each in the game, 04.11; the dwellings' badges show them).
-GameNames.UnitPortrait = efr.bdbl  # of the unit portrait loader's clones, the one the game calls (BhObserverEventSelectionVariantView, `callers`); bday on 0.82.08
+GameNames.UnitPortrait = efr.bdba  # the unit portrait loader the game calls (BhObserverEventSelectionVariantView, `callers`), no clones of its own on 0.82.10; bdbl on 0.82.09
 
 # 0.82.7: the forecast builders exw.bkg, exw.isw (and bjfj) are clones: the same calls in the same order (`calls` in the
 # research console); the game's patches take them all, the mod calls one.
-GameNames.BuildForecast = exw.bjft  # clones with the same code, the one the game's strike forecasts (epm.bhdq and others) call; bjfe on 0.82.08
+GameNames.BuildForecast = exw.bjfi  # clones with the same code, the one the game's strike forecasts (epm.bhdd and others) call; bjft on 0.82.09
 
 # 0.82.7: BhTooltips has two static BhTooltips properties; cftf is its own static field (+0x0, ields in the research
 # console), the one the game's buff hover reads before its text tooltip (BhUnitWindowBuff.OnHover); cvwp is not a field.
-GameNames.Tooltips = BhTooltips.cftw  # the class's own static field (+0x0, `fields` on 0.82.09); cftf on 0.82.08
+GameNames.Tooltips = BhTooltips.cftj  # the class's own static field (+0x0, `fields` on 0.82.10); cftw on 0.82.09
 
 # 0.82.7: dwc.bavk, epe, ecq, obg are void (dwa, bool) of the bonus receiver with the same calls; bavk is the one the
 # dwelling's change of hands (fpq.bnox) calls to give the new side its bonuses (checked in the game, issue #7).
-GameBonusReceiver.Add = dwc.bavu  # what a dwelling's change of hands (fpq.bnph) calls, the only candidate on 0.82.09; bavh on 0.82.08
+GameBonusReceiver.Add = dwc.bavj  # the only candidate on 0.82.10 (the bonus givers call it, `callers`); bavu on 0.82.09
 
 # 0.82.7: eqe.bhqa, imk, ccl, bxm are bool (Unit, eji) of the battle logic going on to the check by attack type
 # (bhqb); bhqa is the one the attack's sequence (eqe.oan and its clones) calls (`callers` in the research console).
-GameBattleLogic.StrikesAgainAfterCounter = eqe.bhqk  # the one the attack's sequence (eqe.bhqi) calls, the only candidate on 0.82.09; bhpv on 0.82.08
+GameBattleLogic.StrikesAgainAfterCounter = eqe.bhpz  # the one the attack's sequence (eqe.bhpx and its clones) calls; bhqk on 0.82.09
 
 # 0.82.7: eqe.bhpz, njl, mff, glh are bool (Unit) of the battle logic asking the unit's counter_before_attack and
 # counter_before_and_after_attack (the same calls); bhpz is the one the attack's sequence (eqe.oan) calls.
-GameBattleLogic.AnswersBeforeStrike = eqe.bhqj  # the one the attack's sequence (eqe.bhqi) calls; bhpu on 0.82.08
+GameBattleLogic.AnswersBeforeStrike = eqe.bhpy  # the one the attack's sequence (eqe.bhpx and its clones) calls; bhqj on 0.82.09
 
 # 0.82.7: BhNavigationButton has three Actions (chbk, chbl, chbm at +0x90, +0x98, +0xA0); its OnPointerClick calls the
 # one at +0x90 (code read in the game, 07.11), the click; the Mods button in the main menu sets it.
-global::Hex.UI.GeneralKit.BhNavigationButton.MenuClick = BhNavigationButton.chcb  # the click action, OnPointerClick calls +0x90, read in the game on 0.82.09; chbk on 0.82.08
+global::Hex.UI.GeneralKit.BhNavigationButton.MenuClick = BhNavigationButton.chbo  # the click action at +0x90 (`fields` on 0.82.10), the one OnPointerClick calls; chcb on 0.82.09
 
 # Of four clones with their own code (efg, ekm, oal, ujj), the first: BhScreen.Awake did the same inline on 0.82.7 (a
 # screen of ours registered, research console `screen`). On 0.82.09 BhScreen.Awake calls one of them (`callers`).
-GameScreenRegistry.Register = cqp.ujr  # the clone BhScreen.Awake calls; nie on 0.82.08
+GameScreenRegistry.Register = cqp.ujh  # of four clones with the same code (bjr, ujh, exr, gqa), none called (BhScreen.Awake inlines it again on 0.82.10); ujr on 0.82.09
 
 # 0.82.08: the sprite registry (coi) has two static properties of its own type; cdwo is the one with the filled tables
 # (the faction prototype aliased its sprites there, checked in the game 10.11).
-GameNames.SpriteRegistry = coi.cdxf  # the static field; cvrp gives the same object (eval in the game on 0.82.09); cdwo on 0.82.08
+GameNames.SpriteRegistry = coi.cdws  # the static field (`fields` on 0.82.10); cdxf on 0.82.09
 
 # 0.82.09: ejh.betm, lxs, gzi, nfq, djf are clones of "ability by type" differing only in their init flag; betm is the
 # one the ability container's own Init and the like call (`callers` in the research console).
-GameAbilities.Ability = ejh.betm  # the clone the ability container's Init calls; besz on 0.82.08 (no clones then)
+GameAbilities.Ability = ejh.betb  # the clone the ability container's Init calls (`callers`); betm on 0.82.09
