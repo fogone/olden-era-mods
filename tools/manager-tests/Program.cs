@@ -754,7 +754,7 @@ Case("data additions: two mods' factions both in the lists, an entry with the sa
     var core = Path.Combine(root, "core");
     Zip(core, "Core.zip",
         ("DB/data.json", """{ "fractions": ["human", "undead"], "availableFractions": ["human"], "other": 1, }"""),
-        ("DB/city_music_sounds.json", """{ "data": [ { "key": "human", "val": { "soundSetName": "h" } } ] }"""));
+        ("DB/city_music_sounds.json", """{ "array": { "data": [ { "key": "human", "val": { "soundSetName": "h" } } ] } }"""));
     var a = Path.Combine(root, "a");
     var b = Path.Combine(root, "b");
     // Mod a also overwrites a field as the game merges it.
@@ -764,7 +764,7 @@ Case("data additions: two mods' factions both in the lists, an entry with the sa
     Nobirds.OldenEra.Modding.Common.DataAdditions.Add("a", "DB/data.json", Bytes("""{ "fractions": ["cove"], "availableFractions": ["cove"] }"""));
     Nobirds.OldenEra.Modding.Common.DataAdditions.Add("b", "DB/data.json", Bytes("""{ "fractions": ["reef", "cove"] }"""));
     Nobirds.OldenEra.Modding.Common.DataAdditions.Add("b", "DB/city_music_sounds.json",
-        Bytes("""{ "data": [ { "key": "reef", "val": { "soundSetName": "r" } }, { "key": "human", "val": { "soundSetName": "h2" } } ] }"""));
+        Bytes("""{ "array": { "data": [ { "key": "reef", "val": { "soundSetName": "r" } }, { "key": "human", "val": { "soundSetName": "h2" } } ] } }"""));
     var output = Path.Combine(root, "additions");
     Check(Nobirds.OldenEra.Modding.Common.DataAdditions.Write(output, new[] { core }, new[] { ("a", a), ("b", b) }), "nothing written");
     using var archive = System.IO.Compression.ZipFile.OpenRead(Path.Combine(output, "additions.zip"));
@@ -777,7 +777,7 @@ Case("data additions: two mods' factions both in the lists, an entry with the sa
     Check(string.Join(",", data["fractions"]!.AsArray().Select(f => (string)f)) == "human,undead,cove,reef", $"fractions: {data["fractions"]}");
     Check(string.Join(",", data["availableFractions"]!.AsArray().Select(f => (string)f)) == "human,cove", $"available: {data["availableFractions"]}");
     Check(data["other"] == null, "a field not added to was written");
-    var music = System.Text.Json.Nodes.JsonNode.Parse(Entry("DB/city_music_sounds.json"))!["data"]!.AsArray();
+    var music = System.Text.Json.Nodes.JsonNode.Parse(Entry("DB/city_music_sounds.json"))!["array"]!["data"]!.AsArray();
     Check(music.Count == 2 && (string)music[0]!["val"]!["soundSetName"] == "h2" && (string)music[1]!["key"] == "reef", $"music: {music.ToJsonString()}");
 });
 

@@ -15,7 +15,9 @@ namespace Nobirds.OldenEra.Modding.Common;
 // it adds, under Add/ with the file's path:
 //
 //   Add/DB/data.json                {"fractions": ["cove"], "availableFractions": ["cove"]}
-//   Add/DB/city_music_sounds.json   {"data": [{"key": "cove", "val": {"soundSetName": "sounds/city/music/human"}}]}
+//   Add/DB/city_music_sounds.json   {"array": {"data": [{"key": "cove", "val": {"soundSetName": "sounds/city/music/human"}}]}}
+//
+// an addition shaped as the file it adds to (the key/value lists hold their list in "array" -> "data").
 //
 // An object is added to field by field; an array gets the elements added at its end, an element already there (the
 // same value, or an object with the same "key", "sid" or "id") replaced in place. The file as the game would have
@@ -77,10 +79,15 @@ internal static class DataAdditions
             foreach (var group in additions.GroupBy(a => a.path, StringComparer.OrdinalIgnoreCase))
             {
                 var file = Merged(group.Key, sources);
+                var fields = file.Select(f => f.Key).ToHashSet();
                 var written = new JsonObject();
                 foreach (var (root, _, add) in group)
                     foreach (var (key, value) in (JsonObject)add)
                     {
+                        // An addition is shaped as the file it adds to: a field the file has none of is added as given, and
+                        // the game reads no field it does not know (the key/value lists are {"array": {"data": [...]}}).
+                        if (fields.Count > 0 && !fields.Contains(key))
+                            Game.Log?.Invoke($"DataAdditions: {root}: Add/{group.Key}: the file has no field \"{key}\" ({string.Join(", ", fields)}): is the addition shaped as the file?");
                         file[key] = Added(file[key] is { } now ? Clone(now) : null, value);
                         written[key] = Clone(file[key]);
                     }
