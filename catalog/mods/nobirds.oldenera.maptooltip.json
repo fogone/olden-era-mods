@@ -92,6 +92,25 @@
   ],
   "packages": [
     {
+      "version": "0.10.2",
+      "games": [
+        "0.82.10"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.maptooltip-0.10.2.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/map-tooltip-v0.10.2/nobirds.oldenera.maptooltip-0.10.2.zip",
+        "sha256": "3394f9af92fdb8a1be07915f51669e473d2f368c475303fa49bb14866d7e47eb"
+      }
+    },
+    {
       "version": "0.10.1",
       "games": [
         "0.82.09"

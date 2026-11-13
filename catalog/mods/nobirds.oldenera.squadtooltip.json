@@ -102,6 +102,25 @@
   ],
   "packages": [
     {
+      "version": "1.32.2",
+      "games": [
+        "0.82.10"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.squadtooltip-1.32.2.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/squad-tooltip-v1.32.2/nobirds.oldenera.squadtooltip-1.32.2.zip",
+        "sha256": "6ef407591cb6157325566c0a52313d3a6404deb7ab85b6687518107e7fb52b9d"
+      }
+    },
+    {
       "version": "1.32.1",
       "games": [
         "0.82.09"
