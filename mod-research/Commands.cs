@@ -167,7 +167,7 @@ internal sealed class Commands
                 }
                 break;
             case "aliases":
-                foreach (var report in NamesGenerator.Generate(argument.Length > 0 ? string.Join(" ", words.Skip(1)) : System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GameNames.g.cs"), Application.version))
+                foreach (var report in NamesGenerator.Generate(argument.Length > 0 ? string.Join(" ", words.Skip(1)) : System.IO.Path.Combine(BepInEx.Paths.BepInExRootPath, "GameNames.g.cs"), Application.version, GameBuild.Of(BepInEx.Paths.GameRootPath)))
                     write(report);
                 break;
             case "types":

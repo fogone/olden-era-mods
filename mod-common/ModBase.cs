@@ -79,6 +79,9 @@ public abstract class ModBase : BasePlugin
         }
     }
 
+    // The running game's build (GameBuild), read once for all the mods.
+    static readonly Lazy<string> RunningBuild = new(() => GameBuild.Of(Paths.GameRootPath));
+
     // The game's names are for one version of the game: the library's (GameNames, made for the version it is released
     // for), and those of a mod that works on the game's code itself (it compiles GameTypes.g.cs, which stamps it with
     // the version: AssemblyMetadata "Nobirds.OldenEra.GameVersion"). On another version the obfuscated names are other ones: the
@@ -93,6 +96,11 @@ public abstract class ModBase : BasePlugin
         if (GameNames.GameVersion != game)
             return (GameNames.GameVersion, game, $"The mod library (OldenEraCommon) is for the game {GameNames.GameVersion}, the game is {game}: the mod is " +
                                                  "off until the library for this version of the game is installed.");
+        // One version, another build (Steam and Game Pass, #68): other obfuscated names. Unread metadata does not stop it.
+        if (RunningBuild.Value is { } build && build != GameNames.GameBuild)
+            return ($"{GameNames.GameVersion} ({GameNames.GameBuild})", $"{game} ({build})",
+                    $"The mod library (OldenEraCommon) is for the game {GameNames.GameVersion} build {GameNames.GameBuild}, the game is {game} build {build} " +
+                    "(another store's build of this version has other names): the mod is off until the library for this build is installed.");
         return own == null || own == game
             ? null
             : (own, game, $"Built for the game {own}, the game is {game}: the mod is off. Rebuild it on this version of the game " +

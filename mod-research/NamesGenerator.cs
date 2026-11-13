@@ -42,8 +42,9 @@ internal static class NamesGenerator
 
     static string PathName(MemberInfo[] path) => path == null ? "?" : $"{path[0].ReflectedType?.Name}.{string.Join(".", path.Select(Step))}";
 
-    // `version`: the game's Application.version, which the written file is for (ModBase checks it at load).
-    public static IEnumerable<string> Generate(string path, string version)
+    // `version`: the game's Application.version, `build`: its GameBuild, which the written file is for (ModBase checks
+    // both at load).
+    public static IEnumerable<string> Generate(string path, string version, string build)
     {
         _ = Game.HeroType;   // Game's lookups are made (and registered) with its first use
         _ = Game.Encounter;
@@ -196,6 +197,9 @@ internal static class NamesGenerator
         code.AppendLine("public static class GameNames");
         code.AppendLine("{");
         code.AppendLine($"    public const string GameVersion = \"{version}\";");
+        code.AppendLine();
+        code.AppendLine("    // the build of that version (GameBuild): the Steam and Game Pass builds have other obfuscated names");
+        code.AppendLine($"    public const string GameBuild = \"{build}\";");
         foreach (var (entry, value) in constants.OrderBy(c => c.entry.Name))
         {
             code.AppendLine();

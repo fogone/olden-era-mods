@@ -45,10 +45,11 @@ if (Environment.GetEnvironmentVariable("OE_LINKS") is { Length: > 0 } dumped)
 Console.WriteLine($"Read the game's files in {watch.Elapsed.TotalSeconds:0.0} s");
 
 var version = GameVersion(Path.Combine(gameDir, "HeroesOldenEra_Data", "globalgamemanagers"));
-Console.WriteLine($"Game version {version}");
+var build = GameBuild.Of(gameDir) ?? throw new InvalidOperationException($"cannot read {GameBuild.MetadataPath(gameDir)}");
+Console.WriteLine($"Game version {version}, build {build}");
 // Each problem as an error the build shows ("error GN0002: ..."), not only an exit code.
 var ok = true;
-foreach (var line in NamesGenerator.Generate(output, version))
+foreach (var line in NamesGenerator.Generate(output, version, build))
 {
     ok &= !line.StartsWith("not written");
     Console.WriteLine(!ok && line.StartsWith("  ") ? $"error GN0002: {line.Trim()}" : line);
