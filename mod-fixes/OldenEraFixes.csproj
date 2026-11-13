@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.Fixes</RootNamespace>
     <ModId>nobirds.oldenera.fixes</ModId>
     <ModName>Olden Era Fixes</ModName>
-    <Version>0.1.2</Version>
+    <Version>0.1.3</Version>
     <ModTags>fix;qol</ModTags>
     <ModRequires>nobirds.oldenera.core</ModRequires>
   </PropertyGroup>
