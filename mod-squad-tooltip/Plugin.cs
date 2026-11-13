@@ -59,7 +59,6 @@ public partial class Plugin : ModBase
         On(ModEvents.SkullsFilled, fill => Logs.Guard("skulls", () => OnSkullsFilled(fill)));
         On(ModEvents.SquadTooltipFilled, fill => Logs.Guard("tooltip", () => OnTooltipFilled(fill)));
         On(ModEvents.HeroSelected, _ => Logs.Guard("prepare", Prepare));
-        DiplomacyPoints.Watch(harmony);
         WatchEncounters();
     }
 

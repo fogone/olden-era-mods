@@ -1,5 +1,6 @@
+using System.Globalization;
 using System.Linq;
-using HarmonyLib;
+using System.Text.RegularExpressions;
 
 namespace Nobirds.OldenEra.Modding.Common;
 
@@ -85,47 +86,26 @@ public static partial class Game
     }
 }
 
-// The Diplomacy points of a hero and a squad, as the game's explained Diplomacy check (ffd.blop) itself counts them
-// with its points methods (GameTargets.DiplomacyPoints: ffd.blou for the squad, ffd.blow for the hero): watched while
-// the check runs for the mod. Where the check answers without counting (a squad that always or never joins), none.
-//   DiplomacyPoints.Watch(Harmony);                       // in OnLoad; the mod's Harmony takes it off on unload
+// The Diplomacy points of a hero and a squad, as the game's explained Diplomacy check (ffd.bloo on 0.82.10) counts and
+// writes them: its explanation ends with the line "hero points: {0}, squad points: {1}" (the hidden string a.yxa) when
+// it counted them. Since 0.82.10 the check works the final points out inline (the squad's base times its reaction's
+// factor, the hero's base plus the hero's stats and level, times the army ratio's and the hero's factors), so they are
+// read from that line, the game's own numbers. Where the check answers without counting (a squad that always or never
+// joins, no Diplomacy), none.
 //   var (joins, reason, points) = DiplomacyPoints.Check(hero, squad);
 public static class DiplomacyPoints
 {
-    static bool counting;
-    static int? heroPoints, squadPoints;
-
-    public static void Watch(Harmony harmony)
-    {
-        var points = GameTargets.DiplomacyPoints;
-        if (points.Length != 2)
-            return;
-        harmony.PatchEach(new[] { points[0] }, postfix: new HarmonyMethod(typeof(DiplomacyPoints), nameof(SquadPostfix)));
-        harmony.PatchEach(new[] { points[1] }, postfix: new HarmonyMethod(typeof(DiplomacyPoints), nameof(HeroPostfix)));
-    }
+    // The two whole numbers of the explanation's last line.
+    static readonly Regex pointsLine = new Regex(@"(-?\d+)\D+(-?\d+)\s*$");
 
     // The game's explained check (GameHero.WouldJoin) and the points it counted, if it did.
     internal static (bool joins, string reason, (int hero, int squad)? points) Check(GameHero hero, GameSquad squad)
     {
-        heroPoints = squadPoints = null;
-        counting = true;
-        try
-        {
-            var (joins, reason) = hero.WouldJoin(squad);
-            return (joins, reason, heroPoints is { } h && squadPoints is { } s ? (h, s) : null);
-        }
-        finally { counting = false; }
-    }
-
-    static void SquadPostfix(int __result)
-    {
-        if (counting)
-            squadPoints = __result;
-    }
-
-    static void HeroPostfix(int __result)
-    {
-        if (counting)
-            heroPoints = __result;
+        var (joins, reason) = hero.WouldJoin(squad);
+        var last = reason?.TrimEnd().Split('\n').LastOrDefault();
+        var match = last != null ? pointsLine.Match(last) : null;
+        return (joins, reason, match is { Success: true }
+            ? (int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture), int.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture))
+            : null);
     }
 }
