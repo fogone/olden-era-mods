@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.SquadTooltip</RootNamespace>
     <ModId>nobirds.oldenera.squadtooltip</ModId>
     <ModName>Olden Era Squad Tooltip</ModName>
-    <Version>1.32.1</Version>
+    <Version>1.32.2</Version>
     <ModTags>ui;map;tooltip;info;squads;battle</ModTags>
     <ModRequires>nobirds.oldenera.core</ModRequires>
   </PropertyGroup>

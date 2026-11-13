@@ -6,7 +6,7 @@
     <RootNamespace>Nobirds.OldenEra.Modding.Visited</RootNamespace>
     <ModId>nobirds.oldenera.visited</ModId>
     <ModName>Olden Era Visited</ModName>
-    <Version>0.36.1</Version>
+    <Version>0.36.2</Version>
     <ModTags>ui;map;tooltip;info;buildings</ModTags>
     <ModRequires>nobirds.oldenera.core</ModRequires>
   </PropertyGroup>
