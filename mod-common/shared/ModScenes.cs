@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json.Nodes;
+using HarmonyLib;
 using Hex.GameScenes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,7 +23,8 @@ namespace Nobirds.OldenEra.Modding.Common;
 // The library gives each mod scene an EScene number of its own (from 0x100, in the order the mods are read), writes the
 // number into the cities naming the scene (an entry of the data additions' root, DataAdditions), and when a session's
 // town registry is there, loads the scene by its name (additive, its roots off, as the game's) and adds it to the
-// registry under the number through the registry's own method. Nothing of the game is hooked.
+// registry under the number through the registry's own method. Closing a town, the game turns off its own town scenes by
+// its list, a mod's scene with them (a hook on that method: a mod's scene cannot be on the list).
 public static class ModScenes
 {
     sealed class Scene
@@ -49,6 +51,7 @@ public static class ModScenes
         {
             ticking = true;
             Ticker.Add(typeof(ModScenes), Tick);
+            WatchClosing();
         }
     }
 
@@ -122,5 +125,26 @@ public static class ModScenes
             registry.AddScenes(new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<GameSceneEntry>(new[] { entry }));
             Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name} in the town registry as {scene.Id} ({entry.Roots?.Count ?? 0} roots)");
         }
+    }
+
+    // Closing a town, the game turns off its town scenes but the ones kept, by its own list: the scenes a session loads by
+    // their EScene names, which a mod's scene cannot be among. A mod's scene is turned off with them, in the same call: its
+    // camera off before the map's is on (the game's renderer takes the camera turned on last), not a frame later.
+    static Harmony harmony;
+
+    static void WatchClosing()
+    {
+        if (harmony != null)
+            return;
+        harmony = new Harmony("nobirds.oldenera.common.mod-scenes");
+        harmony.PatchEach(GameTargets.CityScenesOff, postfix: new HarmonyMethod(typeof(ModScenes), nameof(ClosedPostfix)));
+    }
+
+    static void ClosedPostfix(GameCityScenes __instance, Il2CppSystem.Collections.Generic.HashSet<EScene> __0)
+    {
+        var registry = __instance.Registry;
+        foreach (var scene in scenes)
+            if (__0?.Contains((EScene)scene.Id) != true && registry?.Scenes?.ContainsKey((EScene)scene.Id) == true)
+                registry.SetActive((EScene)scene.Id, false);
     }
 }

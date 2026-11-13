@@ -353,6 +353,9 @@ public static class GameNames
 
         // scene registry: scenes: cht.ccma : Dictionary`2
         internal global::Il2CppSystem.Collections.Generic.Dictionary<global::Hex.GameScenes.EScene, GameSceneEntry> Scenes => sceneRegistry.ccma;
+
+        // scene registry: turn a scene on or off: cht.raz(EScene, Boolean) : Void
+        internal void SetActive(global::Hex.GameScenes.EScene a0, bool a1) => sceneRegistry.raz(a0, a1);
     }
 
     extension(GameScreenRegistry screenRegistry)
@@ -758,6 +761,13 @@ internal static class GameTargets
 
     static global::System.Reflection.MethodInfo M(global::System.Type type, string name, params global::System.Type[] parameters) =>
         type.GetMethod(name, Any, null, parameters, null);
+
+    // town scenes off but the kept: eja.cbp(HashSet`1) : Void, eja.beou(HashSet`1) : Void
+    public static readonly global::System.Reflection.MethodInfo[] CityScenesOff =
+    {
+        M(typeof(GameCityScenes), nameof(GameCityScenes.cbp), typeof(global::Il2CppSystem.Collections.Generic.HashSet<global::Hex.GameScenes.EScene>)),
+        M(typeof(GameCityScenes), nameof(GameCityScenes.beou), typeof(global::Il2CppSystem.Collections.Generic.HashSet<global::Hex.GameScenes.EScene>)),
+    };
 
     // counter decision: eqe.bhqi(Unit, Unit, eji, Hex, List`1) : Boolean
     public static readonly global::System.Reflection.MethodInfo CounterDecision = M(typeof(GameBattleLogic), nameof(GameBattleLogic.bhqi), typeof(global::Hex.Session.Battle.Unit), typeof(global::Hex.Session.Battle.Unit), typeof(GameAbility), typeof(global::Hex.Session.Battle.Hex), typeof(global::Il2CppSystem.Collections.Generic.List<global::Hex.Session.Battle.Hex>));

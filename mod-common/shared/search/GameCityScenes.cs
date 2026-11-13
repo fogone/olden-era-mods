@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Hex.GameScenes;
@@ -40,6 +41,20 @@ public static partial class Game
                 && ps[0].ParameterType == typeof(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<>).MakeGenericType(e))
             : null, Name).Generate("AddScenes");
 
+    // cht.rbf(EScene, Boolean) on 0.82.09: a scene of the registry turned on or off (its roots), what the game calls for
+    // each of its town scenes when a town is closed.
+    // Clones of it (three on 0.82.10, alike but for a hidden string): the one the game calls closing a town.
+    static readonly Lookup<MethodInfo> registrySetActive = Lookup<MethodInfo>.Among("scene registry: turn a scene on or off",
+        () => cityScenesOff.Value is { } off
+            ? SetActiveClones().Select(m => (m, callers: off.Count(o => GameCode.Calls(o).Any(c => GameCode.At(c.target).Contains(m)))))
+                .Where(x => x.callers > 0).OrderByDescending(x => x.callers).ThenBy(x => x.m.Name, StringComparer.Ordinal).Take(1).Select(x => x.m)
+            : null,
+        Name).Generate("SetActive");
+
+    static IEnumerable<MethodInfo> SetActiveClones() => sceneRegistry.Value?.GetMethods(Own).Where(m => m.ReturnType == typeof(void)
+        && m.GetParameters() is { Length: 2 } ps && ps[0].ParameterType == typeof(EScene) && ps[1].ParameterType == typeof(bool))
+        ?? Enumerable.Empty<MethodInfo>();
+
     // chs.rat(): the entry takes its scene's root objects (Scene.GetRootGameObjects) and turns them off, as the game does
     // once its scene is loaded.
     // Of the methods turning the scene's roots off (clones on 0.82.09), the one that also keeps them in the entry's
@@ -80,6 +95,17 @@ public static partial class Game
             .OfType<MethodInfo>()
             .Where(m => m.GetParameters() is { Length: 1 } ps && ps[0].ParameterType == typeof(string));
     }
+
+    // The town scenes turned off but the ones kept (eja.bepf(HashSet<EScene>) on 0.82.09, with clones): the game's town
+    // scenes by its own list, what it does when a town is closed. A mod's scene is not on that list.
+    static readonly Lookup<List<MethodInfo>> cityScenesOff = new Lookup<List<MethodInfo>>("town scenes off but the kept",
+        () => cityScenes.Value is { } c && SetActiveClones().ToList() is { Count: > 0 } setActive
+            ? c.GetMethods(Own).Where(m => m.ReturnType == typeof(void)
+                    && m.GetParameters() is { Length: 1 } ps && ps[0].ParameterType == typeof(Il2CppSystem.Collections.Generic.HashSet<EScene>)
+                    && GameCode.Calls(m).Any(call => GameCode.At(call.target).Any(setActive.Contains)))
+                .ToList() is { Count: > 0 } found ? found : null
+            : null,
+        Members.Names).GenerateTarget("CityScenesOff");
 
     // eja.cluu
     static readonly Lookup<PropertyInfo> cityRegistry = Lookup<PropertyInfo>.Among("town scenes: registry",
