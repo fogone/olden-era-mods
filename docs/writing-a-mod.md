@@ -318,6 +318,22 @@ the game and putting the mod's animated model into it:
 
 It is what the map model of the first test used; a prefab of the game's kind in the bundle is the way.
 
+A building on the map (a town, a dwelling) is a prefab of the game with its scripts and points too: the map object's
+`"prefs": ["interactive/<name>"]` is loaded from `objects/interactive/<name>`. `"part"` names the part of the game's
+prefab the mod's model replaces (default: the animated one); the model is put as big as that part, its base centred on
+the part's, and its materials on a shader the game does not have are drawn with the part's material (the game's
+`Hex/Lit`) and their own texture:
+
+```json
+Models\objects\interactive\myfaction_city.json
+{ "like": "objects/interactive/dungeon_city", "model": "myfaction_town", "part": "dungeon_city_map" }
+```
+
+with the map object copied from the game's town and its `prefs` renamed (`Copy\<faction>.json`, `"names":
+{"interactive/dungeon_city": "interactive/myfaction_city"}`). Checked 13.11.2026 on 0.82.10 with a town building of
+Golden-Era's 3D town: in place, at the town's size, drawn with the game's material. The model must be a whole one: that
+building, a relief made for the town's camera, falls into shards seen from above.
+
 **Without Unity: `oe-bundle`** (`tools/bundle`). From a model prefab of a bundle (an animated skinned mesh) it writes a
 unit's battle and map prefabs of the game's kind into the bundle, the game's components by the readable names:
 

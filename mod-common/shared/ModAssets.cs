@@ -20,10 +20,11 @@ namespace Nobirds.OldenEra.Modding.Common;
 //                                    is the view's "mapMesh": "me.myfaction/goblin_map"
 //   Models/<path>.json               a model of the game's kind made from one of a bundle's, found at <path>:
 //                                    {"like": "<a prefab of the game>", "model": "<an asset of the mod's bundles>",
-//                                     "scale": 1}. The game's prefab with its scripts and points (the squad helper, the
-//                                    effects point, the quest marker), its animated model (the part with the Animator)
-//                                    replaced by the mod's, as big as the one it replaces times "scale"; for a bundle
-//                                    made without the game's scripts
+//                                     "scale": 1, "part": "<the part replaced>"}. The game's prefab with its scripts and
+//                                    points (the squad helper, the effects point, the quest marker, a town's banner),
+//                                    its model (the part named, by default the one with the Animator) replaced by the
+//                                    mod's, as big as the one it replaces times "scale"; for a bundle made without the
+//                                    game's scripts
 //
 // What the game makes of the prefab then (the squad on the map, its collider, materials, the scale from the view) it
 // makes itself, as of its own. The bundles are loaded on the first frame, before any game is started.
@@ -36,7 +37,7 @@ public static class ModAssets
 
     sealed class Model
     {
-        public string Root, Path, Like, Source;
+        public string Root, Path, Like, Source, Part;
         public float Scale = 1;
     }
 
@@ -103,6 +104,7 @@ public static class ModAssets
                 Path = path,
                 Like = e.TryGetProperty("like", out var like) ? like.GetString() : null,
                 Source = e.TryGetProperty("model", out var source) ? source.GetString() : null,
+                Part = e.TryGetProperty("part", out var part) ? part.GetString() : null,
                 Scale = e.TryGetProperty("scale", out var scale) && scale.TryGetSingle(out var s) ? s : 1,
             };
             if (string.IsNullOrEmpty(model.Like) || string.IsNullOrEmpty(model.Source))
@@ -223,13 +225,15 @@ public static class ModAssets
         }
         var copy = Object.Instantiate(like, holder.transform, false);
         copy.name = System.IO.Path.GetFileName(model.Path);
-        var old = copy.GetComponentInChildren<Animator>(true);
-        if (old == null)
+        // The part replaced: the one named ("part": a town on the map, its model one of the prefab's children), or the
+        // animated model (a unit's).
+        var named = !string.IsNullOrEmpty(model.Part);
+        var place = named ? Part(copy.transform, model.Part) : copy.GetComponentInChildren<Animator>(true)?.transform;
+        if (place == null)
         {
-            Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: {model.Like} has no animated model");
+            Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: {model.Like} has no {(named ? $"part {model.Part}" : "animated model")}");
             return copy;
         }
-        var place = old.transform;
         var replaced = Object.Instantiate(source, place.parent, false);
         replaced.name = place.name;
         replaced.transform.localPosition = place.localPosition;
@@ -239,9 +243,87 @@ public static class ModAssets
         var size = Size(replaced.transform);
         var fit = size > 0 && Size(place) is var placeSize && placeSize > 0 ? placeSize / size : 1;
         replaced.transform.localScale = place.localScale * fit * model.Scale;
+        GameMaterials(place, replaced.transform);
+        // A named part (a building) stands where the game's stood: its base centred on the game's model's base, as a
+        // model made apart is not at its own origin.
+        if (named && Bounds(place) is { } was && Bounds(replaced.transform) is { } now)
+            replaced.transform.position += new Vector3(was.center.x - now.center.x, was.min.y - now.min.y, was.center.z - now.center.z);
         replaced.transform.SetSiblingIndex(place.GetSiblingIndex());
         Object.DestroyImmediate(place.gameObject);
         return copy;
+    }
+
+    // A model's materials on a shader the game does not have (a bundle made with Unity's own, Unlit/Texture...) are drawn
+    // as the part it replaces is: that part's material (the game's Hex/Lit, its light and fog of war) with the model's
+    // texture. The game's renderer draws no shader of its own kind but its own.
+    static void GameMaterials(Transform part, Transform model)
+    {
+        var game = part.GetComponentsInChildren<Renderer>(true).Select(r => r.sharedMaterial).FirstOrDefault(m => m != null && m.shader != null);
+        if (game == null)
+            return;
+        var made = new Dictionary<IntPtr, Material>();
+        foreach (var renderer in model.GetComponentsInChildren<Renderer>(true))
+        {
+            if (renderer.TryCast<MeshRenderer>() == null && renderer.TryCast<SkinnedMeshRenderer>() == null)
+                continue;
+            var materials = renderer.sharedMaterials;
+            var changed = false;
+            for (var i = 0; i < materials.Length; i++)
+            {
+                var own = materials[i];
+                if (own == null || own.shader == null || Shader.Find(own.shader.name) != null)
+                    continue;
+                if (!made.TryGetValue(own.Pointer, out var drawn))
+                {
+                    drawn = new Material(game) { name = own.name, mainTexture = own.mainTexture };
+                    // Not the game model's glow.
+                    if (drawn.HasProperty("_EmissionTex"))
+                        drawn.SetTexture("_EmissionTex", null);
+                    made[own.Pointer] = drawn;
+                }
+                materials[i] = drawn;
+                changed = true;
+            }
+            if (changed)
+                renderer.sharedMaterials = materials;
+        }
+    }
+
+    // The box around a model's meshes, in the world (null: no mesh), from the meshes themselves: a renderer of an
+    // inactive object (the models are kept under one) has no bounds of its own.
+    static Bounds? Bounds(Transform model)
+    {
+        Bounds? box = null;
+        foreach (var renderer in model.GetComponentsInChildren<Renderer>(true))
+        {
+            var mesh = renderer.TryCast<SkinnedMeshRenderer>()?.sharedMesh ?? renderer.GetComponent<MeshFilter>()?.sharedMesh;
+            if (mesh == null)
+                continue;
+            var local = mesh.bounds;
+            var toWorld = renderer.transform.localToWorldMatrix;
+            for (var i = 0; i < 8; i++)
+            {
+                var corner = toWorld.MultiplyPoint3x4(local.center + Vector3.Scale(local.extents,
+                    new Vector3((i & 1) * 2 - 1, (i & 2) - 1, (i & 4) / 2 - 1)));
+                if (box is { } known)
+                {
+                    known.Encapsulate(corner);
+                    box = known;
+                }
+                else
+                    box = new Bounds(corner, Vector3.zero);
+            }
+        }
+        return box;
+    }
+
+    // A prefab's part by its name, anywhere under it.
+    static Transform Part(Transform root, string name)
+    {
+        foreach (var t in root.GetComponentsInChildren<Transform>(true))
+            if (t.name == name)
+                return t;
+        return null;
     }
 
     // The largest side of a model's meshes as they are made (their bounds in their own space, scaled as under the
