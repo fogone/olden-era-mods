@@ -264,7 +264,8 @@ game instead of writing them: `data\Copy\myfaction.json`
 
 Besides the copies, a new faction is its `DB\fractions\` entry (its name, icon, laws, city names; written by the mod),
 `Add\DB\data.json` with it in `fractions` and `availableFractions`, `Add\DB\city_music_sounds.json` and
-`city_ambient_sounds.json` with its key, its texts, pictures and lobby entry (#56). `DB/biomes_info.json` maps one
+`city_ambient_sounds.json` with its key (shaped as the game's files: `{"array": {"data": [{"key": "myfaction", "val":
+{...}}]}}`), its texts, pictures and lobby entry (#56). `DB/biomes_info.json` maps one
 faction to each biome; adding the faction to a biome of the game (`{"key": "Grass", ...}`) would replace that biome's
 faction, so leave it out.
 
