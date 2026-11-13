@@ -52,6 +52,11 @@ sealed class CitySpec
         public float[] Rotation { get; set; }
         public float? Fov { get; set; }
         public float? Far { get; set; }
+        // The points the camera flies through (around the town's camera point, CityCamera: the camera's position is one
+        // of them), a closed loop of four at least; none: the camera stays where it is.
+        public float[][] Nodes { get; set; }
+        // default: stays; cursor: turns after the cursor (the delta angles); free: also flies through the nodes.
+        public string Mode { get; set; } = "default";
     }
 
     public static CitySpec Read(string file)
@@ -223,14 +228,17 @@ sealed class CityScene
                 (0.10144019f, 0.4825136f, 1.2879217f), (0.59018254f, 0.7359377f, 0.25286824f), (1f, 0.82741547f, 0.22321585f) });
             Curve(v["movementSpeedCurve"], new[] { (0f, 1f, 0f), (1f, 1f, 0f) });
             var nodes = v["positionNodes.Array"];
-            // The controller builds a spline of the nodes (it needs four at least): four at the camera, a hair apart, so it
-            // stays where it is.
-            for (var i = 0; i < 4; i++)
+            // The controller builds a spline of the nodes (it needs four at least), in the world: the ones given, or four
+            // at the camera, a hair apart, so it stays where it is.
+            var points = spec.Nodes ?? Enumerable.Range(0, 4).Select(i => new[] { x + i * 0.001f, y, z }).ToArray();
+            if (points.Length < 4 || points.Any(p => p.Length != 3))
+                throw new Exception("camera.nodes: four points [x, y, z] at least");
+            foreach (var p in points)
             {
                 var node = ValueBuilder.DefaultValueFieldFromArrayTemplate(nodes);
-                node["x"].AsFloat = offset[0] + x + i * 0.001f;
-                node["y"].AsFloat = offset[1] + y;
-                node["z"].AsFloat = offset[2] + z;
+                node["x"].AsFloat = offset[0] + p[0];
+                node["y"].AsFloat = offset[1] + p[1];
+                node["z"].AsFloat = offset[2] + p[2];
                 nodes.Children.Add(node);
             }
         });
@@ -241,8 +249,17 @@ sealed class CityScene
             v["lookAtTransform.m_PathID"].AsLong = rigTransform;
             v["cameraTransform.m_PathID"].AsLong = cameraTransform;
         });
-        Component(helper, rig, "Hex.Session.City", "BhCityCameraHelper", TypeTrees.PPtr(1, "cameraController", "BhCityCameraController"),
-            v => v["cameraController.m_PathID"].AsLong = controller);
+        // The camera's mode (the game's eit.EType: Default stays, Cursor turns after the cursor, Free also flies through
+        // the nodes: the game's towns are Free).
+        var mode = Array.IndexOf(new[] { "default", "cursor", "free" }, spec.Mode.ToLowerInvariant());
+        if (mode < 0)
+            throw new Exception($"camera.mode: {spec.Mode} (default, cursor or free)");
+        Component(helper, rig, "Hex.Session.City", "BhCityCameraHelper", TypeTrees.PPtr(1, "cameraController", "BhCityCameraController")
+            .Append(new TypeTrees.Node(1, "int", "currentMode", 4, 0)), v =>
+        {
+            v["cameraController.m_PathID"].AsLong = controller;
+            v["currentMode"].AsInt = mode;
+        });
         Component(context, cameraGo, "Hex.Render", "BhCameraContext", Enumerable.Empty<TypeTrees.Node>(), _ => { });
         Component(raycaster, cameraGo, "UnityEngine.EventSystems", "PhysicsRaycaster", new[]
         {

@@ -61,6 +61,9 @@ interface over it). The tool makes them of the scene's objects:
 - `camera.object`: the scene's camera; `position` and `size` (an orthographic camera's half height) frame it when the
   scene's own values frame something else; `rotationSpeed`, `deltaHorizontalAngle`, `deltaVerticalAngle`,
   `maxMovementSpeed`, `transitionTime`, `cullingMask`: the controller's settings, the game's town values by default;
+- `camera.mode`: `default` (stays), `cursor` (turns after the cursor by the delta angles) or `free` (also flies through
+  the nodes, as the game's towns; the game's settings may turn the flight off); `camera.nodes`: the points it flies
+  through, `[x, y, z]` from the `CityCamera` point, four at least (none: four at the camera, so it stays);
 - `camera.rotation`, `fov`, `far`: a perspective camera's turn (a quaternion `[x, y, z, w]`), vertical field of view and
   far plane;
 - `buildingHeight`: the buildings' height for the game's effects (2);
