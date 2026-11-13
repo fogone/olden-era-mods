@@ -126,10 +126,10 @@ public static partial class Game
 
     // ---------- the Diplomacy points ----------
 
-    // The Diplomacy check explained: static bool (hero, squad, out string) that the encounter's check calls (ffd.blop,
-    // called by ffd.bloq). Its code on 0.82.7: squad = blou(hero, squad, config), hero = blow(hero, squad, config),
-    // joins = hero >= squad, the explanation "hero points: {hero} squad points: {squad}". The config is the game's
-    // DiplomacyInfoConfig (cnp.cdqh); the check passes it itself.
+    // The Diplomacy check explained: static bool (hero, squad, out string) that the encounter's check calls (ffd.bloo,
+    // called by ffd.blop on 0.82.10). It counts the squad's and the hero's points, joins = hero >= squad, and ends the
+    // explanation with "hero points: {hero}, squad points: {squad}" (DiplomacyPoints reads them there). The config is the
+    // game's DiplomacyInfoConfig; the check passes it itself.
     static readonly Lookup<MethodInfo> explainedCheck = Lookup<MethodInfo>.Among("diplomacy check explained",
         () => encounterJoinCheck.Value is { } check
             ? GameCode.Calls(check).SelectMany(c => GameCode.At(c.target))
@@ -137,19 +137,6 @@ public static partial class Game
                 .DistinctCode()
             : null,
         Members.Name, onlyOne: true).Generate("JoinsByDiplomacyExplained");
-
-    // The points, in the order the explained check calls them: the squad's, then the hero's (static int (hero, squad, config)).
-    static readonly Lookup<List<MethodInfo>> pointsMethods = new Lookup<List<MethodInfo>>("diplomacy points (squad, hero)",
-        () => explainedCheck.Value is { } check
-            ? GameCode.Calls(check).Select(c => GameCode.At(c.target).FirstOrDefault(m => m.IsStatic && m.ReturnType == typeof(int) &&
-                    m.GetParameters().Select(p => p.ParameterType).SequenceEqual(new[] { Game.HeroType, Game.SquadType, typeof(DiplomacyInfoConfig) })))
-                .Where(m => m != null).ToList() is { Count: 2 } found ? found : null
-            : null,
-        Members.Names).GenerateTarget("DiplomacyPoints");
-
-    // The points methods (squad's, hero's), for watching what the explained check counts (DiplomacyPoints). The
-    // check counts them only on its last way: a squad that always joins (isCampaignFreeDiplomacy, reaction type 5, ...),
-    // never joins (reaction type 0) or a hero without Diplomacy are answered before, with no points.
 
     // Of the hero's side (Game.HeroSideOwner, fgd.cqej of type fqu): is it a person's, bool M() (fqu.bnyp); its AI, the
     // property of a type with a DifficultyAi (fqu.crmt, fzh; null for a person); its state, the property of a type with
