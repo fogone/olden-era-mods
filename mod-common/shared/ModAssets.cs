@@ -237,7 +237,9 @@ public static class ModAssets
         var replaced = Object.Instantiate(source, place.parent, false);
         replaced.name = place.name;
         replaced.transform.localPosition = place.localPosition;
-        replaced.transform.localRotation = place.localRotation;
+        // Turned as the part, an animated one; a named part (a building) upright in the prefab, as Unity's models are
+        // (the game's buildings are made lying, Z up, and turned by their part).
+        replaced.transform.localRotation = named ? Quaternion.identity : place.localRotation;
         // As big as the game's model it replaces (models are made in their own units: the game's troglodyte is 0.03
         // high, a model made in metres 1.7), then the mod's "scale".
         var size = Size(replaced.transform);

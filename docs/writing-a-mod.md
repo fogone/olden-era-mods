@@ -334,6 +334,12 @@ with the map object copied from the game's town and its `prefs` renamed (`Copy\<
 Golden-Era's 3D town: in place, at the town's size, drawn with the game's material. The model must be a whole one: that
 building, a relief made for the town's camera, falls into shards seen from above.
 
+A model made from a picture: an image-to-3D tool (TRELLIS.2, Hunyuan3D, Meshy...) gives a `.glb`, `oe-bundle model`
+(`tools/bundle/README.md`) makes it a bundle's prefab without Unity. Checked 13.11.2026 on 0.82.10: the Stronghold
+town of the HoMM3 map (its sprite redrawn large by Gemini, made a model by TRELLIS.2: 95,000 triangles, a 2048 texture)
+stands on the map in the prototype's towns. A named part's model stands upright in the prefab: the game's buildings are
+made lying (Z up) and turned by their part, a model of Unity's kind is not.
+
 **Without Unity: `oe-bundle`** (`tools/bundle`). From a model prefab of a bundle (an animated skinned mesh) it writes a
 unit's battle and map prefabs of the game's kind into the bundle, the game's components by the readable names:
 

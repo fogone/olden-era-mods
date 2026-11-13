@@ -85,3 +85,27 @@ interface over it). The tool makes them of the scene's objects:
 A building's collider is the box around its meshes.
 
 See `docs/writing-a-mod.md`, "Town scenes".
+
+## Models from glTF
+
+```
+oe-bundle model <bundle> <out bundle> <model.json>
+```
+
+A model made elsewhere, a glTF binary file (`.glb`: an image-to-3D tool's, a 3D editor's export), made a prefab of a
+bundle of the game's Unity version without Unity. The bundle given is the shape of what is written: one of the game's
+Unity version holding a prefab of a textured mesh (a GameObject with a MeshFilter and a MeshRenderer, its material's
+`_MainTex`); that prefab gets the model's mesh and texture and the bundle's other assets are taken out:
+
+```json
+{ "glb": "town.glb", "name": "myfaction_town", "template": "<the bundle's prefab of a textured mesh>", "turn": 0 }
+```
+
+- the mesh: the glTF's first mesh, its triangles, positions, normals and first UV set, put into Unity's space (x
+  mirrored, the triangles' order turned) and turned by `turn` degrees about the vertical axis; a node's transform is not
+  applied;
+- the texture: the material's base colour (PNG, JPEG, WebP, `EXT_texture_webp` too), uncompressed with its mipmaps;
+- the bundle's files are named after `name`, so it loads next to the bundle it was made from.
+
+The prefab is `assets/<name>.prefab`: a mod's `Models\<path>.json` puts it into a prefab of the game (`"model":
+"<name>"`, see `docs/writing-a-mod.md`), drawn with the game's material.
