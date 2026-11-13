@@ -365,6 +365,12 @@ game does the rest: it shows the levels built, opens a building's windows on a c
 interface over the camera. Checked 13.11.2026 on the Stronghold prototype in Golden-Era's scene: the town opens with the
 game's interface, a click on the town hall opens the building tree, a market built there appears in the scene.
 
+A town modelled in 3D needs no scene built in Unity either: its buildings and surroundings made as prefabs of a model
+bundle, `oe-bundle city` puts them into a scene (`models`, `tools/bundle/README.md`) and its camera is made a
+perspective one. Checked 13.11.2026 with Golden-Era's 3D Stronghold (its buildings modelled from the HoMM3 art, a
+terrain, a sky, effects): the town opens in 3D with the game's interface, a click on the town hall opens the building
+tree, fortifications built there appear after the game's building effect.
+
 ## 3. The framework
 
 ### ModBase (`mod-common/ModBase.cs`)

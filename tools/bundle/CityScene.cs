@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using AssetsTools.NET;
 using AssetsTools.NET.Extra;
@@ -18,6 +19,19 @@ sealed class CitySpec
     public float BuildingHeight { get; set; } = 2;
     public CameraSpec Camera { get; set; }
     public float[] Offset { get; set; } = { 0, -2000, 0 };
+    // The scene's objects taken out (with what is under them): by name, or by its beginning ending in "*".
+    public string[] Remove { get; set; }
+    public ModelsSpec Models { get; set; }
+
+    // Prefabs of a model bundle (its path from the JSON's folder) put into the scene, at a place: the town's buildings
+    // and its surroundings modelled in Unity. Their roots are the scene's objects by name, slots name them as any other.
+    public sealed class ModelsSpec
+    {
+        public string Bundle { get; set; }
+        public string[] Prefabs { get; set; }
+        public float[] Position { get; set; }
+        public float[] Rotation { get; set; }
+    }
 
     // The scene's camera made the town's: the object, and the controller's settings (the game's town values by
     // default: cityDungeon's; no turning: a scene of flat layers).
@@ -34,10 +48,20 @@ sealed class CitySpec
         // frames something else; the scene's by default.
         public float[] Position { get; set; }
         public float? Size { get; set; }
+        // A perspective camera: its turn (a quaternion: x, y, z, w), its vertical field of view, how far it sees.
+        public float[] Rotation { get; set; }
+        public float? Fov { get; set; }
+        public float? Far { get; set; }
     }
 
-    public static CitySpec Read(string file) => JsonSerializer.Deserialize<CitySpec>(File.ReadAllText(file),
-        new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+    public static CitySpec Read(string file)
+    {
+        var spec = JsonSerializer.Deserialize<CitySpec>(File.ReadAllText(file),
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
+        if (spec.Models != null)
+            spec.Models.Bundle = Path.GetFullPath(spec.Models.Bundle, Path.GetDirectoryName(Path.GetFullPath(file)));
+        return spec;
+    }
 }
 
 sealed class CityScene
@@ -61,6 +85,16 @@ sealed class CityScene
 
     public void Add(CitySpec spec)
     {
+        foreach (var pattern in spec.Remove ?? Array.Empty<string>())
+            RemoveObjects(pattern);
+        if (spec.Models is { } models)
+        {
+            var assets = new ModelImport(am, scene, shared, sharedFileId).Add(models.Bundle, models.Prefabs, models.Position, models.Rotation);
+            Preload(assets.ToArray());
+            nextScene = scene.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
+            nextShared = shared.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
+        }
+
         var objects = scene.file.GetAssetsOfType(AssetClassID.GameObject)
             .ToDictionary(i => am.GetBaseField(scene, i)["m_Name"].AsString, i => i.PathId);
         long Object(string name) => objects.TryGetValue(name, out var id) ? id : throw new Exception($"the scene has no object {name}");
@@ -105,14 +139,14 @@ sealed class CityScene
                     v["buildingHeight"].AsFloat = spec.BuildingHeight;
                     v["buildingVfxScale"].AsFloat = 1;
                 });
+                var (center, size) = Bounds(levelGo);
                 Native(collider, (int)AssetClassID.BoxCollider, TypeTrees.BoxCollider(), v =>
                 {
                     v["m_GameObject.m_PathID"].AsLong = levelGo;
                     v["m_Enabled"].AsBool = true;
-                    // A quad's mesh (Golden-Era's layers): 1 x 1 in its own space; thin in depth.
-                    v["m_Size.x"].AsFloat = 1;
-                    v["m_Size.y"].AsFloat = 1;
-                    v["m_Size.z"].AsFloat = 0.1f;
+                    (v["m_Center.x"].AsFloat, v["m_Center.y"].AsFloat, v["m_Center.z"].AsFloat) = (center.X, center.Y, center.Z);
+                    // Thin in depth at least: a flat layer's quad.
+                    (v["m_Size.x"].AsFloat, v["m_Size.y"].AsFloat, v["m_Size.z"].AsFloat) = (size.X, size.Y, Math.Max(size.Z, 0.1f));
                 });
                 AddComponents(levelGo, building, collider);
                 buildings.Add(building);
@@ -166,6 +200,9 @@ sealed class CityScene
             (x, y, z) = (p[0], p[1], p[2]);
             Edit(cameraTransform, v => { var at = v["m_LocalPosition"]; at["x"].AsFloat = x; at["y"].AsFloat = y; at["z"].AsFloat = z; });
         }
+        if (spec.Rotation is { Length: 4 } r)
+            Edit(cameraTransform, v => (v["m_LocalRotation.x"].AsFloat, v["m_LocalRotation.y"].AsFloat, v["m_LocalRotation.z"].AsFloat,
+                v["m_LocalRotation.w"].AsFloat) = (r[0], r[1], r[2], r[3]));
 
         long rig = nextScene++, rigTransform = nextScene++, controller = nextScene++, helper = nextScene++;
         long context = nextScene++, raycaster = nextScene++;
@@ -224,6 +261,13 @@ sealed class CityScene
                 v["m_CullingMask.m_Bits"].AsUInt = spec.CullingMask;
                 if (spec.Size is { } size)
                     v["orthographic size"].AsFloat = size;
+                if (spec.Fov is { } fov)
+                {
+                    v["orthographic"].AsBool = false;
+                    v["field of view"].AsFloat = fov;
+                }
+                if (spec.Far is { } far)
+                    v["far clip plane"].AsFloat = far;
             });
         Console.WriteLine($"  camera: {spec.Object} under CityCamera, at ({x}, {y}, {z})");
     }
@@ -405,20 +449,83 @@ sealed class CityScene
         return id;
     }
 
-    // The shared assets' preload list (PreloadData): the scene's scripts loaded with it.
-    void Preload(long id)
+    // The shared assets' preload list (PreloadData): the scene's scripts and assets loaded with it.
+    void Preload(params long[] ids)
     {
         foreach (var info in shared.file.GetAssetsOfType(AssetClassID.PreloadData))
         {
             var v = am.GetBaseField(shared, info);
             var array = v["m_Assets.Array"];
-            var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(array);
-            e["m_FileID"].AsInt = 0;
-            e["m_PathID"].AsLong = id;
-            array.Children.Add(e);
+            foreach (var id in ids)
+            {
+                var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(array);
+                e["m_FileID"].AsInt = 0;
+                e["m_PathID"].AsLong = id;
+                array.Children.Add(e);
+            }
             info.SetNewData(v);
         }
     }
+
+    // The scene's objects of a name (or a name's beginning, "name*") taken out with all under them.
+    void RemoveObjects(string pattern)
+    {
+        bool Matches(string name) => pattern.EndsWith('*') ? name.StartsWith(pattern[..^1]) : name == pattern;
+        var hierarchy = new Hierarchy(am, scene);
+        var removed = 0;
+        foreach (var info in scene.file.GetAssetsOfType(AssetClassID.GameObject).ToList())
+        {
+            if (scene.file.GetAssetInfo(info.PathId) == null || !Matches(am.GetBaseField(scene, info)["m_Name"].AsString))
+                continue;
+            var transform = TransformOf(info.PathId);
+            var father = Field(scene, transform)["m_Father.m_PathID"].AsLong;
+            if (father != 0)
+                Edit(father, v => v["m_Children.Array"].Children.RemoveAll(c => c["m_PathID"].AsLong == transform));
+            foreach (var id in hierarchy.Objects(info.PathId))
+                scene.file.Metadata.RemoveAssetInfo(scene.file.GetAssetInfo(id));
+            removed++;
+        }
+        Console.WriteLine($"  removed {removed} objects {pattern}");
+    }
+
+    // The box around what an object draws (its meshes' and those of the objects under it), in its own space.
+    (Vector3 center, Vector3 size) Bounds(long go)
+    {
+        Vector3 min = new(float.MaxValue), max = new(float.MinValue);
+        void Walk(long g, Matrix4x4 toLevel)
+        {
+            foreach (var c in Field(scene, g)["m_Component.Array"].Children.Select(c => c["component.m_PathID"].AsLong))
+            {
+                if (scene.file.GetAssetInfo(c).TypeId != (int)AssetClassID.MeshFilter)
+                    continue;
+                var mesh = Field(scene, c)["m_Mesh"];
+                var file = mesh["m_FileID"].AsInt == 0 ? scene : mesh["m_FileID"].AsInt == sharedFileId ? shared : null;
+                if (file == null || mesh["m_PathID"].AsLong == 0)
+                    continue;
+                var box = Field(file, mesh["m_PathID"].AsLong)["m_LocalAABB"];
+                var at = Vec(box["m_Center"]);
+                var extent = Vec(box["m_Extent"]);
+                for (var i = 0; i < 8; i++)
+                {
+                    var corner = Vector3.Transform(at + extent * new Vector3((i & 1) * 2 - 1, (i & 2) - 1, (i & 4) / 2 - 1), toLevel);
+                    min = Vector3.Min(min, corner);
+                    max = Vector3.Max(max, corner);
+                }
+            }
+            foreach (var child in Field(scene, TransformOf(g))["m_Children.Array"].Children.Select(c => c["m_PathID"].AsLong))
+            {
+                var t = Field(scene, child);
+                var local = Matrix4x4.CreateScale(Vec(t["m_LocalScale"]))
+                    * Matrix4x4.CreateFromQuaternion(new Quaternion(Vec(t["m_LocalRotation"]), t["m_LocalRotation.w"].AsFloat))
+                    * Matrix4x4.CreateTranslation(Vec(t["m_LocalPosition"]));
+                Walk(t["m_GameObject.m_PathID"].AsLong, local * toLevel);
+            }
+        }
+        Walk(go, Matrix4x4.Identity);
+        return min.X > max.X ? (Vector3.Zero, new Vector3(1, 1, 0)) : ((min + max) / 2, max - min);
+    }
+
+    static Vector3 Vec(AssetTypeValueField v) => new(v["x"].AsFloat, v["y"].AsFloat, v["z"].AsFloat);
 
     void New(AssetsFileInstance file, long id, int typeId, ushort scriptIndex, Action<AssetTypeValueField> fill)
     {

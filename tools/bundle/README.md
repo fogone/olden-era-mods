@@ -61,7 +61,24 @@ interface over it). The tool makes them of the scene's objects:
 - `camera.object`: the scene's camera; `position` and `size` (an orthographic camera's half height) frame it when the
   scene's own values frame something else; `rotationSpeed`, `deltaHorizontalAngle`, `deltaVerticalAngle`,
   `maxMovementSpeed`, `transitionTime`, `cullingMask`: the controller's settings, the game's town values by default;
+- `camera.rotation`, `fov`, `far`: a perspective camera's turn (a quaternion `[x, y, z, w]`), vertical field of view and
+  far plane;
 - `buildingHeight`: the buildings' height for the game's effects (2);
-- `offset`: where the scene is put (`[0, -2000, 0]`: away from the world map, which the game keeps loaded under it).
+- `offset`: where the scene is put (`[0, -2000, 0]`: away from the world map, which the game keeps loaded under it);
+- `remove`: the scene's objects taken out with all under them, by name or by a name's beginning (`"layer_*"`);
+- `models`: prefabs of a model bundle built in Unity put into the scene, so a town modelled as prefabs (buildings,
+  terrain, sky, effects) needs no scene of its own built in Unity:
+
+  ```json
+  "models": { "bundle": "../town_models", "prefabs": ["town_terrain", "townHall_1"], "position": [0, 0, 0], "rotation": [0, 0, 0, 1] }
+  ```
+
+  `bundle` is the path from the JSON's folder; `prefabs` the roots taken (all when left out), put at `position` and
+  `rotation`; slots name them as any other object. Their GameObjects and components go into the scene's file, what they
+  draw with (meshes, materials, textures, shaders, animation) into its shared assets, renumbered as Unity numbers a
+  scene's objects; a texture kept in the bundle's resource file (`.resS`) is put into the texture. The bundle must be
+  of the game's Unity version and refer to no other file; scripts of its own are refused.
+
+A building's collider is the box around its meshes.
 
 See `docs/writing-a-mod.md`, "Town scenes".
