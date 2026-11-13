@@ -111,6 +111,20 @@
   ],
   "packages": [
     {
+      "version": "0.8.2",
+      "games": [
+        "0.82.10"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.core-0.8.2.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/core-v0.8.2/nobirds.oldenera.core-0.8.2.zip",
+        "sha256": "ec4e2b4af2f45836718e70307b32fc03b8a101574f4e67899fb2a040db28c254"
+      }
+    },
+    {
       "version": "0.8.1",
       "games": [
         "0.82.09"

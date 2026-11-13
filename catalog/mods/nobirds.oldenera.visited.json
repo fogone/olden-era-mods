@@ -101,6 +101,25 @@
   ],
   "packages": [
     {
+      "version": "0.36.2",
+      "games": [
+        "0.82.10"
+      ],
+      "bepinex": "6.0.0-be.788",
+      "requires": [
+        {
+          "id": "nobirds.oldenera.core",
+          "version": null
+        }
+      ],
+      "files": [],
+      "archive": {
+        "name": "nobirds.oldenera.visited-0.36.2.zip",
+        "url": "https://github.com/fogone/olden-era-mods/releases/download/visited-v0.36.2/nobirds.oldenera.visited-0.36.2.zip",
+        "sha256": "0e4f05879822b1c9b08d44c2528ea5cb14badf43f3e09e51ecdf5851c021e33f"
+      }
+    },
+    {
       "version": "0.36.1",
       "games": [
         "0.82.09"
