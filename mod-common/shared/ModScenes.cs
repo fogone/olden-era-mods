@@ -98,6 +98,8 @@ public static class ModScenes
     // Each frame: a session's town registry without a mod's scene gets it (loaded first when it is not).
     static void Tick()
     {
+        if (Reloading())
+            return;
         var registry = GameNames.Session?.TryCast<GameMapGameSession>()?.Scenes?.City?.Registry;
         var known = registry?.Scenes;
         if (known == null || !known.ContainsKey(EScene.cityCore))
@@ -118,6 +120,8 @@ public static class ModScenes
                 continue;
             }
             scene.Loading = null;
+            Terrains(scene, unity);
+            GameShaders(scene, unity);
             // The game's entry, made as the game makes its own once a scene is loaded: chs(EScene, Scene), then it takes
             // the scene's roots and turns them off (chs.rat on 0.82.08).
             var entry = new GameSceneEntry((EScene)scene.Id, unity);
@@ -126,6 +130,141 @@ public static class ModScenes
             Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name} in the town registry as {scene.Id} ({entry.Roots?.Count ?? 0} roots)");
         }
     }
+
+    // A mod's scene made again from a new bundle file while the game runs (a modder's quick look, the research console's
+    // "scene reload"): the scene out of the town registry and unloaded, its bundle unloaded, the file put in the cache in
+    // place of the bundle's (the game's components named as in this game, as at the start), the bundle loaded; the next
+    // ticks load the scene and give it to the registry as at the start. The town must be closed. Returns what it does.
+    public static string Reload(string name, string file)
+    {
+        var scene = scenes.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (scene == null)
+            return $"no mod scene {name}";
+        if (!File.Exists(file))
+            return $"no file {file}";
+        var registry = GameNames.Session?.TryCast<GameMapGameSession>()?.Scenes?.City?.Registry;
+        if (registry?.Scenes?.ContainsKey((EScene)scene.Id) == true)
+        {
+            registry.SetActive((EScene)scene.Id, false);
+            registry.Scenes.Remove((EScene)scene.Id);
+        }
+        scene.Loading = null;
+        reloading = (scene, file, SceneManager.GetSceneByName(scene.Name).isLoaded ? SceneManager.UnloadSceneAsync(scene.Name) : null);
+        return $"reloading {scene.Name} from {file}";
+    }
+
+    static (Scene scene, string file, AsyncOperation unloading)? reloading;
+
+    // The reload's steps once the scene is unloaded: the bundle out, the new file in, the bundle in.
+    static bool Reloading()
+    {
+        if (reloading is not { } r)
+            return false;
+        if (r.unloading is { isDone: false })
+            return true;
+        reloading = null;
+        try
+        {
+            foreach (var bundle in Resources.FindObjectsOfTypeAll<AssetBundle>())
+                if (bundle.isStreamedSceneAssetBundle && bundle.GetAllScenePaths().Any(p => System.IO.Path.GetFileNameWithoutExtension(p).Equals(r.scene.Name, StringComparison.OrdinalIgnoreCase)))
+                {
+                    var cached = ModAssets.CachedFile(r.scene.Root, bundle.name);
+                    bundle.Unload(true);
+                    if (BundleNames.Rename(r.file, cached + ".renamed", out _) > 0)
+                        File.Copy(cached + ".renamed", cached, true);
+                    else
+                        File.Copy(r.file, cached, true);
+                    File.Delete(cached + ".renamed");
+                    AssetBundle.LoadFromFile(cached);
+                    Game.Log?.Invoke($"ModScenes: {r.scene.Root}: scene {r.scene.Name} reloaded from {r.file}");
+                    return false;
+                }
+            Game.Log?.Invoke($"ModScenes: {r.scene.Root}: no loaded bundle holds the scene {r.scene.Name}");
+        }
+        catch (Exception e) { Game.Log?.Invoke($"ModScenes: {r.scene.Root}: reload: {e.GetType().Name}: {e.Message}"); }
+        return false;
+    }
+
+    // A mod scene's terrains (Unity's Terrain, as the game's towns have theirs; oe-bundle city: terrain) drawn as the
+    // game's: the terrain's material is named after a material of the game (its terrain shader, Hex/TerrainUnity), which
+    // is copied; the copy's textures (_Texture0..3, mixed by the terrain's splat map) are the layers' own (a mod's image)
+    // or the game's textures the layers are named after, one per layer, repeated every layer's tile size. A bundle
+    // carries neither the game's material nor its textures.
+    static void Terrains(Scene scene, UnityEngine.SceneManagement.Scene unity)
+    {
+        foreach (var root in unity.GetRootGameObjects())
+            foreach (var terrain in root.GetComponentsInChildren<Terrain>(true))
+            {
+                var data = terrain.terrainData;
+                if (data == null)
+                    continue;
+                var ours = terrain.materialTemplate;
+                if (ours != null && GameObjects<Material>(ours.name, m => m != ours && m.shader != null && m.shader.name.StartsWith("Hex/")) is { } game)
+                {
+                    var material = new Material(game) { name = ours.name };
+                    var layers = data.terrainLayers;
+                    for (var i = 0; i < layers.Length; i++)
+                    {
+                        if (layers[i] == null)
+                            continue;
+                        if ((layers[i].diffuseTexture ?? GameObjects<Texture2D>(layers[i].name, _ => true)) is { } texture)
+                            material.SetTexture($"_Texture{i}", texture);
+                        else
+                            Game.Log?.Invoke($"ModScenes: {scene.Root}: terrain {terrain.name}: the game has no texture {layers[i].name}");
+                        var tile = layers[i].tileSize;
+                        material.SetTextureScale($"_Texture{i}", new Vector2(1 / tile.x, 1 / tile.y));
+                    }
+                    terrain.materialTemplate = material;
+                }
+                else if (ours != null)
+                    Game.Log?.Invoke($"ModScenes: {scene.Root}: terrain {terrain.name}: the game has no material {ours.name}");
+                Game.Log?.Invoke($"ModScenes: {scene.Root}: terrain {terrain.name} ({data.heightmapResolution}, {data.size}) with {terrain.materialTemplate?.name}");
+            }
+    }
+
+    // A mod scene's materials drawn as the game's: a bundle carries a stand-in of each shader its materials use (made
+    // from what the bundle's author had, or a template's renamed: oe-bundle model's "shader"). A material whose shader
+    // the game has by that name is made a copy of a game material on that shader (its render states and settings the
+    // game's: a stand-in's defaults are not; one with no glow of its own), with the mod material's main texture.
+    static void GameShaders(Scene scene, UnityEngine.SceneManagement.Scene unity)
+    {
+        var made = new Dictionary<IntPtr, Material>();
+        foreach (var root in unity.GetRootGameObjects())
+            foreach (var renderer in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var materials = renderer.sharedMaterials;
+                var changed = false;
+                for (var i = 0; i < materials.Length; i++)
+                {
+                    var ours = materials[i];
+                    if (ours?.shader is not { } stand || Shader.Find(stand.name) is not { } shader || shader == stand)
+                        continue;
+                    if (!made.TryGetValue(ours.Pointer, out var copy))
+                    {
+                        var template = GameObjects<Material>(null, m => m.shader == shader && m != ours && (!m.HasProperty("_EmissionTex") || m.GetTexture("_EmissionTex") == null));
+                        copy = template != null ? new Material(template) : new Material(shader);
+                        copy.name = ours.name;
+                        if (ours.HasProperty("_MainTex") && copy.HasProperty("_MainTex"))
+                        {
+                            copy.mainTexture = ours.mainTexture;
+                            copy.mainTextureScale = ours.mainTextureScale;
+                            copy.mainTextureOffset = ours.mainTextureOffset;
+                        }
+                        made[ours.Pointer] = copy;
+                    }
+                    materials[i] = copy;
+                    changed = true;
+                }
+                if (changed)
+                    renderer.sharedMaterials = materials;
+            }
+        if (made.Count > 0)
+            Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: {made.Count} materials drawn as the game's");
+    }
+
+    // A loaded object of the game by its name (any name: null).
+    static T GameObjects<T>(string name, Func<T, bool> fits) where T : UnityEngine.Object =>
+        Resources.FindObjectsOfTypeAll<T>().FirstOrDefault(o => (name == null || o.name == name) && fits(o));
 
     // Closing a town, the game turns off its town scenes but the ones kept, by its own list: the scenes a session loads by
     // their EScene names, which a mod's scene cannot be among. A mod's scene is turned off with them, in the same call: its

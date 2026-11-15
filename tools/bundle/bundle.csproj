@@ -26,4 +26,7 @@
     <None Include="README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="SkiaSharp" Version="4.156.0" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TerrainTypes.json" LogicalName="TerrainTypes.json" />
+  </ItemGroup>
 </Project>

@@ -403,6 +403,48 @@ perspective one. Checked 13.11.2026 with Golden-Era's 3D Stronghold (its buildin
 terrain, a sky, effects): the town opens in 3D with the game's interface, a click on the town hall opens the building
 tree, fortifications built there appear after the game's building effect.
 
+##### A town of generated models
+
+A town's ground and buildings can be made without Unity and without a modeller, the way the SDK's test town is: the
+ground as the game's towns have theirs, the buildings as models of their own. What goes into it and what to watch for:
+
+- **The ground is a Unity Terrain** (`terrain` in `oe-bundle city`), as the game's towns have (cityHuman2, CityUndead2,
+  cityNature, cityUnfrozen2): a heightmap and a splat map mixing four textures, drawn with the game's terrain material
+  (`Hex/TerrainUnity`). A whole landscape made by an image-to-3D tool as one textured model looks blurred and blotched
+  at a town's scale: such tools paint an object seen from around (a 2048 texture for the whole of it, its floor seen
+  edge-on from the front), not a ground the camera looks down at. The model is good for the shape: `tools/terrain/
+  heightmap.py` takes its top surface as heights and its slopes as where rock goes. The surface comes from textures that
+  repeat: the game's (the terrain's layers named after them) or the mod's own (a layer's `image`).
+- **The game's terrain material blends by the textures' height** (`_HeightBlendDepth`, `_HeightmapScale0..3`): it is
+  the game's material copied, its textures replaced. Its textures are the ones a layer names; a texture of the world map
+  (`Sand`, `Dirt`) is clamped, not repeated, and draws as smeared stripes: take a town's (`dirt_ground1..4`,
+  `rock_ground1`, `dead_ground1..4`, ...) or an image of the mod's (seamless, `tools/terrain/ground.py`, `strata.py`).
+  The game's terrain shader projects the textures three ways on slopes, so a texture of horizontal bands lies as layers
+  of rock on a cliff.
+- **A splat map is weights in all four channels, alpha too**: an image library that premultiplies colour by alpha when
+  it reads a PNG zeroes the weights where the rock weight (alpha) is 0, and the shader then draws its last texture
+  everywhere. `oe-bundle` reads the image as it is and makes its mipmaps channel by channel.
+- **The terrain's level-of-detail data** (each patch's error and height range) is written so every patch is drawn at
+  full detail: the game's build has stripped the method that works it out from the heights (`TerrainData.SetHeights`).
+- **The town camera looks at a point** (the controller's `lookAtTransform`): a rotation given to the camera is undone by
+  the controller each frame. `camera.lookAt` sets that point; the camera's height and the point frame the town.
+- **A model made from a glTF is drawn with the game's shader** (`shader` in `oe-bundle model`: `Hex/Lit`, the game's
+  buildings' shader). The library does not just put the game's shader on the model's material: a material made with
+  another shader keeps its own render states, and `Hex/Lit` with a stand-in's `_ZTest` (7, greater-or-equal) draws only
+  where something is in front of it, which is nowhere. The model's material is made a copy of a game material on that
+  shader, its main texture the model's (`ModScenes`).
+- **A sky** is a model too: a half cylinder with a sky picture (`tools/terrain/sky.py`), drawn unlit, both sides.
+- **Roads and trodden ground come from a plan**, not from a picture: the buildings' places and the roads as lines (x,
+  z, width) give the splat map's road weight by the distance to the lines, a little noise on the edges; a road narrower
+  than it looks on a concept picture reads right at the town's scale (about a metre for the main road). A light town
+  texture of the game (`sand3`) on the roads and a pebbly one (`256_1_dirt_stines_texture`) by them match a desert
+  town; a grey one (`dirt_ground2`) reads as stone.
+- **A model put into a scene several times** (the small huts around a town) shares its mesh, material and texture:
+  `oe-bundle city` imports a bundle's assets once and points every copy at them.
+- **Iterate without restarting the game**: `scene reload <scene> <bundle file>` in the research console takes the
+  scene out of the town registry, unloads it and its bundle, puts the new file in the bundle cache and loads it again;
+  the town must be closed. A data archive and the library still need a restart.
+
 ## 3. The framework
 
 ### ModBase (`mod-common/ModBase.cs`)

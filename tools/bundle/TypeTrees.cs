@@ -116,6 +116,18 @@ static class TypeTrees
         Vector3(1, "m_Center"),
     }.SelectMany(n => n));
 
+    // A Unity class's type tree for Unity 6000.0 (TerrainTypes.json: the terrain's classes, from UnityPy's type tree
+    // database: [level, type, name, size, flags, version]).
+    public static TypeTreeType Unity(int classId)
+    {
+        using var stream = typeof(TypeTrees).Assembly.GetManifestResourceStream("TerrainTypes.json")
+            ?? throw new Exception("TerrainTypes.json is not in the tool");
+        var nodes = System.Text.Json.JsonDocument.Parse(stream).RootElement.GetProperty(classId.ToString()).EnumerateArray()
+            .Select(n => new Node(n[0].GetInt32(), n[1].GetString(), n[2].GetString(), n[3].GetInt32(), n[4].GetUInt32(),
+                Array: n[1].GetString() == "Array", Version: (ushort)n[5].GetInt32()));
+        return Make(classId, 0xFFFF, nodes);
+    }
+
     static TypeTreeType Make(int typeId, ushort scriptIndex, IEnumerable<Node> nodes)
     {
         var list = nodes.ToList();

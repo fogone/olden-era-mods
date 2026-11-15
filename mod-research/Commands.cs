@@ -400,6 +400,12 @@ internal sealed class Commands
             case "screen":
                 write(ScreenSpike.Run(argument));
                 break;
+            case "scene":
+                // scene reload <scene> <bundle file>: a mod's town scene made again from a new bundle (the town closed).
+                write(words.Length >= 4 && words[1] == "reload"
+                    ? Nobirds.OldenEra.Modding.Common.ModScenes.Reload(words[2], rest[(rest.IndexOf(words[2], StringComparison.Ordinal) + words[2].Length)..].Trim())
+                    : "scene reload <scene> <bundle file>");
+                break;
             case "growth":
                 foreach (var growthLine in words.Length > 1 && words[1] == "dump" ? GrowthDump() : Growth())
                     write(growthLine);

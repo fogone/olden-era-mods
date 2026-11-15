@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using AssetsTools.NET;
 using AssetsTools.NET.Extra;
 
@@ -21,16 +22,24 @@ sealed class CitySpec
     public float[] Offset { get; set; } = { 0, -2000, 0 };
     // The scene's objects taken out (with what is under them): by name, or by its beginning ending in "*".
     public string[] Remove { get; set; }
-    public ModelsSpec Models { get; set; }
+    // The town's ground: a terrain of the game's kind (CityTerrain.cs).
+    public TerrainSpec Terrain { get; set; }
+    [JsonConverter(typeof(OneOrMany<ModelsSpec>))]
+    public ModelsSpec[] Models { get; set; }
 
     // Prefabs of a model bundle (its path from the JSON's folder) put into the scene, at a place: the town's buildings
-    // and its surroundings modelled in Unity. Their roots are the scene's objects by name, slots name them as any other.
+    // and its surroundings, modelled in Unity or made of glTF models (oe-bundle model), a bundle each. Their roots are
+    // the scene's objects by name, slots name them as any other.
     public sealed class ModelsSpec
     {
         public string Bundle { get; set; }
         public string[] Prefabs { get; set; }
         public float[] Position { get; set; }
         public float[] Rotation { get; set; }
+        public float[] Scale { get; set; }
+        // The root's name in the scene (one prefab put once, its own name by default): the same model put twice, as two
+        // levels of a building, needs a name for each.
+        public string Name { get; set; }
     }
 
     // The scene's camera made the town's: the object, and the controller's settings (the game's town values by
@@ -50,6 +59,9 @@ sealed class CitySpec
         public float? Size { get; set; }
         // A perspective camera: its turn (a quaternion: x, y, z, w), its vertical field of view, how far it sees.
         public float[] Rotation { get; set; }
+        // The point the camera looks at (from the CityCamera point; the controller turns the camera to it): the
+        // CityCamera point itself by default.
+        public float[] LookAt { get; set; }
         public float? Fov { get; set; }
         public float? Far { get; set; }
         // The points the camera flies through (around the town's camera point, CityCamera: the camera's position is one
@@ -63,13 +75,20 @@ sealed class CitySpec
     {
         var spec = JsonSerializer.Deserialize<CitySpec>(File.ReadAllText(file),
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true, ReadCommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
-        if (spec.Models != null)
-            spec.Models.Bundle = Path.GetFullPath(spec.Models.Bundle, Path.GetDirectoryName(Path.GetFullPath(file)));
+        foreach (var models in spec.Models ?? Array.Empty<ModelsSpec>())
+            models.Bundle = Path.GetFullPath(models.Bundle, Path.GetDirectoryName(Path.GetFullPath(file)));
+        if (spec.Terrain is { } terrain)
+        {
+            var folder = Path.GetDirectoryName(Path.GetFullPath(file));
+            (terrain.Heights, terrain.Splat) = (Path.GetFullPath(terrain.Heights, folder), Path.GetFullPath(terrain.Splat, folder));
+            foreach (var layer in (terrain.Layers ?? Array.Empty<TerrainSpec.LayerSpec>()).Where(l => l.Image != null))
+                layer.Image = Path.GetFullPath(layer.Image, folder);
+        }
         return spec;
     }
 }
 
-sealed class CityScene
+sealed partial class CityScene
 {
     const string Assembly = "Hex.dll";
 
@@ -92,19 +111,24 @@ sealed class CityScene
     {
         foreach (var pattern in spec.Remove ?? Array.Empty<string>())
             RemoveObjects(pattern);
-        if (spec.Models is { } models)
+        if (spec.Models is { Length: > 0 })
         {
-            var assets = new ModelImport(am, scene, shared, sharedFileId).Add(models.Bundle, models.Prefabs, models.Position, models.Rotation);
-            Preload(assets.ToArray());
+            var import = new ModelImport(am, scene, shared, sharedFileId);
+            var assets = spec.Models.SelectMany(m => import.Add(m.Bundle, m.Prefabs, m.Position, m.Rotation, m.Scale, m.Name)).ToArray();
+            Preload(assets);
             nextScene = scene.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
             nextShared = shared.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
         }
 
+        // Objects by name: the ones a slot names must be the only ones of their name (the parts of models may repeat).
         var objects = scene.file.GetAssetsOfType(AssetClassID.GameObject)
-            .ToDictionary(i => am.GetBaseField(scene, i)["m_Name"].AsString, i => i.PathId);
-        long Object(string name) => objects.TryGetValue(name, out var id) ? id : throw new Exception($"the scene has no object {name}");
+            .GroupBy(i => am.GetBaseField(scene, i)["m_Name"].AsString, i => i.PathId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        long Object(string name) => objects.TryGetValue(name, out var ids)
+            ? ids.Count == 1 ? ids[0] : throw new Exception($"the scene has {ids.Count} objects named {name}")
+            : throw new Exception($"the scene has no object {name}");
 
-        var layer = am.GetBaseField(scene, scene.file.GetAssetInfo(objects.Values.First()))["m_Layer"].AsUInt;
+        var layer = am.GetBaseField(scene, scene.file.GetAssetInfo(objects.Values.First()[0]))["m_Layer"].AsUInt;
         long root = nextScene++, rootTransform = nextScene++, manager = nextScene++;
         var slotTransforms = new List<long>();
         foreach (var (slot, levels) in spec.Slots)
@@ -178,6 +202,8 @@ sealed class CityScene
 
         if (spec.Camera is { } camera)
             AddCamera(camera, Object(camera.Object), layer, spec.Offset);
+        if (spec.Terrain is { } ground)
+            AddTerrain(ground, layer);
 
         // The scene away from the map: the game's town scenes are loaded with the session, at their own places.
         foreach (var info in scene.file.GetAssetsOfType(AssetClassID.Transform))
@@ -213,7 +239,17 @@ sealed class CityScene
         long context = nextScene++, raycaster = nextScene++;
         Reparent(cameraTransform, rigTransform);
         GameObject(rig, "CityCamera", layer, rigTransform, controller, helper);
-        Transform(rigTransform, rig, 0, cameraTransform);
+        long lookAt = rigTransform;
+        if (spec.LookAt is { Length: 3 } at)
+        {
+            long lookGo = nextScene++;
+            lookAt = nextScene++;
+            GameObject(lookGo, "CityCameraLookAt", layer, lookAt);
+            Transform(lookAt, lookGo, rigTransform, at);
+            Transform(rigTransform, rig, 0, cameraTransform, lookAt);
+        }
+        else
+            Transform(rigTransform, rig, 0, cameraTransform);
 
         var settings = SharedAsset("Hex.Session.City", "SoCityCameraSettings", SettingsFields(), v =>
         {
@@ -246,7 +282,7 @@ sealed class CityScene
         {
             v["settings.m_FileID"].AsInt = sharedFileId;
             v["settings.m_PathID"].AsLong = settings;
-            v["lookAtTransform.m_PathID"].AsLong = rigTransform;
+            v["lookAtTransform.m_PathID"].AsLong = lookAt;
             v["cameraTransform.m_PathID"].AsLong = cameraTransform;
         });
         // The camera's mode (the game's eit.EType: Default stays, Cursor turns after the cursor, Free also flies through
@@ -377,9 +413,13 @@ sealed class CityScene
         v["m_IsActive"].AsBool = true;
     });
 
-    void Transform(long id, long go, long father, params long[] children) => New(scene, id, (int)AssetClassID.Transform, 0xFFFF, v =>
+    void Transform(long id, long go, long father, params long[] children) => Transform(id, go, father, null, children);
+
+    void Transform(long id, long go, long father, float[] position, params long[] children) => New(scene, id, (int)AssetClassID.Transform, 0xFFFF, v =>
     {
         v["m_GameObject.m_PathID"].AsLong = go;
+        if (position != null)
+            (v["m_LocalPosition.x"].AsFloat, v["m_LocalPosition.y"].AsFloat, v["m_LocalPosition.z"].AsFloat) = (position[0], position[1], position[2]);
         v["m_LocalRotation.w"].AsFloat = 1;
         v["m_LocalScale.x"].AsFloat = v["m_LocalScale.y"].AsFloat = v["m_LocalScale.z"].AsFloat = 1;
         var array = v["m_Children.Array"];
@@ -556,4 +596,16 @@ sealed class CityScene
         info.SetNewData(value);
         meta.AddAssetInfo(info);
     }
+}
+
+// A JSON value that is one object or an array of them.
+sealed class OneOrMany<T> : JsonConverter<T[]>
+{
+    public override T[] Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) =>
+        reader.TokenType == JsonTokenType.StartArray
+            ? JsonSerializer.Deserialize<T[]>(ref reader, options)
+            : new[] { JsonSerializer.Deserialize<T>(ref reader, options) };
+
+    public override void Write(Utf8JsonWriter writer, T[] value, JsonSerializerOptions options) =>
+        JsonSerializer.Serialize(writer, value, options);
 }
