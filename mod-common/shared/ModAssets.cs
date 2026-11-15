@@ -25,6 +25,11 @@ namespace Nobirds.OldenEra.Modding.Common;
 //                                    its model (the part named, by default the one with the Animator) replaced by the
 //                                    mod's, as big as the one it replaces times "scale"; for a bundle made without the
 //                                    game's scripts
+//                                    {"like": "<a unit of the game>", "meshes": {"<its skinned mesh>": "<a model of the
+//                                     mod's bundles>", "<another>": ""}}: the game's unit as it is (its skeleton, its
+//                                    animations, effects and timelines), only the skinned meshes named drawn with the
+//                                    mod's meshes (skinned to the same bones, `oe-bundle model` of a skinned glTF) and
+//                                    their textures; "" hides one (a weapon the new model does not carry)
 //
 // What the game makes of the prefab then (the squad on the map, its collider, materials, the scale from the view) it
 // makes itself, as of its own. The bundles are loaded on the first frame, before any game is started.
@@ -39,6 +44,7 @@ public static class ModAssets
     {
         public string Root, Path, Like, Source, Part;
         public float Scale = 1;
+        public Dictionary<string, string> Meshes;
     }
 
     static readonly List<Bundle> bundles = new();
@@ -47,6 +53,11 @@ public static class ModAssets
     static GameObject holder;
 
     static string CacheFolder => System.IO.Path.Combine(BepInEx.Paths.CachePath, "oldenera-mod-assets");
+
+    // The cached file of a mod's bundle (by its name, as Unity names a loaded bundle).
+    internal static string CachedFile(string root, string name) =>
+        bundles.FirstOrDefault(b => b.Root == root && System.IO.Path.GetFileName(b.Name).Equals(name, StringComparison.OrdinalIgnoreCase))?.File
+        ?? System.IO.Path.Combine(CacheFolder, Safe(root), name);
 
     // A bundle of a mod's data root, from its archive: put into the cache folder with the game's components named as
     // in this game version (BundleNames), when it is not there as it is. A stamp next to it says from what it was made.
@@ -106,10 +117,13 @@ public static class ModAssets
                 Source = e.TryGetProperty("model", out var source) ? source.GetString() : null,
                 Part = e.TryGetProperty("part", out var part) ? part.GetString() : null,
                 Scale = e.TryGetProperty("scale", out var scale) && scale.TryGetSingle(out var s) ? s : 1,
+                Meshes = e.TryGetProperty("meshes", out var meshes) && meshes.ValueKind == JsonValueKind.Object
+                    ? meshes.EnumerateObject().ToDictionary(p => p.Name, p => p.Value.GetString() ?? "")
+                    : null,
             };
-            if (string.IsNullOrEmpty(model.Like) || string.IsNullOrEmpty(model.Source))
+            if (string.IsNullOrEmpty(model.Like) || string.IsNullOrEmpty(model.Source) && model.Meshes == null)
             {
-                Game.Log?.Invoke($"ModAssets: {root}: Models/{path}.json: \"like\" (a prefab of the game) and \"model\" (an asset of the mod's bundles) are needed");
+                Game.Log?.Invoke($"ModAssets: {root}: Models/{path}.json: \"like\" (a prefab of the game) and \"model\" (an asset of the mod's bundles) or \"meshes\" are needed");
                 return;
             }
             models.RemoveAll(m => m.Path.Equals(path, StringComparison.OrdinalIgnoreCase));
@@ -212,19 +226,14 @@ public static class ModAssets
             Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: no prefab {model.Like} in the game");
             return null;
         }
+        if (model.Meshes != null)
+            return Skins(model, like);
         if (Find(manager, model.Root, model.Source, gameObject)?.TryCast<GameObject>() is not { } source)
         {
             Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: no model {model.Source} in the mod's bundles");
             return null;
         }
-        if (holder == null)
-        {
-            holder = new GameObject("OE_ModAssets");
-            holder.SetActive(false);
-            Object.DontDestroyOnLoad(holder);
-        }
-        var copy = Object.Instantiate(like, holder.transform, false);
-        copy.name = System.IO.Path.GetFileName(model.Path);
+        var copy = Holder(like, model.Path);
         // The part replaced: the one named ("part": a town on the map, its model one of the prefab's children), or the
         // animated model (a unit's).
         var named = !string.IsNullOrEmpty(model.Part);
@@ -252,6 +261,69 @@ public static class ModAssets
             replaced.transform.position += new Vector3(was.center.x - now.center.x, was.min.y - now.min.y, was.center.z - now.center.z);
         replaced.transform.SetSiblingIndex(place.GetSiblingIndex());
         Object.DestroyImmediate(place.gameObject);
+        return copy;
+    }
+
+    // The game's unit `like`, copied, its skinned meshes named drawn with the mod's: each mod model's mesh (skinned to
+    // the same bones, in the same bind poses) put on the game's renderer, which keeps its bones, and on every renderer of
+    // that game mesh (an ability's glow drawn over the body), the main one's material given the model's texture.
+    static GameObject Skins(Model model, GameObject like)
+    {
+        var manager = GameNames.ResourceManager();
+        var copy = Holder(like, model.Path);
+        var renderers = copy.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+        foreach (var (name, source) in model.Meshes)
+        {
+            var renderer = renderers.FirstOrDefault(r => r.name == name || r.sharedMesh != null && r.sharedMesh.name == name);
+            if (renderer == null)
+            {
+                Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: {model.Like} has no skinned mesh {name}");
+                continue;
+            }
+            if (string.IsNullOrEmpty(source))
+            {
+                renderer.gameObject.SetActive(false);
+                continue;
+            }
+            var prefab = Find(manager, model.Root, source, Il2CppType.Of<GameObject>())?.TryCast<GameObject>();
+            var filter = prefab?.GetComponentInChildren<MeshFilter>(true);
+            if (filter?.sharedMesh is not { } mesh)
+            {
+                Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: no model {source} with a mesh in the mod's bundles");
+                continue;
+            }
+            if (mesh.bindposes.Length != renderer.bones.Length)
+            {
+                Game.Log?.Invoke($"ModAssets: {model.Root}: {model.Path}: {source} has {mesh.bindposes.Length} bones, {name} {renderer.bones.Length}");
+                continue;
+            }
+            var texture = filter.GetComponent<MeshRenderer>()?.sharedMaterial?.mainTexture;
+            var game = renderer.sharedMesh;
+            foreach (var other in renderers.Where(r => r.sharedMesh == game))
+                other.sharedMesh = mesh;
+            if (texture != null && renderer.sharedMaterial is { } material)
+            {
+                var drawn = new Material(material) { name = mesh.name, mainTexture = texture };
+                if (drawn.HasProperty("_EmissionTex"))
+                    drawn.SetTexture("_EmissionTex", null);
+                // One material: the model's mesh has one part (the game's may have one a material).
+                renderer.sharedMaterials = new Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray<Material>(new[] { drawn });
+            }
+        }
+        return copy;
+    }
+
+    // A copy of a game's prefab kept under the inactive holder.
+    static GameObject Holder(GameObject like, string path)
+    {
+        if (holder == null)
+        {
+            holder = new GameObject("OE_ModAssets");
+            holder.SetActive(false);
+            Object.DontDestroyOnLoad(holder);
+        }
+        var copy = Object.Instantiate(like, holder.transform, false);
+        copy.name = System.IO.Path.GetFileName(path);
         return copy;
     }
 

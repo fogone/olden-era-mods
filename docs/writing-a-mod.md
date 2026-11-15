@@ -373,6 +373,41 @@ A bundle carries its own copies of the shaders its materials use, and a copy of 
 game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
 of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
 
+**A unit on a game unit's skeleton.** A new creature needs no rig and no animations of its own: its mesh is skinned to
+the skeleton of a game unit of the same build, and the game's unit is used as it is (its animations, timelines,
+effects, attack points), only drawn with the new mesh:
+
+```json
+Models\units\myfaction\goblin.json
+{ "like": "units/Humans/1Prefabs/esquire",
+  "meshes": { "Swordsman_mesh": "unit_goblin", "SwordsmanShield_mesh": "", "SwordsmanSword_mesh": "" } }
+```
+
+Each skinned mesh named gets the mesh of the mod's model prefab (a bundle's, `oe-bundle model` of a skinned glTF) and
+its texture on the game's material; the game's renderer keeps its bones, so the mesh must be skinned to the same bones
+in the same bind poses; `""` hides one (a weapon the creature does not carry). The view then names it like any model
+(`"mesh": "myfaction/goblin"`); its `scale` and times (`attackTimeBefore`...) are the game unit's, as its clips are.
+Checked 16.11.2026 on 0.82.10: a goblin on the esquire's skeleton in the unit window, moved by the esquire's idle, and
+the twelve creatures of the test faction (on the esquire, the crossbowman, the minotaur, the ent, the phoenix) standing
+in a town, each moved by its host's animation; a host's weapon left visible moves with the hand (the crossbow).
+
+How such a mesh is made without a modeller (`tools/units/`, see its README):
+1. the game unit exported with its skeleton (UnityPy: meshes, bones, bind poses) and rendered in its bind pose from
+   the front (`render_pose.py`);
+2. the render repainted by an image model as the new creature, "keep exactly the same pose, limbs and silhouette": a
+   pose of the picture is a pose of the skeleton;
+3. the picture made a model by an image-to-3D tool (Hunyuan3D-2);
+4. the model skinned to the skeleton (`skin_to_game.py`): turned to the picture's side, stretched to the game mesh's
+   box and then onto its surface (scaled and shifted on each axis to the nearest points both ways), each vertex given the weights of the nearest point of the game mesh facing the same way, the vertices far from
+   it (an ear where the game unit has a helmet) taking their weights from their neighbours on the model; written in the
+   game mesh's space with the unit's bones and bind poses.
+
+Pick a host of the same build and posture: an image-to-3D tool makes a figure upright when the picture is a front
+view, so a hunched host (the troglodyte, head before the chest) puts the head and arms of an upright creature on the
+wrong bones (the hands flattened in the animations); an upright one of the same build (the esquire for a goblin) fits.
+The image model keeps a host's pose but not always its layout: asked to repaint the cavalry's horse and knight (who
+stands beside the horse in the bind pose) as a wolf and a goblin, it put the goblin elsewhere, or on the wolf's back.
+
 #### Town scenes
 
 A town is a scene: a session loads the game's city scenes with it and keeps each in the town's scene registry by its

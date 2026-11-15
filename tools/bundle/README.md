@@ -105,7 +105,14 @@ Unity version holding a prefab of a textured mesh (a GameObject with a MeshFilte
   mirrored, the triangles' order turned) and turned by `turn` degrees about the vertical axis; a node's transform is not
   applied;
 - the texture: the material's base colour (PNG, JPEG, WebP, `EXT_texture_webp` too), uncompressed with its mipmaps;
-- the bundle's files are named after `name`, so it loads next to the bundle it was made from.
+- the bundle's files are named after `name`, so it loads next to the bundle it was made from;
+- a skinned mesh (`JOINTS_0` and `WEIGHTS_0` on a node with a skin) keeps its skin as the game's units have it: four
+  bones a vertex (weights as floats, bones as 32-bit integers, in a stream of their own), the bind poses (the skin's
+  inverse bind matrices, mirrored as the vertices are), the bones by the CRC-32 of their paths from the root bone
+  (`Root/Hips/Spine`, as Unity hashes them) and each bone's box; it is not turned (its bind poses would not fit).
 
 The prefab is `assets/<name>.prefab`: a mod's `Models\<path>.json` puts it into a prefab of the game (`"model":
-"<name>"`, see `docs/writing-a-mod.md`), drawn with the game's material.
+"<name>"`, see `docs/writing-a-mod.md`), drawn with the game's material. A skinned mesh made on a game unit's skeleton
+(`tools/units/skin_to_game.py`) is put on that unit's renderer instead (`"meshes"`), the unit's bones moving it. Written
+from the game's troglodyte exported to glTF, the mesh reads back the same as the game's (positions, weights, bones, bind
+poses, bone hashes and boxes).
