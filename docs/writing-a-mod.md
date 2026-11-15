@@ -340,6 +340,15 @@ town of the HoMM3 map (its sprite redrawn large by Gemini, made a model by TRELL
 stands on the map in the prototype's towns. A named part's model stands upright in the prefab: the game's buildings are
 made lying (Z up) and turned by their part, a model of Unity's kind is not.
 
+A town's gate goes where the game's towns have theirs: in the front-left corner, as the map shows the town (the game
+mirrors a town with its entrance, so the model's gate follows). The entrance on a map is the map object's `nodes`, but
+the map generator does not read them: it places towns by its city encounter templates
+(`generator/encounter_templates/rmg_unguarded_city_encounter_*`), shared by all factions, which bring the road and put
+the hero at the corner of the town's 3×3 square. So the model is made with its gate there (the picture asked of the
+image tool shows the gate at the front-left corner; `turn` faces it), not moved: a model moved off its square covers
+the road. Checked 15.11.2026 on 0.82.10: a Stronghold town made by Hunyuan3D-2 with its gate in that corner, the road
+and the hero at the gate.
+
 **Without Unity: `oe-bundle`** (`tools/bundle`). From a model prefab of a bundle (an animated skinned mesh) it writes a
 unit's battle and map prefabs of the game's kind into the bundle, the game's components by the readable names:
 
