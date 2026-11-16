@@ -476,6 +476,12 @@ ground as the game's towns have theirs, the buildings as models of their own. Wh
   town; a grey one (`dirt_ground2`) reads as stone.
 - **A model put into a scene several times** (the small huts around a town) shares its mesh, material and texture:
   `oe-bundle city` imports a bundle's assets once and points every copy at them.
+- **A game prefab in the town** (a creature on its nest, by its lair) is a place, not a copy: `prefabs` in `oe-bundle
+  city` writes an empty object "OE_Prefab <path>" (a model's `path` in the game's resources, the mod's `Models\...`
+  included) at a position, a turn and a scale, under a building level's object when `parent` names it, so it shows
+  when that level is built. The library puts the prefab there once the scene is loaded (`ModScenes`): a unit's model
+  brings its own animations, so it idles as it does in battle. A unit model faces +x and a town model -z: a quarter
+  turn faces it to the camera.
 - **Iterate without restarting the game**: `scene reload <scene> <bundle file>` in the research console takes the
   scene out of the town registry, unloads it and its bundle, puts the new file in the bundle cache and loads it again;
   the town must be closed. A data archive and the library still need a restart.

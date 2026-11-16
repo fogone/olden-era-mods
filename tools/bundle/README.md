@@ -81,6 +81,15 @@ interface over it). The tool makes them of the scene's objects:
   draw with (meshes, materials, textures, shaders, animation) into its shared assets, renumbered as Unity numbers a
   scene's objects; a texture kept in the bundle's resource file (`.resS`) is put into the texture. The bundle must be
   of the game's Unity version and refer to no other file; scripts of its own are refused.
+- `prefabs`: places for prefabs of the game's resources (a unit on its nest), filled when the scene is loaded:
+
+  ```json
+  "prefabs": [{ "path": "units/mymod/roc", "parent": "town_Tier_5_1", "position": [0, 4.2, 0], "turn": 90, "scale": 0.5 }]
+  ```
+
+  each an empty object "OE_Prefab <path>" at `position` (from `parent`, the scene's object it is put under, or from the
+  scene), turned by `turn` degrees about y and scaled; the library instantiates the prefab of `path` (as the game's
+  resource manager finds it, a mod's `Models\...` included) under it.
 
 A building's collider is the box around its meshes.
 

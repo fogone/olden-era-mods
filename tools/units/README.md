@@ -21,7 +21,15 @@ oe-bundle model <template bundle> Bundles\unit_goblin unit_goblin.json
 - `--view <degrees>`: the side the picture showed the unit from (`a270` -> 270). An image-to-3D tool faces the model to
   the picture's camera; without it the best of four quarter turns by shape is taken, which may take the back for the
   front;
-- `--also <mesh>...`: other skinned meshes of the unit on the same bones (a rider and his horse) the model covers too.
+- `--also <mesh>...`: other skinned meshes of the unit on the same bones (a rider and his horse) the model covers too;
+- `--smooth <n>`: the weights averaged n times with the model's points around each, across pieces not joined by edges
+  (an image-to-3D tool makes fur and spikes pieces of their own): for a body unlike the unit's (a wolf on the cavalry's
+  horse, fit 0.12 of 2.7), whose pieces otherwise take weights apart and tear when the bones turn;
+- `--skip-bones <bone>...`: parts of the unit the creature does not have (the bolt beside the crossbowman);
+- `--uniform`: scaled alike on all axes (a weapon or a prop keeps its thickness).
+
+A rider and his mount are two models, each on its own mesh of the unit (the cavalry's `Horse` and `Man`): a
+`Models\*.json` names a bundle for each (`"meshes": { "Horse": "unit_wolf", "Man": "unit_goblin", "Spear": "" }`).
 
 The model is stretched to the game mesh's box, so the picture must keep the host's pose and posture; the fit it prints
 (the mean distance of the model to the game surface) says how well: the goblin on the esquire 0.03 of 1.6, on the

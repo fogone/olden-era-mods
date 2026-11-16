@@ -201,6 +201,19 @@ public static class ModAssets
         return null;
     }
 
+    // A prefab by a path of the game's, where the game looks for it: the resource manager's table (the mods' bundles and
+    // models), then Resources. Null: none.
+    internal static GameObject Prefab(string path)
+    {
+        var key = $"{Hex.ResManager.rootPath}/{path.Replace('\\', '/').ToLowerInvariant()}";
+        var gameObject = Il2CppType.Of<GameObject>();
+        if (GameNames.ResourceManager()?.Assets is { } table)
+            foreach (var entry in table.Values)
+                if (entry.Key.Path == key && entry.Key.AssetType.Equals(gameObject))
+                    return entry.Asset.TryCast<GameObject>();
+        return Resources.Load(path, gameObject)?.TryCast<GameObject>();
+    }
+
     // An asset into the game's table at a path of the game's (as from a bundle's Assets/Resources/<path>).
     static void Put(Hex.ResManager manager, string root, string path, Object asset)
     {

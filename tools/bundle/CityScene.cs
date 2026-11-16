@@ -26,6 +26,21 @@ sealed class CitySpec
     public TerrainSpec Terrain { get; set; }
     [JsonConverter(typeof(OneOrMany<ModelsSpec>))]
     public ModelsSpec[] Models { get; set; }
+    // Places of prefabs the game finds by path when the scene is loaded (the library's ModScenes): a creature of the
+    // game's units or a mod's model by its lair. An empty object "OE_Prefab <path>" at the place.
+    public PrefabSpec[] Prefabs { get; set; }
+
+    public sealed class PrefabSpec
+    {
+        public string Path { get; set; }
+        public float[] Position { get; set; }
+        // Degrees about the vertical axis.
+        public float Turn { get; set; }
+        public float Scale { get; set; } = 1;
+        // An object of the scene it stands on, its place and scale in that object's space (a building's level: the
+        // creature there once that level is built); the scene's root by default.
+        public string Parent { get; set; }
+    }
 
     // Prefabs of a model bundle (its path from the JSON's folder) put into the scene, at a place: the town's buildings
     // and its surroundings, modelled in Unity or made of glTF models (oe-bundle model), a bundle each. Their roots are
@@ -204,6 +219,30 @@ sealed partial class CityScene
             AddCamera(camera, Object(camera.Object), layer, spec.Offset);
         if (spec.Terrain is { } ground)
             AddTerrain(ground, layer);
+        foreach (var prefab in spec.Prefabs ?? Array.Empty<CitySpec.PrefabSpec>())
+        {
+            long go = nextScene++, transform = nextScene++;
+            GameObject(go, "OE_Prefab " + prefab.Path, layer, transform);
+            var half = prefab.Turn * MathF.PI / 360;
+            var father = prefab.Parent == null ? 0 : TransformOf(Object(prefab.Parent));
+            if (father != 0)
+                Edit(father, v =>
+                {
+                    var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(v["m_Children.Array"]);
+                    e["m_PathID"].AsLong = transform;
+                    v["m_Children.Array"].Children.Add(e);
+                });
+            New(scene, transform, (int)AssetClassID.Transform, 0xFFFF, v =>
+            {
+                v["m_GameObject.m_PathID"].AsLong = go;
+                v["m_Father.m_PathID"].AsLong = father;
+                if (prefab.Position is { Length: 3 } p)
+                    (v["m_LocalPosition.x"].AsFloat, v["m_LocalPosition.y"].AsFloat, v["m_LocalPosition.z"].AsFloat) = (p[0], p[1], p[2]);
+                (v["m_LocalRotation.y"].AsFloat, v["m_LocalRotation.w"].AsFloat) = (MathF.Sin(half), MathF.Cos(half));
+                v["m_LocalScale.x"].AsFloat = v["m_LocalScale.y"].AsFloat = v["m_LocalScale.z"].AsFloat = prefab.Scale;
+            });
+            Console.WriteLine($"  prefab place {prefab.Path}");
+        }
 
         // The scene away from the map: the game's town scenes are loaded with the session, at their own places.
         foreach (var info in scene.file.GetAssetsOfType(AssetClassID.Transform))

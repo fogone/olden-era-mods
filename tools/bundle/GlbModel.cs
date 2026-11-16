@@ -373,6 +373,8 @@ sealed class GlbPrefab
                 if (model.Weights[i * 4 + c] <= 0)
                     continue;
                 var b = model.Joints[i * 4 + c];
+                if (b >= bones)
+                    throw new Exception($"vertex {i}: bone {b}, the skin has {bones}");
                 var m = poses[b];
                 // Unity's matrices act on columns: q = M p.
                 var q = new Vector3(m.M11 * p.X + m.M12 * p.Y + m.M13 * p.Z + m.M14, m.M21 * p.X + m.M22 * p.Y + m.M23 * p.Z + m.M24,

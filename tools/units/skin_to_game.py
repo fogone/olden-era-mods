@@ -1,7 +1,7 @@
 # A model made apart (an image-to-3D tool's .glb, textured, standing in the pose of a game unit's bind pose) skinned to
 # that unit's skeleton, so that the game's own animations move it:
 #
-#   python skin_to_game.py <unit.glb> <mesh name> <model.glb> <out.glb> [--view <degrees>] [--uniform] [--skip-bones <bone>...] [--also <other mesh>...]
+#   python skin_to_game.py <unit.glb> <mesh name> <model.glb> <out.glb> [--view <degrees>] [--uniform] [--skip-bones <bone>...] [--smooth <n>] [--also <other mesh>...]
 #
 # <unit.glb>: the game unit exported with its skeleton (nodes, skins, inverse bind matrices, the skinned meshes);
 # <mesh name>: its skinned mesh the model replaces. The model is turned about the vertical (the best of four quarter
@@ -15,6 +15,9 @@
 # (a weapon or a prop: a club for a sword keeps its own thickness).
 # --skip-bones: parts of the game mesh the new creature does not have (a bolt lying beside the crossbowman: the bones
 # moving them), left out of the fit and the weights.
+# --smooth: the weights averaged n times with the model's points around each (a few centimetres), across pieces not
+# joined by edges: a model of a body other than the unit's (a wolf on a horse) whose fur or spikes are pieces of their
+# own, which otherwise take weights apart and tear when the bones turn.
 # --also: other skinned meshes of the unit on the same bones (a rider and his horse) the model covers too: their
 # surfaces give weights and the box as well (the model then replaces the first, the others are hidden).
 import json, struct, sys, io
@@ -108,8 +111,8 @@ def main():
     tree_g = cKDTree(G)
     best = None
     view = float(args[args.index("--view") + 1]) if "--view" in args else None
-    for quarter in ([round(view / 90) % 4] if view is not None else range(4)):
-        a = quarter * np.pi / 2
+    for turn in ([view % 360] if view is not None else (0, 90, 180, 270)):
+        a = np.radians(turn)
         R = np.array([[np.cos(a), 0, np.sin(a)], [0, 1, 0], [-np.sin(a), 0, np.cos(a)]])
         P = V @ R.T
         pl, ph = P.min(0), P.max(0)
@@ -121,10 +124,10 @@ def main():
             P = (P - pl) / (ph - pl) * (gh - gl) + gl
         sub = P[np.random.default_rng(0).choice(len(P), min(4000, len(P)), replace=False)]
         d = tree_g.query(sub)[0].mean() + cKDTree(sub).query(G)[0].mean()
-        print(f"  turn {quarter * 90}: fit {d:.5f}")
+        print(f"  turn {turn:g}: fit {d:.5f}")
         if best is None or d < best[0]:
-            best = (d, quarter, P)
-    _, quarter, P = best
+            best = (d, turn, P)
+    _, turn, P = best
     # Refined: scale and shift on each axis (alike on all with --uniform) to bring the model onto the game surface,
     # matching points both ways, the farthest third of the pairs left out.
     tree_p = None
@@ -139,7 +142,7 @@ def main():
             scale_k[ax], shift[ax] = np.linalg.lstsq(A, a_dst[:, ax], rcond=None)[0]
         P = P * scale_k + shift
     fit = cKDTree(G).query(P[::7])[0].mean()
-    print(f"model {model_path}: {len(V)} vertices, turned {quarter * 90} degrees, fit {fit:.4f}")
+    print(f"model {model_path}: {len(V)} vertices, turned {turn:g} degrees, fit {fit:.4f}")
 
     # Weights: from points spread over the game mesh's triangles, each with its triangle's weights blended.
     rng = np.random.default_rng(1)
@@ -156,7 +159,7 @@ def main():
     # the other way and gives nothing.
     tn = np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]); tn /= np.linalg.norm(tn, axis=1, keepdims=True) + 1e-12
     SN = tn[pick]
-    a = quarter * np.pi / 2
+    a = np.radians(turn)
     R = np.array([[np.cos(a), 0, np.sin(a)], [0, 1, 0], [-np.sin(a), 0, np.cos(a)]])
     stretch = np.ptp(P, axis=0) / np.ptp(V @ R.T, axis=0)   # as the model was scaled on each axis
     PN = (np.asarray(model.vertex_normals, float) @ R.T) / stretch
@@ -188,17 +191,28 @@ def main():
     spread = ~sure & (wa[key].sum(1) > 1e-6)
     w[spread] = wa[key][spread] / wa[key][spread].sum(1, keepdims=True)
     print(f"  weights spread over the model to {int(spread.sum())} vertices far from the game surface")
+    if "--smooth" in args:
+        k = min(32, len(P))
+        dd, nn = cKDTree(P).query(P, k=k)
+        g = np.exp(-(dd / (0.015 * size)) ** 2); g /= g.sum(1, keepdims=True)
+        M = coo_matrix((g.ravel(), (np.repeat(np.arange(len(P)), k), nn.ravel())), shape=(len(P), len(P))).tocsr()
+        for _ in range(int(args[args.index("--smooth") + 1])):
+            w = M @ w
+        print(f"  weights smoothed {args[args.index('--smooth') + 1]} times")
     top = np.argsort(-w, 1)[:, :4]
     tw = np.take_along_axis(w, top, 1); tw /= tw.sum(1, keepdims=True)
+    if top.shape[1] < 4:   # fewer than four bones (a weapon on one): the rest of the four with no weight
+        pad = 4 - top.shape[1]
+        top = np.c_[top, np.zeros((len(top), pad), int)]; tw = np.c_[tw, np.zeros((len(tw), pad))]
     print(f"  weights: max distance to the game surface {dist[:, 0].max():.4f}, mean {dist[:, 0].mean():.5f}")
 
     # Into the game mesh's space: each vertex by the inverse of its own bind transform.
-    full = np.zeros((len(P), nb)); np.put_along_axis(full, top, tw, 1)
+    full = np.zeros((len(P), nb)); np.add.at(full, (np.arange(len(P))[:, None], top), tw)
     MV = np.einsum("vj,jab->vab", full, skinmat)
     inverse = np.linalg.inv(MV)
     local_p = np.einsum("vab,vb->va", inverse, np.c_[P, np.ones(len(P))])[:, :3]
     n = np.asarray(model.vertex_normals, float)
-    a = quarter * np.pi / 2
+    a = np.radians(turn)
     R = np.array([[np.cos(a), 0, np.sin(a)], [0, 1, 0], [-np.sin(a), 0, np.cos(a)]])
     scale = np.ptp(P, axis=0) / np.ptp(V @ R.T, axis=0)
     n = (n @ R.T) / scale

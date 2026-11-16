@@ -122,6 +122,7 @@ public static class ModScenes
             scene.Loading = null;
             Terrains(scene, unity);
             GameShaders(scene, unity);
+            Prefabs(scene, unity);
             // The game's entry, made as the game makes its own once a scene is loaded: chs(EScene, Scene), then it takes
             // the scene's roots and turns them off (chs.rat on 0.82.08).
             var entry = new GameSceneEntry((EScene)scene.Id, unity);
@@ -219,6 +220,30 @@ public static class ModScenes
                 else if (ours != null)
                     Game.Log?.Invoke($"ModScenes: {scene.Root}: terrain {terrain.name}: the game has no material {ours.name}");
                 Game.Log?.Invoke($"ModScenes: {scene.Root}: terrain {terrain.name} ({data.heightmapResolution}, {data.size}) with {terrain.materialTemplate?.name}");
+            }
+    }
+
+    // A mod scene's places of prefabs taken by path (oe-bundle city: prefabs; a creature by its lair, from the game's
+    // units or a mod's): an empty object named "OE_Prefab <path>" gets the prefab the game finds at that path (the
+    // resource manager's table, then Resources), as its child where it stands, as big as the place is. A bundle cannot
+    // carry the game's prefabs nor a mod's model made at load (ModAssets' Models).
+    const string PrefabPlace = "OE_Prefab ";
+
+    static void Prefabs(Scene scene, UnityEngine.SceneManagement.Scene unity)
+    {
+        foreach (var root in unity.GetRootGameObjects())
+            foreach (var place in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (!place.name.StartsWith(PrefabPlace, StringComparison.Ordinal) || place.childCount > 0)
+                    continue;
+                var path = place.name[PrefabPlace.Length..].Trim();
+                if (ModAssets.Prefab(path) is not { } prefab)
+                {
+                    Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: no prefab {path} for {place.name}");
+                    continue;
+                }
+                var made = UnityEngine.Object.Instantiate(prefab, place, false);
+                made.SetActive(true);
             }
     }
 
