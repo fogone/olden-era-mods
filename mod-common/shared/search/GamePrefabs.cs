@@ -49,6 +49,14 @@ public static partial class Game
         () => Types.Where(t => IsComponent(t) && HasField(t, "camPoint", typeof(UnityEngine.Transform)) && HasField(t, "speed", typeof(float))),
         t => t.Name, onlyOne: true).Generate("GameCityCameraPoint");
 
+    // A scene's main light (bel on 0.82.10): the marker the game's pipeline takes its sun by, on the towns' "Sun" and
+    // the map's "MainLight" next to their Light: the one enabled is the static main light (bxko, its getter llc), which
+    // the pipeline turns and lights, shadows included, from the scene's Hex.Render.LightingSettings.
+    static readonly Lookup<Type> mainLight = Lookup<Type>.Among("main light",
+        () => Types.Where(t => IsComponent(t) && t.GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            .Any(p => p.PropertyType == typeof(UnityEngine.Light))),
+        t => t.Name, onlyOne: true).Generate("GameMainLight");
+
     public static Type UnitViewHelperType => unitViewHelper.Value;
     public static Type UnitAnimationEventsType => unitAnimationEvents.Value;
 }

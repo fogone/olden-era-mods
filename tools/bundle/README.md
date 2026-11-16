@@ -81,6 +81,52 @@ interface over it). The tool makes them of the scene's objects:
   draw with (meshes, materials, textures, shaders, animation) into its shared assets, renumbered as Unity numbers a
   scene's objects; a texture kept in the bundle's resource file (`.resS`) is put into the texture. The bundle must be
   of the game's Unity version and refer to no other file; scripts of its own are refused.
+- `prefabs`: places for prefabs of the game's resources (a unit on its nest), filled when the scene is loaded:
+
+  ```json
+  "prefabs": [{ "path": "units/mymod/roc", "parent": "town_Tier_5_1", "position": [0, 4.2, 0], "turn": 90, "scale": 0.5 }]
+  ```
+
+  each an empty object "OE_Prefab <path>" at `position` (from `parent`, the scene's object it is put under, or from the
+  scene), turned by `turn` degrees about y and scaled; the library instantiates the prefab of `path` (as the game's
+  resource manager finds it, a mod's `Models\...` included) under it.
+
+- `lighting`: the town's light, fog and post-processing, as the game's towns have them (global volumes of Post
+  Processing v2 under the camera's rig, on layer 12):
+
+  ```json
+  "lighting": { "sun": { "color": [1, 0.88, 0.7], "intensity": 1.8, "height": 35, "azimuth": 35, "shadows": 1 },
+                "ambient": [0.56, 0.48, 0.42], "ssao": { "intensity": 0.9, "radius": 0.04 },
+                "fog": { "color": [0.86, 0.74, 0.6, 0.35], "start": 60, "end": 420 },
+                "bloom": { "intensity": 2.5, "threshold": 0.97 }, "vignette": { "intensity": 0.3, "smoothness": 0.3 } }
+  ```
+
+  the light volume holds the game's own effect `Hex.Render.LightingSettings`, which the game's pipeline sets its sun
+  (turned to `height` and `azimuth`, its colour, strength and shadows), ambient light, SSAO and fog from on every
+  render; the scene's directional light becomes the sun (the game's main light marker on it, shadows on); `sky`: below.
+  `bloom`,
+  `vignette` and `depthOfField` go in a second volume (depth of field left the picture black until turned off and on
+  again, 16.11: left out of the test town). The library gives the town camera the game's post-processing layer when
+  the scene loads (its resources are the game's, which a bundle cannot carry). For scale, the game's own towns: the
+  human town's sun 1.3 at 31 degrees, fog 2.5-30; the nature town's 2.45 at 35 degrees, fog 17-80.
+- `lighting.sky`: the far distance as the game's towns paint it, a panorama on the game's sky shader
+  (`Hex/Misc/TileableSkybox`):
+
+  ```json
+  "sky": { "image": "sky/panorama.png", "scaleX": 3, "scaleY": 6, "rotationY": 90, "rotationX": 0, "tint": [1, 1, 1], "exposure": 1 }
+  ```
+
+  the picture goes `scaleX` times round the horizon (so it repeats every 360 / `scaleX` degrees: its left and right
+  edges must join), its middle row is the horizon and its height spans 180 / `scaleY` degrees (beyond, its top and
+  bottom rows go on up and down); `rotationY` turns it about the vertical (90: its middle before a camera facing +z),
+  `rotationX` then raises its horizon by that many degrees in front. The game's nature town: a 4096x1380 picture,
+  `scaleX` 3, `scaleY` 4.94, so about 34 pixels a degree both ways. Its colour is the picture's times `tint` and
+  `exposure`; the fog does not reach it, so the picture's haze at the horizon should be the fog's colour. The light
+  volume's `LightingSettings.skybox` gets the sky's material, which the game's pipeline makes the scene's skybox on every
+  render, and the town camera clears to it; the material's shader is a stand-in the library replaces with the game's
+  when the scene is loaded.
+- `models` entries cast shadows when drawn on a shader of the game's (`Hex/...`), not when unlit (a painted backdrop);
+  `"castShadows"` says otherwise.
 
 A building's collider is the box around its meshes.
 
@@ -105,7 +151,14 @@ Unity version holding a prefab of a textured mesh (a GameObject with a MeshFilte
   mirrored, the triangles' order turned) and turned by `turn` degrees about the vertical axis; a node's transform is not
   applied;
 - the texture: the material's base colour (PNG, JPEG, WebP, `EXT_texture_webp` too), uncompressed with its mipmaps;
-- the bundle's files are named after `name`, so it loads next to the bundle it was made from.
+- the bundle's files are named after `name`, so it loads next to the bundle it was made from;
+- a skinned mesh (`JOINTS_0` and `WEIGHTS_0` on a node with a skin) keeps its skin as the game's units have it: four
+  bones a vertex (weights as floats, bones as 32-bit integers, in a stream of their own), the bind poses (the skin's
+  inverse bind matrices, mirrored as the vertices are), the bones by the CRC-32 of their paths from the root bone
+  (`Root/Hips/Spine`, as Unity hashes them) and each bone's box; it is not turned (its bind poses would not fit).
 
 The prefab is `assets/<name>.prefab`: a mod's `Models\<path>.json` puts it into a prefab of the game (`"model":
-"<name>"`, see `docs/writing-a-mod.md`), drawn with the game's material.
+"<name>"`, see `docs/writing-a-mod.md`), drawn with the game's material. A skinned mesh made on a game unit's skeleton
+(`tools/units/skin_to_game.py`) is put on that unit's renderer instead (`"meshes"`), the unit's bones moving it. Written
+from the game's troglodyte exported to glTF, the mesh reads back the same as the game's (positions, weights, bones, bind
+poses, bone hashes and boxes).

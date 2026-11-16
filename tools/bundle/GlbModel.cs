@@ -24,6 +24,11 @@ sealed class GlbSpec
     public string Name { get; set; }
     public string Template { get; set; }
     public float Turn { get; set; }
+    // The name the template's shader is given: a shader of the game (e.g. Hex/Lit), which the mod library draws the
+    // model with in place of the template's (ModAssets, ModScenes); the template's own when left out.
+    public string Shader { get; set; }
+    // The texture's largest side at most (halved until it fits); the model's own size when left out.
+    public int TextureSize { get; set; }
 
     public static GlbSpec Read(string file)
     {
@@ -39,6 +44,14 @@ sealed class GlbModel
     public float[] Positions, Normals, Uvs;
     public uint[] Indices;
     public byte[] Texture;
+    // A skinned mesh's (the glTF's mesh with JOINTS_0 and WEIGHTS_0 on a node with a skin): four bones and weights a
+    // vertex, the skin's inverse bind matrices (glTF's order: by columns), its bones' paths from the root bone down
+    // ("Root/Hips/Spine", as Unity names a bone in a mesh) and the root bone's name.
+    public int[] Joints;
+    public float[] Weights, BindPoses;
+    public string[] BonePaths;
+    public string RootBone;
+    public bool Skinned => Joints != null;
 
     public static GlbModel Read(string path)
     {
@@ -55,7 +68,7 @@ sealed class GlbModel
         {
             var a = accessors[index]!;
             var view = views[(int)a["bufferView"]!]!;
-            var components = (string)a["type"] switch { "SCALAR" => 1, "VEC2" => 2, "VEC3" => 3, "VEC4" => 4, var t => throw new Exception($"accessor type {t}") };
+            var components = (string)a["type"] switch { "SCALAR" => 1, "VEC2" => 2, "VEC3" => 3, "VEC4" => 4, "MAT4" => 16, var t => throw new Exception($"accessor type {t}") };
             var type = (int)a["componentType"]!;
             var size = type switch { 5126 or 5125 => 4, 5123 => 2, 5121 => 1, _ => throw new Exception($"component type {type}") };
             return (bin + ((int?)view["byteOffset"] ?? 0) + ((int?)a["byteOffset"] ?? 0), (int?)view["byteStride"] ?? size * components,
@@ -94,7 +107,36 @@ sealed class GlbModel
                 5123 => BitConverter.ToUInt16(bytes, indexOffset + i * indexStride),
                 _ => bytes[indexOffset + i * indexStride],
             };
-        if (json["nodes"]?.AsArray().Any(node => node?["matrix"] != null || node?["rotation"] != null || node?["scale"] != null || node?["translation"] != null) == true)
+        var nodes = json["nodes"]?.AsArray() ?? new JsonArray();
+        var skinned = nodes.Select((node, i) => (node, i)).FirstOrDefault(n => (int?)n.node?["mesh"] == 0 && n.node?["skin"] != null);
+        if (skinned.node != null && attributes["JOINTS_0"] is { } joints && attributes["WEIGHTS_0"] is { } weights)
+        {
+            var (offset, stride, count, components, type) = Accessor((int)joints);
+            model.Joints = new int[count * 4];
+            for (var i = 0; i < count; i++)
+                for (var c = 0; c < 4; c++)
+                    model.Joints[i * 4 + c] = type == 5123 ? BitConverter.ToUInt16(bytes, offset + i * stride + c * 2) : bytes[offset + i * stride + c];
+            model.Weights = Floats((int)weights);
+            var skin = json["skins"]![(int)skinned.node["skin"]!]!;
+            var jointNodes = skin["joints"]!.AsArray().Select(j => (int)j!).ToArray();
+            model.BindPoses = Floats((int)skin["inverseBindMatrices"]!);
+            // A bone's path: the names from the topmost bone of the skin down to it.
+            var parent = new Dictionary<int, int>();
+            for (var i = 0; i < nodes.Count; i++)
+                foreach (var child in nodes[i]?["children"]?.AsArray() ?? new JsonArray())
+                    parent[(int)child!] = i;
+            var isJoint = jointNodes.ToHashSet();
+            string Name(int n) => (string)nodes[n]!["name"] ?? $"node{n}";
+            model.BonePaths = jointNodes.Select(n =>
+            {
+                var names = new List<string> { Name(n) };
+                for (var p = n; parent.TryGetValue(p, out var up) && isJoint.Contains(up); p = up)
+                    names.Insert(0, Name(up));
+                return string.Join("/", names);
+            }).ToArray();
+            model.RootBone = model.BonePaths.OrderBy(p => p.Count(c => c == '/')).First().Split('/')[0];
+        }
+        else if (nodes.Any(node => node?["matrix"] != null || node?["rotation"] != null || node?["scale"] != null || node?["translation"] != null))
             Console.WriteLine($"  {Path.GetFileName(path)}: its nodes' transforms are not applied");
 
         // The base colour's image, as stored in the file.
@@ -184,6 +226,8 @@ sealed class GlbPrefab
 
         WriteMesh(mesh, spec, model);
         WriteTexture(texture, spec, model);
+        if (spec.Shader != null)
+            Edit(shader, v => v["m_ParsedForm.m_Name"].AsString = spec.Shader);
         Edit(material, v =>
         {
             v["m_Name"].AsString = spec.Name;
@@ -220,9 +264,13 @@ sealed class GlbPrefab
     void WriteMesh(long id, GlbSpec spec, GlbModel model)
     {
         var count = model.Positions.Length / 3;
-        var turn = Matrix4x4.CreateRotationY(spec.Turn * MathF.PI / 180);
-        // Unity's vertex layout of the template: position, normal and the first UV set, floats, one stream.
-        var data = new byte[count * 32];
+        // A skinned mesh stays in its bind poses' space: not turned.
+        if (model.Skinned && spec.Turn != 0)
+            Console.WriteLine($"  {spec.Name}: a skinned mesh is not turned (its bind poses would not fit)");
+        var turn = Matrix4x4.CreateRotationY((model.Skinned ? 0 : spec.Turn) * MathF.PI / 180);
+        // Unity's vertex layout of the template: position, normal and the first UV set, floats, one stream; a skinned
+        // mesh's bone weights (four floats) and bones (four 32-bit integers) in a second stream, as the game's units have.
+        var data = new byte[count * (model.Skinned ? 64 : 32)];
         Vector3 min = new(float.MaxValue), max = new(float.MinValue);
         for (var i = 0; i < count; i++)
         {
@@ -238,6 +286,15 @@ sealed class GlbPrefab
             }
             min = Vector3.Min(min, p);
             max = Vector3.Max(max, p);
+            if (model.Skinned)
+            {
+                var skin = count * 32 + i * 32;
+                for (var c = 0; c < 4; c++)
+                {
+                    BitConverter.TryWriteBytes(data.AsSpan(skin + c * 4), model.Weights[i * 4 + c]);
+                    BitConverter.TryWriteBytes(data.AsSpan(skin + 16 + c * 4), (uint)model.Joints[i * 4 + c]);
+                }
+            }
         }
         var indices = new byte[model.Indices.Length * 4];
         for (var i = 0; i < model.Indices.Length; i += 3)
@@ -257,15 +314,22 @@ sealed class GlbPrefab
         Edit(id, v =>
         {
             var channels = v["m_VertexData.m_Channels.Array"].Children;
-            (int offset, int dimension)[] wanted = { (0, 3), (12, 3), (0, 0), (0, 0), (24, 2) };
+            // Channels: position, normal, tangent, colour, UV0..7, blend weights, blend indices (stream, offset, format
+            // (0 float, 10 32-bit unsigned integer), dimension).
+            var wanted = new (int stream, int offset, int format, int dimension)[14];
+            (wanted[0], wanted[1], wanted[4]) = ((0, 0, 0, 3), (0, 12, 0, 3), (0, 24, 0, 2));
+            if (model.Skinned)
+                (wanted[12], wanted[13]) = ((1, 0, 0, 4), (1, 16, 10, 4));
             for (var c = 0; c < channels.Count; c++)
             {
-                var (offset, dimension) = c < wanted.Length ? wanted[c] : (0, 0);
-                channels[c]["stream"].AsByte = 0;
+                var (stream, offset, format, dimension) = c < wanted.Length ? wanted[c] : (0, 0, 0, 0);
+                channels[c]["stream"].AsByte = (byte)stream;
                 channels[c]["offset"].AsByte = (byte)offset;
-                channels[c]["format"].AsByte = 0;
+                channels[c]["format"].AsByte = (byte)format;
                 channels[c]["dimension"].AsByte = (byte)dimension;
             }
+            if (model.Skinned)
+                WriteSkin(v, model, data, count);
             v["m_Name"].AsString = spec.Name;
             v["m_VertexData.m_VertexCount"].AsUInt = (uint)count;
             v["m_VertexData.m_DataSize"].AsByteArray = data;
@@ -285,15 +349,99 @@ sealed class GlbPrefab
         });
     }
 
+    // A skinned mesh's bind poses (glTF's inverse bind matrices, mirrored as the vertices are), its bones by the CRC-32
+    // of their paths (as Unity hashes a bone's name in a mesh) and each bone's box of the vertices it moves, in its own
+    // space (the renderer's bounds are made of them).
+    static void WriteSkin(AssetTypeValueField v, GlbModel model, byte[] data, int count)
+    {
+        var bones = model.BonePaths.Length;
+        var poses = new Matrix4x4[bones];
+        float[] sign = { -1, 1, 1, 1 };
+        for (var b = 0; b < bones; b++)
+        {
+            float M(int r, int c) => sign[r] * sign[c] * model.BindPoses[b * 16 + c * 4 + r];
+            poses[b] = new Matrix4x4(M(0, 0), M(0, 1), M(0, 2), M(0, 3), M(1, 0), M(1, 1), M(1, 2), M(1, 3),
+                M(2, 0), M(2, 1), M(2, 2), M(2, 3), M(3, 0), M(3, 1), M(3, 2), M(3, 3));
+        }
+        var low = Enumerable.Repeat(new Vector3(float.PositiveInfinity), bones).ToArray();
+        var high = Enumerable.Repeat(new Vector3(float.NegativeInfinity), bones).ToArray();
+        for (var i = 0; i < count; i++)
+        {
+            var p = new Vector3(BitConverter.ToSingle(data, i * 32), BitConverter.ToSingle(data, i * 32 + 4), BitConverter.ToSingle(data, i * 32 + 8));
+            for (var c = 0; c < 4; c++)
+            {
+                if (model.Weights[i * 4 + c] <= 0)
+                    continue;
+                var b = model.Joints[i * 4 + c];
+                if (b >= bones)
+                    throw new Exception($"vertex {i}: bone {b}, the skin has {bones}");
+                var m = poses[b];
+                // Unity's matrices act on columns: q = M p.
+                var q = new Vector3(m.M11 * p.X + m.M12 * p.Y + m.M13 * p.Z + m.M14, m.M21 * p.X + m.M22 * p.Y + m.M23 * p.Z + m.M24,
+                    m.M31 * p.X + m.M32 * p.Y + m.M33 * p.Z + m.M34);
+                low[b] = Vector3.Min(low[b], q);
+                high[b] = Vector3.Max(high[b], q);
+            }
+        }
+        var poseArray = v["m_BindPose.Array"];
+        poseArray.Children.Clear();
+        foreach (var m in poses)
+        {
+            var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(poseArray);
+            float[,] values = { { m.M11, m.M12, m.M13, m.M14 }, { m.M21, m.M22, m.M23, m.M24 }, { m.M31, m.M32, m.M33, m.M34 }, { m.M41, m.M42, m.M43, m.M44 } };
+            for (var r = 0; r < 4; r++)
+                for (var c = 0; c < 4; c++)
+                    e[$"e{r}{c}"].AsFloat = values[r, c];
+            poseArray.Children.Add(e);
+        }
+        var hashes = v["m_BoneNameHashes.Array"];
+        hashes.Children.Clear();
+        foreach (var path in model.BonePaths)
+        {
+            var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(hashes);
+            e.AsUInt = Crc32(path);
+            hashes.Children.Add(e);
+        }
+        v["m_RootBoneNameHash"].AsUInt = Crc32(model.RootBone);
+        var boxes = v["m_BonesAABB.Array"];
+        boxes.Children.Clear();
+        for (var b = 0; b < bones; b++)
+        {
+            var e = ValueBuilder.DefaultValueFieldFromArrayTemplate(boxes);
+            (e["m_Min.x"].AsFloat, e["m_Min.y"].AsFloat, e["m_Min.z"].AsFloat) = (low[b].X, low[b].Y, low[b].Z);
+            (e["m_Max.x"].AsFloat, e["m_Max.y"].AsFloat, e["m_Max.z"].AsFloat) = (high[b].X, high[b].Y, high[b].Z);
+            boxes.Children.Add(e);
+        }
+        v["m_VariableBoneCountWeights.m_Data.Array"].Children.Clear();
+        Console.WriteLine($"  skinned: {bones} bones from {model.RootBone}");
+    }
+
+    static uint Crc32(string text)
+    {
+        var crc = 0xFFFFFFFFu;
+        foreach (var b in System.Text.Encoding.UTF8.GetBytes(text))
+        {
+            crc ^= b;
+            for (var k = 0; k < 8; k++)
+                crc = (crc & 1) != 0 ? (crc >> 1) ^ 0xEDB88320u : crc >> 1;
+        }
+        return ~crc;
+    }
+
     void WriteTexture(long id, GlbSpec spec, GlbModel model)
     {
         var info = new SKImageInfo(1, 1, SKColorType.Rgba8888, SKAlphaType.Unpremul);
         using var decoded = model.Texture != null ? SKBitmap.Decode(model.Texture) ?? throw new Exception("the base colour image could not be read") : null;
-        using var image = new SKBitmap(info.WithSize(decoded?.Width ?? 4, decoded?.Height ?? 4));
+        int width = decoded?.Width ?? 4, height = decoded?.Height ?? 4;
+        while (spec.TextureSize > 0 && Math.Max(width, height) > spec.TextureSize)
+            (width, height) = (Math.Max(1, width / 2), Math.Max(1, height / 2));
+        using var image = new SKBitmap(info.WithSize(width, height));
         if (decoded == null)
             image.Erase(new SKColor(200, 200, 200));
-        else
+        else if (decoded.Width == width && decoded.Height == height)
             decoded.CopyTo(image, SKColorType.Rgba8888);
+        else
+            decoded.ScalePixels(image, new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
         // Uncompressed (RGBA32) with its mipmaps, the rows as the image has them: Unity's first row is a UV's v = 0, the
         // glTF's top one.
         var levels = new List<byte[]>();

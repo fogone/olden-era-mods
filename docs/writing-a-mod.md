@@ -373,6 +373,41 @@ A bundle carries its own copies of the shaders its materials use, and a copy of 
 game is a stand-in (one pass: no fog of war, no shadows): the library puts the bundle's materials on the game's shader
 of the same name. Use lower-case paths: the table's keys are (a mixed-case path was not tried).
 
+**A unit on a game unit's skeleton.** A new creature needs no rig and no animations of its own: its mesh is skinned to
+the skeleton of a game unit of the same build, and the game's unit is used as it is (its animations, timelines,
+effects, attack points), only drawn with the new mesh:
+
+```json
+Models\units\myfaction\goblin.json
+{ "like": "units/Humans/1Prefabs/esquire",
+  "meshes": { "Swordsman_mesh": "unit_goblin", "SwordsmanShield_mesh": "", "SwordsmanSword_mesh": "" } }
+```
+
+Each skinned mesh named gets the mesh of the mod's model prefab (a bundle's, `oe-bundle model` of a skinned glTF) and
+its texture on the game's material; the game's renderer keeps its bones, so the mesh must be skinned to the same bones
+in the same bind poses; `""` hides one (a weapon the creature does not carry). The view then names it like any model
+(`"mesh": "myfaction/goblin"`); its `scale` and times (`attackTimeBefore`...) are the game unit's, as its clips are.
+Checked 16.11.2026 on 0.82.10: a goblin on the esquire's skeleton in the unit window, moved by the esquire's idle, and
+the twelve creatures of the test faction (on the esquire, the crossbowman, the minotaur, the ent, the phoenix) standing
+in a town, each moved by its host's animation; a host's weapon left visible moves with the hand (the crossbow).
+
+How such a mesh is made without a modeller (`tools/units/`, see its README):
+1. the game unit exported with its skeleton (UnityPy: meshes, bones, bind poses) and rendered in its bind pose from
+   the front (`render_pose.py`);
+2. the render repainted by an image model as the new creature, "keep exactly the same pose, limbs and silhouette": a
+   pose of the picture is a pose of the skeleton;
+3. the picture made a model by an image-to-3D tool (Hunyuan3D-2);
+4. the model skinned to the skeleton (`skin_to_game.py`): turned to the picture's side, stretched to the game mesh's
+   box and then onto its surface (scaled and shifted on each axis to the nearest points both ways), each vertex given the weights of the nearest point of the game mesh facing the same way, the vertices far from
+   it (an ear where the game unit has a helmet) taking their weights from their neighbours on the model; written in the
+   game mesh's space with the unit's bones and bind poses.
+
+Pick a host of the same build and posture: an image-to-3D tool makes a figure upright when the picture is a front
+view, so a hunched host (the troglodyte, head before the chest) puts the head and arms of an upright creature on the
+wrong bones (the hands flattened in the animations); an upright one of the same build (the esquire for a goblin) fits.
+The image model keeps a host's pose but not always its layout: asked to repaint the cavalry's horse and knight (who
+stands beside the horse in the bind pose) as a wolf and a goblin, it put the goblin elsewhere, or on the wolf's back.
+
 #### Town scenes
 
 A town is a scene: a session loads the game's city scenes with it and keeps each in the town's scene registry by its
@@ -402,6 +437,60 @@ bundle, `oe-bundle city` puts them into a scene (`models`, `tools/bundle/README.
 perspective one. Checked 13.11.2026 with Golden-Era's 3D Stronghold (its buildings modelled from the HoMM3 art, a
 terrain, a sky, effects): the town opens in 3D with the game's interface, a click on the town hall opens the building
 tree, fortifications built there appear after the game's building effect.
+
+##### A town of generated models
+
+A town's ground and buildings can be made without Unity and without a modeller, the way the SDK's test town is: the
+ground as the game's towns have theirs, the buildings as models of their own. What goes into it and what to watch for:
+
+- **The ground is a Unity Terrain** (`terrain` in `oe-bundle city`), as the game's towns have (cityHuman2, CityUndead2,
+  cityNature, cityUnfrozen2): a heightmap and a splat map mixing four textures, drawn with the game's terrain material
+  (`Hex/TerrainUnity`). A whole landscape made by an image-to-3D tool as one textured model looks blurred and blotched
+  at a town's scale: such tools paint an object seen from around (a 2048 texture for the whole of it, its floor seen
+  edge-on from the front), not a ground the camera looks down at. The model is good for the shape: `tools/terrain/
+  heightmap.py` takes its top surface as heights and its slopes as where rock goes. The surface comes from textures that
+  repeat: the game's (the terrain's layers named after them) or the mod's own (a layer's `image`).
+- **The game's terrain material blends by the textures' height** (`_HeightBlendDepth`, `_HeightmapScale0..3`): it is
+  the game's material copied, its textures replaced. Its textures are the ones a layer names; a texture of the world map
+  (`Sand`, `Dirt`) is clamped, not repeated, and draws as smeared stripes: take a town's (`dirt_ground1..4`,
+  `rock_ground1`, `dead_ground1..4`, ...) or an image of the mod's (seamless, `tools/terrain/ground.py`, `strata.py`).
+  The game's terrain shader projects the textures three ways on slopes, so a texture of horizontal bands lies as layers
+  of rock on a cliff.
+- **A splat map is weights in all four channels, alpha too**: an image library that premultiplies colour by alpha when
+  it reads a PNG zeroes the weights where the rock weight (alpha) is 0, and the shader then draws its last texture
+  everywhere. `oe-bundle` reads the image as it is and makes its mipmaps channel by channel.
+- **The terrain's level-of-detail data** (each patch's error and height range) is written so every patch is drawn at
+  full detail: the game's build has stripped the method that works it out from the heights (`TerrainData.SetHeights`).
+- **The town camera looks at a point** (the controller's `lookAtTransform`): a rotation given to the camera is undone by
+  the controller each frame. `camera.lookAt` sets that point; the camera's height and the point frame the town.
+- **A model made from a glTF is drawn with the game's shader** (`shader` in `oe-bundle model`: `Hex/Lit`, the game's
+  buildings' shader). The library does not just put the game's shader on the model's material: a material made with
+  another shader keeps its own render states, and `Hex/Lit` with a stand-in's `_ZTest` (7, greater-or-equal) draws only
+  where something is in front of it, which is nowhere. The model's material is made a copy of a game material on that
+  shader, its main texture the model's (`ModScenes`).
+- **The sky is the game's kind** (`lighting.sky` in `oe-bundle city`): a panorama on the game's sky shader
+  (`Hex/Misc/TileableSkybox`), which the light volume gives the game's pipeline, as the game's towns have theirs (the
+  nature town's: a 4096x1380 picture three times round, about 34 pixels a degree). The picture's left and right edges
+  join, its middle row is the horizon; the fog does not reach it, so its haze at the horizon is the fog's colour. A
+  model in front must not paint a sky of its own: a landscape made from a picture with its depth leaves the picture's
+  sky and far distance out (a depth estimate gives them an inverse depth about 0, which a fit of the near ground would
+  put a hundred metres away). Checked 16.11.2026 in the test town: the panorama where the shader's mapping puts it.
+- **Roads and trodden ground come from a plan**, not from a picture: the buildings' places and the roads as lines (x,
+  z, width) give the splat map's road weight by the distance to the lines, a little noise on the edges; a road narrower
+  than it looks on a concept picture reads right at the town's scale (about a metre for the main road). A light town
+  texture of the game (`sand3`) on the roads and a pebbly one (`256_1_dirt_stines_texture`) by them match a desert
+  town; a grey one (`dirt_ground2`) reads as stone.
+- **A model put into a scene several times** (the small huts around a town) shares its mesh, material and texture:
+  `oe-bundle city` imports a bundle's assets once and points every copy at them.
+- **A game prefab in the town** (a creature on its nest, by its lair) is a place, not a copy: `prefabs` in `oe-bundle
+  city` writes an empty object "OE_Prefab <path>" (a model's `path` in the game's resources, the mod's `Models\...`
+  included) at a position, a turn and a scale, under a building level's object when `parent` names it, so it shows
+  when that level is built. The library puts the prefab there once the scene is loaded (`ModScenes`): a unit's model
+  brings its own animations, so it idles as it does in battle. A unit model faces +x and a town model -z: a quarter
+  turn faces it to the camera.
+- **Iterate without restarting the game**: `scene reload <scene> <bundle file>` in the research console takes the
+  scene out of the town registry, unloads it and its bundle, puts the new file in the bundle cache and loads it again;
+  the town must be closed. A data archive and the library still need a restart.
 
 ## 3. The framework
 

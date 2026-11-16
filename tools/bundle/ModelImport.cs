@@ -14,6 +14,9 @@ sealed class ModelImport
     readonly AssetsManager am;
     readonly AssetsFileInstance scene, shared;
     readonly int sharedFileId;
+    // The assets already imported from each bundle (its id -> the shared file's): a model put into the scene again shares
+    // its meshes, materials and textures.
+    readonly Dictionary<string, Dictionary<long, long>> imported = new();
 
     public ModelImport(AssetsManager am, AssetsFileInstance scene, AssetsFileInstance shared, int sharedFileId)
     {
@@ -23,9 +26,10 @@ sealed class ModelImport
         this.sharedFileId = sharedFileId;
     }
 
-    // The prefabs (all of the bundle's when none are named) put into the scene at a place. The shared assets imported
+    // The prefabs (all of the bundle's when none are named) put into the scene at a place and size. The shared assets imported
     // are returned, for the scene to preload.
-    public List<long> Add(string bundlePath, string[] names, float[] position, float[] rotation)
+    public List<long> Add(string bundlePath, string[] names, float[] position, float[] rotation, float[] scale = null, string rename = null,
+        bool? castShadows = null)
     {
         var bundle = am.LoadBundleFile(bundlePath, true);
         var directory = bundle.file.BlockAndDirInfo.DirectoryInfos;
@@ -67,9 +71,11 @@ sealed class ModelImport
                     pending.Push(to);
         }
 
-        // The prefabs' roots at the place given (Unity's prefabs are at their own origin).
+        // The prefabs' roots at the place given (Unity's prefabs are at their own origin), named as asked.
         foreach (var go in roots.Values)
         {
+            if (rename != null)
+                values[go]["m_Name"].AsString = rename;
             var t = values[values[go]["m_Component.Array"].Children.Select(c => c["component.m_PathID"].AsLong)
                 .First(c => source.file.GetAssetInfo(c).TypeId == (int)AssetClassID.Transform)];
             if (position is { Length: 3 })
@@ -77,18 +83,36 @@ sealed class ModelImport
             if (rotation is { Length: 4 })
                 (t["m_LocalRotation.x"].AsFloat, t["m_LocalRotation.y"].AsFloat, t["m_LocalRotation.z"].AsFloat, t["m_LocalRotation.w"].AsFloat) =
                     (rotation[0], rotation[1], rotation[2], rotation[3]);
+            if (scale is { Length: 1 or 3 })
+                (t["m_LocalScale.x"].AsFloat, t["m_LocalScale.y"].AsFloat, t["m_LocalScale.z"].AsFloat) =
+                    scale.Length == 3 ? (scale[0], scale[1], scale[2]) : (scale[0], scale[0], scale[0]);
         }
+
+        // Its renderers cast shadows as the game's towns' do when they are drawn lit, on a shader of the game's (Hex/...),
+        // not when unlit (a painted backdrop): unless the spec says.
+        foreach (var (id, v) in values)
+            if (source.file.GetAssetInfo(id).TypeId == (int)AssetClassID.MeshRenderer)
+            {
+                var material = v["m_Materials.Array"].Children.Select(m => m["m_PathID"].AsLong).FirstOrDefault(m => m != 0);
+                var shader = material != 0 && values.TryGetValue(material, out var mv) && mv["m_Shader.m_PathID"].AsLong is var sh && values.TryGetValue(sh, out var sv)
+                    ? sv["m_ParsedForm.m_Name"].IsDummy ? sv["m_Name"].AsString : sv["m_ParsedForm.m_Name"].AsString : "";
+                v["m_CastShadows"].AsByte = (byte)((castShadows ?? shader.StartsWith("Hex/")) ? 1 : 0);
+            }
 
         // A scene's object: a GameObject or a component of one; the rest are assets. Each is given the next id of its
         // file: a scene's objects are numbered from 1 up, as Unity builds it.
         bool InScene(long id) => source.file.GetAssetInfo(id).TypeId == (int)AssetClassID.GameObject || !values[id]["m_GameObject"].IsDummy;
         long nextScene = scene.file.Metadata.AssetInfos.Max(a => a.PathId) + 1, nextShared = shared.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
-        var ids = values.Keys.OrderBy(id => id).ToDictionary(id => id, id => InScene(id) ? nextScene++ : nextShared++);
+        if (!imported.TryGetValue(bundlePath, out var known))
+            imported[bundlePath] = known = new Dictionary<long, long>();
+        var ids = values.Keys.OrderBy(id => id).ToDictionary(id => id, id => InScene(id) ? nextScene++ : known.TryGetValue(id, out var was) ? was : nextShared++);
         var assets = new List<long>();
         foreach (var (id, v) in values)
         {
             var info = source.file.GetAssetInfo(id);
             var inScene = InScene(id);
+            if (!inScene && known.ContainsKey(id))
+                continue;
             var target = inScene ? scene : shared;
             foreach (var p in Pointers(v))
             {
@@ -119,7 +143,10 @@ sealed class ModelImport
             copy.SetNewData(v);
             target.file.Metadata.AddAssetInfo(copy);
             if (!inScene)
+            {
                 assets.Add(ids[id]);
+                known[id] = ids[id];
+            }
         }
         Console.WriteLine($"  models: {roots.Count} prefabs of {Path.GetFileName(bundlePath)}, {values.Count - assets.Count} scene objects, {assets.Count} assets");
         return assets;

@@ -24,6 +24,7 @@ global using GameInputReceiver = global::cbe;
 global using GameIntroStep = global::ccj;
 global using GameLocalization = global::cav;
 global using GameLocalizedText = global::cpz;
+global using GameMainLight = global::bel;
 global using GameMapGameSession = global::dcz;
 global using GameMapObject = global::fql;
 global using GameMapObjectStore = global::fqm;
