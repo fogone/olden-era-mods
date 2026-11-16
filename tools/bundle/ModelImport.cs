@@ -28,7 +28,8 @@ sealed class ModelImport
 
     // The prefabs (all of the bundle's when none are named) put into the scene at a place and size. The shared assets imported
     // are returned, for the scene to preload.
-    public List<long> Add(string bundlePath, string[] names, float[] position, float[] rotation, float[] scale = null, string rename = null)
+    public List<long> Add(string bundlePath, string[] names, float[] position, float[] rotation, float[] scale = null, string rename = null,
+        bool? castShadows = null)
     {
         var bundle = am.LoadBundleFile(bundlePath, true);
         var directory = bundle.file.BlockAndDirInfo.DirectoryInfos;
@@ -86,6 +87,17 @@ sealed class ModelImport
                 (t["m_LocalScale.x"].AsFloat, t["m_LocalScale.y"].AsFloat, t["m_LocalScale.z"].AsFloat) =
                     scale.Length == 3 ? (scale[0], scale[1], scale[2]) : (scale[0], scale[0], scale[0]);
         }
+
+        // Its renderers cast shadows as the game's towns' do when they are drawn lit, on a shader of the game's (Hex/...),
+        // not when unlit (a painted backdrop): unless the spec says.
+        foreach (var (id, v) in values)
+            if (source.file.GetAssetInfo(id).TypeId == (int)AssetClassID.MeshRenderer)
+            {
+                var material = v["m_Materials.Array"].Children.Select(m => m["m_PathID"].AsLong).FirstOrDefault(m => m != 0);
+                var shader = material != 0 && values.TryGetValue(material, out var mv) && mv["m_Shader.m_PathID"].AsLong is var sh && values.TryGetValue(sh, out var sv)
+                    ? sv["m_ParsedForm.m_Name"].IsDummy ? sv["m_Name"].AsString : sv["m_ParsedForm.m_Name"].AsString : "";
+                v["m_CastShadows"].AsByte = (byte)((castShadows ?? shader.StartsWith("Hex/")) ? 1 : 0);
+            }
 
         // A scene's object: a GameObject or a component of one; the rest are assets. Each is given the next id of its
         // file: a scene's objects are numbered from 1 up, as Unity builds it.

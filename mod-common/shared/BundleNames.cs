@@ -31,6 +31,7 @@ public static class BundleNames
         new("BuildingSlot", () => typeof(GameBuildingSlot),                 // a town's building slot: its name, its buildings
             () => new() { ["sceneSlot"] = GameNames.BuildingSlotNameField }),
         new("CityCameraPoint", () => typeof(GameCityCameraPoint)),          // a town camera's point
+        new("MainLight", () => typeof(GameMainLight)),                      // a scene's sun, lit by its LightingSettings
     };
 
     sealed record Name(string Ns, string Cls, string Assembly, Dictionary<string, string> Fields);

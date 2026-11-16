@@ -29,6 +29,8 @@ sealed class CitySpec
     // Places of prefabs the game finds by path when the scene is loaded (the library's ModScenes): a creature of the
     // game's units or a mod's model by its lair. An empty object "OE_Prefab <path>" at the place.
     public PrefabSpec[] Prefabs { get; set; }
+    // The town's light, fog and post-processing, as the game's towns' volumes (CityLighting.cs).
+    public LightingSpec Lighting { get; set; }
 
     public sealed class PrefabSpec
     {
@@ -55,6 +57,8 @@ sealed class CitySpec
         // The root's name in the scene (one prefab put once, its own name by default): the same model put twice, as two
         // levels of a building, needs a name for each.
         public string Name { get; set; }
+        // Its renderers cast shadows (by default: when drawn on a shader of the game's, not a painted backdrop's).
+        public bool? CastShadows { get; set; }
     }
 
     // The scene's camera made the town's: the object, and the controller's settings (the game's town values by
@@ -129,7 +133,7 @@ sealed partial class CityScene
         if (spec.Models is { Length: > 0 })
         {
             var import = new ModelImport(am, scene, shared, sharedFileId);
-            var assets = spec.Models.SelectMany(m => import.Add(m.Bundle, m.Prefabs, m.Position, m.Rotation, m.Scale, m.Name)).ToArray();
+            var assets = spec.Models.SelectMany(m => import.Add(m.Bundle, m.Prefabs, m.Position, m.Rotation, m.Scale, m.Name, m.CastShadows)).ToArray();
             Preload(assets);
             nextScene = scene.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
             nextShared = shared.file.Metadata.AssetInfos.Max(a => a.PathId) + 1;
@@ -219,6 +223,8 @@ sealed partial class CityScene
             AddCamera(camera, Object(camera.Object), layer, spec.Offset);
         if (spec.Terrain is { } ground)
             AddTerrain(ground, layer);
+        if (spec.Lighting is { } lighting)
+            AddLighting(lighting);
         foreach (var prefab in spec.Prefabs ?? Array.Empty<CitySpec.PrefabSpec>())
         {
             long go = nextScene++, transform = nextScene++;
@@ -275,6 +281,7 @@ sealed partial class CityScene
                 v["m_LocalRotation.w"].AsFloat) = (r[0], r[1], r[2], r[3]));
 
         long rig = nextScene++, rigTransform = nextScene++, controller = nextScene++, helper = nextScene++;
+        cameraRig = rigTransform;
         long context = nextScene++, raycaster = nextScene++;
         Reparent(cameraTransform, rigTransform);
         GameObject(rig, "CityCamera", layer, rigTransform, controller, helper);
@@ -527,9 +534,10 @@ sealed partial class CityScene
     }
 
     // An asset of a game script (a ScriptableObject: a MonoBehaviour of no GameObject) among the shared assets.
-    long SharedAsset(string ns, string cls, IEnumerable<TypeTrees.Node> fields, Action<AssetTypeValueField> fill)
+    long SharedAsset(string ns, string cls, IEnumerable<TypeTrees.Node> fields, Action<AssetTypeValueField> fill,
+        string assembly = Assembly)
     {
-        var scriptId = Script(ns, cls, Assembly);
+        var scriptId = Script(ns, cls, assembly);
         var meta = shared.file.Metadata;
         var index = (ushort)meta.ScriptTypes.Count;
         meta.ScriptTypes.Add(new AssetPPtr(0, scriptId));

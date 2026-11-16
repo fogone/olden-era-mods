@@ -91,6 +91,26 @@ interface over it). The tool makes them of the scene's objects:
   scene), turned by `turn` degrees about y and scaled; the library instantiates the prefab of `path` (as the game's
   resource manager finds it, a mod's `Models\...` included) under it.
 
+- `lighting`: the town's light, fog and post-processing, as the game's towns have them (global volumes of Post
+  Processing v2 under the camera's rig, on layer 12):
+
+  ```json
+  "lighting": { "sun": { "color": [1, 0.88, 0.7], "intensity": 1.8, "height": 35, "azimuth": 35, "shadows": 1 },
+                "ambient": [0.56, 0.48, 0.42], "ssao": { "intensity": 0.9, "radius": 0.04 },
+                "fog": { "color": [0.86, 0.74, 0.6, 0.35], "start": 60, "end": 420 },
+                "bloom": { "intensity": 2.5, "threshold": 0.97 }, "vignette": { "intensity": 0.3, "smoothness": 0.3 } }
+  ```
+
+  the light volume holds the game's own effect `Hex.Render.LightingSettings`, which the game's pipeline sets its sun
+  (turned to `height` and `azimuth`, its colour, strength and shadows), ambient light, SSAO and fog from on every
+  render; the scene's directional light becomes the sun (the game's main light marker on it, shadows on). `bloom`,
+  `vignette` and `depthOfField` go in a second volume (depth of field left the picture black until turned off and on
+  again, 16.11: left out of the test town). The library gives the town camera the game's post-processing layer when
+  the scene loads (its resources are the game's, which a bundle cannot carry). For scale, the game's own towns: the
+  human town's sun 1.3 at 31 degrees, fog 2.5-30; the nature town's 2.45 at 35 degrees, fog 17-80.
+- `models` entries cast shadows when drawn on a shader of the game's (`Hex/...`), not when unlit (a painted backdrop);
+  `"castShadows"` says otherwise.
+
 A building's collider is the box around its meshes.
 
 See `docs/writing-a-mod.md`, "Town scenes".

@@ -7,6 +7,7 @@ using System.Text.Json.Nodes;
 using HarmonyLib;
 using Hex.GameScenes;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 
 namespace Nobirds.OldenEra.Modding.Common;
@@ -123,6 +124,8 @@ public static class ModScenes
             Terrains(scene, unity);
             GameShaders(scene, unity);
             Prefabs(scene, unity);
+            try { PostProcessing(scene, unity); }
+            catch (Exception e) { Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: post-processing: {e.GetType().Name}: {e.Message}"); }
             // The game's entry, made as the game makes its own once a scene is loaded: chs(EScene, Scene), then it takes
             // the scene's roots and turns them off (chs.rat on 0.82.08).
             var entry = new GameSceneEntry((EScene)scene.Id, unity);
@@ -244,6 +247,41 @@ public static class ModScenes
                 }
                 var made = UnityEngine.Object.Instantiate(prefab, place, false);
                 made.SetActive(true);
+            }
+    }
+
+    // A mod scene's town camera with the game's post-processing layer, as the game's town cameras have it: the town's
+    // light, fog and effects come in global volumes of the scene (oe-bundle city: lighting; the game's
+    // Hex.Render.LightingSettings among them), which only a camera with a layer renders. The layer needs the game's own
+    // resources (its post-processing shaders), which a bundle cannot carry: it is made here with the resources and the
+    // volume layers of a camera of the game's.
+    static void PostProcessing(Scene scene, UnityEngine.SceneManagement.Scene unity)
+    {
+        PostProcessLayer game = null;
+        foreach (var layer in Resources.FindObjectsOfTypeAll<PostProcessLayer>())
+            // A camera that renders the volumes' layer 12, as the game's town and map cameras (the unit preview's do not).
+            if (layer.gameObject.scene != unity && layer.m_Resources != null && (layer.volumeLayer.value & (1 << 12)) != 0)
+            {
+                game = layer;
+                break;
+            }
+        foreach (var root in unity.GetRootGameObjects())
+            foreach (var camera in root.GetComponentsInChildren<Camera>(true))
+            {
+                if (camera.tag != "MainCamera" || camera.GetComponent<PostProcessLayer>() != null)
+                    continue;
+                if (game == null)
+                {
+                    Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: no camera of the game's with post-processing to copy");
+                    return;
+                }
+                var made = camera.gameObject.AddComponent<PostProcessLayer>();
+                made.Init(game.m_Resources);
+                made.volumeLayer = game.volumeLayer;
+                made.volumeTrigger = camera.transform;
+                made.antialiasingMode = game.antialiasingMode;
+                made.stopNaNPropagation = game.stopNaNPropagation;
+                Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: camera {camera.name} renders the post-processing volumes (layers {game.volumeLayer.value})");
             }
     }
 
