@@ -103,6 +103,8 @@ sealed class CitySpec
             foreach (var layer in (terrain.Layers ?? Array.Empty<TerrainSpec.LayerSpec>()).Where(l => l.Image != null))
                 layer.Image = Path.GetFullPath(layer.Image, folder);
         }
+        if (spec.Lighting?.Sky is { Image: not null } sky)
+            sky.Image = Path.GetFullPath(sky.Image, Path.GetDirectoryName(Path.GetFullPath(file)));
         return spec;
     }
 }
@@ -115,6 +117,8 @@ sealed partial class CityScene
     readonly AssetsFileInstance scene, shared;
     readonly int sharedFileId;
     long nextScene, nextShared;
+    // The town camera's Camera components (the sky clears them to it).
+    readonly List<long> townCameras = new();
 
     public CityScene(AssetsManager am, AssetsFileInstance scene, AssetsFileInstance shared, int sharedFileId)
     {
@@ -354,6 +358,8 @@ sealed partial class CityScene
         // The Camera as the game's town camera's: drawn first (the interface's cameras over it), the game's layers.
         foreach (var c in Field(scene, cameraGo)["m_Component.Array"].Children.Select(c => c["component.m_PathID"].AsLong)
                      .Where(c => scene.file.GetAssetInfo(c).TypeId == (int)AssetClassID.Camera).ToList())
+        {
+            townCameras.Add(c);
             Edit(c, v =>
             {
                 v["m_Depth"].AsFloat = 0;
@@ -368,6 +374,7 @@ sealed partial class CityScene
                 if (spec.Far is { } far)
                     v["far clip plane"].AsFloat = far;
             });
+        }
         Console.WriteLine($"  camera: {spec.Object} under CityCamera, at ({x}, {y}, {z})");
     }
 

@@ -123,6 +123,8 @@ public static class ModScenes
             scene.Loading = null;
             Terrains(scene, unity);
             GameShaders(scene, unity);
+            try { Sky(scene, unity); }
+            catch (Exception e) { Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: sky: {e.GetType().Name}: {e.Message}"); }
             Prefabs(scene, unity);
             try { PostProcessing(scene, unity); }
             catch (Exception e) { Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: post-processing: {e.GetType().Name}: {e.Message}"); }
@@ -323,6 +325,25 @@ public static class ModScenes
             }
         if (made.Count > 0)
             Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: {made.Count} materials drawn as the game's");
+    }
+
+    // A mod scene's sky: the material its light volume sets (LightingSettings.skybox, which the game's pipeline makes the
+    // scene's skybox on every render), on a stand-in of the game's sky shader (oe-bundle's "lighting.sky"), drawn with
+    // the game's shader of that name; its texture and settings are the material's own.
+    static void Sky(Scene scene, UnityEngine.SceneManagement.Scene unity)
+    {
+        foreach (var root in unity.GetRootGameObjects())
+            foreach (var volume in root.GetComponentsInChildren<PostProcessVolume>(true))
+            {
+                var settings = volume.sharedProfile?.settings;
+                for (var i = 0; settings != null && i < settings.Count; i++)
+                    if (settings[i]?.TryCast<Hex.Render.LightingSettings>()?.skybox is { overrideState: true } skybox
+                        && skybox.value is { } sky && sky.shader is { } stand && Shader.Find(stand.name) is { } shader && shader != stand)
+                    {
+                        sky.shader = shader;
+                        Game.Log?.Invoke($"ModScenes: {scene.Root}: scene {scene.Name}: sky {sky.name} drawn with the game's {shader.name}");
+                    }
+            }
     }
 
     // A loaded object of the game by its name (any name: null).

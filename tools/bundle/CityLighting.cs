@@ -18,6 +18,7 @@ sealed class LightingSpec
     public BloomSpec Bloom { get; set; }
     public VignetteSpec Vignette { get; set; }
     public DepthOfFieldSpec DepthOfField { get; set; }
+    public SkySpec Sky { get; set; }
 
     public sealed class SunSpec
     {
@@ -58,6 +59,23 @@ sealed class LightingSpec
         public float[] Color { get; set; } = { 0, 0, 0 };
     }
 
+    // The far distance as the game's towns paint it: a panorama on the game's sky shader (Hex/Misc/TileableSkybox). The
+    // shader takes a direction's texture point as u = 0.5 - atan2(z, x) * scaleX / 2pi, v = 0.5 + elevation * scaleY /
+    // 180 degrees, after turning the direction back by rotationY about the vertical and rotationX in the turned x-y
+    // plane: the picture goes scaleX times round the horizon, its middle row is the horizon, it is 180 / scaleY degrees
+    // high (beyond, its top and bottom rows go on); rotationY 90 puts its middle before a camera facing +z, rotationX
+    // then raises its horizon there. The colour is the picture's times tint and exposure (no fog on it).
+    public sealed class SkySpec
+    {
+        public string Image { get; set; }
+        public float ScaleX { get; set; } = 3;
+        public float ScaleY { get; set; } = 6;
+        public float RotationY { get; set; } = 90;
+        public float RotationX { get; set; }
+        public float[] Tint { get; set; } = { 1, 1, 1 };
+        public float Exposure { get; set; } = 1;
+    }
+
     public sealed class DepthOfFieldSpec
     {
         public float FocusDistance { get; set; } = 31;
@@ -76,6 +94,7 @@ sealed partial class CityScene
 
     void AddLighting(LightingSpec spec)
     {
+        var sky = spec.Sky is { } skySpec ? Sky(skySpec) : 0;
         var light = Settings("Hex.Render", "LightingSettings", "LightingSettings", Assembly, new (string, string)[]
         {
             ("mainLightColor", "Color"), ("mainLightIntensity", "Float"), ("lightZenithAngle", "Float"),
@@ -92,6 +111,11 @@ sealed partial class CityScene
             Float(v, "lightAzimuthAngle", spec.Sun.Azimuth);
             Float(v, "shadowsStrength", spec.Sun.Shadows);
             Float(v, "emissionStrength", spec.EmissionStrength);
+            if (sky != 0)
+            {
+                v["skybox.overrideState"].AsBool = true;
+                (v["skybox.value.m_FileID"].AsInt, v["skybox.value.m_PathID"].AsLong) = (0, sky);
+            }
             Color(v, "ambientColor", spec.Ambient);
             Bool(v, "ssaoEnabled", true);
             Float(v, "ssaoIntensity", spec.Ssao.Intensity);
@@ -151,6 +175,58 @@ sealed partial class CityScene
         if (effects.Count > 0)
             Volume("PostProcesEffects", effects.ToArray());
         Console.WriteLine($"  lighting: sun {spec.Sun.Intensity} at {spec.Sun.Height}/{spec.Sun.Azimuth}, fog {(spec.Fog is { } f ? $"{f.Start}-{f.End}" : "off")}, {effects.Count} effects");
+    }
+
+    const string SkyShader = "Hex/Misc/TileableSkybox";
+
+    // The sky as the game's towns draw theirs: the panorama a texture (repeating round, clamped up and down), its
+    // material on the game's sky shader, which the light volume gives the game's pipeline (LightingSettings.skybox: the
+    // pipeline makes it the scene's skybox on every render), the town camera cleared to it. A bundle cannot carry the
+    // game's shader: the material's is a stand-in of its name (one of the shared assets' shaders copied and renamed),
+    // which the mod library replaces with the game's when the scene is loaded (ModScenes).
+    long Sky(LightingSpec.SkySpec spec)
+    {
+        if (spec.Image == null)
+            throw new Exception("lighting.sky.image: the panorama picture");
+        long texture = nextShared++, shader = nextShared++, material = nextShared++;
+        var name = Path.GetFileNameWithoutExtension(spec.Image);
+        CloneShared(AssetClassID.Texture2D, texture, v => WriteTexture(v, spec.Image, name, 0, linear: false, repeat: true, clampV: true, upright: true));
+        CloneShared(AssetClassID.Shader, shader, v => v["m_ParsedForm.m_Name"].AsString = SkyShader);
+        CloneShared(AssetClassID.Material, material, v =>
+        {
+            v["m_Name"].AsString = name;
+            (v["m_Shader.m_FileID"].AsInt, v["m_Shader.m_PathID"].AsLong) = (0, shader);
+            foreach (var list in new[] { "m_ValidKeywords", "m_InvalidKeywords", "disabledShaderPasses" })
+                if (!v[list].IsDummy)
+                    v[list]["Array"].Children.Clear();
+            if (!v["stringTagMap"].IsDummy)
+                v["stringTagMap.Array"].Children.Clear();
+            v["m_CustomRenderQueue"].AsInt = -1;
+            var properties = v["m_SavedProperties"];
+            foreach (var list in new[] { "m_TexEnvs", "m_Ints", "m_Floats", "m_Colors" })
+                if (!properties[list].IsDummy)
+                    properties[list]["Array"].Children.Clear();
+            Add(properties["m_TexEnvs.Array"], e =>
+            {
+                e["first"].AsString = "_MainTex";
+                (e["second.m_Texture.m_FileID"].AsInt, e["second.m_Texture.m_PathID"].AsLong) = (0, texture);
+                e["second.m_Scale.x"].AsFloat = e["second.m_Scale.y"].AsFloat = 1;
+            });
+            foreach (var (property, value) in new[] { ("_Exposure", spec.Exposure), ("_RotationY", spec.RotationY),
+                         ("_RotationX", spec.RotationX), ("_ScaleY", spec.ScaleY), ("_ScaleX", spec.ScaleX) })
+                Add(properties["m_Floats.Array"], e => (e["first"].AsString, e["second"].AsFloat) = (property, value));
+            Add(properties["m_Colors.Array"], e =>
+            {
+                e["first"].AsString = "_Tint";
+                (e["second.r"].AsFloat, e["second.g"].AsFloat, e["second.b"].AsFloat) = (spec.Tint[0], spec.Tint[1], spec.Tint[2]);
+                e["second.a"].AsFloat = 1;
+            });
+        });
+        Preload(texture, shader, material);
+        foreach (var camera in townCameras)
+            Edit(camera, v => v["m_ClearFlags"].AsUInt = 1);
+        Console.WriteLine($"  sky: {name}, {spec.ScaleX} times round, {180 / spec.ScaleY:0.#} degrees high, turned {spec.RotationY}/{spec.RotationX}");
+        return material;
     }
 
     // The scene's directional light made its sun, as the game's towns' "Sun": the game's main light marker on it (a

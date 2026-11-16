@@ -103,11 +103,28 @@ interface over it). The tool makes them of the scene's objects:
 
   the light volume holds the game's own effect `Hex.Render.LightingSettings`, which the game's pipeline sets its sun
   (turned to `height` and `azimuth`, its colour, strength and shadows), ambient light, SSAO and fog from on every
-  render; the scene's directional light becomes the sun (the game's main light marker on it, shadows on). `bloom`,
+  render; the scene's directional light becomes the sun (the game's main light marker on it, shadows on); `sky`: below.
+  `bloom`,
   `vignette` and `depthOfField` go in a second volume (depth of field left the picture black until turned off and on
   again, 16.11: left out of the test town). The library gives the town camera the game's post-processing layer when
   the scene loads (its resources are the game's, which a bundle cannot carry). For scale, the game's own towns: the
   human town's sun 1.3 at 31 degrees, fog 2.5-30; the nature town's 2.45 at 35 degrees, fog 17-80.
+- `lighting.sky`: the far distance as the game's towns paint it, a panorama on the game's sky shader
+  (`Hex/Misc/TileableSkybox`):
+
+  ```json
+  "sky": { "image": "sky/panorama.png", "scaleX": 3, "scaleY": 6, "rotationY": 90, "rotationX": 0, "tint": [1, 1, 1], "exposure": 1 }
+  ```
+
+  the picture goes `scaleX` times round the horizon (so it repeats every 360 / `scaleX` degrees: its left and right
+  edges must join), its middle row is the horizon and its height spans 180 / `scaleY` degrees (beyond, its top and
+  bottom rows go on up and down); `rotationY` turns it about the vertical (90: its middle before a camera facing +z),
+  `rotationX` then raises its horizon by that many degrees in front. The game's nature town: a 4096x1380 picture,
+  `scaleX` 3, `scaleY` 4.94, so about 34 pixels a degree both ways. Its colour is the picture's times `tint` and
+  `exposure`; the fog does not reach it, so the picture's haze at the horizon should be the fog's colour. The light
+  volume's `LightingSettings.skybox` gets the sky's material, which the game's pipeline makes the scene's skybox on every
+  render, and the town camera clears to it; the material's shader is a stand-in the library replaces with the game's
+  when the scene is loaded.
 - `models` entries cast shadows when drawn on a shader of the game's (`Hex/...`), not when unlit (a painted backdrop);
   `"castShadows"` says otherwise.
 

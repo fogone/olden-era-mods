@@ -468,7 +468,13 @@ ground as the game's towns have theirs, the buildings as models of their own. Wh
   another shader keeps its own render states, and `Hex/Lit` with a stand-in's `_ZTest` (7, greater-or-equal) draws only
   where something is in front of it, which is nowhere. The model's material is made a copy of a game material on that
   shader, its main texture the model's (`ModScenes`).
-- **A sky** is a model too: a half cylinder with a sky picture (`tools/terrain/sky.py`), drawn unlit, both sides.
+- **The sky is the game's kind** (`lighting.sky` in `oe-bundle city`): a panorama on the game's sky shader
+  (`Hex/Misc/TileableSkybox`), which the light volume gives the game's pipeline, as the game's towns have theirs (the
+  nature town's: a 4096x1380 picture three times round, about 34 pixels a degree). The picture's left and right edges
+  join, its middle row is the horizon; the fog does not reach it, so its haze at the horizon is the fog's colour. A
+  model in front must not paint a sky of its own: a landscape made from a picture with its depth leaves the picture's
+  sky and far distance out (a depth estimate gives them an inverse depth about 0, which a fit of the near ground would
+  put a hundred metres away). Checked 16.11.2026 in the test town: the panorama where the shader's mapping puts it.
 - **Roads and trodden ground come from a plan**, not from a picture: the buildings' places and the roads as lines (x,
   z, width) give the splat map's road weight by the distance to the lines, a little noise on the edges; a road narrower
   than it looks on a concept picture reads right at the town's scale (about a metre for the main road). A light town

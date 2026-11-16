@@ -173,7 +173,7 @@ sealed partial class CityScene
     void CloneShared(AssetClassID type, long id, Action<AssetTypeValueField> change)
     {
         var source = shared.file.GetAssetsOfType(type).FirstOrDefault()
-            ?? throw new Exception($"terrain: the scene's shared assets have no {type} to make one of (put a model into the scene)");
+            ?? throw new Exception($"the scene's shared assets have no {type} to make one of (put a model into the scene)");
         var v = am.GetBaseField(shared, source);
         change(v);
         var info = AssetFileInfo.Create(shared.file, id, (int)type, 0xFFFF, null, false);
@@ -182,9 +182,11 @@ sealed partial class CityScene
     }
 
     // A texture of an image: RGBA32 with its mipmaps, the rows as the image has them (its first row is v = 0: for the
-    // splat map z = 0); a square of the size given, or of any size (0). The splat map is linear and clamped, a layer's
-    // image a colour (sRGB) repeating.
-    static void WriteTexture(AssetTypeValueField v, string path, string name, int size, bool linear, bool repeat)
+    // splat map z = 0), or upright (its first row the top, v = 1: a picture); a square of the size given, or of any size
+    // (0). The splat map is linear and clamped, a layer's image a colour (sRGB) repeating, a sky's repeating round and
+    // clamped up and down (clampV).
+    static void WriteTexture(AssetTypeValueField v, string path, string name, int size, bool linear, bool repeat,
+        bool clampV = false, bool upright = false)
     {
         // Read as it is (unpremultiplied): a splat map's alpha is a weight, the colour must not be multiplied by it.
         using var codec = SKCodec.Create(path) ?? throw new Exception($"terrain: {path} could not be read");
@@ -194,8 +196,17 @@ sealed partial class CityScene
         using var image = new SKBitmap(info);
         if (codec.GetPixels(info, image.GetPixels()) is not (SKCodecResult.Success or SKCodecResult.IncompleteInput))
             throw new Exception($"terrain: {path} could not be read");
+        var pixels = image.Bytes;
+        if (upright)
+        {
+            var row = image.Width * 4;
+            var flipped = new byte[pixels.Length];
+            for (var y = 0; y < image.Height; y++)
+                Array.Copy(pixels, y * row, flipped, (image.Height - 1 - y) * row, row);
+            pixels = flipped;
+        }
         // The mipmaps: each the average of four of the level above, channel by channel (alpha a channel as the others).
-        var levels = new List<byte[]> { image.Bytes };
+        var levels = new List<byte[]> { pixels };
         for (int w = image.Width, h = image.Height; w > 1 || h > 1;)
         {
             int nw = Math.Max(1, w / 2), nh = Math.Max(1, h / 2);
@@ -220,6 +231,8 @@ sealed partial class CityScene
         settings["m_FilterMode"].AsInt = 2;
         settings["m_Aniso"].AsInt = repeat ? 4 : 1;
         settings["m_WrapU"].AsInt = settings["m_WrapV"].AsInt = settings["m_WrapW"].AsInt = repeat ? 0 : 1;
+        if (clampV)
+            settings["m_WrapV"].AsInt = 1;
         v["m_TextureFormat"].AsInt = 4;
         v["m_MipCount"].AsInt = levels.Count;
         v["m_CompleteImageSize"].AsUInt = (uint)all.Length;
